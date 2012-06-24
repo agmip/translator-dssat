@@ -1,35 +1,66 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.agmip.translators</groupId>
-  <artifactId>translator-dssat</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <name>translator-dssat</name>
-  <description>
-      AgMIP DSSAT Translator
-  </description>
-  <url>http://www.agmip.org/</url>
+    <groupId>org.agmip.translators</groupId>
+    <artifactId>translator-dssat</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>translator-dssat</name>
+    <description>
+        AgMIP DSSAT Translator
+    </description>
+    <url>http://www.agmip.org/</url>
 
-  <parent>
-      <groupId>org.agmip.translators</groupId>
-      <artifactId>translator-dist</artifactId>
-      <version>0.1</version>
-  </parent>
+    <parent>
+        <groupId>org.agmip.translators</groupId>
+        <artifactId>translator-dist</artifactId>
+        <version>0.1</version>
+    </parent>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-  <dependencies>
-      <dependency>
-          <groupId>org.agmip</groupId>
-          <artifactId>agmip-core</artifactId>
-      </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-  </dependencies>
+    <licenses>
+        <license>
+            <url>http://raw.github.com/agmip/translator-dssat/LICENSE</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Meng Zhang</name>
+            <email>meng.zhang15@ufl.edu</email>
+            <roles>
+                <role>Module Lead</role>
+                <role>Contributor</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Christopher Villalobos</name>
+            <email>cvillalobos@ufl.edu</email>
+            <roles>
+                <role>Contributor</role>
+                <role>Maintainer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.agmip</groupId>
+            <artifactId>agmip-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
+
+    <scm>
+        <connection>scm:git:git://github.com/agmip/translator-dssat.git</connection>
+        <developerConnection>scm:git:git@github.com:agmip/translator-dssat.git</developerConnection>
+        <url>https://github.com/agmip/translator-dssat</url>
+    </scm>
 </project>
