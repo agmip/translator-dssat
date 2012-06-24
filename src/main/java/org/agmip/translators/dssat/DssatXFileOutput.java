@@ -15,9 +15,14 @@ import org.agmip.util.JSONAdapter;
  * @version 1.0
  */
 public class DssatXFileOutput extends DssatCommonOutput {
+    private File outputFile;
 
     // Define necessary id for the experiment data
     private static String[] necessaryData = {"pdate", "plpop,plpoe", "plrs", "cr", "cul_id", "wst_insi", "soil_id"};
+
+    public File getOutputFile() {
+        return outputFile;
+    }
 
     /**
      * DSSAT Experiment Data Output method
@@ -96,7 +101,10 @@ public class DssatXFileOutput extends DssatCommonOutput {
             } else {
                 fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "X";
             }
-            br = new BufferedWriter(new FileWriter(new File(fileName)));
+
+            outputFile = new File(fileName);
+
+            br = new BufferedWriter(new FileWriter(outputFile));
             data = result;
 
             // Output XFile

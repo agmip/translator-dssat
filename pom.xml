@@ -21,6 +21,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <organization>
+        <name>AgMIP - Agricultural Model Intercomparison and Improvement Project</name>
+        <url>http://www.agmip.org/</url>
+    </organization>
+
     <licenses>
         <license>
             <url>http://raw.github.com/agmip/translator-dssat/LICENSE</url>
@@ -32,8 +37,8 @@
             <name>Meng Zhang</name>
             <email>meng.zhang15@ufl.edu</email>
             <roles>
-                <role>Module Lead</role>
                 <role>Contributor</role>
+                <role>Module Lead</role>
             </roles>
         </developer>
         <developer>
@@ -56,6 +61,29 @@
             <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <scm>
         <connection>scm:git:git://github.com/agmip/translator-dssat.git</connection>

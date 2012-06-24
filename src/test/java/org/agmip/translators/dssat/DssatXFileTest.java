@@ -1,10 +1,12 @@
 package org.agmip.translators.dssat;
 
 import java.io.IOException;
+import java.io.File;
 import org.agmip.core.types.AdvancedHashMap;
 import org.agmip.util.JSONAdapter;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 /**
@@ -35,8 +37,12 @@ public class DssatXFileTest {
         
         result = j.fromJSON(jsonExample);
         obDssatXFileOutput.writeFile("", result);
+
+        File file = obDssatXFileOutput.getOutputFile();
+        assertTrue(file.exists());
         
         result = obDssatXFileInput.readFile(filePath);
         System.out.println(j.toJSON(result));
+        assertTrue(file.delete());
     }
 }

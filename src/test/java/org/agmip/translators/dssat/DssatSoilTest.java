@@ -1,10 +1,12 @@
 package org.agmip.translators.dssat;
 
 import java.io.IOException;
+import java.io.File;
 import org.agmip.core.types.AdvancedHashMap;
 import org.agmip.util.JSONAdapter;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 
 /**
@@ -30,5 +32,9 @@ public class DssatSoilTest {
         JSONAdapter j = new JSONAdapter();
         AdvancedHashMap<String, Object> result = j.fromJSON(jsonExample);
         obDssatSoil.writeFile("", result);
+        File file = obDssatSoil.getOutputFile();
+        assertTrue(file.exists());
+        assertTrue(file.delete());
+
     }
 }

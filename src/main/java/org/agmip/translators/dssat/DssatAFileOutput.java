@@ -15,6 +15,11 @@ import org.agmip.util.JSONAdapter;
  * @version 1.0
  */
 public class DssatAFileOutput extends DssatCommonOutput {
+    private File outputFile;
+
+    public File getOutputFile() {
+        return outputFile;
+    }
 
     /**
      * DSSAT Observation Data Output method
@@ -207,7 +212,12 @@ public class DssatAFileOutput extends DssatCommonOutput {
             } else {
                 fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "A";
             }
-            br = new BufferedWriter(new FileWriter(new File(fileName)));
+            if (! arg0.equals("") ) {
+                fileName = arg0 + File.separator + fileName;
+            }
+            outputFile = new File(fileName);
+
+            br = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Observation File
             // Titel Section

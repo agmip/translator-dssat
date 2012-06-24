@@ -18,6 +18,11 @@ import org.agmip.util.JSONAdapter;
  * @version 1.0
  */
 public class DssatWeatherOutput extends DssatCommonOutput {
+    private File outputFile;
+
+    public File getOutputFile() {
+        return outputFile;
+    }
 
     /**
      * DSSAT Weather Data Output method
@@ -58,7 +63,9 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             } else {
                 fileName += data.getOr("w_date", "00").toString().substring(0, 2) + "01.WTH";
             }
-            br = new BufferedWriter(new FileWriter(new File(fileName)));
+
+            outputFile = new File(fileName);
+            br = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Weather File
             // Titel Section

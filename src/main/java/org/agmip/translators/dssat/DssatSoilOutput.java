@@ -16,6 +16,11 @@ import org.agmip.util.JSONAdapter;
  * @version 1.0
  */
 public class DssatSoilOutput extends DssatCommonOutput {
+    private File outputFile;
+
+    public File getOutputFile() {
+        return outputFile;
+    }
 
     /**
      * DSSAT Soil Data Output method
@@ -50,7 +55,9 @@ public class DssatSoilOutput extends DssatCommonOutput {
             } else {
                 fileName = fileName.substring(0, 2) + ".SOL";
             }
-            br = new BufferedWriter(new FileWriter(new File(fileName)));
+
+            outputFile = new File(fileName);
+            br = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Soil File
             // Titel Section
