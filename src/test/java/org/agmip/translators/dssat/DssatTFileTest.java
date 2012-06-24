@@ -1,4 +1,4 @@
-package org.agmip.core.translators;
+package org.agmip.translators.dssat;
 
 import java.io.IOException;
 import org.agmip.core.types.AdvancedHashMap;

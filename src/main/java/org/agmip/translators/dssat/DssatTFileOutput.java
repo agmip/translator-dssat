@@ -1,4 +1,4 @@
-package org.agmip.core.translators;
+package org.agmip.translators.dssat;
 
 import java.io.BufferedWriter;
 import java.io.File;

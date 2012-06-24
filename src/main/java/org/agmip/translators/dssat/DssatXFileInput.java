@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.agmip.core.translators;
+package org.agmip.translators.dssat;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
