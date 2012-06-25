@@ -1,14 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.agmip.translators.dssat;
 
 import org.agmip.core.types.AdvancedHashMap;
 
 /**
  *
- * @author Mike
+ * @author Meng Zhang
  */
 public class DssatControllerOutput {
 

@@ -63,8 +63,8 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             } else {
                 fileName += data.getOr("w_date", "00").toString().substring(0, 2) + "01.WTH";
             }
-
-            outputFile = new File(fileName);
+            arg0 = revisePath(arg0);
+            outputFile = new File(arg0 + fileName);
             br = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Weather File

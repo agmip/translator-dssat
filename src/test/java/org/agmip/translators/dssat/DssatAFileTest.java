@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author mike
+ * @author Meng Zhang
  */
 public class DssatAFileTest {
     

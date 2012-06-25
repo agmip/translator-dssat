@@ -27,7 +27,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
     /**
      * DSSAT Experiment Data Output method
      * 
-     * @param arg0  file name(?)
+     * @param arg0  file output path
      * @param result  data holder object
      */
     @Override
@@ -85,7 +85,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 if (strs != null) {
                     //throw new Exception("Incompleted record because missing data : [" + necessaryData[i] + "]");
                     //System.out.println("Incompleted record because missing data : [" + necessaryData[i] + "]");
-                    sbError.append("! Warning: Incompleted record because missing data : [" + necessaryData[i] + "]");
+                    sbError.append("! Warning: Incompleted record because missing data : [").append(necessaryData[i]).append("]");
                     //return;
                 }
             }
@@ -101,9 +101,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
             } else {
                 fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "X";
             }
-
-            outputFile = new File(fileName);
-
+            arg0 = revisePath(arg0);
+            outputFile = new File(arg0 + fileName);
             br = new BufferedWriter(new FileWriter(outputFile));
             data = result;
 
@@ -149,10 +148,10 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 } // Otherwise, add newline for every 75-bits charactors
                 else {
                     while (notes.length() > 75) {
-                        sbData.append(" " + notes.substring(0, 75) + "\r\n");
+                        sbData.append(" ").append(notes.substring(0, 75)).append("\r\n");
                         notes = notes.substring(75);
                     }
-                    sbData.append(" " + notes + "\r\n");
+                    sbData.append(" ").append(notes).append("\r\n");
                 }
             }
             sbData.append("\r\n");
@@ -281,7 +280,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             data.getOr("flhst", defValC).toString(),
                             formatNumStr(5, data.getOr("fhdur", defValR).toString())));
                 }
-                sbData.append(eventPart2.toString() + "\r\n");
+                sbData.append(eventPart2.toString()).append("\r\n");
             }
 
             // SOIL ANALYSIS Section

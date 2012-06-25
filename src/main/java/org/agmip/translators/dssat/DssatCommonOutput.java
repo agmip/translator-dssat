@@ -144,4 +144,20 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 
         return ret;
     }
+    
+    /**
+     * Revise output path
+     *
+     * @param path the output path
+     * @return revised path
+     */
+    protected String revisePath(String path) {
+        if (!path.trim().equals("")) {
+            path = path.replaceAll("/", "\\");
+            if (path.endsWith("\\")) {
+                path +="\\";
+            }
+        }
+        return path;
+    }
 }

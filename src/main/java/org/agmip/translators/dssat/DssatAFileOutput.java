@@ -215,8 +215,8 @@ public class DssatAFileOutput extends DssatCommonOutput {
             if (! arg0.equals("") ) {
                 fileName = arg0 + File.separator + fileName;
             }
-            outputFile = new File(fileName);
-
+            arg0 = revisePath(arg0);
+            outputFile = new File(arg0 + fileName);
             br = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Observation File

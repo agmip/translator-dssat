@@ -25,7 +25,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
     /**
      * DSSAT Soil Data Output method
      * 
-     * @param arg0  file name(?)
+     * @param arg0   file output path
      * @param result  data holder object
      */
     @Override
@@ -55,8 +55,8 @@ public class DssatSoilOutput extends DssatCommonOutput {
             } else {
                 fileName = fileName.substring(0, 2) + ".SOL";
             }
-
-            outputFile = new File(fileName);
+            arg0 = revisePath(arg0);
+            outputFile = new File(arg0 + fileName);
             br = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Soil File
@@ -98,7 +98,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
                         data.getOr("smke", defValC).toString()));
 
                 // Soil Layer data section
-                ArrayList soilRecords = (ArrayList) data.getOr("SoilLayer", new ArrayList());
+                ArrayList soilRecords = (ArrayList) data.getOr("SoilLayer", new ArrayList()); // TODO the key name might change
 
                 // part one
                 sbData.append("@  SLB  SLMH  SLLL  SDUL  SSAT  SRGF  SSKS  SBDM  SLOC  SLCL  SLSI  SLCF  SLNI  SLHW  SLHB  SCEC  SADC\r\n");
@@ -162,7 +162,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
 
                 // Add part two
                 if (p2Flg) {
-                    sbData.append(sbLyrP2.toString() + "\r\n");
+                    sbData.append(sbLyrP2.toString()).append("\r\n");
                 }
             }
 
