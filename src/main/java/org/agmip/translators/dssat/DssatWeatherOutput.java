@@ -18,6 +18,7 @@ import org.agmip.util.JSONAdapter;
  * @version 1.0
  */
 public class DssatWeatherOutput extends DssatCommonOutput {
+
     private File outputFile;
 
     public File getOutputFile() {
@@ -54,14 +55,14 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // Get Data from input holder
             data = result;
-            ArrayList weatherRecords = (ArrayList) data.getOr("WeatherDaily", new ArrayList());
+            ArrayList weatherRecords = (ArrayList) data.getOr("WeatherDaily", new ArrayList()); // TODO key might be changed
 
             // Initial BufferedWriter
             String fileName = data.getOr("wst_insi", "").toString();
             if (fileName.equals("")) {
                 fileName = "a.tmp";
             } else {
-                fileName += data.getOr("w_date", "00").toString().substring(0, 2) + "01.WTH";
+                fileName += adapter.exportRecord((Map) weatherRecords.get(0)).getOr("w_date", "2000").toString().substring(2, 4) + "01.WTH";
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
