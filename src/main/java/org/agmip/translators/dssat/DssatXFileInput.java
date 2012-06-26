@@ -54,7 +54,7 @@ public class DssatXFileInput extends DssatCommonInput {
         }
 
         while ((line = br.readLine()) != null) {
-            // TODO Create holders for each section and build final result holder in the last
+            
             // Get content type of line
             judgeContentType(line);
 
@@ -211,7 +211,7 @@ public class DssatXFileInput extends DssatCommonInput {
         }
 
         br.close();
-        brw.close();
+        if (brw != null) brw.close();
 
         return ret;
     }
