@@ -7,9 +7,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.agmip.core.types.AdvancedHashMap;
@@ -55,7 +57,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
             ret = readFile(getBufferReader(filePath));
 
         } catch (Exception e) {
-            System.out.println(e.toString());
+            //System.out.println(e.getMessage());
+            e.printStackTrace();
         }
 
         return ret;
@@ -169,14 +172,11 @@ public abstract class DssatCommonInput implements TranslatorInput {
         int length;
 
         for (String key : formats.keySet()) {
-            length = (Integer) formats.get(key);
-            if (length <= line.length()) {
+            length = Math.min((Integer) formats.get(key), line.length());
+            if (!((String)key).contains("null")) {
                 ret.put(key, line.substring(0, length).trim());
-                line = line.substring(length);
-            } else {
-                ret.put(key, line.trim());
-                line = "";
             }
+            line = line.substring(length);
         }
 
         return ret;
@@ -281,5 +281,70 @@ public abstract class DssatCommonInput implements TranslatorInput {
         char[] buf = new char[size];
         br.read(buf);
         return new BufferedReader(new CharArrayReader(buf));
+    }
+
+    /**
+     * compress the data in a map object
+     *
+     * @param m input map
+     */
+    protected void compressData(AdvancedHashMap m) {
+        
+        for (Object key : m.keySet()) {
+            if (m.get(key).getClass().equals(ArrayList.class)) {
+                // iterate sub array nodes
+                compressData((ArrayList) m.get(key));
+            } else if (m.get(key).getClass().equals(AdvancedHashMap.class)) {
+                // iterate sub data nodes
+                compressData((AdvancedHashMap) m.get(key));
+            } else {
+                // ignore other type nodes
+            }
+        }
+        
+    }
+
+    /**
+     * compress the data in an ArrayList object
+     *
+     * @param arr input ArrayList
+     *
+     */
+    protected void compressData(ArrayList arr) {
+        
+        AdvancedHashMap fstData = null; // The first data record (Map type)
+        AdvancedHashMap cprData = null; // The following data record which will be compressed
+        
+        
+        for (int i = 0; i < arr.size(); i++) {
+            if (arr.get(i).getClass().equals(ArrayList.class)) {
+                // iterate sub array nodes
+                compressData((ArrayList) arr.get(i));
+            } else if (arr.get(i).getClass().equals(AdvancedHashMap.class)) {
+                // iterate sub data nodes
+                compressData((AdvancedHashMap) arr.get(i));
+                
+                // Compress data for current array
+                if (fstData == null) {
+                    // Get first data node
+                    fstData = (AdvancedHashMap) arr.get(i);
+                } else {
+                    cprData = (AdvancedHashMap) arr.get(i);
+                    Object[] keys = cprData.keySet().toArray();
+                    // The missing data will be given a "" value; Only data item (String type) will be processed
+                    for (Object key : fstData.keySet()) {
+                        if (fstData.get(key).getClass().equals(String.class)  && !cprData.containsKey(key)) {
+                            cprData.put(key, "");
+                        }
+                    }
+                    // The repeated data will be deleted; Only data item (String type) will be processed
+                    for (Object key : keys) {
+                        if (cprData.get(key).getClass().equals(String.class) && cprData.get(key).equals(fstData.get(key))) {
+                            cprData.remove(key);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

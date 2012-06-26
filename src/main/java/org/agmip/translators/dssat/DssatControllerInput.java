@@ -23,7 +23,13 @@ public class DssatControllerInput {
         }
         
         for (int i = 0; i < inputs.length; i++) {
-            ret.put(inputs[i].jsonKey, inputs[i].readFile(brMap));
+            // If return map contains multiple file, like soil or weather, get ArrayList from the return map
+            if (inputs[i].jsonKey.equals("soil") || inputs[i].jsonKey.equals("weather")) {
+                ret.put(inputs[i].jsonKey, inputs[i].readFile(brMap).get(inputs[i].jsonKey));
+            } else {
+                ret.put(inputs[i].jsonKey, inputs[i].readFile(brMap));
+            }
+            
         }
         
         return ret;
