@@ -201,26 +201,4 @@ public class DssatSoilInput extends DssatCommonInput {
         flg[1] = "";
         flg[2] = "data";
     }
-
-    /**
-     * Add the new item into array by having same key value
-     * 
-     * @param arr   the target array
-     * @param item  the input item which will be added into array
-     * @param key   the primary key item's name
-     */
-    private void addToArray(ArrayList arr, AdvancedHashMap item, Object key) {
-        AdvancedHashMap elem;
-        boolean unmatchFlg = true;
-        for (int i = 0; i < arr.size(); i++) {
-            elem = (AdvancedHashMap) arr.get(i);
-            if (elem.get(key).equals(item.get(key))) {
-                elem.put(item);
-                break;
-            }
-        }
-        if (unmatchFlg) {
-            arr.add(item);
-        }
-    }
 }

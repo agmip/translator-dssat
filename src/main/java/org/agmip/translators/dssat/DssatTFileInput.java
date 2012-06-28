@@ -8,25 +8,25 @@ import java.util.LinkedHashMap;
 import org.agmip.core.types.AdvancedHashMap;
 
 /**
- * DSSAT AFile Data I/O API Class
+ * DSSAT TFile Data I/O API Class
  * 
  * @author Meng Zhang
  * @version 1.0
  */
-public class DssatAFileInput extends DssatCommonInput {
+public class DssatTFileInput extends DssatCommonInput {
 
     /**
      * Constructor with no parameters
      * Set jsonKey as "observed"
      * 
      */
-    public DssatAFileInput() {
+    public DssatTFileInput() {
         super();
         jsonKey = "observed";
     }
 
     /**
-     * DSSAT AFile Data input method for Controller using
+     * DSSAT TFile Data input method for Controller using
      * 
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
@@ -37,24 +37,25 @@ public class DssatAFileInput extends DssatCommonInput {
         AdvancedHashMap ret = new AdvancedHashMap();
         AdvancedHashMap file = new AdvancedHashMap();
         String line;
-        BufferedReader brA;
+        BufferedReader brT;
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
         ArrayList obvData = new ArrayList();
+        ArrayList obvDataSection = new ArrayList();
         String obvDataKey = "data";  // TODO the key name might change
-        String obvFileKey = "average";  // TODO the key name might change
+        String obvFileKey = "time_course";  // TODO the key name might change
 
-        brA = (BufferedReader) brMap.get("A");
+        brT = (BufferedReader) brMap.get("T");
 
         // If AFile File is no been found
-        if (brA == null) {
+        if (brT == null) {
             // TODO reprot file not exist error
             return ret;
         }
 
         ret.put(obvFileKey, file);
         file.put(obvDataKey, obvData);
-        while ((line = brA.readLine()) != null) {
+        while ((line = brT.readLine()) != null) {
 
             // Get content type of line
             judgeContentType(line);
@@ -75,13 +76,22 @@ public class DssatAFileInput extends DssatCommonInput {
                         formats.put(titles.get(i), 6);
                     }
                     // Read line and save into return holder
-                    addToArray(obvData, readLine(line, formats), "trno");
+                    
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    // translate date from yyddd format to yyyymmdd format
+                    tmp.put("date", translateDateStr((String) tmp.get("date")));
+                    // Add data to the array
+                    String[] keys = {"trno", "date"};
+                    addToArray(obvDataSection,tmp, keys);
                 }
 
             } // Read Observed title
             else if (flg[2].equals("title")) {
 
                 titles = new ArrayList();
+                obvDataSection = new ArrayList();
+                obvData.add(obvDataSection);
                 line = line.replaceFirst("@", " ");
                 for (int i = 0; i < line.length(); i += 6) {
                     titles.add(line.substring(i, Math.min(i + 6, line.length())).trim().toLowerCase());
@@ -91,7 +101,7 @@ public class DssatAFileInput extends DssatCommonInput {
             }
         }
 
-        brA.close();
+        brT.close();
 
         return ret;
     }

@@ -173,7 +173,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
         for (String key : formats.keySet()) {
             length = Math.min((Integer) formats.get(key), line.length());
-            if (!((String)key).contains("null")) {
+            if (!((String) key).contains("null")) {
                 ret.put(key, line.substring(0, length).trim());
             }
             line = line.substring(length);
@@ -289,7 +289,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param m input map
      */
     protected void compressData(AdvancedHashMap m) {
-        
+
         for (Object key : m.keySet()) {
             if (m.get(key).getClass().equals(ArrayList.class)) {
                 // iterate sub array nodes
@@ -301,7 +301,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 // ignore other type nodes
             }
         }
-        
+
     }
 
     /**
@@ -311,19 +311,19 @@ public abstract class DssatCommonInput implements TranslatorInput {
      *
      */
     protected void compressData(ArrayList arr) {
-        
+
         AdvancedHashMap fstData = null; // The first data record (Map type)
         AdvancedHashMap cprData = null; // The following data record which will be compressed
-        
-        
+
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i).getClass().equals(ArrayList.class)) {
                 // iterate sub array nodes
                 compressData((ArrayList) arr.get(i));
+                
             } else if (arr.get(i).getClass().equals(AdvancedHashMap.class)) {
                 // iterate sub data nodes
                 compressData((AdvancedHashMap) arr.get(i));
-                
+
                 // Compress data for current array
                 if (fstData == null) {
                     // Get first data node
@@ -333,7 +333,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                     Object[] keys = cprData.keySet().toArray();
                     // The missing data will be given a "" value; Only data item (String type) will be processed
                     for (Object key : fstData.keySet()) {
-                        if (fstData.get(key).getClass().equals(String.class)  && !cprData.containsKey(key)) {
+                        if (fstData.get(key).getClass().equals(String.class) && !cprData.containsKey(key)) {
                             cprData.put(key, "");
                         }
                     }
@@ -344,7 +344,47 @@ public abstract class DssatCommonInput implements TranslatorInput {
                         }
                     }
                 }
+            } else {
             }
+        }
+    }
+
+    /**
+     * Add the new item into array by having same key value
+     * 
+     * @param arr   the target array
+     * @param item  the input item which will be added into array
+     * @param key   the primary key item's name
+     */
+    protected void addToArray(ArrayList arr, AdvancedHashMap item, Object key) {
+        AdvancedHashMap elem;
+        boolean unmatchFlg = true;
+        for (int i = 0; i < arr.size(); i++) {
+            elem = (AdvancedHashMap) arr.get(i);
+            if (!key.getClass().isArray()) {
+                if (elem.get(key).equals(item.get(key))) {
+                    elem.put(item);
+                    unmatchFlg = false;
+                    break;
+                }
+            } else {
+                Object [] keys = (Object[])key;
+                boolean equalFlg = true;
+                for (int j = 0; j < keys.length; j++) {
+                    if (!elem.get(keys[j]).equals(item.get(keys[j]))) {
+                        equalFlg = false;
+                        break;
+                    }
+                }
+                if (equalFlg) {
+                    elem.put(item);
+                    unmatchFlg = false;
+                    break;
+                }
+            }
+        }
+        if (unmatchFlg) {
+            arr.add(item);
         }
     }
 }
