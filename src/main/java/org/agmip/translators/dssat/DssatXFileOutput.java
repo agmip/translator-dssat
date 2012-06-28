@@ -15,11 +15,14 @@ import org.agmip.util.JSONAdapter;
  * @version 1.0
  */
 public class DssatXFileOutput extends DssatCommonOutput {
-    private File outputFile;
 
+    private File outputFile;
     // Define necessary id for the experiment data
     private static String[] necessaryData = {"pdate", "plpop,plpoe", "plrs", "cr", "cul_id", "wst_insi", "soil_id"};
 
+    /**
+     * Get output file object
+     */
     public File getOutputFile() {
         return outputFile;
     }
@@ -36,7 +39,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         // Initial variables
         JSONAdapter adapter = new JSONAdapter();    // JSON Adapter
         AdvancedHashMap<String, Object> data;       // Data holder for section data
-        BufferedWriter br;                          // output object
+        BufferedWriter bwX;                          // output object
         StringBuilder sbData = new StringBuilder();     // construct the data info in the output
         StringBuilder eventPart2;                   // output string for second part of event data
         ArrayList eventRecords;                     // Arraylist for event data holder
@@ -103,7 +106,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
-            br = new BufferedWriter(new FileWriter(outputFile));
+            bwX = new BufferedWriter(new FileWriter(outputFile));
             data = result;
 
             // Output XFile
@@ -596,9 +599,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
             sbData.append(createSMMAStr(0, result));
 
             // Output finish
-            br.write(sbError.toString());
-            br.write(sbData.toString());
-            br.close();
+            bwX.write(sbError.toString());
+            bwX.write(sbData.toString());
+            bwX.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

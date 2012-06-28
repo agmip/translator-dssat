@@ -21,6 +21,9 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
     private File outputFile;
 
+    /**
+     * Get output file object
+     */
     public File getOutputFile() {
         return outputFile;
     }
@@ -38,7 +41,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
         JSONAdapter adapter = new JSONAdapter();    // JSON Adapter
         AdvancedHashMap<String, Object> record;     // Data holder for daily data
         AdvancedHashMap<String, Object> data;       // Data holder for whole weather data
-        BufferedWriter br;                   // output object
+        BufferedWriter bwW;                   // output object
         StringBuilder sbData = new StringBuilder();     // construct the data info in the output
         HashMap optDaily = new HashMap();           // Define optional daily data fields
         optDaily.put("tdew", "  DEWP");
@@ -66,7 +69,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
-            br = new BufferedWriter(new FileWriter(outputFile));
+            bwW = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Weather File
             // Titel Section
@@ -128,9 +131,9 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             }
 
             // Output finish
-            br.write(sbError.toString());
-            br.write(sbData.toString());
-            br.close();
+            bwW.write(sbError.toString());
+            bwW.write(sbData.toString());
+            bwW.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

@@ -15,8 +15,12 @@ import org.agmip.util.JSONAdapter;
  * @version 1.0
  */
 public class DssatTFileOutput extends DssatCommonOutput {
+
     private File outputFile;
 
+    /**
+     * Get output file object
+     */
     public File getOutputFile() {
         return outputFile;
     }
@@ -34,7 +38,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
         JSONAdapter adapter = new JSONAdapter();    // JSON Adapter
         AdvancedHashMap<String, Object> record;     // Data holder for daily data
         AdvancedHashMap<String, Object> data;       // Data holder for whole Observation data
-        BufferedWriter br;                   // output object
+        BufferedWriter bwT;                   // output object
         StringBuilder sbData = new StringBuilder();     // construct the data info in the output
         HashMap titleList = new HashMap();          // Define necessary observation data fields
         // TODO Add neccessary fields here
@@ -601,7 +605,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
-            br = new BufferedWriter(new FileWriter(outputFile));
+            bwT = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Observation File
             // Titel Section
@@ -662,9 +666,9 @@ public class DssatTFileOutput extends DssatCommonOutput {
             }
 
             // Output finish
-            br.write(sbError.toString());
-            br.write(sbData.toString());
-            br.close();
+            bwT.write(sbError.toString());
+            bwT.write(sbData.toString());
+            bwT.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

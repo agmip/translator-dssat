@@ -319,7 +319,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             if (arr.get(i).getClass().equals(ArrayList.class)) {
                 // iterate sub array nodes
                 compressData((ArrayList) arr.get(i));
-                
+
             } else if (arr.get(i).getClass().equals(AdvancedHashMap.class)) {
                 // iterate sub data nodes
                 compressData((AdvancedHashMap) arr.get(i));
@@ -368,7 +368,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                     break;
                 }
             } else {
-                Object [] keys = (Object[])key;
+                Object[] keys = (Object[]) key;
                 boolean equalFlg = true;
                 for (int j = 0; j < keys.length; j++) {
                     if (!elem.get(keys[j]).equals(item.get(keys[j]))) {

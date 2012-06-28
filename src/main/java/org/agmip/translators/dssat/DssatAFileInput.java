@@ -91,7 +91,7 @@ public class DssatAFileInput extends DssatCommonInput {
             }
         }
 
-        brA.close();
+//        brA.close();
 
         return ret;
     }

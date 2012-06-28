@@ -16,8 +16,12 @@ import org.agmip.util.JSONAdapter;
  * @version 1.0
  */
 public class DssatSoilOutput extends DssatCommonOutput {
+
     private File outputFile;
 
+    /**
+     * Get output file object
+     */
     public File getOutputFile() {
         return outputFile;
     }
@@ -35,7 +39,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
         JSONAdapter adapter = new JSONAdapter();        // JSON Adapter
         AdvancedHashMap<String, Object> record;         // Data holder for layer data
         AdvancedHashMap<String, Object> data;           // Data holder for one record of soil data
-        BufferedWriter br;                              // output object
+        BufferedWriter bwS;                              // output object
         StringBuilder sbData = new StringBuilder();     // construct the data info in the output
         StringBuilder sbLyrP2 = new StringBuilder();    // output string for second part of layer data
         boolean p2Flg = false;
@@ -57,11 +61,11 @@ public class DssatSoilOutput extends DssatCommonOutput {
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
-            br = new BufferedWriter(new FileWriter(outputFile));
+            bwS = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Soil File
             // Titel Section
-            br.write("*SOILS\r\n\r\n");
+            bwS.write("*SOILS\r\n\r\n");
 
             // TODO Add Loop for multiple record of data
 //            ArrayList siteRecords = (ArrayList) result.getOr("soil", new ArrayList());
@@ -167,9 +171,9 @@ public class DssatSoilOutput extends DssatCommonOutput {
             }
 
             // Output finish
-            br.write(sbError.toString());
-            br.write(sbData.toString());
-            br.close();
+            bwS.write(sbError.toString());
+            bwS.write(sbData.toString());
+            bwS.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

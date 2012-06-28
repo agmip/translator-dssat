@@ -206,12 +206,10 @@ public class DssatXFileInput extends DssatCommonInput {
                 // TODO
             } else {
             }
-
-
         }
 
-        br.close();
-        if (brw != null) brw.close();
+//        br.close();
+//        if (brw != null) brw.close();
 
         return ret;
     }

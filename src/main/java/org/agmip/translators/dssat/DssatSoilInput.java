@@ -181,7 +181,7 @@ public class DssatSoilInput extends DssatCommonInput {
 
         compressData(files);
         ret.put(jsonKey, files);
-        brS.close();
+//        brS.close();
 
         return ret;
     }

@@ -1,5 +1,6 @@
 package org.agmip.translators.dssat;
 
+import java.io.File;
 import java.util.Calendar;
 import org.agmip.core.types.AdvancedHashMap;
 import org.agmip.core.types.TranslatorOutput;
@@ -144,7 +145,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 
         return ret;
     }
-    
+
     /**
      * Revise output path
      *
@@ -155,9 +156,14 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         if (!path.trim().equals("")) {
             path = path.replaceAll("/", "\\");
             if (path.endsWith("\\")) {
-                path +="\\";
+                path += "\\";
             }
         }
         return path;
     }
+
+    /**
+     * Get output file object
+     */
+    public abstract File getOutputFile();
 }

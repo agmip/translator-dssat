@@ -76,14 +76,14 @@ public class DssatTFileInput extends DssatCommonInput {
                         formats.put(titles.get(i), 6);
                     }
                     // Read line and save into return holder
-                    
+
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
                     // translate date from yyddd format to yyyymmdd format
                     tmp.put("date", translateDateStr((String) tmp.get("date")));
                     // Add data to the array
                     String[] keys = {"trno", "date"};
-                    addToArray(obvDataSection,tmp, keys);
+                    addToArray(obvDataSection, tmp, keys);
                 }
 
             } // Read Observed title
@@ -101,7 +101,7 @@ public class DssatTFileInput extends DssatCommonInput {
             }
         }
 
-        brT.close();
+//        brT.close();
 
         return ret;
     }

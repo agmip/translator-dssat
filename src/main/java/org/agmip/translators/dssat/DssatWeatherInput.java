@@ -142,7 +142,7 @@ public class DssatWeatherInput extends DssatCommonInput {
 
         compressData(files);
         ret.put(jsonKey, files);
-        brW.close();
+//        brW.close();
 
         return ret;
     }
