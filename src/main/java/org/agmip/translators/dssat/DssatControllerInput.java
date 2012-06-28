@@ -12,8 +12,18 @@ import org.agmip.core.types.AdvancedHashMap;
 public class DssatControllerInput {
 
     private DssatCommonInput[] inputs = {
-        new DssatXFileInput()};
+        new DssatSoilInput(),
+        new DssatWeatherInput(),
+        new DssatXFileInput(),
+        new DssatAFileInput(),
+        new DssatTFileInput()};
     
+    /**
+     * All DSSAT Data input method
+     * 
+     * @param brMap  The holder for BufferReader objects for all files
+     * @return result data holder object
+     */
     public AdvancedHashMap readFiles(String arg0) throws FileNotFoundException, IOException {
         
         HashMap brMap = new HashMap();
