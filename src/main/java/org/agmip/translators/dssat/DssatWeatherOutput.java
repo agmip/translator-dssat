@@ -66,7 +66,11 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             if (fileName.equals("")) {
                 fileName = "a.tmp";
             } else {
-                fileName += adapter.exportRecord((Map) weatherRecords.get(0)).getOr("w_date", "2000").toString().substring(2, 4) + "01.WTH";
+                if (weatherRecords.isEmpty()) {
+                    fileName += "0001.WTH";
+                } else {
+                    fileName += adapter.exportRecord((Map) weatherRecords.get(0)).getOr("w_date", "2000").toString().substring(2, 4) + "01.WTH";
+                }
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);

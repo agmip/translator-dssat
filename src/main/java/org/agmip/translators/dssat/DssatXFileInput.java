@@ -509,7 +509,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("om_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("omdat", translateDateStr((String) tmp.get("omdat")));
+                    tmp.put("omday", translateDateStr((String) tmp.get("omday")));
                     omArr.add(tmp);
                 } else {
                 }
