@@ -53,13 +53,9 @@ public class DssatXFileInput extends DssatCommonInput {
         ArrayList irArr = new ArrayList();
         ArrayList irdArr = new ArrayList();
         ArrayList feArr = new ArrayList();
-        ArrayList fedArr = new ArrayList();
         ArrayList omArr = new ArrayList();
-        ArrayList omdArr = new ArrayList();
         ArrayList chArr = new ArrayList();
-        ArrayList chdArr = new ArrayList();
         ArrayList tiArr = new ArrayList();
-        ArrayList tidArr = new ArrayList();
         ArrayList emArr = new ArrayList();
         ArrayList haArr = new ArrayList();
         ArrayList smArr = new ArrayList();
