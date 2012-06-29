@@ -173,7 +173,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
         for (String key : formats.keySet()) {
             length = Math.min((Integer) formats.get(key), line.length());
-            if (!((String) key).contains("null")) {
+            if (!((String) key).equals("")) {
                 ret.put(key, line.substring(0, length).trim());
             }
             line = line.substring(length);

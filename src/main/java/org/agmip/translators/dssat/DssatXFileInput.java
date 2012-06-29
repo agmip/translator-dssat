@@ -2,6 +2,7 @@ package org.agmip.translators.dssat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import org.agmip.core.types.AdvancedHashMap;
@@ -41,6 +42,28 @@ public class DssatXFileInput extends DssatCommonInput {
         String wid;
         String fileName;
         LinkedHashMap formats = new LinkedHashMap();
+        ArrayList trArr = new ArrayList();
+        ArrayList cuArr = new ArrayList();
+        ArrayList flArr = new ArrayList();
+        ArrayList saArr = new ArrayList();
+        ArrayList sadArr = new ArrayList();
+        ArrayList icArr = new ArrayList();
+        ArrayList icdArr = new ArrayList();
+        ArrayList plArr = new ArrayList();
+        ArrayList irArr = new ArrayList();
+        ArrayList irdArr = new ArrayList();
+        ArrayList feArr = new ArrayList();
+        ArrayList fedArr = new ArrayList();
+        ArrayList omArr = new ArrayList();
+        ArrayList omdArr = new ArrayList();
+        ArrayList chArr = new ArrayList();
+        ArrayList chdArr = new ArrayList();
+        ArrayList tiArr = new ArrayList();
+        ArrayList tidArr = new ArrayList();
+        ArrayList emArr = new ArrayList();
+        ArrayList haArr = new ArrayList();
+        ArrayList smArr = new ArrayList();
+        String eventKey = "data";
 
         br = (BufferedReader) brMap.get("X");
         mapW = (HashMap) brMap.get("W");
@@ -53,12 +76,27 @@ public class DssatXFileInput extends DssatCommonInput {
             return ret;
         }
 
+        ret.put("treatment", trArr);
+        ret.put("cultivar", cuArr);
+        ret.put("field", flArr);
+        ret.put("soil_analysis", saArr);
+        ret.put("initial_condition", icArr);
+        ret.put("plant", plArr);
+        ret.put("irrigation", irArr);
+        ret.put("fertilizer", feArr);
+        ret.put("residue_organic", omArr);
+        ret.put("soil_analysis", chArr);
+        ret.put("tillage", tiArr);
+        ret.put("emvironment", emArr);
+        ret.put("harvest", haArr);
+        ret.put("simulation", smArr);
+
         while ((line = br.readLine()) != null) {
-            
+
             // Get content type of line
             judgeContentType(line);
 
-            // Read Exp Detail
+            // Read Exp title info
             if (flg[0].startsWith("exp.details:") && flg[2].equals("")) {
 
                 // Set variables' formats
@@ -71,17 +109,19 @@ public class DssatXFileInput extends DssatCommonInput {
             } // Read General Section
             else if (flg[0].startsWith("general")) {
 
+                // People info
                 if (flg[1].equals("people") && flg[2].equals("data")) {
                     ret.put("people", line.trim());
-                } else if (flg[1].equals("address") && flg[2].equals("data")) {
-                    //$ret[$flg[0]]["address"] = trim($line);
+
+                } // Address info
+                else if (flg[1].equals("address") && flg[2].equals("data")) {
                     String[] addr = line.split(",[ ]*");
                     ret.put("fl_loc_1", "");
                     ret.put("fl_loc_2", "");
                     ret.put("fl_loc_3", "");
-                    if (!line.trim().equals("")) {
-                        ret.put("institutes", line.trim());
-                    }
+                    ret.put("institutes", line.trim());
+//                    ret.put("address", line.trim());    // TODO wait for confirmation about this item
+
                     switch (addr.length) {
                         case 0:
                             break;
@@ -106,29 +146,136 @@ public class DssatXFileInput extends DssatCommonInput {
                             }
                             ret.put("fl_loc_3", loc3.substring(0, loc3.length() - 2));
                     }
-                } else if ((flg[1].equals("site") || flg[1].equals("sites")) && flg[2].equals("data")) {
+
+                } // Site info
+                else if ((flg[1].equals("site") || flg[1].equals("sites")) && flg[2].equals("data")) {
                     //$ret[$flg[0]]["site"] = trim($line);
-                } else if (flg[1].startsWith("parea") && flg[2].equals("data")) {
-                } else if (flg[1].equals("notes") && flg[2].equals("data")) {
+                    // TODO wait for confirmation: site is missing in the master variables list
+                    ret.put("site", line.trim());
+
+                } // Plot Info
+                else if (flg[1].startsWith("parea") && flg[2].equals("data")) {
+
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("parea", 7);
+                    formats.put("prno", 6);
+                    formats.put("plen", 6);
+                    formats.put("pldr", 6);
+                    formats.put("plsp", 6);
+                    formats.put("play", 6);
+                    formats.put("pltha", 6);
+                    formats.put("hrno", 6);
+                    formats.put("hlen", 6);
+                    formats.put("plthm", 16);
+                    // Read line and save into return holder
+                    ret.put("plot_info", readLine(line, formats));
+
+                } // Notes field
+                else if (flg[1].equals("notes") && flg[2].equals("data")) {
                     //$ret[$flg[0]]["notes"] = addArray($ret[$flg[0]]["notes"], " ". trim($line), "");
+                    if (!ret.containsKey("notes")) {
+                        ret.put("notes", line.trim() + "\\r\\n");
+                    } else {
+                        String notes = (String) ret.get("notes");
+                        notes += line.trim() + "\\r\\n";
+                        ret.put("notes", notes);
+                    }
                 } else {
                 }
 
             } // Read TREATMENTS Section
             else if (flg[0].startsWith("treatments")) {
-                //TODO
+                // TODO how to handle the indexes
+                // Read TREATMENTS data
+                if (flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("trno", 2);
+                    formats.put("sq", 2);
+                    formats.put("op", 2);
+                    formats.put("co", 2);
+                    formats.put("tr_name", 26);
+                    formats.put("ge", 3);
+                    formats.put("fl", 3);
+                    formats.put("sa", 3);
+                    formats.put("ic", 3);
+                    formats.put("pl", 3);
+                    formats.put("ir", 3);
+                    formats.put("fe", 3);
+                    formats.put("om", 3);
+                    formats.put("ch", 3);
+                    formats.put("ti", 3);
+                    formats.put("em", 3);
+                    formats.put("ha", 3);
+                    formats.put("sm", 3);
+                    // Read line and save into return holder
+                    trArr.add(readLine(line, formats));
+                } else {
+                }
+
+
             } // Read CULTIVARS Section
             else if (flg[0].startsWith("cultivars")) {
-                // TODO
-                ret.put("cr", line.substring(3, 5).trim());
+
+                // Read CULTIVARS data
+                if (flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);    // P.S. ignore the data index "ge"
+                    formats.put("cr", 3);
+                    formats.put("cul_id", 7);
+                    formats.put("cul_name", 17);
+                    // Read line and save into return holder
+                    cuArr.add(readLine(line, formats));
+                    ret.put("cr", line.substring(3, 5).trim()); // TODO need to be deleted?
+                } else {
+                }
             } // Read FIELDS Section
             else if (flg[0].startsWith("fields")) {
 
+                // Read field info 1st line
                 if (flg[1].startsWith("l id_") && flg[2].equals("data")) {
-                    //TODO
-                    wid = line.substring(12, 20).trim();
-                } else if (flg[1].startsWith("l ...") && flg[2].equals("data")) {
 
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("fl", 2);
+                    formats.put("id_field", 9);
+                    formats.put("wth_id", 9);      //TODO id do not match with the master list "wsta_id"
+                    formats.put("flsl", 6);
+                    formats.put("flob", 6);
+                    formats.put("fl_drntype", 6);
+                    formats.put("fldrd", 6);
+                    formats.put("fldrs", 6);
+                    formats.put("flst", 6);
+                    formats.put("sltx", 6);
+                    formats.put("sldp", 6);
+                    formats.put("soil_id", 11);
+                    formats.put("fl_name", line.length());
+                    // Read line and save into return holder
+                    addToArray(flArr, readLine(line, formats), "fl");
+                    // Read weather station id
+                    wid = line.substring(12, 20).trim();
+
+                }// // Read field info 2nd line
+                else if (flg[1].startsWith("l ...") && flg[2].equals("data")) {
+
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("fl", 2);
+                    formats.put("fl_lat", 16);
+                    formats.put("fl_long", 16);
+                    formats.put("flele", 10);
+                    formats.put("farea", 18);
+                    formats.put("slen", 6);          //TODO id do not find in the master list (? it seems to be calculated by other fields)
+                    formats.put("fllwr", 6);
+                    formats.put("flsla", 6);
+                    formats.put("flhst", 6);         //TODO id do not find in the master list (field histoy code)
+                    formats.put("fhdur", 6);         //TODO id do not find in the master list (duration associated with field history code in years)
+                    // Read line and save into return holder
+                    addToArray(flArr, readLine(line, formats), "fl");
+                    // TODO Delete the following handling?
+                    // Read lat and long
                     String strLat = line.substring(3, 18).trim();
                     String strLong = line.substring(19, 34).trim();
 
@@ -171,39 +318,479 @@ public class DssatXFileInput extends DssatCommonInput {
 
             } // Read SOIL ANALYSIS Section
             else if (flg[0].startsWith("soil")) {
-                // TODO
+
+                // Read SOIL ANALYSIS global data
+                if (flg[1].startsWith("a sadat") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);         // P.S. ignore the data index "sa"
+                    formats.put("sadat", 6);
+                    formats.put("samhb", 6);
+                    formats.put("sampx", 6);
+                    formats.put("samke", 6);
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("sadat", translateDateStr((String) tmp.get("sadat")));
+                    saArr.add(tmp);
+                    sadArr = new ArrayList();
+                    tmp.put(eventKey, sadArr);
+
+                } // Read SOIL ANALYSIS layer data
+                else if (flg[1].startsWith("a sadat") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);         // P.S. ignore the data index "sa"
+                    formats.put("sabl", 6);
+                    formats.put("sabdm", 6);
+                    formats.put("saoc", 6);
+                    formats.put("sani", 6);
+                    formats.put("saphw", 6);
+                    formats.put("saphb", 6);
+                    formats.put("sapx", 6);
+                    formats.put("sake", 6);
+                    formats.put("sasc", 6);     // TODO id do not find in the master list (Measured stable organic C by soil layer, g[C]/100g[Soil])
+                    // Read line and save into return holder
+                    sadArr.add(readLine(line, formats));
+                } else {
+                }
+
             } // Read INITIAL CONDITIONS Section
             else if (flg[0].startsWith("initial")) {
-                // TODO
+
+                // Read INITIAL CONDITIONS global data
+                if (flg[1].startsWith("c   pcr") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);         // P.S. ignore the data index "ic"
+                    formats.put("icpcr", 6);
+                    formats.put("icdat", 6);
+                    formats.put("icrt", 6);
+                    formats.put("icnd", 6);
+                    formats.put("icrz#", 6);    // TODO use the "icrz#" instead of "icrzno"
+                    formats.put("icrze", 6);
+                    formats.put("icwt", 6);
+                    formats.put("icrag", 6);
+                    formats.put("icrn", 6);
+                    formats.put("icrp", 6);
+                    formats.put("icrip", 6);
+                    formats.put("icrdp", 6);
+                    formats.put("ic_name", line.length());
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("icdat", translateDateStr((String) tmp.get("icdat")));
+                    icArr.add(tmp);
+                    icdArr = new ArrayList();
+                    tmp.put(eventKey, icdArr);
+
+                } else // INITIAL CONDITIONS layer data
+                if (flg[1].startsWith("c  icbl") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);         // P.S. ignore the detail (event) data index "ic"
+                    formats.put("icbl", 6);
+                    formats.put("ich2o", 6);
+                    formats.put("icnh4", 6);
+                    formats.put("icno3", 6);
+                    // Read line and save into return holder
+                    icdArr.add(readLine(line, formats));
+
+                } else {
+                }
+
             } // Read PLANTING DETAILS Section
             else if (flg[0].startsWith("planting")) {
-                // TODO
-                ret.put("pdate", line.substring(3, 8).trim());
+
+                // Read PLANTING data
+                if (flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);         // P.S. ignore the data index "pl"
+                    formats.put("pdate", 6);
+                    formats.put("pldae", 6);
+                    formats.put("plpop", 6);
+                    formats.put("plpoe", 6);
+                    formats.put("plme", 6);
+                    formats.put("plds", 6);
+                    formats.put("plrs", 6);
+                    formats.put("plrd", 6);
+                    formats.put("pldp", 6);
+                    formats.put("plmwt", 6);
+                    formats.put("page", 6);
+                    formats.put("penv", 6);
+                    formats.put("plph", 6);
+                    formats.put("plspl", 6);
+                    formats.put("pl_name", line.length());
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("pdate", translateDateStr((String) tmp.get("pdate")));
+                    tmp.put("pldae", translateDateStr((String) tmp.get("pldae")));
+                    plArr.add(tmp);
+                    ret.put("pdate", translateDateStr(line.substring(3, 8).trim()));
+                } else {
+                }
+
             } // Read IRRIGATION AND WATER MANAGEMENT Section
             else if (flg[0].startsWith("irrigation")) {
-                // TODO
+
+                // Read IRRIGATION global data
+                if (flg[1].startsWith("i  efir") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);         // P.S. ignore the data index "ir"
+                    formats.put("ireff", 6);
+                    formats.put("irmdp", 6);
+                    formats.put("irthr", 6);
+                    formats.put("irept", 6);
+                    formats.put("irstg", 6);
+                    formats.put("iame", 6);
+                    formats.put("iamt", 6);
+                    formats.put("ir_name", line.length());
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    irArr.add(tmp);
+                    irdArr = new ArrayList();
+                    tmp.put(eventKey, irdArr);
+
+                } // Read IRRIGATION appliction data
+                else if (flg[1].startsWith("i idate") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);         // P.S. ignore the data index "ir"
+                    formats.put("idate", 6);
+                    formats.put("irop", 6);
+                    formats.put("irval", 6);
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("idate", translateDateStr((String) tmp.get("idate")));
+                    irdArr.add(tmp);
+
+                } else {
+                }
+
             } // Read FERTILIZERS (INORGANIC) Section
             else if (flg[0].startsWith("fertilizers")) {
-                // TODO
+
+                // Read FERTILIZERS data
+                if (flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);         // P.S. ignore the data index "fe"
+                    formats.put("fdate", 6);
+                    formats.put("fecd", 6);
+                    formats.put("feacd", 6);
+                    formats.put("fedep", 6);
+                    formats.put("feamn", 6);
+                    formats.put("feamp", 6);
+                    formats.put("feamk", 6);
+                    formats.put("feamc", 6);
+                    formats.put("feamo", 6);
+                    formats.put("feocd", 6);
+                    formats.put("fe_name", line.length());
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("fdate", translateDateStr((String) tmp.get("fdate")));
+                    feArr.add(tmp);
+                } else {
+                }
+
             } // Read RESIDUES AND OTHER ORGANIC MATERIALS Section
             else if (flg[0].startsWith("residues")) {
-                // TODO
+
+                // Read ORGANIC MATERIALS data
+                if (flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);         // P.S. ignore the data index "om"
+                    formats.put("omday", 6);    // TODO id do not match with the master list "omdat"
+                    formats.put("omcd", 6);
+                    formats.put("omamt", 6);
+                    formats.put("omn%", 6);      // TODO id do not match with the master list "omnpct"
+                    formats.put("omp%", 6);      // TODO id do not match with the master list "omppct"
+                    formats.put("omk%", 6);      // TODO id do not match with the master list "omkpct"
+                    formats.put("ominp", 6);
+                    formats.put("omdep", 6);
+                    formats.put("omacd", 6);
+                    formats.put("om_name", line.length());
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("omdat", translateDateStr((String) tmp.get("omdat")));
+                    omArr.add(tmp);
+                } else {
+                }
+
             } // Read CHEMICAL APPLICATIONS Section
             else if (flg[0].startsWith("chemical")) {
-                // TODO
+
+                // Read CHEMICAL APPLICATIONS data
+                if (flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);         // P.S. ignore the data index "ch"
+                    formats.put("cdate", 6);
+                    formats.put("chcd", 6);
+                    formats.put("chamt", 6);
+                    formats.put("chacd", 6);
+                    formats.put("chdep", 6);
+                    formats.put("ch_targets", 6);
+                    formats.put("ch_name", line.length());
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("cdate", translateDateStr((String) tmp.get("cdate")));
+                    chArr.add(tmp);
+                } else {
+                }
+
             } // Read TILLAGE Section
             else if (flg[0].startsWith("tillage")) {
-                // TODO
+
+                // Read TILLAGE data
+                if (flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);         // P.S. ignore the data index "ti"
+                    formats.put("tdate", 6);
+                    formats.put("tiimp", 6);
+                    formats.put("tidep", 6);
+                    formats.put("ti_name", line.length());
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("tdate", translateDateStr((String) tmp.get("tdate")));
+                    tiArr.add(tmp);
+                } else {
+                }
+
             } // Read ENVIRONMENT MODIFICATIONS Section
             else if (flg[0].startsWith("environment")) {
-                // TODO
+
+                // Read ENVIRONMENT MODIFICATIONS data
+                if (flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);         // P.S. ignore the data index "em"
+                    formats.put("emday", 6);
+                    formats.put("ecdyl", 2);
+                    formats.put("emdyl", 4);
+                    formats.put("ecrad", 2);
+                    formats.put("emrad", 4);
+                    formats.put("ecmax", 2);
+                    formats.put("emmax", 4);
+                    formats.put("ecmin", 2);
+                    formats.put("emmin", 4);
+                    formats.put("ecrai", 2);
+                    formats.put("emrai", 4);
+                    formats.put("ecco2", 2);
+                    formats.put("emco2", 4);
+                    formats.put("ecdew", 2);
+                    formats.put("emdew", 4);
+                    formats.put("ecwnd", 2);
+                    formats.put("emwnd", 4);
+                    formats.put("em_name", line.length());
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("emday", translateDateStr((String) tmp.get("emday")));
+                    emArr.add(tmp);
+                } else {
+                }
+
             } // Read HARVEST DETAILS Section
             else if (flg[0].startsWith("harvest")) {
-                // TODO
-                ret.put("hdate", line.substring(3, 8).trim());
+
+                // Read HARVEST data
+                if (flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("", 2);         // P.S. ignore the data index "em"
+                    formats.put("haday", 6);    // TODO should I use hdate?
+                    formats.put("hastg", 6);
+                    formats.put("hacom", 6);
+                    formats.put("hasiz", 6);
+                    formats.put("hapc", 6);
+                    formats.put("habpc", 6);
+                    formats.put("ha_name", line.length());
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("haday", translateDateStr((String) tmp.get("haday")));
+                    haArr.add(tmp);
+                    ret.put("hdate", translateDateStr(line.substring(3, 8).trim())); // TODO delete?
+                } else {
+                }
+
+
             } // Read SIMULATION CONTROLS Section
             else if (flg[0].startsWith("simulation")) {
-                // TODO
+
+                // Read general info
+                if (flg[1].startsWith("n general") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("sm", 2);
+                    formats.put("general", 12);
+                    formats.put("nyers", 6);
+                    formats.put("nreps", 6);
+                    formats.put("start", 6);
+                    formats.put("sdate", 6);
+                    formats.put("rseed", 6);
+                    formats.put("sname", 26);
+                    formats.put("model", line.length());
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("sdate", translateDateStr((String) tmp.get("sdate")));
+                    smArr.add(tmp);
+                    addToArray(smArr, tmp, "sm");
+
+                } // Read options info
+                else if (flg[1].startsWith("n options") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("sm", 2);
+                    formats.put("options", 12);
+                    formats.put("water", 6);
+                    formats.put("nitro", 6);
+                    formats.put("symbi", 6);
+                    formats.put("phosp", 6);
+                    formats.put("potas", 6);
+                    formats.put("dises", 6);
+                    formats.put("chem", 6);
+                    formats.put("till", 6);
+                    formats.put("co2", 6);
+                    // Read line and save into return holder
+                    addToArray(smArr, readLine(line, formats), "sm");
+
+                } // Read methods info
+                else if (flg[1].startsWith("n methods") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("sm", 2);
+                    formats.put("methods", 12);
+                    formats.put("wther", 6);
+                    formats.put("incon", 6);
+                    formats.put("light", 6);
+                    formats.put("evapo", 6);
+                    formats.put("infil", 6);
+                    formats.put("photo", 6);
+                    formats.put("hydro", 6);
+                    formats.put("nswit", 6);
+                    formats.put("mesom", 6);
+                    formats.put("mesev", 6);
+                    formats.put("mesol", 6);
+                    // Read line and save into return holder
+                    addToArray(smArr, readLine(line, formats), "sm");
+
+                } // Read management info
+                else if (flg[1].startsWith("n management") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("sm", 2);
+                    formats.put("management", 12);
+                    formats.put("plant", 6);
+                    formats.put("irrig", 6);
+                    formats.put("ferti", 6);
+                    formats.put("resid", 6);
+                    formats.put("harvs", 6);
+                    // Read line and save into return holder
+                    addToArray(smArr, readLine(line, formats), "sm");
+
+                } // Read outputs info
+                else if (flg[1].startsWith("n outputs") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("sm", 2);
+                    formats.put("outputs", 12);
+                    formats.put("fname", 6);
+                    formats.put("ovvew", 6);
+                    formats.put("sumry", 6);
+                    formats.put("fropt", 6);
+                    formats.put("grout", 6);
+                    formats.put("caout", 6);
+                    formats.put("waout", 6);
+                    formats.put("niout", 6);
+                    formats.put("miout", 6);
+                    formats.put("diout", 6);
+                    formats.put("long", 6);
+                    formats.put("chout", 6);
+                    formats.put("opout", 6);
+                    // Read line and save into return holder
+                    addToArray(smArr, readLine(line, formats), "sm");
+
+                } // Read planting info
+                else if (flg[1].startsWith("n planting") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("sm", 2);
+                    formats.put("planting", 12);
+                    formats.put("pfrst", 6);
+                    formats.put("plast", 6);
+                    formats.put("ph20l", 6);
+                    formats.put("ph2ou", 6);
+                    formats.put("ph20d", 6);
+                    formats.put("pstmx", 6);
+                    formats.put("pstmn", 6);
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("pfrst", translateDateStr((String) tmp.get("pfrst")));
+                    tmp.put("plast", translateDateStr((String) tmp.get("plast")));
+                    addToArray(smArr, tmp, "sm");
+
+                } // Read irrigation info
+                else if (flg[1].startsWith("n irrigation") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("sm", 2);
+                    formats.put("irrigation", 12);
+                    formats.put("imdep", 6);
+                    formats.put("ithrl", 6);
+                    formats.put("ithru", 6);
+                    formats.put("iroff", 6);
+                    formats.put("imeth", 6);
+                    formats.put("iramt", 6);
+                    formats.put("ireff", 6);
+                    // Read line and save into return holder
+                    addToArray(smArr, readLine(line, formats), "sm");
+
+                } // Read nitrogen info
+                else if (flg[1].startsWith("n nitrogen") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("sm", 2);
+                    formats.put("nitrogen", 12);
+                    formats.put("nmdep", 6);
+                    formats.put("nmthr", 6);
+                    formats.put("namnt", 6);
+                    formats.put("ncode", 6);
+                    formats.put("naoff", 6);
+                    // Read line and save into return holder
+                    addToArray(smArr, readLine(line, formats), "sm");
+
+                } // Read residues info
+                else if (flg[1].startsWith("n residues") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("sm", 2);
+                    formats.put("residues", 12);
+                    formats.put("ripcn", 6);
+                    formats.put("rtime", 6);
+                    formats.put("ridep", 6);
+                    // Read line and save into return holder
+                    addToArray(smArr, readLine(line, formats), "sm");
+
+                } // Read harvest info
+                else if (flg[1].startsWith("n harvest") && flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("sm", 2);
+                    formats.put("harvests", 12);
+                    formats.put("hfrst", 6);    // TODO wait for confirmation about it is a date
+                    formats.put("hlast", 6);
+                    formats.put("hpcnp", 6);
+                    formats.put("hrcnr", 6);
+                    // Read line and save into return holder
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("hlast", translateDateStr((String) tmp.get("hlast")));
+                    addToArray(smArr, tmp, "sm");
+
+                } else {
+                }
+
             } else {
             }
         }

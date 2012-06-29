@@ -37,7 +37,6 @@ public class DssatControllerTest {
         obDssatControllerOutput.writeFiles("", result);
         File[] files = obDssatControllerOutput.getOutputFiles();
         for (int i = 0; i < files.length; i++) {
-            System.out.println(files[i].exists());
             assertTrue(files[i].exists());
             assertTrue(files[i].delete());
         }

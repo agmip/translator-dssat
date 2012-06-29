@@ -127,8 +127,6 @@ public class DssatWeatherInput extends DssatCommonInput {
                                 titles.add("tdew");
                             } else if (title.equalsIgnoreCase("PAR")) {
                                 titles.add("pard");
-                            } else if (title.equals("")) {
-                                titles.add("null" + i);
                             } else {
                                 titles.add(title.toLowerCase());
                             }
