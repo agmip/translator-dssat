@@ -46,6 +46,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
         String[] p2Ids = {"slpx", "slpt", "slpo", "slca", "slal", "slfe", "slmn", "slbs", "slpa", "slpb", "slke", "slmg", "slna", "slsu", "slec", "slca"};
 //        File file;
 //        FileWriter output;
+        String layerKey = "data";  // TODO the key name might change
 
         try {
 
@@ -102,7 +103,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
                         data.getOr("smke", defValC).toString()));
 
                 // Soil Layer data section
-                ArrayList soilRecords = (ArrayList) data.getOr("SoilLayer", new ArrayList()); // TODO the key name might change
+                ArrayList soilRecords = (ArrayList) data.getOr(layerKey, new ArrayList());
 
                 // part one
                 sbData.append("@  SLB  SLMH  SLLL  SDUL  SSAT  SRGF  SSKS  SBDM  SLOC  SLCL  SLSI  SLCF  SLNI  SLHW  SLHB  SCEC  SADC\r\n");

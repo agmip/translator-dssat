@@ -43,7 +43,7 @@ public class DssatWeatherInput extends DssatCommonInput {
         BufferedReader brW = null;
         LinkedHashMap mapW;
         LinkedHashMap formats = new LinkedHashMap();
-        String dailyKey = "WeatherDaily";  // TODO the key name might change
+        String dailyKey = "data";  // TODO the key name might change
 
         mapW = (LinkedHashMap) brMap.get("W");
 

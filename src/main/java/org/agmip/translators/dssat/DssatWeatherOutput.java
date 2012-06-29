@@ -50,6 +50,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
         Set optDailyIds = optDaily.keySet();
 //        File file;
 //        FileWriter output;
+        String dailyKey = "data";  // TODO the key name might change
 
         try {
 
@@ -58,7 +59,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // Get Data from input holder
             data = result;
-            ArrayList weatherRecords = (ArrayList) data.getOr("WeatherDaily", new ArrayList()); // TODO key might be changed
+            ArrayList weatherRecords = (ArrayList) data.getOr(dailyKey, new ArrayList());
 
             // Initial BufferedWriter
             String fileName = data.getOr("wst_insi", "").toString();

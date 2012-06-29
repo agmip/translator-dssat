@@ -42,7 +42,7 @@ public class DssatSoilInput extends DssatCommonInput {
         BufferedReader brS = null;
         LinkedHashMap mapS;
         LinkedHashMap formats = new LinkedHashMap();
-        String layerKey = "SoilLayer";  // TODO the key name might change
+        String layerKey = "data";  // TODO the key name might change
 
         mapS = (LinkedHashMap) brMap.get("S");
 
