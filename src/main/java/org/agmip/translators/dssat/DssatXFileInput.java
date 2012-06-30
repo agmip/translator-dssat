@@ -116,7 +116,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     ret.put("fl_loc_2", "");
                     ret.put("fl_loc_3", "");
                     ret.put("institutes", line.trim());
-//                    ret.put("address", line.trim());    // TODO wait for confirmation about this item
+//                    ret.put("address", line.trim());    // P.S. no longer to use this field
 
                     switch (addr.length) {
                         case 0:
@@ -182,7 +182,7 @@ public class DssatXFileInput extends DssatCommonInput {
 
             } // Read TREATMENTS Section
             else if (flg[0].startsWith("treatments")) {
-                // TODO how to handle the indexes
+
                 // Read TREATMENTS data
                 if (flg[2].equals("data")) {
                     // Set variables' formats
@@ -224,7 +224,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("cul_name", 17);
                     // Read line and save into return holder
                     cuArr.add(readLine(line, formats));
-                    ret.put("cr", line.substring(3, 5).trim()); // TODO need to be deleted?
+                    ret.put("cr", line.substring(3, 5).trim()); // TODO keep for the early version; just first entry
                 } else {
                 }
             } // Read FIELDS Section
@@ -237,7 +237,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.clear();
                     formats.put("fl", 2);
                     formats.put("id_field", 9);
-                    formats.put("wth_id", 9);      //TODO id do not match with the master list "wsta_id"
+                    formats.put("wsta_id", 9);      //P.S. id do not match with the master list "wth_id"; might have another id name
                     formats.put("flsl", 6);
                     formats.put("flob", 6);
                     formats.put("fl_drntype", 6);
@@ -263,17 +263,17 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("fl_long", 16);
                     formats.put("flele", 10);
                     formats.put("farea", 18);
-                    formats.put("slen", 6);          //TODO id do not find in the master list (? it seems to be calculated by other fields)
+                    formats.put("", 6);             // P.S. id do not find in the master list (? it seems to be calculated by other fields)
                     formats.put("fllwr", 6);
                     formats.put("flsla", 6);
-                    formats.put("flhst", 6);         //TODO id do not find in the master list (field histoy code)
-                    formats.put("fhdur", 6);         //TODO id do not find in the master list (duration associated with field history code in years)
+                    formats.put("flhst", 6);        // P.S. id do not find in the master list (field histoy code)
+                    formats.put("fhdur", 6);        // P.S. id do not find in the master list (duration associated with field history code in years)
                     // Read line and save into return holder
-                    addToArray(flArr, readLine(line, formats), "fl");
-                    // TODO Delete the following handling?
+                    AdvancedHashMap tmp = readLine(line, formats);
+
                     // Read lat and long
-                    String strLat = line.substring(3, 18).trim();
-                    String strLong = line.substring(19, 34).trim();
+                    String strLat = (String) tmp.get("fl_lat");
+                    String strLong = (String) tmp.get("fl_long");
 
                     // If lat or long is not valid data, read data from weather file
                     if (!checkValidValue(strLat) || !checkValidValue(strLong) || (Double.parseDouble(strLat) == 0 && Double.parseDouble(strLong) == 0)) {
@@ -306,10 +306,12 @@ public class DssatXFileInput extends DssatCommonInput {
                             strLat = defValI;
                             strLong = defValI;
                         }
-
                     }
-                    ret.put("fl_lat", strLong);
-                    ret.put("fl_long", strLat);
+                    ret.put("fl_lat", strLong); // TODO Keep the meta data handling for the early version
+                    ret.put("fl_long", strLat); // TODO Keep the meta data handling for the early version
+                    tmp.put("fl_lat", strLong);
+                    tmp.put("fl_long", strLat);
+                    addToArray(flArr, tmp, "fl");
                 }
 
             } // Read SOIL ANALYSIS Section
@@ -344,7 +346,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("saphb", 6);
                     formats.put("sapx", 6);
                     formats.put("sake", 6);
-                    formats.put("sasc", 6);     // TODO id do not find in the master list (Measured stable organic C by soil layer, g[C]/100g[Soil])
+                    formats.put("sasc", 6);     // P.S. id do not find in the master list (Measured stable organic C by soil layer, g[C]/100g[Soil])
                     // Read line and save into return holder
                     sadArr.add(readLine(line, formats));
                 } else {
@@ -362,7 +364,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("icdat", 6);
                     formats.put("icrt", 6);
                     formats.put("icnd", 6);
-                    formats.put("icrz#", 6);    // TODO use the "icrz#" instead of "icrzno"
+                    formats.put("icrz#", 6);    // P.S. use the "icrz#" instead of "icrzno"
                     formats.put("icrze", 6);
                     formats.put("icwt", 6);
                     formats.put("icrag", 6);
@@ -421,7 +423,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     tmp.put("pdate", translateDateStr((String) tmp.get("pdate")));
                     tmp.put("pldae", translateDateStr((String) tmp.get("pldae")));
                     plArr.add(tmp);
-                    ret.put("pdate", translateDateStr(line.substring(3, 8).trim()));
+                    ret.put("pdate", translateDateStr(line.substring(3, 8).trim())); // TODO keep for the early version
                 } else {
                 }
 
@@ -497,19 +499,19 @@ public class DssatXFileInput extends DssatCommonInput {
                     // Set variables' formats
                     formats.clear();
                     formats.put("", 2);         // P.S. ignore the data index "om"
-                    formats.put("omday", 6);    // TODO id do not match with the master list "omdat"
+                    formats.put("omdat", 6);    // P.S. id do not match with the master list "omday"
                     formats.put("omcd", 6);
                     formats.put("omamt", 6);
-                    formats.put("omn%", 6);      // TODO id do not match with the master list "omnpct"
-                    formats.put("omp%", 6);      // TODO id do not match with the master list "omppct"
-                    formats.put("omk%", 6);      // TODO id do not match with the master list "omkpct"
+                    formats.put("omn%", 6);      // P.S. id do not match with the master list "omnpct"
+                    formats.put("omp%", 6);      // P.S. id do not match with the master list "omppct"
+                    formats.put("omk%", 6);      // P.S. id do not match with the master list "omkpct"
                     formats.put("ominp", 6);
                     formats.put("omdep", 6);
                     formats.put("omacd", 6);
                     formats.put("om_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("omday", translateDateStr((String) tmp.get("omday")));
+                    tmp.put("omdat", translateDateStr((String) tmp.get("omdat")));
                     omArr.add(tmp);
                 } else {
                 }
@@ -596,7 +598,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     // Set variables' formats
                     formats.clear();
                     formats.put("", 2);         // P.S. ignore the data index "em"
-                    formats.put("haday", 6);    // TODO should I use hdate?
+                    formats.put("hdate", 6);
                     formats.put("hastg", 6);
                     formats.put("hacom", 6);
                     formats.put("hasiz", 6);
@@ -605,14 +607,16 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("ha_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("haday", translateDateStr((String) tmp.get("haday")));
+                    tmp.put("hdate", translateDateStr((String) tmp.get("hdate")));
                     haArr.add(tmp);
-                    ret.put("hdate", translateDateStr(line.substring(3, 8).trim())); // TODO delete?
+                    if (haArr.size() == 1) {
+                        ret.put("hdate", translateDateStr(line.substring(3, 8).trim())); // TODO keep for early version
+                    }
                 } else {
                 }
 
 
-            } // Read SIMULATION CONTROLS Section
+            } // Read SIMULATION CONTROLS Section // P.S. no need to be divided
             else if (flg[0].startsWith("simulation")) {
 
                 // Read general info
@@ -620,111 +624,121 @@ public class DssatXFileInput extends DssatCommonInput {
                     // Set variables' formats
                     formats.clear();
                     formats.put("sm", 2);
-                    formats.put("general", 12);
-                    formats.put("nyers", 6);
-                    formats.put("nreps", 6);
-                    formats.put("start", 6);
-                    formats.put("sdate", 6);
-                    formats.put("rseed", 6);
-                    formats.put("sname", 26);
-                    formats.put("model", line.length());
+//                    formats.put("general", 12);
+//                    formats.put("nyers", 6);
+//                    formats.put("nreps", 6);
+//                    formats.put("start", 6);
+//                    formats.put("sdate", 6);
+//                    formats.put("rseed", 6);
+//                    formats.put("sname", 26);
+//                    formats.put("model", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("sdate", translateDateStr((String) tmp.get("sdate")));
-                    smArr.add(tmp);
+//                    tmp.put("sdate", translateDateStr((String) tmp.get("sdate")));
+                    tmp.put("general", line);
                     addToArray(smArr, tmp, "sm");
+
 
                 } // Read options info
                 else if (flg[1].startsWith("n options") && flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
                     formats.put("sm", 2);
-                    formats.put("options", 12);
-                    formats.put("water", 6);
-                    formats.put("nitro", 6);
-                    formats.put("symbi", 6);
-                    formats.put("phosp", 6);
-                    formats.put("potas", 6);
-                    formats.put("dises", 6);
-                    formats.put("chem", 6);
-                    formats.put("till", 6);
-                    formats.put("co2", 6);
+//                    formats.put("options", 12);
+//                    formats.put("water", 6);
+//                    formats.put("nitro", 6);
+//                    formats.put("symbi", 6);
+//                    formats.put("phosp", 6);
+//                    formats.put("potas", 6);
+//                    formats.put("dises", 6);
+//                    formats.put("chem", 6);
+//                    formats.put("till", 6);
+//                    formats.put("co2", 6);
                     // Read line and save into return holder
-                    addToArray(smArr, readLine(line, formats), "sm");
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("options", line);
+                    addToArray(smArr, tmp, "sm");
 
                 } // Read methods info
                 else if (flg[1].startsWith("n methods") && flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
                     formats.put("sm", 2);
-                    formats.put("methods", 12);
-                    formats.put("wther", 6);
-                    formats.put("incon", 6);
-                    formats.put("light", 6);
-                    formats.put("evapo", 6);
-                    formats.put("infil", 6);
-                    formats.put("photo", 6);
-                    formats.put("hydro", 6);
-                    formats.put("nswit", 6);
-                    formats.put("mesom", 6);
-                    formats.put("mesev", 6);
-                    formats.put("mesol", 6);
+//                    formats.put("methods", 12);
+//                    formats.put("wther", 6);
+//                    formats.put("incon", 6);
+//                    formats.put("light", 6);
+//                    formats.put("evapo", 6);
+//                    formats.put("infil", 6);
+//                    formats.put("photo", 6);
+//                    formats.put("hydro", 6);
+//                    formats.put("nswit", 6);
+//                    formats.put("mesom", 6);
+//                    formats.put("mesev", 6);
+//                    formats.put("mesol", 6);
                     // Read line and save into return holder
-                    addToArray(smArr, readLine(line, formats), "sm");
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("methods", line);
+                    addToArray(smArr, tmp, "sm");
 
                 } // Read management info
                 else if (flg[1].startsWith("n management") && flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
                     formats.put("sm", 2);
-                    formats.put("management", 12);
-                    formats.put("plant", 6);
-                    formats.put("irrig", 6);
-                    formats.put("ferti", 6);
-                    formats.put("resid", 6);
-                    formats.put("harvs", 6);
+//                    formats.put("management", 12);
+//                    formats.put("plant", 6);
+//                    formats.put("irrig", 6);
+//                    formats.put("ferti", 6);
+//                    formats.put("resid", 6);
+//                    formats.put("harvs", 6);
                     // Read line and save into return holder
-                    addToArray(smArr, readLine(line, formats), "sm");
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("management", line);
+                    addToArray(smArr, tmp, "sm");
 
                 } // Read outputs info
                 else if (flg[1].startsWith("n outputs") && flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
                     formats.put("sm", 2);
-                    formats.put("outputs", 12);
-                    formats.put("fname", 6);
-                    formats.put("ovvew", 6);
-                    formats.put("sumry", 6);
-                    formats.put("fropt", 6);
-                    formats.put("grout", 6);
-                    formats.put("caout", 6);
-                    formats.put("waout", 6);
-                    formats.put("niout", 6);
-                    formats.put("miout", 6);
-                    formats.put("diout", 6);
-                    formats.put("long", 6);
-                    formats.put("chout", 6);
-                    formats.put("opout", 6);
+//                    formats.put("outputs", 12);
+//                    formats.put("fname", 6);
+//                    formats.put("ovvew", 6);
+//                    formats.put("sumry", 6);
+//                    formats.put("fropt", 6);
+//                    formats.put("grout", 6);
+//                    formats.put("caout", 6);
+//                    formats.put("waout", 6);
+//                    formats.put("niout", 6);
+//                    formats.put("miout", 6);
+//                    formats.put("diout", 6);
+//                    formats.put("long", 6);
+//                    formats.put("chout", 6);
+//                    formats.put("opout", 6);
                     // Read line and save into return holder
-                    addToArray(smArr, readLine(line, formats), "sm");
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("outputs", line);
+                    addToArray(smArr, tmp, "sm");
 
                 } // Read planting info
                 else if (flg[1].startsWith("n planting") && flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
                     formats.put("sm", 2);
-                    formats.put("planting", 12);
-                    formats.put("pfrst", 6);
-                    formats.put("plast", 6);
-                    formats.put("ph20l", 6);
-                    formats.put("ph2ou", 6);
-                    formats.put("ph20d", 6);
-                    formats.put("pstmx", 6);
-                    formats.put("pstmn", 6);
+//                    formats.put("planting", 12);
+//                    formats.put("pfrst", 6);
+//                    formats.put("plast", 6);
+//                    formats.put("ph20l", 6);
+//                    formats.put("ph2ou", 6);
+//                    formats.put("ph20d", 6);
+//                    formats.put("pstmx", 6);
+//                    formats.put("pstmn", 6);
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("pfrst", translateDateStr((String) tmp.get("pfrst")));
-                    tmp.put("plast", translateDateStr((String) tmp.get("plast")));
+//                    tmp.put("pfrst", translateDateStr((String) tmp.get("pfrst")));
+//                    tmp.put("plast", translateDateStr((String) tmp.get("plast")));
+                    tmp.put("planting", line);
                     addToArray(smArr, tmp, "sm");
 
                 } // Read irrigation info
@@ -732,56 +746,63 @@ public class DssatXFileInput extends DssatCommonInput {
                     // Set variables' formats
                     formats.clear();
                     formats.put("sm", 2);
-                    formats.put("irrigation", 12);
-                    formats.put("imdep", 6);
-                    formats.put("ithrl", 6);
-                    formats.put("ithru", 6);
-                    formats.put("iroff", 6);
-                    formats.put("imeth", 6);
-                    formats.put("iramt", 6);
-                    formats.put("ireff", 6);
+//                    formats.put("irrigation", 12);
+//                    formats.put("imdep", 6);
+//                    formats.put("ithrl", 6);
+//                    formats.put("ithru", 6);
+//                    formats.put("iroff", 6);
+//                    formats.put("imeth", 6);
+//                    formats.put("iramt", 6);
+//                    formats.put("ireff", 6);
                     // Read line and save into return holder
-                    addToArray(smArr, readLine(line, formats), "sm");
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("irrigation", line);
+                    addToArray(smArr, tmp, "sm");
 
                 } // Read nitrogen info
                 else if (flg[1].startsWith("n nitrogen") && flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
                     formats.put("sm", 2);
-                    formats.put("nitrogen", 12);
-                    formats.put("nmdep", 6);
-                    formats.put("nmthr", 6);
-                    formats.put("namnt", 6);
-                    formats.put("ncode", 6);
-                    formats.put("naoff", 6);
+//                    formats.put("nitrogen", 12);
+//                    formats.put("nmdep", 6);
+//                    formats.put("nmthr", 6);
+//                    formats.put("namnt", 6);
+//                    formats.put("ncode", 6);
+//                    formats.put("naoff", 6);
                     // Read line and save into return holder
-                    addToArray(smArr, readLine(line, formats), "sm");
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("nitrogen", line);
+                    addToArray(smArr, tmp, "sm");
 
                 } // Read residues info
                 else if (flg[1].startsWith("n residues") && flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
                     formats.put("sm", 2);
-                    formats.put("residues", 12);
-                    formats.put("ripcn", 6);
-                    formats.put("rtime", 6);
-                    formats.put("ridep", 6);
+//                    formats.put("residues", 12);
+//                    formats.put("ripcn", 6);
+//                    formats.put("rtime", 6);
+//                    formats.put("ridep", 6);
                     // Read line and save into return holder
-                    addToArray(smArr, readLine(line, formats), "sm");
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    tmp.put("residues", line);
+                    addToArray(smArr, tmp, "sm");
 
                 } // Read harvest info
                 else if (flg[1].startsWith("n harvest") && flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
                     formats.put("sm", 2);
-                    formats.put("harvests", 12);
-                    formats.put("hfrst", 6);    // TODO wait for confirmation about it is a date
-                    formats.put("hlast", 6);
-                    formats.put("hpcnp", 6);
-                    formats.put("hrcnr", 6);
+//                    formats.put("harvests", 12);
+//                    formats.put("hfrst", 6);    // P.S. Keep the original value
+//                    formats.put("hlast", 6);
+//                    formats.put("hpcnp", 6);
+//                    formats.put("hrcnr", 6);
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("hlast", translateDateStr((String) tmp.get("hlast")));
+//                    tmp.put("hlast", translateDateStr((String) tmp.get("hlast")));
+                    tmp.put("harvests", line);
                     addToArray(smArr, tmp, "sm");
 
                 } else {
