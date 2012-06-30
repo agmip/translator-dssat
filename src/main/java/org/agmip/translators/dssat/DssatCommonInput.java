@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.agmip.core.types.AdvancedHashMap;
@@ -145,7 +144,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             days = Double.valueOf(strDays).intValue();
             // Set date with input value
             year = Integer.parseInt(startDate.substring(0, 2));
-            year += year <= 30 ? 2000 : 1900; // TODO Need confirm that which year is the begining of DSSAT 
+            year += year <= 15 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version 
             cal.set(Calendar.YEAR, year);
             cal.set(Calendar.DAY_OF_YEAR, Integer.parseInt(startDate.substring(2)));
             cal.add(Calendar.DATE, days);
