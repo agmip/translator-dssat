@@ -93,12 +93,13 @@ public abstract class DssatCommonInput implements TranslatorInput {
         } // Continued blank line
         else if (flg[2].equals("blank")) {
 
+            flg[0] = "";
             flg[1] = "";
             flg[2] = "blank";
 
         } else {
 
-            flg[0] = "";
+//            flg[0] = "";
             flg[1] = "";
             flg[2] = "blank";
         }

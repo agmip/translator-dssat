@@ -58,12 +58,13 @@ public class DssatAFileInput extends DssatCommonInput {
 
             // Get content type of line
             judgeContentType(line);
+            System.out.println("["+flg[0]+"]["+flg[1]+"]["+flg[2]+"]:"+line);
 
             // Read Observed data
             if (flg[2].equals("data")) {
 
                 // Read meta info
-                if (flg[0].equals("meta")) {
+                if (flg[0].equals("meta") && flg[1].equals("")) {
 
                     file.put("meta", line.replaceAll(".*:", "").trim());
 
@@ -92,6 +93,7 @@ public class DssatAFileInput extends DssatCommonInput {
         }
 
 //        brA.close();
+        compressData(ret);
 
         return ret;
     }

@@ -814,6 +814,7 @@ public class DssatXFileInput extends DssatCommonInput {
 
 //        br.close();
 //        if (brw != null) brw.close();
+        compressData(ret);
 
         return ret;
     }

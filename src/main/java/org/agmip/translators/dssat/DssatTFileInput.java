@@ -64,7 +64,7 @@ public class DssatTFileInput extends DssatCommonInput {
             if (flg[2].equals("data")) {
 
                 // Read meta info
-                if (flg[0].equals("meta")) {
+                if (flg[0].equals("meta") && flg[1].equals("")) {
 
                     file.put("meta", line.replaceAll(".*:", "").trim());
 
@@ -102,6 +102,7 @@ public class DssatTFileInput extends DssatCommonInput {
         }
 
 //        brT.close();
+        compressData(ret);
 
         return ret;
     }
