@@ -63,7 +63,7 @@ public class DssatControllerTest {
             }
             bo.write((fileNames[i] + ":\r\n").getBytes());
             bo.write(j.toJSON(result).getBytes());
-            bo.write(":\r\n\r\n=================================================================\r\n\r\n".getBytes());
+            bo.write("\r\n\r\n=================================================================\r\n\r\n".getBytes());
             bo.close();
         }
         
