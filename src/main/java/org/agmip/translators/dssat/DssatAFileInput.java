@@ -58,7 +58,6 @@ public class DssatAFileInput extends DssatCommonInput {
 
             // Get content type of line
             judgeContentType(line);
-            System.out.println("["+flg[0]+"]["+flg[1]+"]["+flg[2]+"]:"+line);
 
             // Read Observed data
             if (flg[2].equals("data")) {
