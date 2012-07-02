@@ -136,7 +136,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
         Calendar cal = Calendar.getInstance();
         int days;
         int year;
-        if (startDate.length() > 5 || startDate.length() < 4) {
+        if (startDate == null || startDate.length() > 5 || startDate.length() < 4) {
             //throw new Exception("");
             return "-99"; //defValD;
         }
@@ -163,18 +163,25 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * Divide the data in the line into a map
      *
      * @param line The string of line read from data file
-     * @param formats The defination of lenght for each data field (String itemName : Integer length)
+     * @param formats The definition of length for each data field (String itemName : Integer length)
      * @return the map contains divided data with keys from original string
      */
     protected AdvancedHashMap readLine(String line, LinkedHashMap<String, Integer> formats) {
 
         AdvancedHashMap ret = new AdvancedHashMap();
         int length;
+        String tmp;
 
         for (String key : formats.keySet()) {
+            // To avoid to be over limit of string lenght
             length = Math.min((Integer) formats.get(key), line.length());
             if (!((String) key).equals("")) {
-                ret.put(key, line.substring(0, length).trim());
+                tmp = line.substring(0, length).trim();
+                // if the value is in valid keep blank string in it
+                if (checkValidValue(tmp)) {
+                    ret.put(key, tmp);
+                }
+                //ret.put(key, tmp);
             }
             line = line.substring(length);
         }
