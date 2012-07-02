@@ -41,8 +41,8 @@ public class DssatAFileInput extends DssatCommonInput {
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
         ArrayList obvData = new ArrayList();
-        String obvDataKey = "data";  // TODO the key name might change
-        String obvFileKey = "average";  // TODO the key name might change
+        String obvDataKey = "data";     // P.S. the key name might change
+        String obvFileKey = "summary";  // P.S. the key name might change
 
         brA = (BufferedReader) brMap.get("A");
 
