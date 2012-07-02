@@ -28,7 +28,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
     /**
      * DSSAT Observation Data Output method
      *
-     * @param arg0 file name(?)
+     * @param arg0  file output path
      * @param result data holder object
      */
     @Override
@@ -37,162 +37,16 @@ public class DssatAFileOutput extends DssatCommonOutput {
         // Initial variables
         JSONAdapter adapter = new JSONAdapter();    // JSON Adapter
         AdvancedHashMap<String, Object> record;     // Data holder for daily data
-        AdvancedHashMap<String, Object> data;       // Data holder for whole Observation data
-        BufferedWriter bwA;                   // output object
-        StringBuilder sbData = new StringBuilder();     // construct the data info in the output
-        HashMap titleList = new HashMap();          // Define necessary observation data fields
-        titleList.put("hwam", "  HWAM");    //TODO
-        titleList.put("mdat", "  MDAT");    //TODO
-        titleList.put("adat", "  ADAT");    //TODO
-        titleList.put("cwam", "  CWAM");
-        HashMap altTitleList = new HashMap();        // Define alternative fields for the necessary observation data fields
+        BufferedWriter bwA;                         // output object
+        StringBuilder sbData = new StringBuilder();         // construct the data info in the output
+        HashMap altTitleList = new HashMap();               // Define alternative fields for the necessary observation data fields; key is necessary field
         altTitleList.put("hwam", "hwah");
         altTitleList.put("mdat", "mdap");
         altTitleList.put("adat", "adap");
-        HashMap optTitleList = new HashMap();        // Define optional observation data fields
-        HashMap titleOutput = new HashMap();         // contain output data field id
-        optTitleList.put("etcm", "  ETCM");
-        optTitleList.put("prcm", "  PRCM");
-        optTitleList.put("hdate", " HDATE");
-        optTitleList.put("adap", "  ADAP");
-        optTitleList.put("cwams", " CWAMS");
-        optTitleList.put("hmah", "  HMAH");
-        optTitleList.put("hwah", "  HWAH");
-        optTitleList.put("hwahs", " HWAHS");
-        optTitleList.put("hyah", "  HYAH");
-        optTitleList.put("hyahs", " HYAHS");
-        optTitleList.put("mdap", "  MDAP");
-        optTitleList.put("r8aps", " R8APS");
-        optTitleList.put("adaps", " ADAPS");
-        optTitleList.put("chtds", " CHTDS");
-        optTitleList.put("hmahs", " HMAHS");
-        optTitleList.put("adoy", "  ADOY");
-        optTitleList.put("ap1d", "  AP1D");
-        optTitleList.put("br1d", "  BR1D");
-        optTitleList.put("br2d", "  BR2D");
-        optTitleList.put("br3d", "  BR3D");
-        optTitleList.put("br4d", "  BR4D");
-        optTitleList.put("bwah", "  BWAH");
-        optTitleList.put("bwam", "  BWAM");
-        optTitleList.put("cdwa", "  CDWA");
-        optTitleList.put("cfah", "  CFAH");
-        optTitleList.put("chta", "  CHTA");
-        optTitleList.put("chwa", "  CHWA");
-        optTitleList.put("cnaa", "  CNAA");
-        optTitleList.put("cnam", "  CNAM");
-        optTitleList.put("cpaa", "  CPAA");
-        optTitleList.put("cpam", "  CPAM");
-        optTitleList.put("cwaa", "  CWAA");
-        optTitleList.put("drcm", "  DRCM");
-        optTitleList.put("drid", "  DRID");
-        optTitleList.put("dwap", "  DWAP");
-        optTitleList.put("e#am", "  E#AM");
-        optTitleList.put("e#um", "  E#UM");
-        optTitleList.put("eemd", "  EEMD");
-        optTitleList.put("eoaa", "  EOAA");
-        optTitleList.put("epac", "  EPAC");
-        optTitleList.put("epcm", "  EPCM");
-        optTitleList.put("escm", "  ESCM");
-        optTitleList.put("ewum", "  EWUM");
-        optTitleList.put("fdat", "  FDAT");
-        optTitleList.put("fwah", "  FWAH");
-        optTitleList.put("gl%m", "  GL%M");
-        optTitleList.put("gn%m", "  GN%M");
-        optTitleList.put("gnam", "  GNAM");
-        optTitleList.put("gp%m", "  GP%M");
-        optTitleList.put("gpam", "  GPAM");
-        optTitleList.put("gw%m", "  GW%M");
-        optTitleList.put("gwam", "  GWAM");
-        optTitleList.put("gwgm", "  GWGM");
-        optTitleList.put("gwpm", "  GWPM");
-        optTitleList.put("gyam", "  GYAM");
-        optTitleList.put("gypm", "  GYPM");
-        optTitleList.put("gyvm", "  GYVM");
-        optTitleList.put("h#am", "  H#AM");
-        optTitleList.put("h#gm", "  H#GM");
-        optTitleList.put("h#um", "  H#UM");
-        optTitleList.put("hastg", " HASTG");
-        optTitleList.put("hdap", "  HDAP");
-        optTitleList.put("hiam", "  HIAM");
-        optTitleList.put("hipm", "  HIPM");
-        optTitleList.put("hprh", "  HPRH");
-        optTitleList.put("hwac", "  HWAC");
-        optTitleList.put("hwum", "  HWUM");
-        optTitleList.put("hyam", "  HYAM");
-        optTitleList.put("icsw", "  ICSW");
-        optTitleList.put("idap", "  IDAP");
-        optTitleList.put("idat", "  IDAT");
-        optTitleList.put("ir#m", "  IR#M");
-        optTitleList.put("ircm", "  IRCM");
-        optTitleList.put("l#sm", "  L#SM");
-        optTitleList.put("l#sx", "  L#SX");
-        optTitleList.put("laix", "  LAIX");
-        optTitleList.put("lf3d", "  LF3D");
-        optTitleList.put("lf5d", "  LF5D");
-        optTitleList.put("liwam", " LIWAM");
-        optTitleList.put("llfd", "  LLFD");
-        optTitleList.put("lwam", "  LWAM");
-        optTitleList.put("mdat2", " MDAT2");
-        optTitleList.put("mdoy", "  MDOY");
-        optTitleList.put("niam", "  NIAM");
-        optTitleList.put("nlcm", "  NLCM");
-        optTitleList.put("nucm", "  NUCM");
-//        optTitleList.put("obs_trt_id", " OBS_TRT_ID"); // TRNO TODO Kept for furture using
-        optTitleList.put("ocam", "  OCAM");
-        optTitleList.put("oid", "   OID");
-        optTitleList.put("oid", "   OID");
-        optTitleList.put("oid", "   OID");
-        optTitleList.put("onam", "  ONAM");
-        optTitleList.put("p#am", "  P#AM");
-        optTitleList.put("pd1p", "  PD1P");
-        optTitleList.put("pd1t", "  PD1T");
-        optTitleList.put("pdfp", "  PDFP");
-        optTitleList.put("pdft", "  PDFT");
-        optTitleList.put("pwam", "  PWAM");
-        optTitleList.put("r1at", "  R1AT");
-        optTitleList.put("r2at", "  R2AT");
-        optTitleList.put("r3at", "  R3AT");
-        optTitleList.put("r4at", "  R4AT");
-        optTitleList.put("r5at", "  R5AT");
-        optTitleList.put("r6at", "  R6AT");
-        optTitleList.put("r7at", "  R7AT");
-        optTitleList.put("r8ap", "  R8AP");
-        optTitleList.put("r8at", "  R8AT");
-        optTitleList.put("r9at", "  R9AT");
-        optTitleList.put("rnah", "  RNAH");
-        optTitleList.put("rocm", "  ROCM");
-        optTitleList.put("rpah", "  RPAH");
-        optTitleList.put("snam", "  SNAM");
-        optTitleList.put("spam", "  SPAM");
-        optTitleList.put("sqdat", " SQDAT");
-        optTitleList.put("sraa", "  SRAA");
-        optTitleList.put("swxm", "  SWXM");
-        optTitleList.put("t#am", "  T#AM");
-        optTitleList.put("tdap", "  TDAP");
-        optTitleList.put("tdat", "  TDAT");
-        optTitleList.put("tham", "  THAM");
-        optTitleList.put("tl#c", "  TL#C");
-        optTitleList.put("tnah", "  TNAH");
-        optTitleList.put("tnim", "  TNIM");
-        optTitleList.put("tspd", "  TSPD");
-        optTitleList.put("twah", "  TWAH");
-        optTitleList.put("twam", "  TWAM");
-        optTitleList.put("un%h", "  UN%H");
-        optTitleList.put("unam", "  UNAM");
-        optTitleList.put("upam", "  UPAM");
-        optTitleList.put("uwah", "  UWAH");
-        optTitleList.put("uyah", "  UYAH");
-        optTitleList.put("vwam", "  VWAM");
-        optTitleList.put("z21d", "  Z21D");
-        optTitleList.put("z30d", "  Z30D");
-        optTitleList.put("z31d", "  Z31D");
-        optTitleList.put("z37d", "  Z37D");
-        optTitleList.put("z39d", "  Z39D");
-        Set titleListId = titleList.keySet();
-        Set optTitleListId = optTitleList.keySet();
-        int trno = 1;
-//        File file;
-//        FileWriter output;
+        altTitleList.put("cwam", "");
+        ArrayList optTitleList = getAllTitleList();         // Define optional observation data fields
+        LinkedHashMap titleOutput = new LinkedHashMap();    // contain output data field id
+        int trno;
 
         try {
 
@@ -200,24 +54,17 @@ public class DssatAFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            ArrayList observeRecords;
-            try {
-                observeRecords = (ArrayList) result.getOr("observed", new ArrayList());
-            } catch (ClassCastException e) {
-                observeRecords = new ArrayList();
-                observeRecords.add(result.getOr("observed", new LinkedHashMap()));
-            }
+            AdvancedHashMap obvFile = adapter.exportRecord((Map) result.getOr("observed", result));
+            AdvancedHashMap obvAFile = adapter.exportRecord((Map) obvFile.getOr("average", obvFile));
+            ArrayList observeRecords = ((ArrayList) obvAFile.getOr("data", new ArrayList()));
 
             // Initial BufferedWriter
-            String exName = getExName(result);
+            String exName = getExName(obvAFile);
             String fileName = exName;
             if (fileName.equals("")) {
                 fileName = "a.tmp";
             } else {
                 fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "A";
-            }
-            if (!arg0.equals("")) {
-                fileName = arg0 + File.separator + fileName;
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
@@ -225,36 +72,43 @@ public class DssatAFileOutput extends DssatCommonOutput {
 
             // Output Observation File
             // Titel Section
-            sbData.append(String.format("*EXP. DATA (A): %1$-10s %2$s\r\n\r\n", exName, result.getOr("local_name", defValC).toString()));
+            sbData.append(String.format("*EXP.DATA (A): %1$-10s %2$s\r\n\r\n", exName, obvAFile.getOr("local_name", defValC).toString()));
+
+            // Get first record of observed data
+            AdvancedHashMap fstObvData;
+            if (observeRecords.isEmpty()) {
+                fstObvData = new AdvancedHashMap();
+            } else {
+                fstObvData = adapter.exportRecord((Map) observeRecords.get(0));
+            }
+
+            // Check if which field is available
+            for (Object key : fstObvData.keySet()) {
+                // check which optional data is exist, if not, remove from map
+                if (optTitleList.contains(key)) {
+                    titleOutput.put(key, key);
+                }
+            }
 
             // Check if all necessary field is available
-            //Map obvTemp = new LinkedHashMap();
-            //obvTemp.put("observed", observeRecords);
-            //AdvancedHashMap obvData = adapter.exportRecord(obvTemp);
-            AdvancedHashMap obvData = adapter.exportRecord((Map) result.getOr("observed", new AdvancedHashMap())); // TODO 
-            for (Object title : titleListId) {
-                // check which optional data is exist, if not, remove from map
-                if (!obvData.getOr(title.toString(), "").toString().equals("")) {
-                    titleOutput.put(title, titleList.get(title));
-                } else if (altTitleList.containsKey(title) && !obvData.getOr(altTitleList.get(title).toString(), "").toString().equals("")) {
-                    titleOutput.put(altTitleList.get(title), titleList.get(title));
-                } else {
-                    // TODO throw new Exception("Incompleted record because missing data : [" + title + "]");
-                    sbError.append("! Waring: Incompleted record because missing data : [").append(title).append("]\r\n");
-                }
-            }
+            for (Object title : altTitleList.keySet()) {
 
-            // Check if which optional field is available
-            for (Object title : optTitleListId) {
                 // check which optional data is exist, if not, remove from map
-                if (!obvData.getOr(title.toString(), "").toString().equals("")) {
-                    if (!titleOutput.containsKey(title)) {
-                        titleOutput.put(title, optTitleList.get(title));
+                if (!fstObvData.containsKey(title)) {
+
+                    if (fstObvData.containsKey(altTitleList.get(title))) {
+                        titleOutput.put(title, altTitleList.get(title));
+                    } else {
+                        // TODO throw new Exception("Incompleted record because missing data : [" + title + "]");
+                        sbError.append("! Waring: Incompleted record because missing data : [").append(title).append("]\r\n");
                     }
 
+                } else {
                 }
             }
 
+            // decompress observed data
+            decompressData(observeRecords);
             // Observation Data Section
             Object[] titleOutputId = titleOutput.keySet().toArray();
             for (int i = 0; i < (titleOutputId.length / 40 + titleOutputId.length % 40 == 0 ? 0 : 1); i++) {
@@ -262,25 +116,27 @@ public class DssatAFileOutput extends DssatCommonOutput {
                 sbData.append("@TRNO ");
                 int limit = Math.min(titleOutputId.length, (i + 1) * 40);
                 for (int j = i * 40; j < limit; j++) {
-                    sbData.append(titleOutput.get(titleOutputId[j]).toString());
+                    sbData.append(String.format("%1$6s", titleOutput.get(titleOutputId[j]).toString().toUpperCase()));
                 }
                 sbData.append("\r\n");
+                trno = 1;
 
                 for (int j = 0; j < observeRecords.size(); j++) {
 
                     record = adapter.exportRecord((Map) observeRecords.get(j));
                     sbData.append(String.format(" %1$5d", trno));
+                    trno++;
                     for (int k = i * 40; k < limit; k++) {
-                        if ((titleOutputId[k].toString().equals("adap") && titleOutput.get(titleOutputId[k]).toString().trim().equals("ADAT"))
-                                || (titleOutputId[k].toString().equals("mdap") && titleOutput.get(titleOutputId[k]).toString().trim().equals("MDAT"))) {
-                            sbData.append(String.format("%1$6s", formatDateStr(result.getOr("pdate", defValI).toString(), record.getOr(titleOutputId[k].toString(), defValI).toString())));
+                        if ((titleOutputId[k].toString().equals("adat") && titleOutput.get(titleOutputId[k]).toString().trim().equals("adap"))
+                                || (titleOutputId[k].toString().equals("mdat") && titleOutput.get(titleOutputId[k]).toString().trim().equals("mdap"))) {
+                            String pdate = (String) ((AdvancedHashMap) result.getOr("experiment", new AdvancedHashMap())).getOr("pdate", defValD); // TODO need be updated after ear;y version
+                            sbData.append(String.format("%1$6s", formatDateStr(pdate, record.getOr(titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
                         } else {
-                            sbData.append(" ").append(formatNumStr(5, record.getOr(titleOutputId[k].toString(), defValI).toString()));
+                            sbData.append(" ").append(formatNumStr(5, record.getOr(titleOutput.get(titleOutputId[k]).toString(), defValI).toString()));
                         }
                     }
                     sbData.append("\r\n");
                 }
-
             }
 
             // Output finish
@@ -304,5 +160,156 @@ public class DssatAFileOutput extends DssatCommonOutput {
         defValR = "-99";
         defValC = "";
         defValI = "-99";
+    }
+
+    /**
+     * Create the list of titles for all observed data
+     *
+     */
+    private ArrayList getAllTitleList() {
+
+        ArrayList ret = new ArrayList();
+        ret.add("etcm");
+        ret.add("prcm");
+        ret.add("hdate");
+        ret.add("adap");
+        ret.add("cwam");
+        ret.add("cwams");
+        ret.add("hmah");
+        ret.add("hwah");
+        ret.add("hwahs");
+        ret.add("hyah");
+        ret.add("hyahs");
+        ret.add("mdap");
+        ret.add("r8aps");
+        ret.add("adaps");
+        ret.add("chtds");
+        ret.add("hmahs");
+        ret.add("adat");
+        ret.add("adoy");
+        ret.add("ap1d");
+        ret.add("br1d");
+        ret.add("br2d");
+        ret.add("br3d");
+        ret.add("br4d");
+        ret.add("bwah");
+        ret.add("bwam");
+        ret.add("cdwa");
+        ret.add("cfah");
+        ret.add("chta");
+        ret.add("chwa");
+        ret.add("cnaa");
+        ret.add("cnam");
+        ret.add("cpaa");
+        ret.add("cpam");
+        ret.add("cwaa");
+        ret.add("drcm");
+        ret.add("drid");
+        ret.add("dwap");
+        ret.add("e#am");
+        ret.add("e#um");
+        ret.add("eemd");
+        ret.add("eoaa");
+        ret.add("epac");
+        ret.add("epcm");
+        ret.add("escm");
+        ret.add("ewum");
+        ret.add("fdat");
+        ret.add("fwah");
+        ret.add("gl%m");
+        ret.add("gn%m");
+        ret.add("gnam");
+        ret.add("gp%m");
+        ret.add("gpam");
+        ret.add("gw%m");
+        ret.add("gwam");
+        ret.add("gwgm");
+        ret.add("gwpm");
+        ret.add("gyam");
+        ret.add("gypm");
+        ret.add("gyvm");
+        ret.add("h#am");
+        ret.add("h#gm");
+        ret.add("h#um");
+        ret.add("hastg");
+        ret.add("hdap");
+        ret.add("hiam");
+        ret.add("hipm");
+        ret.add("hprh");
+        ret.add("hwac");
+        ret.add("hwam");
+        ret.add("hwum");
+        ret.add("hyam");
+        ret.add("icsw");
+        ret.add("idap");
+        ret.add("idat");
+        ret.add("ir#m");
+        ret.add("ircm");
+        ret.add("l#sm");
+        ret.add("l#sx");
+        ret.add("laix");
+        ret.add("lf3d");
+        ret.add("lf5d");
+        ret.add("liwam");
+        ret.add("llfd");
+        ret.add("lwam");
+        ret.add("mdat");
+        ret.add("mdat2");
+        ret.add("mdoy");
+        ret.add("niam");
+        ret.add("nlcm");
+        ret.add("nucm");
+        ret.add("ocam");
+        ret.add("oid");
+        ret.add("oid");
+        ret.add("oid");
+        ret.add("onam");
+        ret.add("p#am");
+        ret.add("pd1p");
+        ret.add("pd1t");
+        ret.add("pdfp");
+        ret.add("pdft");
+        ret.add("pwam");
+        ret.add("r1at");
+        ret.add("r2at");
+        ret.add("r3at");
+        ret.add("r4at");
+        ret.add("r5at");
+        ret.add("r6at");
+        ret.add("r7at");
+        ret.add("r8ap");
+        ret.add("r8at");
+        ret.add("r9at");
+        ret.add("rnah");
+        ret.add("rocm");
+        ret.add("rpah");
+        ret.add("snam");
+        ret.add("spam");
+        ret.add("sqdat");
+        ret.add("sraa");
+        ret.add("swxm");
+        ret.add("t#am");
+        ret.add("tdap");
+        ret.add("tdat");
+        ret.add("tham");
+        ret.add("tl#c");
+        ret.add("tnah");
+        ret.add("tnim");
+        ret.add("tspd");
+        ret.add("twah");
+        ret.add("twam");
+        ret.add("un%h");
+        ret.add("unam");
+        ret.add("upam");
+        ret.add("uwah");
+        ret.add("uyah");
+        ret.add("vwam");
+        ret.add("z21d");
+        ret.add("z30d");
+        ret.add("z31d");
+        ret.add("z37d");
+        ret.add("z39d");
+
+        return ret;
     }
 }

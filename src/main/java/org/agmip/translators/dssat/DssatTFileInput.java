@@ -66,7 +66,13 @@ public class DssatTFileInput extends DssatCommonInput {
                 // Read meta info
                 if (flg[0].equals("meta") && flg[1].equals("")) {
 
-                    file.put("meta", line.replaceAll(".*:", "").trim());
+                    // Set variables' formats
+                    line = line.replaceAll(".*:", "").trim();
+                    formats.clear();
+                    formats.put("exname", 10);
+                    formats.put("local_name", line.length());
+                    // Read line and save into return holder
+                    file.put(readLine(line, formats));
 
                 } // Read data info 
                 else {
@@ -108,7 +114,7 @@ public class DssatTFileInput extends DssatCommonInput {
     }
 
     /**
-     * Set reading flgs for title lines (marked with *)
+     * Set reading flags for title lines (marked with *)
      * 
      * @param line  the string of reading line
      */
