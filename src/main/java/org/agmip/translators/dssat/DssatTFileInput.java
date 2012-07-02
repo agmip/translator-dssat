@@ -42,6 +42,7 @@ public class DssatTFileInput extends DssatCommonInput {
         ArrayList titles = new ArrayList();
         ArrayList obvData = new ArrayList();
         ArrayList obvDataSection = new ArrayList();
+        DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
         String obvDataKey = "data";  // TODO the key name might change
         String obvFileKey = "time_course";  // TODO the key name might change
 
@@ -87,6 +88,13 @@ public class DssatTFileInput extends DssatCommonInput {
                     AdvancedHashMap tmp = readLine(line, formats);
                     // translate date from yyddd format to yyyymmdd format
                     tmp.put("date", translateDateStr((String) tmp.get("date")));
+                    for (int i = 0; i < titles.size(); i++) {
+                        if (obvDataList.isDateType(titles.get(i))) {
+                            if (tmp.containsKey(titles.get(i))) {
+                                tmp.put(titles.get(i), translateDateStr((String) tmp.get(titles.get(i))));
+                            }
+                        }
+                    }
                     // Add data to the array
                     String[] keys = {"trno", "date"};
                     addToArray(obvDataSection, tmp, keys);

@@ -33,7 +33,7 @@ public class DssatAFileInput extends DssatCommonInput {
      */
     @Override
     protected AdvancedHashMap readFile(HashMap brMap) throws IOException {
-
+        
         AdvancedHashMap ret = new AdvancedHashMap();
         AdvancedHashMap file = new AdvancedHashMap();
         String line;
@@ -41,6 +41,7 @@ public class DssatAFileInput extends DssatCommonInput {
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
         ArrayList obvData = new ArrayList();
+        DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
         String obvDataKey = "data";     // P.S. the key name might change
         String obvFileKey = "summary";  // P.S. the key name might change
 
@@ -51,7 +52,7 @@ public class DssatAFileInput extends DssatCommonInput {
             // TODO reprot file not exist error
             return ret;
         }
-
+        
         ret.put(obvFileKey, file);
         file.put(obvDataKey, obvData);
         while ((line = brA.readLine()) != null) {
@@ -72,7 +73,7 @@ public class DssatAFileInput extends DssatCommonInput {
                     formats.put("local_name", line.length());
                     // Read line and save into return holder
                     file.put(readLine(line, formats));
-
+                    
                 } // Read data info 
                 else {
                     // Set variables' formats
@@ -81,25 +82,34 @@ public class DssatAFileInput extends DssatCommonInput {
                         formats.put(titles.get(i), 6);
                     }
                     // Read line and save into return holder
-                    addToArray(obvData, readLine(line, formats), "trno");
+                    AdvancedHashMap tmp = readLine(line, formats);
+                    
+                    for (int i = 0; i < titles.size(); i++) {
+                        if (obvDataList.isDateType(titles.get(i))) {
+                            if (tmp.containsKey(titles.get(i))) {
+                                tmp.put(titles.get(i), translateDateStr((String) tmp.get(titles.get(i))));
+                            }
+                        }
+                    }
+                    addToArray(obvData, tmp, "trno");
                 }
-
+                
             } // Read Observed title
             else if (flg[2].equals("title")) {
-
+                
                 titles = new ArrayList();
                 line = line.replaceFirst("@", " ");
                 for (int i = 0; i < line.length(); i += 6) {
                     titles.add(line.substring(i, Math.min(i + 6, line.length())).trim().toLowerCase());
                 }
-
+                
             } else {
             }
         }
 
 //        brA.close();
         compressData(ret);
-
+        
         return ret;
     }
 

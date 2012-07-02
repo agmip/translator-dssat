@@ -41,8 +41,9 @@ public class DssatTFileOutput extends DssatCommonOutput {
         StringBuilder sbData = new StringBuilder();         // construct the data info in the output
         HashMap altTitleList = new HashMap();               // Define alternative fields for the necessary observation data fields; key is necessary field
         // TODO Add alternative fields here
-        ArrayList optTitleList = getAllTitleList();         // Define optional observation data fields
+        ArrayList optTitleList2 = getAllTitleList();         // Define optional observation data fields
         LinkedHashMap titleOutput;                          // contain output data field id
+        DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
 
         try {
 
@@ -87,7 +88,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
                 // Check if which field is available
                 for (Object key : fstObvData.keySet()) {
                     // check which optional data is exist, if not, remove from map
-                    if (optTitleList.contains(key)) {
+                    if (obvDataList.isTimeCourseData(key)) {
                         titleOutput.put(key, key);
                     }
                 }
@@ -129,7 +130,14 @@ public class DssatTFileOutput extends DssatCommonOutput {
                         sbData.append(String.format(" %1$5d", Integer.parseInt(formatDateStr(record.getOr("date", defValI).toString()))));
                         for (int k = i * 39; k < limit; k++) {
 
-                            sbData.append(" ").append(formatNumStr(5, record.getOr(titleOutput.get(titleOutputId[k]).toString(), defValI).toString()));
+                            if (obvDataList.isDapDateType(titleOutputId[k], titleOutput.get(titleOutputId[k]))) {
+                                String pdate = (String) ((AdvancedHashMap) result.getOr("experiment", new AdvancedHashMap())).getOr("pdate", defValD); // TODO need be updated after ear;y version
+                                sbData.append(String.format("%1$6s", formatDateStr(pdate, record.getOr(titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
+                            } else if (obvDataList.isDateType(titleOutputId[k])) {
+                                sbData.append(String.format("%1$6s", formatDateStr(record.getOr(titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
+                            } else {
+                                sbData.append(" ").append(formatNumStr(5, record.getOr(titleOutput.get(titleOutputId[k]).toString(), defValI).toString()));
+                            }
 
                         }
                         sbData.append("\r\n");

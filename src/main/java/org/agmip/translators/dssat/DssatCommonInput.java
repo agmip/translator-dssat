@@ -136,7 +136,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
         Calendar cal = Calendar.getInstance();
         int days;
         int year;
-        if (startDate == null || startDate.length() > 5 || startDate.length() < 4) {
+        if (startDate == null || startDate.length() > 5 || startDate.length() < 1) {
             //throw new Exception("");
             return "-99"; //defValD;
         }
@@ -298,11 +298,10 @@ public abstract class DssatCommonInput implements TranslatorInput {
     protected void compressData(AdvancedHashMap m) {
 
         Object[] keys = m.keySet().toArray();
+        Object key;
         for (int i = 0; i < keys.length; i++) {
-            Object key = keys[i];
-//            
-//        }
-//        for (Object key : m.keySet()) {
+            key = keys[i];
+            
             if (m.get(key).getClass().equals(ArrayList.class)) {
                 if (((ArrayList) m.get(key)).isEmpty()) {
                     // Delete the empty list
