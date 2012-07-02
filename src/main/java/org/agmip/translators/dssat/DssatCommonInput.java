@@ -180,8 +180,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 // if the value is in valid keep blank string in it
                 if (checkValidValue(tmp)) {
                     ret.put(key, tmp);
+                } else {
+                    ret.put(key, "");   // P.S. "" means missing or invalid value
                 }
-                //ret.put(key, tmp);
             }
             line = line.substring(length);
         }
