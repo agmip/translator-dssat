@@ -297,13 +297,29 @@ public abstract class DssatCommonInput implements TranslatorInput {
      */
     protected void compressData(AdvancedHashMap m) {
 
-        for (Object key : m.keySet()) {
+        Object[] keys = m.keySet().toArray();
+        for (int i = 0; i < keys.length; i++) {
+            Object key = keys[i];
+//            
+//        }
+//        for (Object key : m.keySet()) {
             if (m.get(key).getClass().equals(ArrayList.class)) {
-                // iterate sub array nodes
-                compressData((ArrayList) m.get(key));
+                if (((ArrayList) m.get(key)).isEmpty()) {
+                    // Delete the empty list
+                    m.remove(key);
+                } else {
+                    // iterate sub array nodes
+                    compressData((ArrayList) m.get(key));
+                }
             } else if (m.get(key).getClass().equals(AdvancedHashMap.class)) {
-                // iterate sub data nodes
-                compressData((AdvancedHashMap) m.get(key));
+                if (((AdvancedHashMap) m.get(key)).isEmpty()) {
+                    // Delete the empty list
+                    m.remove(key);
+                } else {
+                    // iterate sub data nodes
+                    compressData((AdvancedHashMap) m.get(key));
+                }
+                
             } else {
                 // ignore other type nodes
             }

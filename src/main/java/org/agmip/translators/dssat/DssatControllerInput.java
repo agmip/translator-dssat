@@ -28,28 +28,36 @@ public class DssatControllerInput {
 
         HashMap brMap = new HashMap();
         AdvancedHashMap ret = new AdvancedHashMap();
+        AdvancedHashMap tmp;
         if (inputs.length > 0) {
             brMap = inputs[0].getBufferReader(arg0);
         }
 
         for (int i = 0; i < inputs.length; i++) {
-            // If return map contains multiple file, like soil or weather, get ArrayList from the return map
-            if (inputs[i].getClass().equals(DssatSoilInput.class) || inputs[i].getClass().equals(DssatWeatherInput.class)) {
-                ret.put(inputs[i].jsonKey, inputs[i].readFile(brMap).get(inputs[i].jsonKey));
+            
+            tmp = inputs[i].readFile(brMap);
+            
+            // Check if reading result is empty. If so, ignore it.
+            if (!tmp.isEmpty()) {
+                // If return map contains multiple file, like soil or weather, get ArrayList from the return map
+                if (inputs[i].getClass().equals(DssatSoilInput.class) || inputs[i].getClass().equals(DssatWeatherInput.class)) {
+                    ret.put(inputs[i].jsonKey, tmp.get(inputs[i].jsonKey));
 
-            } // if read Observed data file, need to save them under the same key (currently is "observed")
-            else if (inputs[i].getClass().equals(DssatAFileInput.class) || inputs[i].getClass().equals(DssatTFileInput.class)) {
-                if (ret.containsKey(inputs[i].jsonKey)) {
-                    ((AdvancedHashMap) ret.get(inputs[i].jsonKey)).put(inputs[i].readFile(brMap));
+                } // if read Observed data file, need to save them under the same key (currently is "observed")
+                else if (inputs[i].getClass().equals(DssatAFileInput.class) || inputs[i].getClass().equals(DssatTFileInput.class)) {
+                    if (ret.containsKey(inputs[i].jsonKey)) {
+                        ((AdvancedHashMap) ret.get(inputs[i].jsonKey)).put(tmp);
+                    } else {
+                        ret.put(inputs[i].jsonKey, tmp);
+                    }
                 } else {
-                    ret.put(inputs[i].jsonKey, inputs[i].readFile(brMap));
+                    ret.put(inputs[i].jsonKey,tmp);
                 }
+                
             } else {
-                ret.put(inputs[i].jsonKey, inputs[i].readFile(brMap));
             }
-
         }
-
+        
         return ret;
     }
 }
