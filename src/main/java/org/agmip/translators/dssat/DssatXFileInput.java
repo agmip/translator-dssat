@@ -78,19 +78,19 @@ public class DssatXFileInput extends DssatCommonInput {
         }
 
         ret.put("treatment", trArr);
-        ret.put("cultivar", cuArr);
-        ret.put("field", flArr);
-        ret.put("soil_analysis", saArr);
-        ret.put("initial_condition", icArr);
-        ret.put("plant", plArr);
-        ret.put("irrigation", irArr);
-        ret.put("fertilizer", feArr);
-        ret.put("residue_organic", omArr);
-        ret.put("soil_analysis", chArr);
-        ret.put("tillage", tiArr);
-        ret.put("emvironment", emArr);
-        ret.put("harvest", haArr);
-        ret.put("simulation", smArr);
+//        ret.put("cultivar", cuArr);
+//        ret.put("field", flArr);
+//        ret.put("soil_analysis", saArr);
+//        ret.put("initial_condition", icArr);
+//        ret.put("plant", plArr);
+//        ret.put("irrigation", irArr);
+//        ret.put("fertilizer", feArr);
+//        ret.put("residue_organic", omArr);
+//        ret.put("chemical", chArr);
+//        ret.put("tillage", tiArr);
+//        ret.put("emvironment", emArr);
+//        ret.put("harvest", haArr);
+//        ret.put("simulation", smArr);
 
         while ((line = br.readLine()) != null) {
 
@@ -223,7 +223,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
-                    formats.put("", 2);    // P.S. ignore the data index "ge"
+                    formats.put("cu", 2);
                     formats.put("cr", 3);
                     formats.put("cul_id", 7);
                     formats.put("cul_name", 17);
@@ -331,7 +331,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (flg[1].startsWith("a sadat") && flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
-                    formats.put("", 2);         // P.S. ignore the data index "sa"
+                    formats.put("sa", 2);
                     formats.put("sadat", 6);
                     formats.put("samhb", 6);
                     formats.put("sampx", 6);
@@ -369,7 +369,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (flg[1].startsWith("c   pcr") && flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
-                    formats.put("", 2);         // P.S. ignore the data index "ic"
+                    formats.put("ic", 2);
                     formats.put("icpcr", 6);
                     formats.put("icdat", 6);
                     formats.put("icrt", 6);
@@ -412,7 +412,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
-                    formats.put("", 2);         // P.S. ignore the data index "pl"
+                    formats.put("pl", 2);
                     formats.put("pdate", 6);
                     formats.put("pldae", 6);
                     formats.put("plpop", 6);
@@ -446,7 +446,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (flg[1].startsWith("i  efir") && flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
-                    formats.put("", 2);         // P.S. ignore the data index "ir"
+                    formats.put("ir", 2);
                     formats.put("ireff", 6);
                     formats.put("irmdp", 6);
                     formats.put("irthr", 6);
@@ -471,7 +471,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("irval", 6);
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("idate", translateDateStr((String) tmp.get("idate")));
+//                    tmp.put("idate", translateDateStr((String) tmp.get("idate"))); // TODO DOY handling
                     irdArr.add(tmp);
 
                 } else {
@@ -484,7 +484,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
-                    formats.put("", 2);         // P.S. ignore the data index "fe"
+                    formats.put("fe", 2);
                     formats.put("fdate", 6);
                     formats.put("fecd", 6);
                     formats.put("feacd", 6);
@@ -498,7 +498,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("fe_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("fdate", translateDateStr((String) tmp.get("fdate")));
+//                    tmp.put("fdate", translateDateStr((String) tmp.get("fdate"))); // TODO DOY handling
                     feArr.add(tmp);
                 } else {
                 }
@@ -510,7 +510,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
-                    formats.put("", 2);         // P.S. ignore the data index "om"
+                    formats.put("om", 2);
                     formats.put("omdat", 6);    // P.S. id do not match with the master list "omday"
                     formats.put("omcd", 6);
                     formats.put("omamt", 6);
@@ -523,7 +523,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("om_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("omdat", translateDateStr((String) tmp.get("omdat")));
+//                    tmp.put("omdat", translateDateStr((String) tmp.get("omdat"))); // TODO DOY handling
                     omArr.add(tmp);
                 } else {
                 }
@@ -535,7 +535,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
-                    formats.put("", 2);         // P.S. ignore the data index "ch"
+                    formats.put("ch", 2);
                     formats.put("cdate", 6);
                     formats.put("chcd", 6);
                     formats.put("chamt", 6);
@@ -557,7 +557,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
-                    formats.put("", 2);         // P.S. ignore the data index "ti"
+                    formats.put("ti", 2);
                     formats.put("tdate", 6);
                     formats.put("tiimp", 6);
                     formats.put("tidep", 6);
@@ -576,7 +576,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
-                    formats.put("", 2);         // P.S. ignore the data index "em"
+                    formats.put("em", 2);
                     formats.put("emday", 6);
                     formats.put("ecdyl", 2);
                     formats.put("emdyl", 4);
@@ -609,7 +609,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
-                    formats.put("", 2);         // P.S. ignore the data index "em"
+                    formats.put("ha", 2);
                     formats.put("hdate", 6);
                     formats.put("hastg", 6);
                     formats.put("hacom", 6);
@@ -825,7 +825,110 @@ public class DssatXFileInput extends DssatCommonInput {
         }
 
         br.close();
-        if (brw != null) brw.close();
+        if (brw != null) {
+            brw.close();
+        }
+
+        for (int i = 0; i < trArr.size(); i++) {
+            AdvancedHashMap treatment = (AdvancedHashMap) trArr.get(i);
+
+            // cultivar
+            if (!treatment.getOr("cu", "0").equals("0")) {
+                treatment.put("cultivar", getSectionData(cuArr, "cu", treatment.get("cu").toString()));
+            }
+
+            // field
+            if (!treatment.getOr("fl", "0").equals("0")) {
+                treatment.put("field", getSectionData(flArr, "fl", treatment.get("fl").toString()));
+            }
+
+            // soil_analysis
+            if (!treatment.getOr("sa", "0").equals("0")) {
+                treatment.put("soil_analysis", getSectionData(saArr, "sa", treatment.get("sa").toString()));
+            }
+
+            // initial_condition
+            if (!treatment.getOr("ic", "0").equals("0")) {
+                treatment.put("initial_condition", getSectionData(icArr, "ic", treatment.get("ic").toString()));
+            }
+
+            // plant
+            if (!treatment.getOr("pl", "0").equals("0")) {
+                treatment.put("plant", getSectionData(plArr, "pl", treatment.get("pl").toString()));
+            }
+
+            // irrigation
+            if (!treatment.getOr("ir", "0").equals("0")) {
+                treatment.put("irrigation", getSectionData(irArr, "ir", treatment.get("ir").toString()));
+            }
+
+            // fertilizer
+            if (!treatment.getOr("fe", "0").equals("0")) {
+                treatment.put("fertilizer", getSectionData(feArr, "fe", treatment.get("fe").toString()));
+            }
+
+            // residue_organic
+            if (!treatment.getOr("om", "0").equals("0")) {
+                treatment.put("residue_organic", getSectionData(omArr, "om", treatment.get("om").toString()));
+            }
+
+            // chemical
+            if (!treatment.getOr("ch", "0").equals("0")) {
+                treatment.put("chemical", getSectionData(chArr, "ch", treatment.get("ch").toString()));
+            }
+
+            // tillage
+            if (!treatment.getOr("ti", "0").equals("0")) {
+                treatment.put("tillage", getSectionData(tiArr, "ti", treatment.get("ti").toString()));
+            }
+
+            // emvironment
+            if (!treatment.getOr("em", "0").equals("0")) {
+                treatment.put("emvironment", getSectionData(emArr, "em", treatment.get("em").toString()));
+            }
+
+            // harvest
+            if (!treatment.getOr("ha", "0").equals("0")) {
+                treatment.put("harvest", getSectionData(haArr, "ha", treatment.get("ha").toString()));
+            }
+
+            // simulation
+            if (!treatment.getOr("sm", "0").equals("0")) {
+                treatment.put("simulation", getSectionData(smArr, "sm", treatment.get("sm").toString()));
+            }
+
+            // Revise the date value for FEDATE, IDATE, MLADAT
+            // Get Planting date
+            String pdate = "";
+            ArrayList plTmps = (ArrayList) treatment.getOr("planting", new ArrayList());
+            if (!plTmps.isEmpty()) {
+                pdate = (String) ((AdvancedHashMap) plTmps.get(0)).getOr("pdate", "");
+                if (pdate.length() > 5) {
+                    pdate = pdate.substring(2);
+                }
+            }
+
+            // Fertilizer Date
+            ArrayList feTmps = (ArrayList) treatment.getOr("fertilizer", new ArrayList());
+            AdvancedHashMap feTmp;
+            for (int j = 0; j < feTmps.size(); j++) {
+                feTmp = (AdvancedHashMap) feTmps.get(j);
+                feTmp.put("fdate", translateDateStrForDOY((String) feTmp.get("fdate"), pdate));
+            }
+
+            // Initial condition date
+            AdvancedHashMap icTmp = (AdvancedHashMap) treatment.get("initial_condition");
+            if (icTmp != null) {
+                icTmp.put("idate", translateDateStrForDOY((String) icTmp.getOr("idate", defValI), pdate));
+            }
+
+            // Mulch application date
+            AdvancedHashMap omTmp = (AdvancedHashMap) treatment.get("residue_organic");
+            if (omTmp != null) {
+                omTmp.put("omdat", translateDateStrForDOY((String) omTmp.getOr("omdat", defValI), pdate));
+            }
+
+        }
         compressData(ret);
 
         return ret;
@@ -841,5 +944,51 @@ public class DssatXFileInput extends DssatCommonInput {
         flg[0] = line.substring(1).trim().toLowerCase();
         flg[1] = "";
         flg[2] = "";
+    }
+
+    /**
+     * Get the section data by given index value and key
+     * 
+     * @param secArr    Section data array
+     * @param key       index variable name
+     * @param value     index variable value
+     */
+    private Object getSectionData(ArrayList secArr, Object key, String value) {
+
+        ArrayList ret = null;
+        // Get First data node
+        if (secArr.isEmpty()) {
+            return null;
+        }
+        // Define the section with single sub data
+        ArrayList singleSubRecSecList = new ArrayList();
+        singleSubRecSecList.add("cu");
+        singleSubRecSecList.add("fl");
+        singleSubRecSecList.add("pl");
+        singleSubRecSecList.add("om");  // TODO wait for confirmation that single sub record
+        singleSubRecSecList.add("ti");  // TODO wait for confirmation that single sub record
+        singleSubRecSecList.add("sm");
+        AdvancedHashMap fstNode = (AdvancedHashMap) secArr.get(0);
+        // If it contains multiple sub array of data, or it does not have multiple sub records
+        if (fstNode.containsKey("data") || singleSubRecSecList.contains(key)) {
+            for (int i = 0; i < secArr.size(); i++) {
+                if (((AdvancedHashMap) secArr.get(i)).get(key).equals(value)) {
+                    return secArr.get(i);
+                }
+            }
+
+        } // If it is simple array
+        else {
+            ret = new ArrayList();
+            AdvancedHashMap node;
+            for (int i = 0; i < secArr.size(); i++) {
+                node = (AdvancedHashMap) secArr.get(i);
+                if (node.get(key).equals(value)) {
+                    ret.add(node);
+                }
+            }
+        }
+
+        return ret;
     }
 }
