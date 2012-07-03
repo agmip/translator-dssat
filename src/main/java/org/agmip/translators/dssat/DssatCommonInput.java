@@ -193,7 +193,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
         for (String key : formats.keySet()) {
             // To avoid to be over limit of string lenght
             length = Math.min((Integer) formats.get(key), line.length());
-            if (!((String) key).equals("")) {
+            if (!((String) key).equals("") && !((String) key).startsWith("null")) {
                 tmp = line.substring(0, length).trim();
                 // if the value is in valid keep blank string in it
                 if (checkValidValue(tmp)) {

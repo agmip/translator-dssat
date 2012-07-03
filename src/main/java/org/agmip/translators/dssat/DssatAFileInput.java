@@ -105,7 +105,12 @@ public class DssatAFileInput extends DssatCommonInput {
                 titles = new ArrayList();
                 line = line.replaceFirst("@", " ");
                 for (int i = 0; i < line.length(); i += 6) {
-                    titles.add(line.substring(i, Math.min(i + 6, line.length())).trim().toLowerCase());
+                    String titleStr = line.substring(i, Math.min(i + 6, line.length())).trim().toLowerCase();
+                    if (titleStr.equals("")) {
+                        titles.add("null" + i);
+                    } else {
+                        titles.add(titleStr);
+                    }
                 }
 
             } else {
