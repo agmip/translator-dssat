@@ -91,7 +91,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 }
                 
                 // Get File name
-                String fileName = fstSite.getOr("pedon", "").toString();
+                String fileName = fstSite.getOr("soil_id", "").toString();
                 if (fileName.equals("")) {
                     fileName = "soil.SOL";
                 } else {
@@ -111,18 +111,18 @@ public class DssatSoilOutput extends DssatCommonOutput {
 
                     // Site Info Section
                     sbData.append(String.format("*%1$-10s  %2$-11s %3$-5s %4$5s %5$s\r\n",
-                            soilSite.getOr("pedon", defValC).toString(),
+                            soilSite.getOr("soil_id", defValC).toString(),
                             soilSite.getOr("sl_source", defValC).toString(),
                             soilSite.getOr("sltx", defValC).toString(),
                             formatNumStr(5, soilSite.getOr("sldp", defValR).toString()),
-                            soilSite.getOr("classification", defValC).toString()));
+                            soilSite.getOr("soil_name", defValC).toString()));
                     sbData.append("@SITE        COUNTRY          LAT     LONG SCS FAMILY\r\n");
                     sbData.append(String.format(" %1$-11s %2$-11s %3$9s%4$8s %5$s\r\n",
-                            soilSite.getOr("site", defValC).toString(),
-                            soilSite.getOr("scount", defValC).toString(),
-                            formatNumStr(8, soilSite.getOr("soillat", defValR).toString()),     // P.S. Definition changed 9 -> 10 (06/24)
-                            formatNumStr(8, soilSite.getOr("soillong", defValR).toString()),    // P.S. Definition changed 9 -> 8  (06/24)
-                            soilSite.getOr("name", defValC).toString()));
+                            soilSite.getOr("sl_loc_3", defValC).toString(),
+                            soilSite.getOr("sl_loc_1", defValC).toString(),
+                            formatNumStr(8, soilSite.getOr("soil_lat", defValR).toString()),     // P.S. Definition changed 9 -> 10 (06/24)
+                            formatNumStr(8, soilSite.getOr("soil_long", defValR).toString()),    // P.S. Definition changed 9 -> 8  (06/24)
+                            soilSite.getOr("classification", defValC).toString()));
                     sbData.append("@ SCOM  SALB  SLU1  SLDR  SLRO  SLNF  SLPF  SMHB  SMPX  SMKE\r\n");
                     sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$-5s %9$-5s %10$-5s\r\n",
                             soilSite.getOr("scom", defValC).toString(),
@@ -173,10 +173,10 @@ public class DssatSoilOutput extends DssatCommonOutput {
                                 formatNumStr(5, soilRecord.getOr("slsat", defValR).toString()),
                                 formatNumStr(5, soilRecord.getOr("slrgf", defValR).toString()),
                                 formatNumStr(5, soilRecord.getOr("sksat", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("sbdm", defValR).toString()),
+                                formatNumStr(5, soilRecord.getOr("slbdm", defValR).toString()),
                                 formatNumStr(5, soilRecord.getOr("sloc", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("clay", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("silt", defValR).toString()),
+                                formatNumStr(5, soilRecord.getOr("slcly", defValR).toString()),
+                                formatNumStr(5, soilRecord.getOr("slsil", defValR).toString()),
                                 formatNumStr(5, soilRecord.getOr("slcf", defValR).toString()),
                                 formatNumStr(5, soilRecord.getOr("slni", defValR).toString()),
                                 formatNumStr(5, soilRecord.getOr("slphw", defValR).toString()),

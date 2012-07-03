@@ -81,11 +81,11 @@ public class DssatSoilInput extends DssatCommonInput {
 
                         // Set variables' formats
                         formats.clear();
-                        formats.put("pedon", 10);
+                        formats.put("soil_id", 10);
                         formats.put("sl_source", 13);  // P.S. sl_system is always "SCS" for DSSAT
                         formats.put("sltx", 6);
                         formats.put("sldp", 6);
-                        formats.put("classification", 51);
+                        formats.put("soil_name", 51);
                         // Read line and save into return holder
                         sites.add(readLine(line.substring(1), formats));
                         ((AdvancedHashMap) sites.get(sites.size() - 1)).put(layerKey, new ArrayList());
@@ -95,11 +95,11 @@ public class DssatSoilInput extends DssatCommonInput {
 
                         // Set variables' formats
                         formats.clear();
-                        formats.put("site", 12);
-                        formats.put("scount", 12);  // TODO need confirm for the key name ("")
-                        formats.put("soillat", 10); // P.S. Definition changed 9 -> 10 (06/24)
-                        formats.put("soillong", 8); // P.S. Definition changed 9 -> 8  (06/24)
-                        formats.put("name", 51);    // P.S. "fd_name" for query using, not this time
+                        formats.put("sl_loc_3", 12);
+                        formats.put("sl_loc_1", 12);  // P.S. old key name ("scount")
+                        formats.put("soil_lat", 10); // P.S. Definition changed 9 -> 10 (06/24)
+                        formats.put("soil_long", 8); // P.S. Definition changed 9 -> 8  (06/24)
+                        formats.put("classification", 51);    // P.S. "fd_name" for query using, not this time
                         // Read line and save into return holder
                         ((AdvancedHashMap) sites.get(sites.size() - 1)).put(readLine(line, formats));
 
@@ -133,10 +133,10 @@ public class DssatSoilInput extends DssatCommonInput {
                         formats.put("slsat", 6);
                         formats.put("slrgf", 6);
                         formats.put("sksat", 6);
-                        formats.put("sbdm", 6);
+                        formats.put("slbdm", 6);
                         formats.put("sloc", 6);
-                        formats.put("clay", 6);
-                        formats.put("silt", 6);
+                        formats.put("slcly", 6);
+                        formats.put("slsil", 6);
                         formats.put("slcf", 6);
                         formats.put("slni", 6);
                         formats.put("slphw", 6);
