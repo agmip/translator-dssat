@@ -316,11 +316,11 @@ public class DssatXFileInput extends DssatCommonInput {
                         }
                     }
                     if (flArr.isEmpty()) {
-                        ret.put("fl_lat", strLong); // TODO Keep the meta data handling for the early version
-                        ret.put("fl_long", strLat); // TODO Keep the meta data handling for the early version
+                        ret.put("fl_lat", strLat); // TODO Keep the meta data handling for the early version
+                        ret.put("fl_long", strLong); // TODO Keep the meta data handling for the early version
                     }
-                    tmp.put("fl_lat", strLong);
-                    tmp.put("fl_long", strLat);
+                    tmp.put("fl_lat", strLat);
+                    tmp.put("fl_long", strLong);
                     addToArray(flArr, tmp, "fl");
                 }
 
