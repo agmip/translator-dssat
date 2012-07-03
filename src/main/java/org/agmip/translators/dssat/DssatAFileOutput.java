@@ -84,9 +84,19 @@ public class DssatAFileOutput extends DssatCommonOutput {
 
             // Check if which field is available
             for (Object key : fstObvData.keySet()) {
-                // check which optional data is exist, if not, remove from map
+                // check if the data is belong to summary data
                 if (obvDataList.isSummaryData(key)) {
                     titleOutput.put(key, key);
+
+                } // check if the additional data is too long to output
+                else if (key.toString().length() <= 5) {
+                    if (!key.equals("trno")) {
+                        titleOutput.put(key, key);
+                    }
+
+                } // If it is too long for DSSAT, give a warning message
+                else {
+                    sbError.append("! Waring: Unsuitable data for DSSAT observed data (too long): [").append(key).append("]\r\n");
                 }
             }
 
@@ -127,7 +137,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
                     sbData.append(String.format(" %1$5d", trno));
                     trno++;
                     for (int k = i * 40; k < limit; k++) {
-                        
+
                         if (obvDataList.isDapDateType(titleOutputId[k], titleOutput.get(titleOutputId[k]))) {
                             String pdate = (String) ((AdvancedHashMap) result.getOr("experiment", new AdvancedHashMap())).getOr("pdate", defValD); // TODO need be updated after ear;y version
                             sbData.append(String.format("%1$6s", formatDateStr(pdate, record.getOr(titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));

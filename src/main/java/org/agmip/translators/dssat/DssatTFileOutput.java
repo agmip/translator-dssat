@@ -90,6 +90,16 @@ public class DssatTFileOutput extends DssatCommonOutput {
                     // check which optional data is exist, if not, remove from map
                     if (obvDataList.isTimeCourseData(key)) {
                         titleOutput.put(key, key);
+
+                    } // check if the additional data is too long to output
+                    else if (key.toString().length() <= 5 && !key.equals("trno")) {
+                        if (!key.equals("trno")) {
+                            titleOutput.put(key, key);
+                        }
+
+                    } // If it is too long for DSSAT, give a warning message
+                    else {
+                        sbError.append("! Waring: Unsuitable data for DSSAT observed data (too long): [").append(key).append("]\r\n");
                     }
                 }
 

@@ -16,7 +16,7 @@ public class DssatObservedData {
     private HashMap dapDateTypeList = new HashMap();        // Define the variables of data types comes with day after planting (dap) variable; value means dap variable code
     
     public DssatObservedData() {
-        
+
         // Summary variables list
         summaryList.add("etcm");
         summaryList.add("prcm");
@@ -158,7 +158,7 @@ public class DssatObservedData {
         summaryList.add("z31d");
         summaryList.add("z37d");
         summaryList.add("z39d");
-        
+
         // Time-course variable list
         timeCourseList.add("e#ad");
         timeCourseList.add("chtd");
@@ -413,7 +413,7 @@ public class DssatObservedData {
         timeCourseList.add("nupr");
         timeCourseList.add("nwad");
         timeCourseList.add("o#ad");
-        timeCourseList.add("obs_trt_id");
+//        timeCourseList.add("obs_trt_id");
         timeCourseList.add("omac");
         timeCourseList.add("owad");
         timeCourseList.add("owgd");
@@ -689,7 +689,7 @@ public class DssatObservedData {
         timeCourseList.add("wspd");
         timeCourseList.add("wupr");
         timeCourseList.add("year");
-        
+
         // Date type varibale list
         dateTypeList.add("pldae");
         dateTypeList.add("edate");
@@ -718,7 +718,7 @@ public class DssatObservedData {
         dateTypeList.add("z31d");
         dateTypeList.add("z37d");
         dateTypeList.add("z39d");
-        
+
         // Date type varibale with dap variable list
         dapDateTypeList.put("adat", "adap");
         dapDateTypeList.put("pd1t", "pd1p");
@@ -730,9 +730,9 @@ public class DssatObservedData {
         dapDateTypeList.put("idat", "idap");
         dapDateTypeList.put("mdat", "mdap");
         dapDateTypeList.put("tdat", "tdap");
-
+        
     }
-    
+
     /**
      * Get summary variable list
      * 
@@ -741,7 +741,7 @@ public class DssatObservedData {
     public ArrayList getSummaryList() {
         return summaryList;
     }
-    
+
     /**
      * Get time-course variable list
      * 
@@ -750,7 +750,7 @@ public class DssatObservedData {
     public ArrayList getTimeCourseList() {
         return timeCourseList;
     }
-    
+
     /**
      * Get list of data type variable
      * 
@@ -759,7 +759,7 @@ public class DssatObservedData {
     public ArrayList getDateTypeList() {
         return dateTypeList;
     }
-    
+
     /**
      * Get the list of data type variables with dap variable
      * 
@@ -768,7 +768,7 @@ public class DssatObservedData {
     public HashMap getDapDateTypeList() {
         return dapDateTypeList;
     }
-    
+
     /**
      * Check if the varibale is the summary variable
      * 
@@ -779,7 +779,7 @@ public class DssatObservedData {
     public boolean isSummaryData(Object variableName) {
         return summaryList.contains(variableName);
     }
-    
+
     /**
      * Check if the varibale is the time-course variable
      * 
@@ -790,7 +790,7 @@ public class DssatObservedData {
     public boolean isTimeCourseData(Object variableName) {
         return timeCourseList.contains(variableName);
     }
-    
+
     /**
      * Check if the variable is the date type
      * 
@@ -801,7 +801,7 @@ public class DssatObservedData {
     public boolean isDateType(Object variableName) {
         return dateTypeList.contains(variableName);
     }
-    
+
     /**
      * Check if the variable is the date type with dap variable
      * 
@@ -812,7 +812,7 @@ public class DssatObservedData {
     public boolean isDapDateType(Object variableName) {
         return dapDateTypeList.containsKey(variableName);
     }
-    
+
     /**
      * Check if the variable is the date type with dap variable
      * 
@@ -824,7 +824,7 @@ public class DssatObservedData {
     public boolean isDapDateType(Object variableName, Object dapName) {
         return (dapDateTypeList.containsKey(variableName) && dapDateTypeList.get(variableName).equals(dapName));
     }
-    
+
     /**
      * Get the dap variable name related to the input variable name
      * 
