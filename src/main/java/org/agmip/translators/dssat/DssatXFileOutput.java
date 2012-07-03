@@ -88,7 +88,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 if (strs != null) {
                     //throw new Exception("Incompleted record because missing data : [" + necessaryData[i] + "]");
                     //System.out.println("Incompleted record because missing data : [" + necessaryData[i] + "]");
-                    sbError.append("! Warning: Incompleted record because missing data : [").append(necessaryData[i]).append("]");
+                    sbError.append("! Warning: Incompleted record because missing data : [").append(necessaryData[i]).append("]\r\n");
                     //return;
                 }
             }
@@ -213,15 +213,15 @@ public class DssatXFileOutput extends DssatCommonOutput {
             if (cuArr.isEmpty()) {
                 //throw new Exception ("");
                 //System.out.println("Trhee is no cultivar data in the experiment.");
-                sbError.append("! Warning: Trhee is no cultivar data in the experiment.");
+                sbError.append("! Warning: Trhee is no cultivar data in the experiment.\r\n");
             } else if (flArr.isEmpty()) {
                 //throw new Exception ("");
                 //System.out.println("Trhee is no field data in the experiment.");
-                sbError.append("! Warning: Trhee is no field data in the experiment.");
+                sbError.append("! Warning: Trhee is no field data in the experiment.\r\n");
             } else if (mpArr.isEmpty()) {
                 //throw new Exception ("");
                 //System.out.println("Trhee is no plainting data in the experiment.");
-                sbError.append("! Warning: Trhee is no plainting data in the experiment.");
+                sbError.append("! Warning: Trhee is no plainting data in the experiment.\r\n");
             }
 
             // CULTIVARS Section

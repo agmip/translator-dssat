@@ -44,7 +44,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             return String.format("%1$02d%2$03d", cal.get(Calendar.YEAR) % 100, cal.get(Calendar.DAY_OF_YEAR));
         } catch (Exception e) {
             // if tranlate failed, then use default value for date
-            //sbError.append("! Waring: There is a invalid date [").append(str).append("]");
+            //sbError.append("! Waring: There is a invalid date [").append(str).append("]\r\n");
             return formatDateStr2(defValD);
         }
     }
@@ -65,7 +65,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         String[] inputStr = str.split("\\.");
         if (inputStr[0].length() > bits) {
             //throw new Exception();
-            sbError.append("! Waring: There is a oversized number [").append(str).append("] (Limitation is ").append(bits).append("bits)");
+            sbError.append("! Waring: There is a oversized number [").append(str).append("] (Limitation is ").append(bits).append("bits)\r\n");
         } else {
             ret = inputStr[0];
 
@@ -129,7 +129,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             return String.format("%1$02d%2$03d", cal.get(Calendar.YEAR) % 100, cal.get(Calendar.DAY_OF_YEAR));
         } catch (Exception e) {
             // if tranlate failed, then use default value for date
-            // sbError.append("! Waring: There is a invalid date [").append(startDate).append("]");
+            // sbError.append("! Waring: There is a invalid date [").append(startDate).append("]\r\n");
             return "-99"; //formatDateStr(defValD);
         }
 

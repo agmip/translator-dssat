@@ -131,7 +131,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                 } else {
                     // TODO Throw exception here
                     //System.out.println("A daily record has the missing date in it.");
-                    sbError.append("! Warning: A daily record has the missing date in it.");
+                    sbError.append("! Warning: A daily record has the missing date in it.\r\n");
                 }
             }
 
