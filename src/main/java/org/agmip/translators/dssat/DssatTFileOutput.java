@@ -51,13 +51,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
             // Get Data from input holder
             AdvancedHashMap obvFile = adapter.exportRecord((Map) result.getOr("time_course", result));
-            if (obvFile == null) {
-                return;
-            }
             AdvancedHashMap obvTFile = adapter.exportRecord((Map) obvFile.getOr("average", obvFile));
-            if (obvTFile == null) {
-                return;
-            }
             ArrayList observeRecordsSections = ((ArrayList) obvTFile.getOr("data", new ArrayList()));
 
             // Initial BufferedWriter
