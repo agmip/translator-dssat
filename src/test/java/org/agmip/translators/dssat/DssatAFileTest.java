@@ -40,6 +40,7 @@ public class DssatAFileTest {
         File file = obDssatAFileOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
+            assertTrue(file.getName().equals("UFGA7801.SBA"));
             assertTrue(file.delete());
         }
     }
