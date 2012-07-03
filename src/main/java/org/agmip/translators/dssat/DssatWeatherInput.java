@@ -45,7 +45,7 @@ public class DssatWeatherInput extends DssatCommonInput {
         char[] buf;
         LinkedHashMap mapW;
         LinkedHashMap formats = new LinkedHashMap();
-        String dailyKey = "data";  // TODO the key name might change
+        String dailyKey = "data";  // P.S. the key name might change
 
         mapW = (LinkedHashMap) brMap.get("W");
 
@@ -104,14 +104,6 @@ public class DssatWeatherInput extends DssatCommonInput {
                         for (int i = 0; i < titles.size(); i++) {
                             formats.put(titles.get(i), 6);
                         }
-                        // TODO wait for confirmation about how to handle the unknown field in the daily section
-//                        formats.put("srad", 6);
-//                        formats.put("tmax", 6);
-//                        formats.put("tmin", 6);
-//                        formats.put("rain", 6);
-//                        formats.put("tdew", 6);
-//                        formats.put("wind", 6);
-//                        formats.put("pard", 6);
                         // Read line and save into return holder
                         AdvancedHashMap tmp = readLine(line, formats);
                         // translate date from yyddd format to yyyymmdd format
