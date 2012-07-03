@@ -92,8 +92,8 @@ public class DssatTFileOutput extends DssatCommonOutput {
                         titleOutput.put(key, key);
 
                     } // check if the additional data is too long to output
-                    else if (key.toString().length() <= 5 && !key.equals("trno")) {
-                        if (!key.equals("trno")) {
+                    else if (key.toString().length() <= 5) {
+                        if (!key.equals("trno") && !key.equals("date")) {
                             titleOutput.put(key, key);
                         }
 
