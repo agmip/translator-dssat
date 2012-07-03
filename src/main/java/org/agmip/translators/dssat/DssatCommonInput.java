@@ -321,7 +321,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
         for (int i = 0; i < keys.length; i++) {
             key = keys[i];
 
-            if (m.get(key).getClass().equals(ArrayList.class)) {
+            if (m.get(key) instanceof ArrayList) {
                 if (((ArrayList) m.get(key)).isEmpty()) {
                     // Delete the empty list
                     m.remove(key);
@@ -329,7 +329,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                     // iterate sub array nodes
                     compressData((ArrayList) m.get(key));
                 }
-            } else if (m.get(key).getClass().equals(AdvancedHashMap.class)) {
+            } else if (m.get(key) instanceof AdvancedHashMap) {
                 if (((AdvancedHashMap) m.get(key)).isEmpty()) {
                     // Delete the empty list
                     m.remove(key);
@@ -357,11 +357,11 @@ public abstract class DssatCommonInput implements TranslatorInput {
         AdvancedHashMap cprData = null; // The following data record which will be compressed
 
         for (int i = 0; i < arr.size(); i++) {
-            if (arr.get(i).getClass().equals(ArrayList.class)) {
+            if (arr.get(i) instanceof ArrayList) {
                 // iterate sub array nodes
                 compressData((ArrayList) arr.get(i));
 
-            } else if (arr.get(i).getClass().equals(AdvancedHashMap.class)) {
+            } else if (arr.get(i) instanceof AdvancedHashMap) {
                 // iterate sub data nodes
                 compressData((AdvancedHashMap) arr.get(i));
 
@@ -374,13 +374,20 @@ public abstract class DssatCommonInput implements TranslatorInput {
                     Object[] keys = cprData.keySet().toArray();
                     // The missing data will be given a "" value; Only data item (String type) will be processed
                     for (Object key : fstData.keySet()) {
-                        if (fstData.get(key).getClass().equals(String.class) && !cprData.containsKey(key)) {
-                            cprData.put(key, "");
+                        if (!cprData.containsKey(key)) {
+                            if (fstData.get(key) instanceof String) {
+                                cprData.put(key, "");
+                            } else if (fstData.get(key) instanceof AdvancedHashMap) {
+                                cprData.put(key, new AdvancedHashMap());
+                            } else if (fstData.get(key) instanceof ArrayList) {
+                                cprData.put(key, new ArrayList());
+                            }
                         }
+                        
                     }
                     // The repeated data will be deleted; Only data item (String type) will be processed
                     for (Object key : keys) {
-                        if (cprData.get(key).getClass().equals(String.class) && cprData.get(key).equals(fstData.get(key))) {
+                        if (cprData.get(key).equals(fstData.get(key))) {
                             cprData.remove(key);
                         }
                     }

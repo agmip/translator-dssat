@@ -40,11 +40,11 @@ public class DssatControllerInput {
             // Check if reading result is empty. If so, ignore it.
             if (!tmp.isEmpty()) {
                 // If return map contains multiple file, like soil or weather, get ArrayList from the return map
-                if (inputs[i].getClass().equals(DssatSoilInput.class) || inputs[i].getClass().equals(DssatWeatherInput.class)) {
+                if (inputs[i] instanceof DssatSoilInput || inputs[i] instanceof DssatWeatherInput) {
                     ret.put(inputs[i].jsonKey, tmp.get(inputs[i].jsonKey));
 
                 } // if read Observed data file, need to save them under the same key (currently is "observed")
-                else if (inputs[i].getClass().equals(DssatAFileInput.class) || inputs[i].getClass().equals(DssatTFileInput.class)) {
+                else if (inputs[i] instanceof DssatAFileInput || inputs[i] instanceof DssatTFileInput) {
                     if (ret.containsKey(inputs[i].jsonKey)) {
                         ((AdvancedHashMap) ret.get(inputs[i].jsonKey)).put(tmp);
                     } else {

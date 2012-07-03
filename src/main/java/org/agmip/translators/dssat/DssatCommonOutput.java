@@ -189,10 +189,10 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     protected void decompressData(AdvancedHashMap m) {
 
         for (Object key : m.keySet()) {
-            if (m.get(key).getClass().equals(ArrayList.class)) {
+            if (m.get(key) instanceof ArrayList) {
                 // iterate sub array nodes
                 decompressData((ArrayList) m.get(key));
-            } else if (m.get(key).getClass().equals(AdvancedHashMap.class)) {
+            } else if (m.get(key) instanceof AdvancedHashMap) {
                 // iterate sub data nodes
                 decompressData((AdvancedHashMap) m.get(key));
             } else {
@@ -214,11 +214,11 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         AdvancedHashMap cprData = null; // The following data record which will be compressed
 
         for (int i = 0; i < arr.size(); i++) {
-            if (arr.get(i).getClass().equals(ArrayList.class)) {
+            if (arr.get(i) instanceof ArrayList) {
                 // iterate sub array nodes
                 decompressData((ArrayList) arr.get(i));
 
-            } else if (arr.get(i).getClass().equals(AdvancedHashMap.class)) {
+            } else if (arr.get(i) instanceof AdvancedHashMap) {
                 // iterate sub data nodes
                 decompressData((AdvancedHashMap) arr.get(i));
 
@@ -230,7 +230,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                     cprData = (AdvancedHashMap) arr.get(i);
                     // The omitted data will be recovered to the following map; Only data item (String type) will be processed
                     for (Object key : fstData.keySet()) {
-                        if (fstData.get(key).getClass().equals(String.class) && !cprData.containsKey(key)) {
+                        if (!cprData.containsKey(key)) {
                             cprData.put(key, fstData.get(key));
                         }
                     }
