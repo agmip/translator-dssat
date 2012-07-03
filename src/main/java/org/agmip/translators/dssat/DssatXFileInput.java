@@ -223,7 +223,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
-                    formats.put("cu", 2);
+                    formats.put("ge", 2);
                     formats.put("cr", 3);
                     formats.put("cul_id", 7);
                     formats.put("cul_name", 17);
@@ -833,8 +833,8 @@ public class DssatXFileInput extends DssatCommonInput {
             AdvancedHashMap treatment = (AdvancedHashMap) trArr.get(i);
 
             // cultivar
-            if (!treatment.getOr("cu", "0").equals("0")) {
-                treatment.put("cultivar", getSectionData(cuArr, "cu", treatment.get("cu").toString()));
+            if (!treatment.getOr("ge", "0").equals("0")) {
+                treatment.put("cultivar", getSectionData(cuArr, "ge", treatment.get("ge").toString()));
             }
 
             // field
@@ -962,7 +962,7 @@ public class DssatXFileInput extends DssatCommonInput {
         }
         // Define the section with single sub data
         ArrayList singleSubRecSecList = new ArrayList();
-        singleSubRecSecList.add("cu");
+        singleSubRecSecList.add("ge");
         singleSubRecSecList.add("fl");
         singleSubRecSecList.add("pl");
         singleSubRecSecList.add("om");  // TODO wait for confirmation that single sub record
