@@ -19,13 +19,32 @@ import org.agmip.util.JSONAdapter;
  */
 public class DssatWeatherOutput extends DssatCommonOutput {
 
-    private File outputFile;
+    private File[] outputFiles;
 
     /**
      * Get output file object
      */
     public File getOutputFile() {
-        return outputFile;
+        return getOutputFile(0);
+    }
+
+    /**
+     * Get output file object by array index
+     */
+    public File getOutputFile(int id) {
+
+        if (outputFiles != null && id < outputFiles.length) {
+            return outputFiles[id];
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Get output files array
+     */
+    public File[] getOutputFiles() {
+        return outputFiles;
     }
 
     /**
@@ -73,8 +92,9 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                 }
             }
             arg0 = revisePath(arg0);
-            outputFile = new File(arg0 + fileName);
-            bwW = new BufferedWriter(new FileWriter(outputFile));
+            outputFiles = new File[1];
+            outputFiles[0] = new File(arg0 + fileName);
+            bwW = new BufferedWriter(new FileWriter(outputFiles[0]));
 
             // Output Weather File
             // Titel Section
@@ -153,7 +173,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
         // defValD = ""; No need to set default value for Date type in weather file
         defValR = "-99";
-        defValC = "";
+        defValC = "-99";    // TODO wait for confirmation
         defValI = "-99";
     }
 }

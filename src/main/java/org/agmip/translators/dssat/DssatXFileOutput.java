@@ -696,7 +696,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             defValD = "20110101";
         }
         defValR = "-99";
-        defValC = "";
+        defValC = "-99";    // TODO wait for confirmation
         defValI = "-99";
     }
 

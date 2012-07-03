@@ -170,7 +170,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
 
         // defValD = ""; No need to set default value for Date type in Observation file
         defValR = "-99";
-        defValC = "";
+        defValC = "-99";    // TODO wait for confirmation
         defValI = "-99";
     }
 }
