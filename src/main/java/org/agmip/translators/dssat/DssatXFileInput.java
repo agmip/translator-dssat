@@ -146,7 +146,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 } // Site info
                 else if ((flg[1].equals("site") || flg[1].equals("sites")) && flg[2].equals("data")) {
                     //$ret[$flg[0]]["site"] = trim($line);
-                    // TODO wait for confirmation: site is missing in the master variables list
+                    // P.S. site is missing in the master variables list
                     ret.put("site", line.trim());
 
                 } // Plot Info
@@ -224,7 +224,9 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("cul_name", 17);
                     // Read line and save into return holder
                     cuArr.add(readLine(line, formats));
-                    ret.put("cr", line.substring(3, 5).trim()); // TODO keep for the early version; just first entry
+                    if (cuArr.size() == 1) {
+                        ret.put("cr", line.substring(3, 5).trim()); // TODO keep for the early version; just first entry
+                    }
                 } else {
                 }
             } // Read FIELDS Section
@@ -307,8 +309,10 @@ public class DssatXFileInput extends DssatCommonInput {
                             strLong = defValI;
                         }
                     }
-                    ret.put("fl_lat", strLong); // TODO Keep the meta data handling for the early version
-                    ret.put("fl_long", strLat); // TODO Keep the meta data handling for the early version
+                    if (flArr.isEmpty()) {
+                        ret.put("fl_lat", strLong); // TODO Keep the meta data handling for the early version
+                        ret.put("fl_long", strLat); // TODO Keep the meta data handling for the early version
+                    }
                     tmp.put("fl_lat", strLong);
                     tmp.put("fl_long", strLat);
                     addToArray(flArr, tmp, "fl");
@@ -423,7 +427,9 @@ public class DssatXFileInput extends DssatCommonInput {
                     tmp.put("pdate", translateDateStr((String) tmp.get("pdate")));
                     tmp.put("pldae", translateDateStr((String) tmp.get("pldae")));
                     plArr.add(tmp);
-                    ret.put("pdate", translateDateStr(line.substring(3, 8).trim())); // TODO keep for the early version
+                    if (plArr.size() == 1) {
+                        ret.put("pdate", translateDateStr(line.substring(3, 8).trim())); // TODO keep for the early version
+                    }
                 } else {
                 }
 
