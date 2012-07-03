@@ -41,7 +41,6 @@ public class DssatTFileOutput extends DssatCommonOutput {
         StringBuilder sbData = new StringBuilder();         // construct the data info in the output
         HashMap altTitleList = new HashMap();               // Define alternative fields for the necessary observation data fields; key is necessary field
         // TODO Add alternative fields here
-        ArrayList optTitleList2 = getAllTitleList();         // Define optional observation data fields
         LinkedHashMap titleOutput;                          // contain output data field id
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
 
@@ -52,7 +51,13 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
             // Get Data from input holder
             AdvancedHashMap obvFile = adapter.exportRecord((Map) result.getOr("time_course", result));
+            if (obvFile == null) {
+                return;
+            }
             AdvancedHashMap obvTFile = adapter.exportRecord((Map) obvFile.getOr("average", obvFile));
+            if (obvTFile == null) {
+                return;
+            }
             ArrayList observeRecordsSections = ((ArrayList) obvTFile.getOr("data", new ArrayList()));
 
             // Initial BufferedWriter

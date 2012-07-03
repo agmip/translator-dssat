@@ -1,7 +1,5 @@
 package org.agmip.translators.dssat;
 
-import java.io.FileOutputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.File;
 import org.agmip.core.types.AdvancedHashMap;
@@ -37,13 +35,12 @@ public class DssatTFileTest {
         String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\UFGA7801_SBX.ZIP";
         result = obDssatTFileInput.readFile(filePath);
         System.out.println(j.toJSON(result));
-//        File f = new File("output.txt");
-//        BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
-//        bo.write(j.toJSON(result).getBytes());
-//        bo.close();
+        
         obDssatTFileOutput.writeFile("", result);
         File file = obDssatTFileOutput.getOutputFile();
-        assertTrue(file.exists());
-        assertTrue(file.delete());
+        if (file != null) {
+            assertTrue(file.exists());
+            assertTrue(file.delete());
+        }
     }
 }

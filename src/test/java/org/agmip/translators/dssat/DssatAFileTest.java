@@ -38,7 +38,9 @@ public class DssatAFileTest {
 
         obDssatAFileOutput.writeFile("", result);
         File file = obDssatAFileOutput.getOutputFile();
-        assertTrue(file.exists());
-        assertTrue(file.delete());
+        if (file != null) {
+            assertTrue(file.exists());
+            assertTrue(file.delete());
+        }
     }
 }
