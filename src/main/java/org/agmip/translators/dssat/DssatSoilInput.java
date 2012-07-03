@@ -64,7 +64,7 @@ public class DssatSoilInput extends DssatCommonInput {
             files.add(file);
 
             while ((line = brS.readLine()) != null) {
-                
+
                 // Get content type of line
                 judgeContentType(line);
 
@@ -157,7 +157,7 @@ public class DssatSoilInput extends DssatCommonInput {
                         formats.put("slpx", 6);
                         formats.put("slpt", 6);
                         formats.put("slpo", 6);
-                        formats.put("slca", 6);
+                        formats.put("caco3", 6);    // P.S. Different with document (DSSAT vol2.pdf)
                         formats.put("slal", 6);
                         formats.put("slfe", 6);
                         formats.put("slmn", 6);
