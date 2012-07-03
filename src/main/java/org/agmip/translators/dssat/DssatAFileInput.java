@@ -1,6 +1,7 @@
 package org.agmip.translators.dssat;
 
 import java.io.BufferedReader;
+import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,26 +34,30 @@ public class DssatAFileInput extends DssatCommonInput {
      */
     @Override
     protected AdvancedHashMap readFile(HashMap brMap) throws IOException {
-        
+
         AdvancedHashMap ret = new AdvancedHashMap();
         AdvancedHashMap file = new AdvancedHashMap();
         String line;
         BufferedReader brA;
+        char[] buf;
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
         ArrayList obvData = new ArrayList();
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
         String obvDataKey = "data";     // P.S. the key name might change
         String obvFileKey = "summary";  // P.S. the key name might change
+        String pdate;
 
-        brA = (BufferedReader) brMap.get("A");
+        buf = (char[]) brMap.get("A");
 
         // If AFile File is no been found
-        if (brA == null) {
+        if (buf == null) {
             // TODO reprot file not exist error
             return ret;
+        } else {
+            brA = new BufferedReader(new CharArrayReader(buf));
         }
-        
+
         ret.put(obvFileKey, file);
         file.put(obvDataKey, obvData);
         while ((line = brA.readLine()) != null) {
@@ -73,7 +78,7 @@ public class DssatAFileInput extends DssatCommonInput {
                     formats.put("local_name", line.length());
                     // Read line and save into return holder
                     file.put(readLine(line, formats));
-                    
+
                 } // Read data info 
                 else {
                     // Set variables' formats
@@ -83,33 +88,33 @@ public class DssatAFileInput extends DssatCommonInput {
                     }
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    
+                    pdate = getPdate(brMap, (String) tmp.get("trno"));
                     for (int i = 0; i < titles.size(); i++) {
                         if (obvDataList.isDateType(titles.get(i))) {
                             if (tmp.containsKey(titles.get(i))) {
-                                tmp.put(titles.get(i), translateDateStr((String) tmp.get(titles.get(i))));
+                                tmp.put(titles.get(i), translateDateStrForDOY((String) tmp.get(titles.get(i)), pdate));
                             }
                         }
                     }
                     addToArray(obvData, tmp, "trno");
                 }
-                
+
             } // Read Observed title
             else if (flg[2].equals("title")) {
-                
+
                 titles = new ArrayList();
                 line = line.replaceFirst("@", " ");
                 for (int i = 0; i < line.length(); i += 6) {
                     titles.add(line.substring(i, Math.min(i + 6, line.length())).trim().toLowerCase());
                 }
-                
+
             } else {
             }
         }
 
-//        brA.close();
+        brA.close();
         compressData(ret);
-        
+
         return ret;
     }
 

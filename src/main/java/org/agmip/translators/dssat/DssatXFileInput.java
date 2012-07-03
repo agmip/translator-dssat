@@ -1,6 +1,7 @@
 package org.agmip.translators.dssat;
 
 import java.io.BufferedReader;
+import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +38,9 @@ public class DssatXFileInput extends DssatCommonInput {
         AdvancedHashMap ret = new AdvancedHashMap();
         String line;
         BufferedReader br;
+        char[] buf;
         BufferedReader brw = null;
+        char[] bufW = null;
         HashMap mapW;
         String wid;
         String fileName;
@@ -61,15 +64,17 @@ public class DssatXFileInput extends DssatCommonInput {
         ArrayList smArr = new ArrayList();
         String eventKey = "data";
 
-        br = (BufferedReader) brMap.get("X");
+        buf = (char[]) brMap.get("X");
         mapW = (HashMap) brMap.get("W");
         fileName = (String) brMap.get("Z");
         wid = fileName.length() > 4 ? fileName.substring(0, 4) : fileName;
 
         // If XFile is no been found
-        if (br == null) {
+        if (buf == null) {
             // TODO reprot file not exist error
             return ret;
+        } else {
+            br = new BufferedReader(new CharArrayReader(buf));
         }
 
         ret.put("treatment", trArr);
@@ -283,11 +288,12 @@ public class DssatXFileInput extends DssatCommonInput {
                         // check if weather is validable
                         for (Object key : mapW.keySet()) {
                             if (((String) key).contains(wid)) {
-                                brw = (BufferedReader) mapW.get(key);
+                                bufW = (char[]) mapW.get(key);
                                 break;
                             }
                         }
-                        if (brw != null) {
+                        if (bufW != null) {
+                            brw = new BufferedReader(new CharArrayReader(bufW));
                             String lineW;
                             while ((lineW = brw.readLine()) != null) {
                                 if (lineW.startsWith("@ INSI")) {
@@ -818,8 +824,8 @@ public class DssatXFileInput extends DssatCommonInput {
             }
         }
 
-//        br.close();
-//        if (brw != null) brw.close();
+        br.close();
+        if (brw != null) brw.close();
         compressData(ret);
 
         return ret;

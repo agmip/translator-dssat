@@ -124,6 +124,24 @@ public abstract class DssatCommonInput implements TranslatorInput {
     }
 
     /**
+     * Translate data str from "yyddd" or "doy" to "yyyymmdd"
+     *
+     * @param str date string with format of "yyddd"
+     * @pdate the related planting date
+     * @return result date string with format of "yyyymmdd"
+     */
+    protected String translateDateStrForDOY(String str, String pdate) {
+
+        if (str != null && str.length() <= 3) {
+            if (!pdate.equals("") && pdate.length() >= 2) {
+                str = String.format("%1$2s%2$03d", pdate.substring(0, 2), Integer.parseInt(str));
+            }
+        }
+        
+        return translateDateStr(str, "0");
+    }
+
+    /**
      * Translate data str from "yyddd" to "yyyymmdd" plus days you want
      *
      * @param startDate date string with format of "yyydd"
@@ -136,7 +154,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
         Calendar cal = Calendar.getInstance();
         int days;
         int year;
-        if (startDate == null || startDate.length() > 5 || startDate.length() < 1) {
+        if (startDate == null || startDate.length() > 5 || startDate.length() < 4) {
             //throw new Exception("");
             return "-99"; //defValD;
         }
@@ -281,14 +299,14 @@ public abstract class DssatCommonInput implements TranslatorInput {
      *
      * @param in The input stream of zip file
      * @param size The entry size
-     * @return result The BufferReader object for current entry
+     * @return result The char array for current entry
      * @throws IOException
      */
-    private BufferedReader getBuf(InputStream in, int size) throws IOException {
+    private char[] getBuf(InputStream in, int size) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         char[] buf = new char[size];
         br.read(buf);
-        return new BufferedReader(new CharArrayReader(buf));
+        return buf;
     }
 
     /**
@@ -302,7 +320,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
         Object key;
         for (int i = 0; i < keys.length; i++) {
             key = keys[i];
-            
+
             if (m.get(key).getClass().equals(ArrayList.class)) {
                 if (((ArrayList) m.get(key)).isEmpty()) {
                     // Delete the empty list
@@ -319,7 +337,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                     // iterate sub data nodes
                     compressData((AdvancedHashMap) m.get(key));
                 }
-                
+
             } else {
                 // ignore other type nodes
             }
@@ -409,5 +427,93 @@ public abstract class DssatCommonInput implements TranslatorInput {
         if (unmatchFlg) {
             arr.add(item);
         }
+    }
+
+    /**
+     * Get planting date value from XFile with related treatment number
+     * 
+     * @param m   the files content holder
+     */
+    protected String getPdate(HashMap m, String trno) {
+
+        BufferedReader br;
+        char[] buf = null;
+        String line;
+        LinkedHashMap formats = new LinkedHashMap();
+        String pl = null;
+        String[] flgP = new String[3];
+        DssatXFileInput xfile = new DssatXFileInput();
+
+        buf = (char[]) m.get("X");
+
+        if (buf == null) {
+            return "";
+        } else {
+            br = new BufferedReader(new CharArrayReader(buf));
+        }
+
+        try {
+            while ((line = br.readLine()) != null) {
+
+                // Get content type of line
+                xfile.judgeContentType(line);
+                flgP = xfile.flg;
+
+                // Read TREATMENTS Section
+                if (flgP[0].startsWith("treatments")) {
+
+                    if (pl != null) {
+                        continue;
+                    }
+
+                    // Read TREATMENTS data
+                    if (flgP[2].equals("data")) {
+                        // Set variables' formats
+                        formats.clear();
+                        formats.put("trno", 2);
+                        formats.put("", 44);
+                        formats.put("pl", 3);
+                        // Read line and get related planting info number
+                        AdvancedHashMap tmp = readLine(line, formats);
+                        if (tmp.get("trno").equals(trno)) {
+                            pl = (String) tmp.get("pl");
+                        }
+                    } else {
+                    }
+
+
+                } // Read CULTIVARS Section
+                else if (flgP[0].startsWith("planting")) {
+
+                    if (pl == null) {
+                        return "";
+                    }
+
+                    // Read PLANTING data
+                    if (flgP[2].equals("data")) {
+                        // Set variables' formats
+                        formats.clear();
+                        formats.put("pl", 2);
+                        formats.put("pdate", 6);
+                        // Read line and save into defValD
+                        AdvancedHashMap tmp = readLine(line, formats);
+                        if (tmp.get("pl").equals(pl)) {
+                            return (String) tmp.get("pdate");
+                        }
+                        
+                    } else {
+                    }
+                    
+                } else {
+                }
+            }
+            
+            br.close();
+        } catch (IOException ex) {
+//            Logger.getLogger(DssatCommonInput.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
+        }
+
+        return "";
     }
 }

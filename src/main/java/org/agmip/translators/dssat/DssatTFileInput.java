@@ -1,6 +1,7 @@
 package org.agmip.translators.dssat;
 
 import java.io.BufferedReader;
+import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ public class DssatTFileInput extends DssatCommonInput {
         AdvancedHashMap file = new AdvancedHashMap();
         String line;
         BufferedReader brT;
+        char[] buf;
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
         ArrayList obvData = new ArrayList();
@@ -45,13 +47,16 @@ public class DssatTFileInput extends DssatCommonInput {
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
         String obvDataKey = "data";  // TODO the key name might change
         String obvFileKey = "time_course";  // TODO the key name might change
+        String pdate;
 
-        brT = (BufferedReader) brMap.get("T");
+        buf = (char[]) brMap.get("T");
 
         // If AFile File is no been found
-        if (brT == null) {
+        if (buf == null) {
             // TODO reprot file not exist error
             return ret;
+        } else {
+            brT = new BufferedReader(new CharArrayReader(buf));
         }
 
         ret.put(obvFileKey, file);
@@ -88,10 +93,11 @@ public class DssatTFileInput extends DssatCommonInput {
                     AdvancedHashMap tmp = readLine(line, formats);
                     // translate date from yyddd format to yyyymmdd format
                     tmp.put("date", translateDateStr((String) tmp.get("date")));
+                    pdate = getPdate(brMap, (String) tmp.get("trno"));
                     for (int i = 0; i < titles.size(); i++) {
                         if (obvDataList.isDateType(titles.get(i))) {
                             if (tmp.containsKey(titles.get(i))) {
-                                tmp.put(titles.get(i), translateDateStr((String) tmp.get(titles.get(i))));
+                                tmp.put(titles.get(i), translateDateStrForDOY((String) tmp.get(titles.get(i)), pdate));
                             }
                         }
                     }
@@ -115,7 +121,7 @@ public class DssatTFileInput extends DssatCommonInput {
             }
         }
 
-//        brT.close();
+        brT.close();
         compressData(ret);
 
         return ret;

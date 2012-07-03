@@ -1,6 +1,7 @@
 package org.agmip.translators.dssat;
 
 import java.io.BufferedReader;
+import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ public class DssatWeatherInput extends DssatCommonInput {
         AdvancedHashMap file;
         String line;
         BufferedReader brW = null;
+        char[] buf;
         LinkedHashMap mapW;
         LinkedHashMap formats = new LinkedHashMap();
         String dailyKey = "data";  // TODO the key name might change
@@ -55,7 +57,8 @@ public class DssatWeatherInput extends DssatCommonInput {
 
         for (Object key : mapW.keySet()) {
 
-            brW = (BufferedReader) mapW.get(key);
+            buf = (char[]) mapW.get(key);
+            brW = new BufferedReader(new CharArrayReader(buf));
             file = new AdvancedHashMap();
             daily = new ArrayList();
             titles = new ArrayList();
@@ -140,7 +143,7 @@ public class DssatWeatherInput extends DssatCommonInput {
 
         compressData(files);
         ret.put(jsonKey, files);
-//        brW.close();
+        brW.close();
 
         return ret;
     }

@@ -1,6 +1,7 @@
 package org.agmip.translators.dssat;
 
 import java.io.BufferedReader;
+import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ public class DssatSoilInput extends DssatCommonInput {
         ArrayList sites;
         String line;
         BufferedReader brS = null;
+        char[] buf;
         LinkedHashMap mapS;
         LinkedHashMap formats = new LinkedHashMap();
         String layerKey = "data";  // TODO the key name might change
@@ -54,7 +56,8 @@ public class DssatSoilInput extends DssatCommonInput {
 
         for (Object key : mapS.keySet()) {
 
-            brS = (BufferedReader) mapS.get(key);
+            buf = (char[]) mapS.get(key);
+            brS = new BufferedReader(new CharArrayReader(buf));
             file = new AdvancedHashMap();
             sites = new ArrayList();
             file.put("soil_sites", sites);
@@ -181,7 +184,7 @@ public class DssatSoilInput extends DssatCommonInput {
 
         compressData(files);
         ret.put(jsonKey, files);
-//        brS.close();
+        brS.close();
 
         return ret;
     }
