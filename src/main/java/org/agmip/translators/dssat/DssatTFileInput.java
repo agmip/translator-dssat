@@ -63,8 +63,8 @@ public class DssatTFileInput extends DssatCommonInput {
             }
         }
 
-        ret.put(obvFileKey, file);
-        file.put(obvDataKey, obvData);
+//        ret.put(obvFileKey, file);
+//        file.put(obvDataKey, obvData);
         while ((line = brT.readLine()) != null) {
 
             // Get content type of line
@@ -130,6 +130,8 @@ public class DssatTFileInput extends DssatCommonInput {
             }
         }
 
+        ret.put(obvFileKey, file);
+        file.put(obvDataKey, obvData);
         brT.close();
         compressData(ret);
 

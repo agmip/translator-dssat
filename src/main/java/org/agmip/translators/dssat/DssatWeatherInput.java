@@ -67,7 +67,6 @@ public class DssatWeatherInput extends DssatCommonInput {
             daily = new ArrayList();
             titles = new ArrayList();
             files.add(file);
-            file.put(dailyKey, daily);
 
             while ((line = brW.readLine()) != null) {
 
@@ -137,6 +136,8 @@ public class DssatWeatherInput extends DssatCommonInput {
                 } else {
                 }
             }
+            
+            file.put(dailyKey, daily);
         }
 
         compressData(files);
