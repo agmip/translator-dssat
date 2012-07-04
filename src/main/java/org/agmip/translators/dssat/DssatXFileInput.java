@@ -818,7 +818,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
 //                    tmp.put("hlast", translateDateStr((String) tmp.get("hlast")));
-                    tmp.put("harvests", line);
+                    tmp.put("harvest", line);
                     addToArray(smArr, tmp, "sm");
 
                 } else {
