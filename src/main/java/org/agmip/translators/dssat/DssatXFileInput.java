@@ -310,13 +310,13 @@ public class DssatXFileInput extends DssatCommonInput {
 
                             // check if lat and long are valid in the weather file; if not, set invalid value for them
                             if (!checkValidValue(strLat) || !checkValidValue(strLong) || (Double.parseDouble(strLat) == 0 && Double.parseDouble(strLong) == 0)) {
-                                strLat = defValI;
-                                strLong = defValI;
+                                strLat = "";
+                                strLong = "";
                             }
                         } // if weather file is not avaliable to read, set invalid value for lat and long
                         else {
-                            strLat = defValI;
-                            strLong = defValI;
+                            strLat = "";
+                            strLong = "";
                         }
                     }
                     if (flArr.isEmpty()) {
@@ -926,7 +926,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 ArrayList irTmpSubs = (ArrayList) irTmp.getOr("data", new ArrayList());
                 for (int j = 0; j < irTmpSubs.size(); j++) {
                     AdvancedHashMap irTmpSub = (AdvancedHashMap) irTmpSubs.get(j);
-                    irTmpSub.put("idate", translateDateStrForDOY((String) irTmpSub.getOr("idate", defValI), pdate));
+                    irTmpSub.put("idate", translateDateStrForDOY((String) irTmpSub.getOr("idate", ""), pdate));
                 }
             }
 

@@ -156,7 +156,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
         int year;
         if (startDate == null || startDate.length() > 5 || startDate.length() < 4) {
             //throw new Exception("");
-            return "-99"; //defValD;
+            return ""; //defValD; // P.S. use blank string instead of -99
         }
         try {
             startDate = String.format("%05d", Integer.parseInt(startDate));
@@ -172,7 +172,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
         } catch (Exception e) {
             // if tranlate failed, then use default value for date
             // sbError.append("! Waring: There is a invalid date [").append(startDate).append("]");
-            return "-99"; //formatDateStr(defValD);
+            return ""; //formatDateStr(defValD); // P.S. use blank string instead of -99
         }
 
     }
