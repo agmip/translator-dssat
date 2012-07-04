@@ -80,8 +80,9 @@ public class DssatXFileInput extends DssatCommonInput {
                 br = (BufferedReader) buf;
             }
         }
-
-        ret.put("treatment", trArr);
+        
+        ret.put("data_source", "DSSAT");
+        ret.put("crop_model_version", "v4.5");
 //        ret.put("cultivar", cuArr);
 //        ret.put("field", flArr);
 //        ret.put("soil_analysis", saArr);
@@ -939,6 +940,7 @@ public class DssatXFileInput extends DssatCommonInput {
             }
 
         }
+        ret.put("treatment", trArr);
         compressData(ret);
 
         return ret;
