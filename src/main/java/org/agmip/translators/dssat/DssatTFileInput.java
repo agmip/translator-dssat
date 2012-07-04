@@ -82,7 +82,7 @@ public class DssatTFileInput extends DssatCommonInput {
                     formats.put("exname", 10);
                     formats.put("local_name", line.length());
                     // Read line and save into return holder
-                    file.put(readLine(line, formats));
+                    file.put(readLine(line, formats, ""));
 
                 } // Read data info 
                 else {
@@ -94,7 +94,7 @@ public class DssatTFileInput extends DssatCommonInput {
                     // Read line and save into return holder
 
                     // Read line and save into return holder
-                    AdvancedHashMap tmp = readLine(line, formats);
+                    AdvancedHashMap tmp = readLine(line, formats, "");
                     // translate date from yyddd format to yyyymmdd format
                     tmp.put("date", translateDateStr((String) tmp.get("date")));
                     pdate = getPdate(brMap, (String) tmp.get("trno"));

@@ -81,7 +81,7 @@ public class DssatAFileInput extends DssatCommonInput {
                     formats.put("exname", 10);
                     formats.put("local_name", line.length());
                     // Read line and save into return holder
-                    file.put(readLine(line, formats));
+                    file.put(readLine(line, formats, ""));
 
                 } // Read data info 
                 else {
@@ -91,7 +91,7 @@ public class DssatAFileInput extends DssatCommonInput {
                         formats.put(titles.get(i), 6);
                     }
                     // Read line and save into return holder
-                    AdvancedHashMap tmp = readLine(line, formats);
+                    AdvancedHashMap tmp = readLine(line, formats, "");
                     pdate = getPdate(brMap, (String) tmp.get("trno"));
                     for (int i = 0; i < titles.size(); i++) {
                         if (obvDataList.isDateType(titles.get(i))) {

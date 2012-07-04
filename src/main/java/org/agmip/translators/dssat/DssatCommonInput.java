@@ -176,15 +176,28 @@ public abstract class DssatCommonInput implements TranslatorInput {
         }
 
     }
-
+    
     /**
-     * Divide the data in the line into a map
+     * Divide the data in the line into a map (Default invalid value is null, which means not to be sore in the json)
      *
      * @param line The string of line read from data file
      * @param formats The definition of length for each data field (String itemName : Integer length)
      * @return the map contains divided data with keys from original string
      */
     protected AdvancedHashMap readLine(String line, LinkedHashMap<String, Integer> formats) {
+        
+        return readLine(line, formats, null);
+    }
+
+    /**
+     * Divide the data in the line into a map
+     *
+     * @param line The string of line read from data file
+     * @param formats The definition of length for each data field (String itemName : Integer length)
+     * @param invalidValue  The text will replace the original reading when its value is invalid 
+     * @return the map contains divided data with keys from original string
+     */
+    protected AdvancedHashMap readLine(String line, LinkedHashMap<String, Integer> formats, String invalidValue) {
 
         AdvancedHashMap ret = new AdvancedHashMap();
         int length;
@@ -199,7 +212,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 if (checkValidValue(tmp)) {
                     ret.put(key, tmp);
                 } else {
-                    ret.put(key, "");   // P.S. "" means missing or invalid value
+                    ret.put(key, invalidValue);   // P.S. "" means missing or invalid value
                 }
             }
             line = line.substring(length);
