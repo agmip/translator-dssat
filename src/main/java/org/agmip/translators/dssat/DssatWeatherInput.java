@@ -42,7 +42,7 @@ public class DssatWeatherInput extends DssatCommonInput {
         AdvancedHashMap file;
         String line;
         BufferedReader brW = null;
-        char[] buf;
+        Object buf;
         LinkedHashMap mapW;
         LinkedHashMap formats = new LinkedHashMap();
         String dailyKey = "data";  // P.S. the key name might change
@@ -57,8 +57,12 @@ public class DssatWeatherInput extends DssatCommonInput {
 
         for (Object key : mapW.keySet()) {
 
-            buf = (char[]) mapW.get(key);
-            brW = new BufferedReader(new CharArrayReader(buf));
+            buf = mapW.get(key);
+            if (buf instanceof char[]) {
+                brW = new BufferedReader(new CharArrayReader((char[]) buf));
+            } else {
+                brW = (BufferedReader) buf;
+            }
             file = new AdvancedHashMap();
             daily = new ArrayList();
             titles = new ArrayList();

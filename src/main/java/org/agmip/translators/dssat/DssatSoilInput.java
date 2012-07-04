@@ -41,7 +41,7 @@ public class DssatSoilInput extends DssatCommonInput {
         ArrayList sites;
         String line;
         BufferedReader brS = null;
-        char[] buf;
+        Object buf;
         LinkedHashMap mapS;
         LinkedHashMap formats = new LinkedHashMap();
         String layerKey = "data";  // TODO the key name might change
@@ -56,8 +56,12 @@ public class DssatSoilInput extends DssatCommonInput {
 
         for (Object key : mapS.keySet()) {
 
-            buf = (char[]) mapS.get(key);
-            brS = new BufferedReader(new CharArrayReader(buf));
+            buf = mapS.get(key);
+            if (buf instanceof char[]) {
+                brS = new BufferedReader(new CharArrayReader((char[]) buf));
+            } else {
+                brS = (BufferedReader) buf;
+            }
             file = new AdvancedHashMap();
             sites = new ArrayList();
             file.put("soil_sites", sites);

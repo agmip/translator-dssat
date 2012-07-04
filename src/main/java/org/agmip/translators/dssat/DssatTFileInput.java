@@ -39,7 +39,7 @@ public class DssatTFileInput extends DssatCommonInput {
         AdvancedHashMap file = new AdvancedHashMap();
         String line;
         BufferedReader brT;
-        char[] buf;
+        Object buf;
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
         ArrayList obvData = new ArrayList();
@@ -49,14 +49,18 @@ public class DssatTFileInput extends DssatCommonInput {
         String obvFileKey = "time_course";  // TODO the key name might change
         String pdate;
 
-        buf = (char[]) brMap.get("T");
+        buf = brMap.get("T");
 
         // If AFile File is no been found
         if (buf == null) {
             // TODO reprot file not exist error
             return ret;
         } else {
-            brT = new BufferedReader(new CharArrayReader(buf));
+            if (buf instanceof char[]) {
+                brT = new BufferedReader(new CharArrayReader((char[]) buf));
+            } else {
+                brT = (BufferedReader) buf;
+            }
         }
 
         ret.put(obvFileKey, file);

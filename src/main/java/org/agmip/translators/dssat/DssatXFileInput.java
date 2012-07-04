@@ -38,7 +38,7 @@ public class DssatXFileInput extends DssatCommonInput {
         AdvancedHashMap ret = new AdvancedHashMap();
         String line;
         BufferedReader br;
-        char[] buf;
+        Object buf;
         BufferedReader brw = null;
         char[] bufW = null;
         HashMap mapW;
@@ -64,7 +64,7 @@ public class DssatXFileInput extends DssatCommonInput {
         ArrayList smArr = new ArrayList();
         String eventKey = "data";
 
-        buf = (char[]) brMap.get("X");
+        buf = brMap.get("X");
         mapW = (HashMap) brMap.get("W");
         fileName = (String) brMap.get("Z");
         wid = fileName.length() > 4 ? fileName.substring(0, 4) : fileName;
@@ -74,7 +74,11 @@ public class DssatXFileInput extends DssatCommonInput {
             // TODO reprot file not exist error
             return ret;
         } else {
-            br = new BufferedReader(new CharArrayReader(buf));
+            if (buf instanceof char[]) {
+                br = new BufferedReader(new CharArrayReader((char[]) buf));
+            } else {
+                br = (BufferedReader) buf;
+            }
         }
 
         ret.put("treatment", trArr);
@@ -344,7 +348,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     tmp.put(eventKey, sadArr);
 
                 } // Read SOIL ANALYSIS layer data
-                else if (flg[1].startsWith("a sadat") && flg[2].equals("data")) {
+                else if (flg[1].startsWith("a  sabl") && flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
                     formats.put("", 2);         // P.S. ignore the data index "sa"
@@ -828,7 +832,7 @@ public class DssatXFileInput extends DssatCommonInput {
         if (brw != null) {
             brw.close();
         }
-        
+
         for (int i = 0; i < trArr.size(); i++) {
             AdvancedHashMap treatment = (AdvancedHashMap) trArr.get(i);
 
