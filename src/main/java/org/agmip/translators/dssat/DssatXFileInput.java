@@ -80,7 +80,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 br = (BufferedReader) buf;
             }
         }
-        
+
         ret.put("data_source", "DSSAT");
         ret.put("crop_model_version", "v4.5");
 //        ret.put("cultivar", cuArr);
@@ -940,6 +940,23 @@ public class DssatXFileInput extends DssatCommonInput {
             }
 
         }
+
+        // Remove relational index
+        ArrayList idNames = new ArrayList();
+        idNames.add("ge");
+        idNames.add("fl");
+        idNames.add("sa");
+        idNames.add("ic");
+        idNames.add("pl");
+        idNames.add("ir");
+        idNames.add("fe");
+        idNames.add("om");
+        idNames.add("ch");
+        idNames.add("ti");
+        idNames.add("em");
+        idNames.add("ha");
+        idNames.add("sm");
+        removeIndex(trArr, idNames);
         ret.put("treatment", trArr);
         compressData(ret);
 
@@ -1002,5 +1019,45 @@ public class DssatXFileInput extends DssatCommonInput {
         }
 
         return ret;
+    }
+
+    /**
+     * remove all the relation index for the input array
+     * 
+     * @param arr    The array of treatment data 
+     * @param idNames The array of id want be removed
+     */
+    private void removeIndex(ArrayList arr, ArrayList idNames) {
+
+        for (int i = 0; i < arr.size(); i++) {
+            Object item = arr.get(i);
+            if (item instanceof ArrayList) {
+                removeIndex((ArrayList) item, idNames);
+            } else if (item instanceof AdvancedHashMap) {
+                removeIndex((AdvancedHashMap) item, idNames);
+            }
+
+        }
+
+    }
+
+    /**
+     * remove all the relation index for the input map
+     * 
+     * @param m    the array of treatment data 
+     */
+    private void removeIndex(AdvancedHashMap m, ArrayList idNames) {
+
+        Object[] keys = m.keySet().toArray();
+        for (Object key : keys) {
+            Object item = m.get(key);
+            if (item instanceof ArrayList) {
+                removeIndex((ArrayList) item, idNames);
+            } else if (item instanceof AdvancedHashMap) {
+                removeIndex((AdvancedHashMap) item, idNames);
+            } else if (item instanceof String && idNames.contains(key)) {
+                m.remove(key);
+            }
+        }
     }
 }
