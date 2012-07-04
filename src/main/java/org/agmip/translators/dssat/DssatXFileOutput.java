@@ -19,7 +19,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     private File outputFile;
     // Define necessary id for the experiment data
-    private static String[] necessaryData = {"pdate", "plpop,plpoe", "plrs", "cr", "cul_id", "wst_insi", "soil_id"};
+    private static String[] necessaryData = {"pdate", "plpop,plpoe", "plrs", "crid", "cul_id", "wst_insi", "soil_id"};
 
     /**
      * Get output file object
@@ -238,7 +238,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     secData = adapter.exportRecord((Map) cuArr.get(idx));
                     sbData.append(String.format("%1$2s %2$-2s %3$-6s %4$s\r\n",
                             idx + 1, //secData.getOr("ge", defValI).toString(),
-                            secData.getOr("cr", defValC).toString(),
+                            secData.getOr("crid", defValC).toString(),
                             secData.getOr("cul_id", defValC).toString(),
                             secData.getOr("cul_name", defValC).toString()));
                 }

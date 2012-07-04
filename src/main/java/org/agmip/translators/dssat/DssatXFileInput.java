@@ -229,13 +229,13 @@ public class DssatXFileInput extends DssatCommonInput {
                     // Set variables' formats
                     formats.clear();
                     formats.put("ge", 2);
-                    formats.put("cr", 3);
+                    formats.put("crid", 3);
                     formats.put("cul_id", 7);
                     formats.put("cul_name", 17);
                     // Read line and save into return holder
                     cuArr.add(readLine(line, formats));
                     if (cuArr.size() == 1) {
-                        ret.put("cr", line.substring(3, 5).trim()); // TODO keep for the early version; just first entry
+                        ret.put("crid", line.substring(3, 5).trim()); // TODO keep for the early version; just first entry
                     }
                 } else {
                 }
