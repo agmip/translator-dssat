@@ -64,6 +64,7 @@ public class DssatXFileInput extends DssatCommonInput {
         ArrayList smArr = new ArrayList();
         ArrayList smSubArr = new ArrayList();
         String eventKey = "data";
+        String ireff = "";    // P.S. special handling for EFIR in irrigation section
 
         buf = brMap.get("X");
         mapW = (HashMap) brMap.get("W");
@@ -463,6 +464,8 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("ir_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
+                    ireff = (String) tmp.getOr("ireff", "");
+                    if (!ireff.equals("")) tmp.remove("ireff");
                     irArr.add(tmp);
                     irdArr = new ArrayList();
                     tmp.put(eventKey, irdArr);
@@ -478,6 +481,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
 //                    tmp.put("idate", translateDateStr((String) tmp.get("idate"))); // TODO DOY handling
+                    tmp.put("ireff", ireff);
                     irdArr.add(tmp);
 
                 } else {

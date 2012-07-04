@@ -409,10 +409,16 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 for (int idx = 0; idx < miArr.size(); idx++) {
 
                     secData = adapter.exportRecord((Map) miArr.get(idx));
+                    subDataArr = (ArrayList) secData.getOr("data", new ArrayList());
+                    if (!subDataArr.isEmpty()) {
+                        subData = adapter.exportRecord((Map) subDataArr.get(0));
+                    } else {
+                        subData = new AdvancedHashMap();
+                    }
                     sbData.append("@I  EFIR  IDEP  ITHR  IEPT  IOFF  IAME  IAMT IRNAME\r\n");
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$s\r\n",
                             idx + 1, //data.getOr("ir", defValI).toString(),
-                            formatNumStr(5, secData.getOr("ireff", defValR).toString()),
+                            formatNumStr(5, subData.getOr("ireff", defValR).toString()),
                             formatNumStr(5, secData.getOr("irmdp", defValR).toString()),
                             formatNumStr(5, secData.getOr("irthr", defValR).toString()),
                             formatNumStr(5, secData.getOr("irept", defValR).toString()),
@@ -421,7 +427,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             formatNumStr(5, secData.getOr("iamt", defValR).toString()),
                             secData.getOr("ir_name", defValC).toString()));
 
-                    subDataArr = (ArrayList) secData.getOr("data", new ArrayList());
                     if (!subDataArr.isEmpty()) {
                         sbData.append("@I IDATE  IROP IRVAL\r\n");
                     }
