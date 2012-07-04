@@ -916,10 +916,14 @@ public class DssatXFileInput extends DssatCommonInput {
                 feTmp.put("fdate", translateDateStrForDOY((String) feTmp.get("fdate"), pdate));
             }
 
-            // Initial condition date
-            AdvancedHashMap icTmp = (AdvancedHashMap) treatment.get("initial_condition");
-            if (icTmp != null) {
-                icTmp.put("idate", translateDateStrForDOY((String) icTmp.getOr("idate", defValI), pdate));
+            // Irrigation date
+            AdvancedHashMap irTmp = (AdvancedHashMap) treatment.get("irrigation");
+            if (irTmp != null) {
+                ArrayList irTmpSubs = (ArrayList) irTmp.getOr("data", new ArrayList());
+                for (int j = 0; j < irTmpSubs.size(); j++) {
+                    AdvancedHashMap irTmpSub = (AdvancedHashMap) irTmpSubs.get(j);
+                    irTmpSub.put("idate", translateDateStrForDOY((String) irTmpSub.getOr("idate", defValI), pdate));
+                }
             }
 
             // Mulch application date
