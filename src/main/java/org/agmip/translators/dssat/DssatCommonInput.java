@@ -396,6 +396,49 @@ public abstract class DssatCommonInput implements TranslatorInput {
             }
         }
     }
+    
+    /**
+     * Get a copy of input map
+     *
+     * @param m input map
+     * @return the copy of whole input map
+     */
+    protected AdvancedHashMap CopyMap(AdvancedHashMap m) {
+        AdvancedHashMap ret = new AdvancedHashMap();
+        
+        for (Object key : m.keySet()) {
+            if (m.get(key) instanceof String) {
+                ret.put(key, m.get(key));
+            } else if (m.get(key) instanceof AdvancedHashMap) {
+                ret.put(key, CopyMap((AdvancedHashMap) m.get(key)));
+            } else if (m.get(key) instanceof ArrayList) {
+                ret.put(key, CopyArr((ArrayList) m.get(key)));
+            }
+        }
+        
+        return ret;
+    }
+    
+    /**
+     * Get a copy of input array
+     *
+     * @param arr input ArrayList
+     * @return the copy of whole input array
+     */
+    protected ArrayList CopyArr(ArrayList arr) {
+        ArrayList ret = new ArrayList();
+        for (int i = 0; i < arr.size(); i++) {
+            if (arr.get(i) instanceof String) {
+                ret.add(arr.get(i));
+            } else if (arr.get(i) instanceof AdvancedHashMap) {
+                ret.add(CopyMap((AdvancedHashMap) arr.get(i)));
+            } else if (arr.get(i) instanceof ArrayList) {
+                ret.add(CopyArr((ArrayList) arr.get(i)));
+            }
+        }
+        
+        return ret;
+    }
 
     /**
      * Add the new item into array by having same key value

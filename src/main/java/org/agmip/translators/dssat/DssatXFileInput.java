@@ -828,7 +828,7 @@ public class DssatXFileInput extends DssatCommonInput {
         if (brw != null) {
             brw.close();
         }
-
+        
         for (int i = 0; i < trArr.size(); i++) {
             AdvancedHashMap treatment = (AdvancedHashMap) trArr.get(i);
 
@@ -973,7 +973,7 @@ public class DssatXFileInput extends DssatCommonInput {
         if (fstNode.containsKey("data") || singleSubRecSecList.contains(key)) {
             for (int i = 0; i < secArr.size(); i++) {
                 if (((AdvancedHashMap) secArr.get(i)).get(key).equals(value)) {
-                    return secArr.get(i);
+                    return CopyMap((AdvancedHashMap) secArr.get(i));
                 }
             }
 
@@ -984,7 +984,7 @@ public class DssatXFileInput extends DssatCommonInput {
             for (int i = 0; i < secArr.size(); i++) {
                 node = (AdvancedHashMap) secArr.get(i);
                 if (node.get(key).equals(value)) {
-                    ret.add(node);
+                    ret.add(CopyMap(node));
                 }
             }
         }
