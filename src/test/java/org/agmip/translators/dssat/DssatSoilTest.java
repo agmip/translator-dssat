@@ -41,7 +41,8 @@ public class DssatSoilTest {
         if (files != null) {
             for (int i = 0; i < files.length; i++) {
                 assertTrue(files[i].exists());
-                assertTrue(files[i].getName().equals("IB.SOL"));
+                System.out.println(files[i].getName());
+                assertTrue(files[i].getName().equals("soil.SOL"));
                 assertTrue(files[i].delete());
             }
         }

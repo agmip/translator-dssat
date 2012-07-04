@@ -84,18 +84,19 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 
 
                 // Initial BufferedWriter
-                // Get first site record
-                AdvancedHashMap fstSite = new AdvancedHashMap();
-                if (!soilSites.isEmpty()) {
-                    fstSite = adapter.exportRecord((Map) soilSites.get(0));
-                }
-                
                 // Get File name
-                String fileName = fstSite.getOr("soil_id", "").toString();
-                if (fileName.equals("")) {
+                String exName = getExName(result);
+                String fileName;
+                if (exName.equals("")) {
                     fileName = "soil.SOL";
                 } else {
-                    fileName = fileName.substring(0, 2) + ".SOL";
+                    try {
+                        exName = exName.replace("\\.", "");
+                        fileName = exName.substring(0, 8) + "_" + exName.substring(8) + "X.SOL";
+                    } catch (Exception e) {
+                        fileName = "soil.SOL";
+                    }
+                    
                 }
                 arg0 = revisePath(arg0);
                 outputFiles[i] = new File(arg0 + fileName);
