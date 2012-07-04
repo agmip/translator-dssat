@@ -135,7 +135,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
                     for (int j = 0; j < observeRecords.size(); j++) {
 
                         record = adapter.exportRecord((Map) observeRecords.get(j));
-                        sbData.append(String.format(" %1$5s", record.getOr("trno", defValI).toString()));
+                        sbData.append(String.format(" %1$5s", record.getOr("trno", 1).toString())); // TODO wait for confirmation that other model only have single treatment in one file
                         sbData.append(String.format(" %1$5d", Integer.parseInt(formatDateStr(record.getOr("date", defValI).toString()))));
                         for (int k = i * 39; k < limit; k++) {
 

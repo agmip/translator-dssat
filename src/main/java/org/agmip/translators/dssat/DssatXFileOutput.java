@@ -207,7 +207,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 }
 
                 sbData.append(String.format("%1$2s %2$1s %3$1s %4$1s %5$-25s %6$2s %7$2s %8$2s %9$2s %10$2s %11$2s %12$2s %13$2s %14$2s %15$2s %16$2s %17$2s %18$2s\r\n",
-                        i + 1,
+                        trData.getOr("trno", i + 1).toString(),
                         trData.getOr("sq", "1").toString(), // P.S. default value here is based on document DSSAT vol2.pdf
                         trData.getOr("op", "1").toString(),
                         trData.getOr("co", "0").toString(),

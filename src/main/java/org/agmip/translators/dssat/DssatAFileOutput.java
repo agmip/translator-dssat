@@ -46,7 +46,6 @@ public class DssatAFileOutput extends DssatCommonOutput {
         altTitleList.put("cwam", "");
         LinkedHashMap titleOutput = new LinkedHashMap();    // contain output data field id
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
-        int trno;
 
         try {
 
@@ -129,13 +128,11 @@ public class DssatAFileOutput extends DssatCommonOutput {
                     sbData.append(String.format("%1$6s", titleOutput.get(titleOutputId[j]).toString().toUpperCase()));
                 }
                 sbData.append("\r\n");
-                trno = 1;
 
                 for (int j = 0; j < observeRecords.size(); j++) {
 
                     record = adapter.exportRecord((Map) observeRecords.get(j));
-                    sbData.append(String.format(" %1$5d", trno));
-                    trno++;
+                    sbData.append(String.format(" %1$5s", record.getOr("trno", j + 1)));
                     for (int k = i * 40; k < limit; k++) {
 
                         if (obvDataList.isDapDateType(titleOutputId[k], titleOutput.get(titleOutputId[k]))) {
