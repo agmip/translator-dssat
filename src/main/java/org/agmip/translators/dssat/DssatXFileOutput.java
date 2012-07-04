@@ -602,34 +602,40 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
             // SIMULATION CONTROLS and AUTOMATIC MANAGEMENT Section
             if (!smArr.isEmpty()) {
-                
+
+                // Set Title list
+                ArrayList smTitles = new ArrayList();
+                smTitles.add("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
+                smTitles.add("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
+                smTitles.add("@N METHODS     WTHER INCON LIGHT EVAPO INFIL PHOTO HYDRO NSWIT MESOM MESEV MESOL\r\n");
+                smTitles.add("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
+                smTitles.add("@N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT\r\n");
+                smTitles.add("@  AUTOMATIC MANAGEMENT\r\n@N PLANTING    PFRST PLAST PH2OL PH2OU PH2OD PSTMX PSTMN\r\n");
+                smTitles.add("@N IRRIGATION  IMDEP ITHRL ITHRU IROFF IMETH IRAMT IREFF\r\n");
+                smTitles.add("@N NITROGEN    NMDEP NMTHR NAMNT NCODE NAOFF\r\n");
+                smTitles.add("@N RESIDUES    RIPCN RTIME RIDEP\r\n");
+                smTitles.add("@N HARVEST     HFRST HLAST HPCNP HPCNR\r\n");
+
+                // Loop all the simulation control records
                 for (int idx = 0; idx < smArr.size(); idx++) {
                     secData = adapter.exportRecord((Map) smArr.get(idx));
-                    
-                    sbData.append("*SIMULATION CONTROLS\r\n");
-                    sbData.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
-                    sbData.append(secData.getOr("general", defValC)).append("\r\n");
-                    sbData.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
-                    sbData.append(secData.getOr("options", defValC)).append("\r\n");
-                    sbData.append("@N METHODS     WTHER INCON LIGHT EVAPO INFIL PHOTO HYDRO NSWIT MESOM MESEV MESOL\r\n");
-                    sbData.append(secData.getOr("methods", defValC)).append("\r\n");
-                    sbData.append("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
-                    sbData.append(secData.getOr("management", defValC)).append("\r\n");
-                    sbData.append("@N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT\r\n");
-                    sbData.append(secData.getOr("outputs", defValC)).append("\r\n\r\n");
-                    sbData.append("@  AUTOMATIC MANAGEMENT\r\n");
-                    sbData.append("@N PLANTING    PFRST PLAST PH2OL PH2OU PH2OD PSTMX PSTMN\r\n");
-                    sbData.append(secData.getOr("planting", defValC)).append("\r\n");
-                    sbData.append("@N IRRIGATION  IMDEP ITHRL ITHRU IROFF IMETH IRAMT IREFF\r\n");
-                    sbData.append(secData.getOr("irrigation", defValC)).append("\r\n");
-                    sbData.append("@N NITROGEN    NMDEP NMTHR NAMNT NCODE NAOFF\r\n");
-                    sbData.append(secData.getOr("nitrogen", defValC)).append("\r\n");
-                    sbData.append("@N RESIDUES    RIPCN RTIME RIDEP\r\n");
-                    sbData.append(secData.getOr("residues", defValC)).append("\r\n");
-                    sbData.append("@N HARVEST     HFRST HLAST HPCNP HPCNR\r\n");
-                    sbData.append(secData.getOr("harvest", defValC)).append("\r\n");
+                    subDataArr = (ArrayList) secData.getOr("data", new ArrayList());
+
+                    if (!subDataArr.isEmpty() && subDataArr.size() >= smTitles.size()) {
+                        sbData.append("*SIMULATION CONTROLS\r\n");
+
+                        for (int j = 0; j < subDataArr.size(); j++) {
+                            sbData.append(smTitles.get(j));
+                            sbData.append(subDataArr.get(j)).append("\r\n");
+                            if (j == 4) {
+                                sbData.append("\r\n");
+                            }
+                        }
+                    } else {
+                        sbData.append(createSMMAStr(0, trData));
+                    }
                 }
-                
+
             } else {
                 sbData.append(createSMMAStr(0, trData));
             }
