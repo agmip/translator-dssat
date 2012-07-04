@@ -923,9 +923,11 @@ public class DssatXFileInput extends DssatCommonInput {
             }
 
             // Mulch application date
-            AdvancedHashMap omTmp = (AdvancedHashMap) treatment.get("residue_organic");
-            if (omTmp != null) {
-                omTmp.put("omdat", translateDateStrForDOY((String) omTmp.getOr("omdat", defValI), pdate));
+            ArrayList omTmps = (ArrayList) treatment.getOr("residue_organic", new ArrayList());
+            AdvancedHashMap omTmp;
+            for (int j = 0; j < omTmps.size(); j++) {
+                omTmp = (AdvancedHashMap) omTmps.get(j);
+                omTmp.put("omdat", translateDateStrForDOY((String) omTmp.get("omdat"), pdate));
             }
 
         }
@@ -965,8 +967,8 @@ public class DssatXFileInput extends DssatCommonInput {
         singleSubRecSecList.add("ge");
         singleSubRecSecList.add("fl");
         singleSubRecSecList.add("pl");
-        singleSubRecSecList.add("om");  // TODO wait for confirmation that single sub record
-        singleSubRecSecList.add("ti");  // TODO wait for confirmation that single sub record
+//        singleSubRecSecList.add("om");  // P.S. wait for confirmation that single sub record
+//        singleSubRecSecList.add("ti");  // P.S. wait for confirmation that single sub record
         singleSubRecSecList.add("sm");
         AdvancedHashMap fstNode = (AdvancedHashMap) secArr.get(0);
         // If it contains multiple sub array of data, or it does not have multiple sub records
