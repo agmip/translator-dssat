@@ -54,6 +54,10 @@ public class DssatTFileOutput extends DssatCommonOutput {
             AdvancedHashMap obvTFile = adapter.exportRecord((Map) obvFile.getOr("time_course", obvFile));
             ArrayList observeRecordsSections = ((ArrayList) obvTFile.getOr("data", new ArrayList()));
 
+            if (observeRecordsSections.isEmpty()) {
+                return;
+            }
+
             // Initial BufferedWriter
             String exName = getExName(obvTFile);
             String fileName = exName;

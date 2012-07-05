@@ -54,6 +54,9 @@ public class DssatSoilOutput extends DssatCommonOutput {
             setDefVal();
 
             soilSites = (ArrayList) result.getOr("soil", new ArrayList());
+            if (soilSites.isEmpty()) {
+                return;
+            }
             decompressData(soilSites);
 
             // Initial BufferedWriter

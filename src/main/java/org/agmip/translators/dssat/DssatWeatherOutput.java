@@ -83,6 +83,9 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // Get weather files
             wthFiles = (ArrayList) result.getOr("weather", new ArrayList());
+            if (wthFiles.isEmpty()) {
+                return;
+            }
             decompressData(wthFiles);
             outputFiles = new File[wthFiles.size()];
 
