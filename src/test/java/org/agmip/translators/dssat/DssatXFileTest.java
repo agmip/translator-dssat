@@ -32,7 +32,7 @@ public class DssatXFileTest {
         JSONAdapter j = new JSONAdapter();
         AdvancedHashMap<String, Object> result;
 
-        String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\UFGA7801_SBX.ZIP";
+        String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\UFGA7801_SBX.ZIP"; //UFGA9602.TMX";
         result = obDssatXFileInput.readFile(filePath);
         System.out.println(j.toJSON(result));
 
