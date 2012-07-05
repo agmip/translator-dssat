@@ -93,13 +93,16 @@ public class DssatControllerOutput {
      */
     private String getZipFileName(ArrayList<File> files) {
         
-        File file;
-        for (int i = 0; i < files.size(); i++) {
-            file = files.get(i);
-            if (file.getName().matches(".+\\.\\w{2}[Xx]")) {
-                return file.getName().replaceAll("\\.", "_") + ".ZIP";
+        for (int i = 0; i < outputs.length; i++) {
+            if (outputs[i] instanceof DssatXFileOutput) {
+                if (outputs[i].getOutputFile() != null) {
+                    return outputs[i].getOutputFile().getName().replaceAll("\\.", "_") + ".ZIP";
+                } else {
+                    break;
+                }
             }
         }
+        
         return "OUTPUT.ZIP";
     }
 
