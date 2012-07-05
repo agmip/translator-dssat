@@ -110,7 +110,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                         // Read line and save into return holder
                         AdvancedHashMap tmp = readLine(line, formats, "");
                         // translate date from yyddd format to yyyymmdd format
-                        tmp.put("w_date", translateDateStr((String) tmp.get("w_date")));
+                        translateDateStr(tmp, "w_date");
                         daily.add(tmp);
 
                     } else {

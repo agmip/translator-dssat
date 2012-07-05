@@ -100,9 +100,7 @@ public class DssatTFileInput extends DssatCommonInput {
                     pdate = getPdate(brMap, (String) tmp.get("trno"));
                     for (int i = 0; i < titles.size(); i++) {
                         if (obvDataList.isDateType(titles.get(i))) {
-                            if (tmp.containsKey(titles.get(i))) {
-                                tmp.put(titles.get(i), translateDateStrForDOY((String) tmp.get(titles.get(i)), pdate));
-                            }
+                            translateDateStrForDOY(tmp, (String) titles.get(i), pdate);
                         }
                     }
                     // Add data to the array

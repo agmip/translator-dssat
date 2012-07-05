@@ -113,6 +113,20 @@ public abstract class DssatCommonInput implements TranslatorInput {
     protected abstract void setTitleFlgs(String line);
 
     /**
+     * Take the data str from input map and translate it from "yyddd" to "yyyymmdd"
+     *
+     * @param m input map which might contain date value in it
+     * @param id date string with format of "yyddd"
+     * @return result date string with format of "yyyymmdd"
+     */
+    protected void translateDateStr(AdvancedHashMap m, String id) {
+
+        if (m.containsKey(id)) {
+            m.put(id, translateDateStr((String) m.get(id)));
+        }
+    }
+    
+    /**
      * Translate data str from "yyddd" to "yyyymmdd"
      *
      * @param str date string with format of "yyddd"
@@ -121,6 +135,20 @@ public abstract class DssatCommonInput implements TranslatorInput {
     protected String translateDateStr(String str) {
 
         return translateDateStr(str, "0");
+    }
+    
+    /**
+     * Translate data str from "yyddd" or "doy" to "yyyymmdd"
+     *
+     * @param str date string with format of "yyddd"
+     * @pdate the related planting date
+     * @return result date string with format of "yyyymmdd"
+     */
+    protected void translateDateStrForDOY(AdvancedHashMap m, String id, String pdate) {
+
+        if (m.containsKey(id)) {
+            m.put(id, translateDateStrForDOY((String) m.get(id), pdate));
+        }
     }
 
     /**
@@ -240,7 +268,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @return check result
      */
     protected boolean checkValidValue(String value) {
-        if (value.trim().equals(defValC) || value.equals(defValI) || value.equals(defValR)) {
+        if (value == null || value.trim().equals(defValC) || value.equals(defValI) || value.equals(defValR)) {
             return false;
         } else {
             return true;

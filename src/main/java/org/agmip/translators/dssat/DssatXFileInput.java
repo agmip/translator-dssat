@@ -313,21 +313,25 @@ public class DssatXFileInput extends DssatCommonInput {
 
                             // check if lat and long are valid in the weather file; if not, set invalid value for them
                             if (!checkValidValue(strLat) || !checkValidValue(strLong) || (Double.parseDouble(strLat) == 0 && Double.parseDouble(strLong) == 0)) {
-                                strLat = "";
-                                strLong = "";
+                                strLat = null;
+                                strLong = null;
                             }
                         } // if weather file is not avaliable to read, set invalid value for lat and long
                         else {
-                            strLat = "";
-                            strLong = "";
+                            strLat = null;
+                            strLong = null;
                         }
                     }
                     if (flArr.isEmpty()) {
                         ret.put("fl_lat", strLat); // TODO Keep the meta data handling for the early version
                         ret.put("fl_long", strLong); // TODO Keep the meta data handling for the early version
                     }
-                    tmp.put("fl_lat", strLat);
-                    tmp.put("fl_long", strLong);
+                    if (tmp.containsKey("fl_lat")) {
+                        tmp.put("fl_lat", strLat);
+                    }
+                    if (tmp.containsKey("fl_long")) {
+                        tmp.put("fl_long", strLong);
+                    }
                     addToArray(flArr, tmp, "fl");
                 }
 
@@ -345,7 +349,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("samke", 6);
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("sadat", translateDateStr((String) tmp.get("sadat")));
+                    translateDateStr(tmp, "sadat");
                     saArr.add(tmp);
                     sadArr = new ArrayList();
                     tmp.put(eventKey, sadArr);
@@ -392,7 +396,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("ic_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("icdat", translateDateStr((String) tmp.get("icdat")));
+                    translateDateStr(tmp, "icdat");
                     icArr.add(tmp);
                     icdArr = new ArrayList();
                     tmp.put(eventKey, icdArr);
@@ -437,8 +441,8 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("pl_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("pdate", translateDateStr((String) tmp.get("pdate")));
-                    tmp.put("pldae", translateDateStr((String) tmp.get("pldae")));
+                    translateDateStr(tmp, "pdate");
+                    translateDateStr(tmp, "pldae");
                     plArr.add(tmp);
                     if (plArr.size() == 1) {
                         ret.put("pdate", translateDateStr(line.substring(3, 8).trim())); // TODO keep for the early version
@@ -464,8 +468,10 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("ir_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    ireff = (String) tmp.getOr("ireff", "");
-                    if (!ireff.equals("")) tmp.remove("ireff");
+                    ireff = (String) tmp.get("ireff");
+                    if (ireff != null) {
+                        tmp.remove("ireff");
+                    }
                     irArr.add(tmp);
                     irdArr = new ArrayList();
                     tmp.put(eventKey, irdArr);
@@ -480,7 +486,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("irval", 6);
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-//                    tmp.put("idate", translateDateStr((String) tmp.get("idate"))); // TODO DOY handling
+//                    tmp.put("idate", translateDateStr((String) tmp.getOr("idate"))); // TODO DOY handling
                     tmp.put("ireff", ireff);
                     irdArr.add(tmp);
 
@@ -508,7 +514,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("fe_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-//                    tmp.put("fdate", translateDateStr((String) tmp.get("fdate"))); // TODO DOY handling
+//                    translateDateStr(tmp, "fdate"); // TODO DOY handling
                     feArr.add(tmp);
                 } else {
                 }
@@ -533,7 +539,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("om_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-//                    tmp.put("omdat", translateDateStr((String) tmp.get("omdat"))); // TODO DOY handling
+//                    translateDateStr(tmp, "omdat"); // TODO DOY handling
                     omArr.add(tmp);
                 } else {
                 }
@@ -555,7 +561,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("ch_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("cdate", translateDateStr((String) tmp.get("cdate")));
+                    translateDateStr(tmp, "cdate");
                     chArr.add(tmp);
                 } else {
                 }
@@ -574,7 +580,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("ti_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("tdate", translateDateStr((String) tmp.get("tdate")));
+                    translateDateStr(tmp, "tdate");
                     tiArr.add(tmp);
                 } else {
                 }
@@ -607,7 +613,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("em_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("emday", translateDateStr((String) tmp.get("emday")));
+                    translateDateStr(tmp, "emday");
                     emArr.add(tmp);
                 } else {
                 }
@@ -629,7 +635,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("ha_name", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-                    tmp.put("hdate", translateDateStr((String) tmp.get("hdate")));
+                    translateDateStr(tmp, "hdate");
                     haArr.add(tmp);
                     if (haArr.size() == 1) {
                         ret.put("hdate", translateDateStr(line.substring(3, 8).trim())); // TODO keep for early version
@@ -656,7 +662,7 @@ public class DssatXFileInput extends DssatCommonInput {
 //                    formats.put("model", line.length());
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats);
-//                    tmp.put("sdate", translateDateStr((String) tmp.get("sdate")));
+//                    translateDateStr(tmp, "sdate");
                     smSubArr = new ArrayList();
                     smArr.add(tmp);
                     tmp.put("data", smSubArr);
@@ -765,8 +771,8 @@ public class DssatXFileInput extends DssatCommonInput {
 //                    formats.put("pstmn", 6);
                     // Read line and save into return holder
 //                    AdvancedHashMap tmp = readLine(line, formats);
-//                    tmp.put("pfrst", translateDateStr((String) tmp.get("pfrst")));
-//                    tmp.put("plast", translateDateStr((String) tmp.get("plast")));
+//                    translateDateStr(tmp, "pfrst");
+//                    translateDateStr(tmp, "plast");
 //                    tmp.put("planting", line);
 //                    addToArray(smArr, tmp, "sm");
                     smSubArr.add(line);
@@ -834,7 +840,7 @@ public class DssatXFileInput extends DssatCommonInput {
 //                    formats.put("hrcnr", 6);
                     // Read line and save into return holder
 //                    AdvancedHashMap tmp = readLine(line, formats);
-//                    tmp.put("hlast", translateDateStr((String) tmp.get("hlast")));
+//                    translateDateStr(tmp, "hlast");
 //                    tmp.put("harvest", line);
 //                    addToArray(smArr, tmp, "sm");
                     smSubArr.add(line);
@@ -935,7 +941,8 @@ public class DssatXFileInput extends DssatCommonInput {
             AdvancedHashMap feTmp;
             for (int j = 0; j < feTmps.size(); j++) {
                 feTmp = (AdvancedHashMap) feTmps.get(j);
-                feTmp.put("fdate", translateDateStrForDOY((String) feTmp.get("fdate"), pdate));
+                translateDateStrForDOY(feTmp, "fdate", pdate);
+//                feTmp.put("fdate", translateDateStrForDOY((String) feTmp.get("fdate"), pdate));
             }
 
             // Irrigation date
@@ -944,7 +951,8 @@ public class DssatXFileInput extends DssatCommonInput {
                 ArrayList irTmpSubs = (ArrayList) irTmp.getOr("data", new ArrayList());
                 for (int j = 0; j < irTmpSubs.size(); j++) {
                     AdvancedHashMap irTmpSub = (AdvancedHashMap) irTmpSubs.get(j);
-                    irTmpSub.put("idate", translateDateStrForDOY((String) irTmpSub.getOr("idate", ""), pdate));
+                    translateDateStrForDOY(irTmpSub, "idate", pdate);
+//                    irTmpSub.put("idate", translateDateStrForDOY((String) irTmpSub.getOr("idate", ""), pdate));
                 }
             }
 
@@ -953,7 +961,8 @@ public class DssatXFileInput extends DssatCommonInput {
             AdvancedHashMap omTmp;
             for (int j = 0; j < omTmps.size(); j++) {
                 omTmp = (AdvancedHashMap) omTmps.get(j);
-                omTmp.put("omdat", translateDateStrForDOY((String) omTmp.get("omdat"), pdate));
+                translateDateStrForDOY(omTmp, "omdat", pdate);
+//                omTmp.put("omdat", translateDateStrForDOY((String) omTmp.getOr("omdat"), pdate));
             }
 
         }
@@ -1003,7 +1012,7 @@ public class DssatXFileInput extends DssatCommonInput {
 
         ArrayList ret = null;
         // Get First data node
-        if (secArr.isEmpty()) {
+        if (secArr.isEmpty() || value == null) {
             return null;
         }
         // Define the section with single sub data
@@ -1018,7 +1027,7 @@ public class DssatXFileInput extends DssatCommonInput {
         // If it contains multiple sub array of data, or it does not have multiple sub records
         if (fstNode.containsKey("data") || singleSubRecSecList.contains(key)) {
             for (int i = 0; i < secArr.size(); i++) {
-                if (((AdvancedHashMap) secArr.get(i)).get(key).equals(value)) {
+                if (value.equals(((AdvancedHashMap) secArr.get(i)).get(key))) {
                     return CopyMap((AdvancedHashMap) secArr.get(i));
                 }
             }
@@ -1029,7 +1038,7 @@ public class DssatXFileInput extends DssatCommonInput {
             AdvancedHashMap node;
             for (int i = 0; i < secArr.size(); i++) {
                 node = (AdvancedHashMap) secArr.get(i);
-                if (node.get(key).equals(value)) {
+                if (value.equals(node.get(key))) {
                     ret.add(CopyMap(node));
                 }
             }
