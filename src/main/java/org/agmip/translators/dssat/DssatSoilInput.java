@@ -170,7 +170,11 @@ public class DssatSoilInput extends DssatCommonInput {
                         formats.put("slpx", 6);
                         formats.put("slpt", 6);
                         formats.put("slpo", 6);
-                        formats.put("caco3", 6);    // P.S. Different with document (DSSAT vol2.pdf)
+                        if (flg[1].contains("caco3")) {
+                            formats.put("caco3", 6);    // P.S. For old version of soil file
+                        } else {
+                            formats.put("slca", 6);
+                        }
                         formats.put("slal", 6);
                         formats.put("slfe", 6);
                         formats.put("slmn", 6);
@@ -182,7 +186,9 @@ public class DssatSoilInput extends DssatCommonInput {
                         formats.put("slna", 6);
                         formats.put("slsu", 6);
                         formats.put("slec", 6);
-                        formats.put("slca", 6);
+                        if (flg[1].contains("caco3")) {
+                            formats.put("slca", 6);
+                        }
                         // Read line and save into return holder
 //                        addToArray((ArrayList) ((AdvancedHashMap) sites.get(sites.size() - 1)).get(layerKey),
 //                                readLine(line, formats),
