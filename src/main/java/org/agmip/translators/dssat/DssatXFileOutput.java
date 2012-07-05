@@ -784,7 +784,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
         defValR = "-99";
         defValC = "-99";    // TODO wait for confirmation
         defValI = "-99";
-        System.out.println(defValD + ", " + icdat + ", " + pdate);
     }
 
     /**
