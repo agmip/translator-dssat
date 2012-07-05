@@ -1,6 +1,5 @@
 package org.agmip.translators.dssat;
 
-import java.util.ArrayList;
 import java.io.FileOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -39,10 +38,10 @@ public class DssatControllerTest {
         String[] fileNames = {
 //            "UFGA8201.ZIP",
 //            "UFGA9602.TMX",
-            "UFGA7801_SBX.ZIP",
-            "UFGA7802_SBX.ZIP",
+//            "UFGA7801_SBX.ZIP",
+//            "UFGA7802_SBX.ZIP",
             "UFGA8201_MZX.ZIP",
-            "UFGA8202_MZX.ZIP"
+//            "UFGA8202_MZX.ZIP"
         };
 
         File f = new File("output.txt");
@@ -50,10 +49,11 @@ public class DssatControllerTest {
         for (int i = 0; i < fileNames.length; i++) {
             result = obDssatControllerInput.readFiles(filePath + fileNames[i]);
             System.out.println(fileNames[i] + ":\r\n" + j.toJSON(result));
-            if (fileNames[i].equals("UFGA7801_SBX.ZIP")) {
+            if (fileNames[i].equals(fileNames[0])) {
                 resultForWrite = result;
             }
 
+            // Output json for reading
             if (i != 0) {
                 bo = new BufferedOutputStream(new FileOutputStream(f, true));
             } else {
@@ -64,14 +64,13 @@ public class DssatControllerTest {
             bo.write("\r\n\r\n=================================================================\r\n\r\n".getBytes());
             bo.close();
         }
+        f.delete();
         
         obDssatControllerOutput.writeFiles("", resultForWrite);
-        ArrayList<File> files = obDssatControllerOutput.getOutputFiles();
-        for (int i = 0; i < files.size(); i++) {
-            if (files.get(i) != null) {
-                assertTrue(files.get(i).exists());
-                assertTrue(files.get(i).delete());
-            }
+        File file = obDssatControllerOutput.getOutputZipFile();
+        if (file != null) {
+            assertTrue(file.exists());
+            assertTrue(file.delete());
         }
 
     }
