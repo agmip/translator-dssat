@@ -46,7 +46,7 @@ public class DssatTFileInput extends DssatCommonInput {
         ArrayList obvDataSection = new ArrayList();
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
         String obvDataKey = "data";  // TODO the key name might change
-        String obvFileKey = "time_course";  // TODO the key name might change
+        String obvFileKey = "time_series";  // TODO the key name might change
         String pdate;
 
         buf = brMap.get("T");
