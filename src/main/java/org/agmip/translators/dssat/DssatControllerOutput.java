@@ -10,9 +10,9 @@ import org.agmip.core.types.AdvancedHashMap;
 public class DssatControllerOutput {
 
     private DssatCommonOutput[] outputs = {
-//        new DssatXFileOutput(),
-//        new DssatSoilOutput(),
-//        new DssatWeatherOutput(),
+        new DssatXFileOutput(),
+        new DssatSoilOutput(),
+        new DssatWeatherOutput(),
         new DssatAFileOutput(),
         new DssatTFileOutput()};
     
