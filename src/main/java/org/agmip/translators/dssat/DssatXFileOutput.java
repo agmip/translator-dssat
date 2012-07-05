@@ -18,8 +18,6 @@ import org.agmip.util.JSONAdapter;
 public class DssatXFileOutput extends DssatCommonOutput {
 
     private File outputFile;
-    // Define necessary id for the experiment data
-    private static String[] necessaryData = {"pdate", "plpop,plpoe", "plrs", "crid", "cul_id", "wst_insi", "soil_id"};
 
     /**
      * Get output file object
@@ -81,24 +79,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //        FileWriter output;
 
         try {
-
-            // Initial missing data check for necessary fields
-            // TODO will be revised
-            for (int i = 0; i < necessaryData.length; i++) {
-                String[] strs = necessaryData[i].split(",");
-                for (int j = 0; j < strs.length; j++) {
-                    if (!result.getOr(strs[j], "").toString().equals("")) {
-                        strs = null;
-                        break;
-                    }
-                }
-                if (strs != null) {
-                    //throw new Exception("Incompleted record because missing data : [" + necessaryData[i] + "]");
-                    //System.out.println("Incompleted record because missing data : [" + necessaryData[i] + "]");
-                    sbError.append("! Warning: Incompleted record because missing data : [").append(necessaryData[i]).append("]\r\n");
-                    //return;
-                }
-            }
 
             // Set default value for missing data
             data = adapter.exportRecord((Map) result.getOr("experiment", result));
@@ -180,7 +160,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             // TREATMENT Section
             trArr = (ArrayList) data.getOr("treatment", new ArrayList());
             if (trArr.isEmpty()) {
-                sbError.append("! Warning: There is no treatment data in the experiment!/r/n");
+                sbError.append("! Warning: There is no treatment data in the experiment!\r\n");
             } else {
                 sbData.append("*TREATMENTS                        -------------FACTOR LEVELS------------\r\n");
                 sbData.append("@N R O C TNAME.................... CU FL SA IC MP MI MF MR MC MT ME MH SM\r\n");
@@ -236,6 +216,12 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 for (int idx = 0; idx < cuArr.size(); idx++) {
                     secData = adapter.exportRecord((Map) cuArr.get(idx));
+                    // Checl if necessary data is missing
+                    if (secData.getOr("crid", "").equals("")) {
+                        sbError.append("! Warning: Incompleted record because missing data : [crid]\r\n");
+                    } else if (secData.getOr("cul_id", "").equals("")) {
+                        sbError.append("! Warning: Incompleted record because missing data : [cul_id]\r\n");
+                    }
                     sbData.append(String.format("%1$2s %2$-2s %3$-6s %4$s\r\n",
                             idx + 1, //secData.getOr("ge", defValI).toString(),
                             secData.getOr("crid", defValC).toString(),
@@ -258,6 +244,12 @@ public class DssatXFileOutput extends DssatCommonOutput {
             }
             for (int idx = 0; idx < flArr.size(); idx++) {
                 secData = adapter.exportRecord((Map) flArr.get(idx));
+                // Check if the necessary is missing
+                if (secData.getOr("wsta_id", "").equals("")) {
+                    sbError.append("! Warning: Incompleted record because missing data : [wsta_id]\r\n");
+                } else if (secData.getOr("soil_id", "").equals("")) {
+                    sbError.append("! Warning: Incompleted record because missing data : [soil_id]\r\n");
+                }
                 sbData.append(String.format("%1$2s %2$-8s %3$-8s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$-5s %10$-5s%11$5s  %12$-10s %13$s\r\n", // P.S. change length definition to match current way
                         idx + 1, //secData.getOr("fl", defValI).toString(),
                         secData.getOr("id_field", defValC).toString(),
@@ -378,6 +370,15 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 for (int idx = 0; idx < mpArr.size(); idx++) {
 
                     secData = adapter.exportRecord((Map) mpArr.get(idx));
+                    // Check if necessary data is missing
+                    if (secData.getOr("pdate", "").equals("")) {
+                        sbError.append("! Warning: Incompleted record because missing data : [pdate]\r\n");
+                    } else if (secData.getOr("plpop", secData.getOr("plpoe", "")).equals("")) {
+                        sbError.append("! Warning: Incompleted record because missing data : [plpop] and [plpoe]\r\n");
+                    }
+                    if (secData.getOr("plrs", "").equals("")) {
+                        sbError.append("! Warning: Incompleted record because missing data : [plrs]\r\n");
+                    }
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s     %6$-1s     %7$-1s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s                        %16$s\r\n",
                             idx + 1, //data.getOr("pl", defValI).toString(),
                             formatDateStr(secData.getOr("pdate", defValD).toString()),
@@ -631,18 +632,18 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                         for (int j = 0; j < subDataArr.size(); j++) {
                             sbData.append(smTitles.get(j));
-                            sbData.append(subDataArr.get(j)).append("\r\n");
+                            sbData.append(String.format("%2s", idx + 1)).append(((String) subDataArr.get(j)).substring(2)).append("\r\n");
                             if (j == 4) {
                                 sbData.append("\r\n");
                             }
                         }
                     } else {
-                        sbData.append(createSMMAStr(0, trData));
+                        sbData.append(createSMMAStr(idx + 1, data, trData));
                     }
                 }
 
             } else {
-                sbData.append(createSMMAStr(0, trData));
+                sbData.append(createSMMAStr(1, data, trData));
             }
 
             // Output finish
@@ -658,69 +659,83 @@ public class DssatXFileOutput extends DssatCommonOutput {
     /**
      * Create string of Simulation Control and Automatic Management Section
      * 
-     * @param type  The return type of string
-     *                  (0:default; 1: undefined)
-     * @param result  date holder for experiment data
+     * @param smid      simulation index number
+     * @param expData   date holder for experiment data
+     * @param trData    date holder for one treatment data
      * @return      date string with format of "yyddd" 
      */
-    private String createSMMAStr(int type, AdvancedHashMap result) {
+    private String createSMMAStr(int smid, AdvancedHashMap expData, AdvancedHashMap trData) {
 
         StringBuilder sb = new StringBuilder();
+        JSONAdapter adapter = new JSONAdapter();
         String nitro;
         String water;
         String sdate;
+        String sm = String.format("%2d", smid);
+        ArrayList dataArr;
+        AdvancedHashMap data;
+        AdvancedHashMap subData;
 
-        if (!result.getOr("fdate", "").toString().equals("")) {
+        dataArr = (ArrayList) trData.getOr("fertilizer", new ArrayList());
+        if (!dataArr.isEmpty()) {
+            subData = adapter.exportRecord((Map) dataArr.get(0));
+        } else {
+            subData = new AdvancedHashMap();
+        }
+        if (!subData.getOr("fdate", "").toString().equals("")) {
             nitro = "Y";
-        } else if (result.getOr("fertilizer", "").toString().equals("N")) {
+        } else if (expData.getOr("fertilizer", "").toString().equals("N")) {
             nitro = "Y";
         } else {
             nitro = "N";
         }
 
-        if (!result.getOr("ireff", "").toString().equals("")) {
+        data = adapter.exportRecord((Map) trData.getOr("irrigation", new AdvancedHashMap()));
+        dataArr = (ArrayList) data.getOr("data", new ArrayList());
+        if (!dataArr.isEmpty()) {
+            subData = adapter.exportRecord((Map) dataArr.get(0));
+        } else {
+            subData = new AdvancedHashMap();
+        }
+        if (!subData.getOr("ireff", "").toString().equals("")) {
             water = "Y";
-        } else if (result.getOr("irrig", "").toString().equals("N")) {
+        } else if (subData.getOr("irrig", "").toString().equals("N")) {
             water = "Y";
         } else {
             water = "N";
         }
 
-        sdate = result.getOr("sdat", "").toString();
+        sdate = expData.getOr("sdat", "").toString();
         if (sdate.equals("")) {
-            sdate = result.getOr("pdate", defValD).toString();
+            data = adapter.exportRecord((Map) trData.getOr("plant", new AdvancedHashMap()));
+            sdate = data.getOr("pdate", defValD).toString();
         }
         sdate = formatDateStr(sdate);
 
-        // Check return type
-        if (type == 1) {
-            // Undefined, will be used for future
-        } // default
-        else {
-            sb.append("*SIMULATION CONTROLS\r\n");
-            sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
-            sb.append(" 1 GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
-            sb.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
+
+        sb.append("*SIMULATION CONTROLS\r\n");
+        sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
+        sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
+        sb.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
 //          sb.append(" 1 OP              Y     Y     Y     N     N     N     N     Y     M\r\n");
-            sb.append(" 1 OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     Y     M\r\n");
-            sb.append("@N METHODS     WTHER INCON LIGHT EVAPO INFIL PHOTO HYDRO NSWIT MESOM MESEV MESOL\r\n");
-            sb.append(" 1 ME              M     M     E     R     S     L     R     1     G     S     2\r\n");
-            sb.append("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
-            sb.append(" 1 MA              R     R     R     R     M\r\n");
-            sb.append("@N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT\r\n");
-            sb.append(" 1 OU              N     Y     Y     1     Y     Y     Y     Y     Y     N     Y     N     Y\r\n\r\n");
-            sb.append("@  AUTOMATIC MANAGEMENT\r\n");
-            sb.append("@N PLANTING    PFRST PLAST PH2OL PH2OU PH2OD PSTMX PSTMN\r\n");
-            sb.append(" 1 PL          82050 82064    40   100    30    40    10\r\n");
-            sb.append("@N IRRIGATION  IMDEP ITHRL ITHRU IROFF IMETH IRAMT IREFF\r\n");
-            sb.append(" 1 IR             30    50   100 GS000 IR001    10  1.00\r\n");
-            sb.append("@N NITROGEN    NMDEP NMTHR NAMNT NCODE NAOFF\r\n");
-            sb.append(" 1 NI             30    50    25 FE001 GS000\r\n");
-            sb.append("@N RESIDUES    RIPCN RTIME RIDEP\r\n");
-            sb.append(" 1 RE            100     1    20\r\n");
-            sb.append("@N HARVEST     HFRST HLAST HPCNP HPCNR\r\n");
-            sb.append(" 1 HA              0 83057   100     0\r\n");
-        }
+        sb.append(sm).append(" OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     Y     M\r\n");
+        sb.append("@N METHODS     WTHER INCON LIGHT EVAPO INFIL PHOTO HYDRO NSWIT MESOM MESEV MESOL\r\n");
+        sb.append(sm).append(" ME              M     M     E     R     S     L     R     1     G     S     2\r\n");
+        sb.append("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
+        sb.append(sm).append(" MA              R     R     R     R     M\r\n");
+        sb.append("@N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT\r\n");
+        sb.append(sm).append(" OU              N     Y     Y     1     Y     Y     Y     Y     Y     N     Y     N     Y\r\n\r\n");
+        sb.append("@  AUTOMATIC MANAGEMENT\r\n");
+        sb.append("@N PLANTING    PFRST PLAST PH2OL PH2OU PH2OD PSTMX PSTMN\r\n");
+        sb.append(sm).append(" PL          82050 82064    40   100    30    40    10\r\n");
+        sb.append("@N IRRIGATION  IMDEP ITHRL ITHRU IROFF IMETH IRAMT IREFF\r\n");
+        sb.append(sm).append(" IR             30    50   100 GS000 IR001    10  1.00\r\n");
+        sb.append("@N NITROGEN    NMDEP NMTHR NAMNT NCODE NAOFF\r\n");
+        sb.append(sm).append(" NI             30    50    25 FE001 GS000\r\n");
+        sb.append("@N RESIDUES    RIPCN RTIME RIDEP\r\n");
+        sb.append(sm).append(" RE            100     1    20\r\n");
+        sb.append("@N HARVEST     HFRST HLAST HPCNP HPCNR\r\n");
+        sb.append(sm).append(" HA              0 83057   100     0\r\n");
 
         return sb.toString();
     }
@@ -732,41 +747,44 @@ public class DssatXFileOutput extends DssatCommonOutput {
      */
     private void setDefVal(AdvancedHashMap result) {
 
-        // TODO need to be revised
-        if (!result.getOr("icdat", "").toString().equals("")) {
-            defValD = result.getOr("icdat", "").toString();
+        ArrayList trDataArr = (ArrayList) result.getOr("treatment", new AdvancedHashMap());
+        Map trData;
+        if (!trDataArr.isEmpty()) {
+            trData = (Map) trDataArr.get(0);
+        } else {
+            trData = new AdvancedHashMap();
+        }
+        Map icData = (Map) trData.get("initial_condition");
+        Map mpData = (Map) trData.get("plant");
+        String icdat;
+        String pdate;
+        if (icData != null) {
+            icdat = (String) icData.get("icdat");
+
+        } else {
+            icdat = null;
+        }
+        if (mpData != null) {
+            pdate = (String) mpData.get("pdate");
+
+        } else {
+            pdate = null;
+        }
+
+        if (icdat != null && !icdat.equals("")) {
+            defValD = icdat;
         } else if (!result.getOr("sdat", "").toString().equals("")) {
             defValD = result.getOr("sdat", "").toString();
-        } else if (!result.getOr("pdate", "").toString().equals("")) {
-            defValD = result.getOr("pdate", "").toString();
+        } else if (pdate != null && !pdate.equals("")) {
+            defValD = pdate;
         } else {
-            //throw new Exception("Experiment can't be output due to unavailable date info.");
+            sbError.append("! Warning: There is noavailable date info in the experiment.\r\n");
             defValD = "20110101";
         }
         defValR = "-99";
         defValC = "-99";    // TODO wait for confirmation
         defValI = "-99";
-    }
-
-    /**
-     * Get index value of the record and set new id value in the array
-     * 
-     * @param idVal  id string for the record
-     * @param arr    array of the id
-     * @return       current index value of the id
-     */
-    private int getIdxVal(String idStr, ArrayList arr) {
-
-        int ret = 0;
-        if (!idStr.equals("")) {
-            ret = arr.indexOf(idStr);
-            if (ret == -1) {
-                arr.add(idStr);
-                ret = arr.size();
-            }
-        }
-
-        return ret;
+        System.out.println(defValD + ", " + icdat + ", " + pdate);
     }
 
     /**
