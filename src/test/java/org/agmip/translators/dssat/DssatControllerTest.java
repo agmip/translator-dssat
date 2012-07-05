@@ -1,5 +1,6 @@
 package org.agmip.translators.dssat;
 
+import java.util.ArrayList;
 import java.io.FileOutputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -65,11 +66,11 @@ public class DssatControllerTest {
         }
         
         obDssatControllerOutput.writeFiles("", resultForWrite);
-        File[] files = obDssatControllerOutput.getOutputFiles();
-        for (int i = 0; i < files.length; i++) {
-            if (files[i] != null) {
-                assertTrue(files[i].exists());
-                assertTrue(files[i].delete());
+        ArrayList<File> files = obDssatControllerOutput.getOutputFiles();
+        for (int i = 0; i < files.size(); i++) {
+            if (files.get(i) != null) {
+                assertTrue(files.get(i).exists());
+                assertTrue(files.get(i).delete());
             }
         }
 
