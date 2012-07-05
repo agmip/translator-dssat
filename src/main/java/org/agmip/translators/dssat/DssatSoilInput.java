@@ -36,9 +36,10 @@ public class DssatSoilInput extends DssatCommonInput {
     protected AdvancedHashMap readFile(HashMap brMap) throws IOException {
 
         AdvancedHashMap ret = new AdvancedHashMap();
-        ArrayList files = new ArrayList();
-        AdvancedHashMap file;
+        String slNotes = null;
         ArrayList sites;
+        AdvancedHashMap site = new AdvancedHashMap();
+        ArrayList layers = new ArrayList();
         String line;
         BufferedReader brS = null;
         Object buf;
@@ -54,6 +55,8 @@ public class DssatSoilInput extends DssatCommonInput {
             return ret;
         }
 
+        sites = new ArrayList();
+
         for (Object key : mapS.keySet()) {
 
             buf = mapS.get(key);
@@ -62,10 +65,6 @@ public class DssatSoilInput extends DssatCommonInput {
             } else {
                 brS = (BufferedReader) buf;
             }
-            file = new AdvancedHashMap();
-            sites = new ArrayList();
-            file.put("soil_sites", sites);
-            files.add(file);
 
             while ((line = brS.readLine()) != null) {
 
@@ -75,7 +74,7 @@ public class DssatSoilInput extends DssatCommonInput {
                 // Read SOILS Info
                 if (flg[0].equals("soil") && flg[2].equals("data")) {
 
-                    file.put("address", line.replaceFirst("\\*[Ss][Oo][Ii][Ll][Ss]?\\s*:?", "").trim());
+                    slNotes = line.replaceFirst("\\*[Ss][Oo][Ii][Ll][Ss]?\\s*:?", "").trim();
 
                 } // Read Site Info
                 else if (flg[0].equals("site")) {
@@ -91,8 +90,14 @@ public class DssatSoilInput extends DssatCommonInput {
                         formats.put("sldp", 6);
                         formats.put("soil_name", 51);
                         // Read line and save into return holder
-                        sites.add(readLine(line.substring(1), formats));
-                        ((AdvancedHashMap) sites.get(sites.size() - 1)).put(layerKey, new ArrayList());
+//                        sites.add(readLine(line.substring(1), formats));
+                        site = readLine(line.substring(1), formats);
+                        if (slNotes != null) {
+                            site.put("sl_notes", slNotes);
+                        }
+                        sites.add(site);
+                        layers = new ArrayList();
+//                        ((AdvancedHashMap) sites.get(sites.size() - 1)).put(layerKey, new ArrayList());
 
                     } // Site detail info
                     else if (flg[1].startsWith("site ") && flg[2].equals("data")) {
@@ -105,7 +110,8 @@ public class DssatSoilInput extends DssatCommonInput {
                         formats.put("soil_long", 8); // P.S. Definition changed 9 -> 8  (06/24)
                         formats.put("classification", 51);    // P.S. "fd_name" for query using, not this time
                         // Read line and save into return holder
-                        ((AdvancedHashMap) sites.get(sites.size() - 1)).put(readLine(line, formats));
+//                        ((AdvancedHashMap) sites.get(sites.size() - 1)).put(readLine(line, formats));
+                        site.put(readLine(line, formats));
 
                     } // soil info
                     else if (flg[1].startsWith("scom ") && flg[2].equals("data")) {
@@ -123,7 +129,8 @@ public class DssatSoilInput extends DssatCommonInput {
                         formats.put("smpx", 6);
                         formats.put("smke", 6);
                         // Read line and save into return holder
-                        ((AdvancedHashMap) sites.get(sites.size() - 1)).put(readLine(line, formats));
+//                        ((AdvancedHashMap) sites.get(sites.size() - 1)).put(readLine(line, formats));
+                        site.put(readLine(line, formats));
 
                     } // layer part one info
                     else if (flg[1].startsWith("slb  slmh") && flg[2].equals("data")) {
@@ -148,9 +155,11 @@ public class DssatSoilInput extends DssatCommonInput {
                         formats.put("slcec", 6);
                         formats.put("sadc", 6);
                         // Read line and save into return holder
-                        addToArray((ArrayList) ((AdvancedHashMap) sites.get(sites.size() - 1)).get(layerKey),
-                                readLine(line, formats),
-                                "sllb");
+//                        addToArray((ArrayList) ((AdvancedHashMap) sites.get(sites.size() - 1)).get(layerKey),
+//                                readLine(line, formats),
+//                                "sllb");
+                        addToArray(layers, readLine(line, formats), "sllb");
+                        site.put(layerKey, layers);
 
                     } // layer part two info
                     else if (flg[1].startsWith("slb  slpx ") && flg[2].equals("data")) {
@@ -175,9 +184,10 @@ public class DssatSoilInput extends DssatCommonInput {
                         formats.put("slec", 6);
                         formats.put("slca", 6);
                         // Read line and save into return holder
-                        addToArray((ArrayList) ((AdvancedHashMap) sites.get(sites.size() - 1)).get(layerKey),
-                                readLine(line, formats),
-                                "sllb");
+//                        addToArray((ArrayList) ((AdvancedHashMap) sites.get(sites.size() - 1)).get(layerKey),
+//                                readLine(line, formats),
+//                                "sllb");
+                        addToArray(layers, readLine(line, formats), "sllb");
 
                     } else {
                     }
@@ -186,8 +196,8 @@ public class DssatSoilInput extends DssatCommonInput {
             }
         }
 
-        compressData(files);
-        ret.put(jsonKey, files);
+        compressData(sites);
+        ret.put(jsonKey, sites);
         brS.close();
 
         return ret;
