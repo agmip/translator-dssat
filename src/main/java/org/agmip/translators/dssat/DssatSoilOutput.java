@@ -55,7 +55,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
 
             soilSites = (ArrayList) result.getOr("soil", new ArrayList());
             decompressData(soilSites);
-          
+
             // Initial BufferedWriter
             // Get File name
             String exName = getExName(result);
@@ -77,11 +77,18 @@ public class DssatSoilOutput extends DssatCommonOutput {
 
             // Output Soil File
             // Titel Section
-            if (!soilSites.isEmpty()) {
-                AdvancedHashMap fstSite = (AdvancedHashMap) soilSites.get(0);
-                bwS.write("*SOILS: " + fstSite.getOr("sl_notes", defValC) +"\r\n\r\n");
+            bwS.write("*SOILS: ");
+            String slNote = "";
+            String tmp;
+            for (int i = 0; i < soilSites.size(); i++) {
+                tmp = (String) ((AdvancedHashMap) soilSites.get(i)).getOr("sl_notes", defValC);
+                if (!slNote.equals(tmp)) {
+                    slNote = tmp;
+                    bwS.write(slNote + "; ");
+                }
             }
-            
+            bwS.write("\r\n\r\n");
+
             // Loop sites of data
             for (int i = 0; i < soilSites.size(); i++) {
                 soilSite = adapter.exportRecord((Map) soilSites.get(i));
@@ -97,8 +104,8 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 sbData.append(String.format(" %1$-11s %2$-11s %3$9s%4$8s %5$s\r\n",
                         soilSite.getOr("sl_loc_3", defValC).toString(),
                         soilSite.getOr("sl_loc_1", defValC).toString(),
-                        formatNumStr(8, soilSite.getOr("soil_lat", defValR).toString()),     // P.S. Definition changed 9 -> 10 (06/24)
-                        formatNumStr(8, soilSite.getOr("soil_long", defValR).toString()),    // P.S. Definition changed 9 -> 8  (06/24)
+                        formatNumStr(8, soilSite.getOr("soil_lat", defValR).toString()), // P.S. Definition changed 9 -> 10 (06/24)
+                        formatNumStr(8, soilSite.getOr("soil_long", defValR).toString()), // P.S. Definition changed 9 -> 8  (06/24)
                         soilSite.getOr("classification", defValC).toString()));
                 sbData.append("@ SCOM  SALB  SLU1  SLDR  SLRO  SLNF  SLPF  SMHB  SMPX  SMKE\r\n");
                 sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$-5s %9$-5s %10$-5s\r\n",
@@ -134,6 +141,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
                     }
                 }
                 if (p2Flg) {
+                    // TODO CACO3 or SLCA?
                     sbLyrP2.append("@  SLB  SLPX  SLPT  SLPO CACO3  SLAL  SLFE  SLMN  SLBS  SLPA  SLPB  SLKE  SLMG  SLNA  SLSU  SLEC  SLCA\r\n");
                 }
 
@@ -197,7 +205,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
             bwS.write(sbError.toString());
             bwS.write(sbData.toString());
             bwS.close();
-            
+
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
