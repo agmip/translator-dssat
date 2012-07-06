@@ -1,6 +1,9 @@
 package org.agmip.translators.dssat;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Map;
 import org.agmip.core.types.AdvancedHashMap;
 import org.agmip.core.types.TranslatorOutput;
 
@@ -41,7 +44,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             return String.format("%1$02d%2$03d", cal.get(Calendar.YEAR) % 100, cal.get(Calendar.DAY_OF_YEAR));
         } catch (Exception e) {
             // if tranlate failed, then use default value for date
-            //sbError.append("! Waring: There is a invalid date [").append(str).append("]");
+            //sbError.append("! Waring: There is a invalid date [").append(str).append("]\r\n");
             return formatDateStr2(defValD);
         }
     }
@@ -62,7 +65,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         String[] inputStr = str.split("\\.");
         if (inputStr[0].length() > bits) {
             //throw new Exception();
-            sbError.append("! Waring: There is a oversized number [").append(str).append("] (Limitation is ").append(bits).append("bits)");
+            sbError.append("! Waring: There is a oversized number [").append(str).append("] (Limitation is ").append(bits).append("bits)\r\n");
         } else {
             ret = inputStr[0];
 
@@ -82,6 +85,9 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                     decimalPart = Double.valueOf(Math.round(input * decimalPower) % decimalPower).longValue();
                     ret = ret + "." + (decimalPart == 0 && (bits - inputStr[0].length() < 2) ? "" : decimalPart);
                 }
+            }
+            if (ret.length() < bits) {
+                ret = String.format("%1$" + bits + "s", ret);
             }
         }
 
@@ -123,7 +129,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             return String.format("%1$02d%2$03d", cal.get(Calendar.YEAR) % 100, cal.get(Calendar.DAY_OF_YEAR));
         } catch (Exception e) {
             // if tranlate failed, then use default value for date
-            // sbError.append("! Waring: There is a invalid date [").append(startDate).append("]");
+            // sbError.append("! Waring: There is a invalid date [").append(startDate).append("]\r\n");
             return "-99"; //formatDateStr(defValD);
         }
 
@@ -137,11 +143,100 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      */
     protected String getExName(AdvancedHashMap result) {
 
-        String ret = result.getOr("exname", "").toString();
+        Map expData;
+        if (result.containsKey("experiment")) {
+            expData = (Map) result.get("experiment");
+        } else if (result.containsKey("exname")) {
+            expData = result;
+        } else {
+            expData = new AdvancedHashMap();
+            expData.put("exname", "");
+        }
+        String ret = (String) expData.get("exname");
         if (ret.contains(".")) {
             ret = ret.substring(0, ret.length() - 1).replace(".", "");
         }
 
         return ret;
+    }
+
+    /**
+     * Revise output path
+     *
+     * @param path the output path
+     * @return revised path
+     */
+    protected String revisePath(String path) {
+        if (!path.trim().equals("")) {
+            path = path.replaceAll("/", "\\");
+            if (path.endsWith("\\")) {
+                path += "\\";
+            }
+        }
+        return path;
+    }
+
+    /**
+     * Get output file object
+     */
+    public abstract File getOutputFile();
+    
+    /**
+     * decompress the data in a map object
+     *
+     * @param m input map
+     */
+    protected void decompressData(AdvancedHashMap m) {
+
+        for (Object key : m.keySet()) {
+            if (m.get(key) instanceof ArrayList) {
+                // iterate sub array nodes
+                decompressData((ArrayList) m.get(key));
+            } else if (m.get(key) instanceof AdvancedHashMap) {
+                // iterate sub data nodes
+                decompressData((AdvancedHashMap) m.get(key));
+            } else {
+                // ignore other type nodes
+            }
+        }
+
+    }
+
+    /**
+     * decompress the data in an ArrayList object
+     *
+     * @param arr input ArrayList
+     *
+     */
+    protected void decompressData(ArrayList arr) {
+
+        AdvancedHashMap fstData = null; // The first data record (Map type)
+        AdvancedHashMap cprData = null; // The following data record which will be compressed
+
+        for (int i = 0; i < arr.size(); i++) {
+            if (arr.get(i) instanceof ArrayList) {
+                // iterate sub array nodes
+                decompressData((ArrayList) arr.get(i));
+
+            } else if (arr.get(i) instanceof AdvancedHashMap) {
+                // iterate sub data nodes
+                decompressData((AdvancedHashMap) arr.get(i));
+
+                // Compress data for current array
+                if (fstData == null) {
+                    // Get first data node
+                    fstData = (AdvancedHashMap) arr.get(i);
+                } else {
+                    cprData = (AdvancedHashMap) arr.get(i);
+                    // The omitted data will be recovered to the following map; Only data item (String type) will be processed
+                    for (Object key : fstData.keySet()) {
+                        if (!cprData.containsKey(key)) {
+                            cprData.put(key, fstData.get(key));
+                        }
+                    }
+                }
+            } else {
+            }
+        }
     }
 }
