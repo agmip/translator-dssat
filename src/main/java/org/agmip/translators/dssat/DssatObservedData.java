@@ -781,7 +781,7 @@ public class DssatObservedData {
     }
 
     /**
-     * Check if the varibale is the time-series variable
+     * Check if the variable is the time-series variable
      * 
      * @param variableName  the code of variable, like "hwam"
      * 
