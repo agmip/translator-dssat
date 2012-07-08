@@ -444,16 +444,16 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param m input map
      * @return the copy of whole input map
      */
-    protected AdvancedHashMap CopyMap(AdvancedHashMap m) {
+    protected AdvancedHashMap CopyList(AdvancedHashMap m) {
         AdvancedHashMap ret = new AdvancedHashMap();
         
         for (Object key : m.keySet()) {
             if (m.get(key) instanceof String) {
                 ret.put(key, m.get(key));
             } else if (m.get(key) instanceof AdvancedHashMap) {
-                ret.put(key, CopyMap((AdvancedHashMap) m.get(key)));
+                ret.put(key, CopyList((AdvancedHashMap) m.get(key)));
             } else if (m.get(key) instanceof ArrayList) {
-                ret.put(key, CopyArr((ArrayList) m.get(key)));
+                ret.put(key, CopyList((ArrayList) m.get(key)));
             }
         }
         
@@ -466,15 +466,15 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param arr input ArrayList
      * @return the copy of whole input array
      */
-    protected ArrayList CopyArr(ArrayList arr) {
+    protected ArrayList CopyList(ArrayList arr) {
         ArrayList ret = new ArrayList();
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i) instanceof String) {
                 ret.add(arr.get(i));
             } else if (arr.get(i) instanceof AdvancedHashMap) {
-                ret.add(CopyMap((AdvancedHashMap) arr.get(i)));
+                ret.add(CopyList((AdvancedHashMap) arr.get(i)));
             } else if (arr.get(i) instanceof ArrayList) {
-                ret.add(CopyArr((ArrayList) arr.get(i)));
+                ret.add(CopyList((ArrayList) arr.get(i)));
             }
         }
         
