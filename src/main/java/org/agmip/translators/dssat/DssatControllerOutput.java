@@ -17,7 +17,7 @@ import org.agmip.core.types.AdvancedHashMap;
  * @author Meng Zhang
  */
 public class DssatControllerOutput {
-    
+
     private DssatCommonOutput[] outputs = {
         new DssatXFileOutput(),
         new DssatSoilOutput(),
@@ -36,7 +36,7 @@ public class DssatControllerOutput {
      * @throws IOException
      */
     public void writeFiles(String arg0, AdvancedHashMap result) throws FileNotFoundException, IOException {
-        
+
         for (int i = 0; i < outputs.length; i++) {
             outputs[i].writeFile(arg0, result);
         }
@@ -49,17 +49,17 @@ public class DssatControllerOutput {
         ZipEntry entry;
         BufferedInputStream bis;
         byte[] data = new byte[1024];
-        
+
         for (int i = 0; i < files.size(); i++) {
             file = files.get(i);
             if (file == null) {
                 continue;
             }
-            
+
             entry = new ZipEntry(file.getPath());
             out.putNextEntry(entry);
             bis = new BufferedInputStream(new FileInputStream(file));
-            
+
             int count;
             while ((count = bis.read(data)) != -1) {
                 out.write(data, 0, count);
@@ -67,7 +67,7 @@ public class DssatControllerOutput {
             bis.close();
             file.delete();
         }
-        
+
         out.close();
     }
 
@@ -92,7 +92,7 @@ public class DssatControllerOutput {
      * @param files the output file array
      */
     private String getZipFileName(ArrayList<File> files) {
-        
+
         for (int i = 0; i < outputs.length; i++) {
             if (outputs[i] instanceof DssatXFileOutput) {
                 if (outputs[i].getOutputFile() != null) {
@@ -102,7 +102,7 @@ public class DssatControllerOutput {
                 }
             }
         }
-        
+
         return "OUTPUT.ZIP";
     }
 
