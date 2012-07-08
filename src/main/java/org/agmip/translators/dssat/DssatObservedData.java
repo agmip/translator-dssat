@@ -781,13 +781,13 @@ public class DssatObservedData {
     }
 
     /**
-     * Check if the varibale is the time-course variable
+     * Check if the varibale is the time-series variable
      * 
      * @param variableName  the code of variable, like "hwam"
      * 
      * @return 
      */
-    public boolean isTimeCourseData(Object variableName) {
+    public boolean isTimeSeriesData(Object variableName) {
         return timeCourseList.contains(variableName);
     }
 

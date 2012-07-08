@@ -91,7 +91,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
                 // Check if which field is available
                 for (Object key : fstObvData.keySet()) {
                     // check which optional data is exist, if not, remove from map
-                    if (obvDataList.isTimeCourseData(key)) {
+                    if (obvDataList.isTimeSeriesData(key)) {
                         titleOutput.put(key, key);
 
                     } // check if the additional data is too long to output
