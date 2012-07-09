@@ -324,7 +324,7 @@ public class DssatXFileInput extends DssatCommonInput {
                             strLong = null;
                         }
                     }
-                    if (flArr.isEmpty()) {
+                    if (flArr.size() == 1) {
                         ret.put("fl_lat", strLat); // TODO Keep the meta data handling for the early version
                         ret.put("fl_long", strLong); // TODO Keep the meta data handling for the early version
                     }
@@ -1049,8 +1049,6 @@ public class DssatXFileInput extends DssatCommonInput {
         singleSubRecSecList.add("ge");
         singleSubRecSecList.add("fl");
         singleSubRecSecList.add("pl");
-//        singleSubRecSecList.add("om");  // P.S. wait for confirmation that single sub record
-//        singleSubRecSecList.add("ti");  // P.S. wait for confirmation that single sub record
         singleSubRecSecList.add("sm");
         singleSubRecSecList.add("trno_a");
 
