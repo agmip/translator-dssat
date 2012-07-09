@@ -65,6 +65,8 @@ public class DssatXFileInput extends DssatCommonInput {
         ArrayList smSubArr = new ArrayList();
         String eventKey = "data";
         String ireff = "";    // P.S. special handling for EFIR in irrigation section
+        DssatAFileInput obvReaderA = new DssatAFileInput();
+        DssatTFileInput obvReaderT = new DssatTFileInput();
 
         buf = brMap.get("X");
         mapW = (HashMap) brMap.get("W");
@@ -322,7 +324,7 @@ public class DssatXFileInput extends DssatCommonInput {
                             strLong = null;
                         }
                     }
-                    if (flArr.isEmpty()) {
+                    if (flArr.size() == 1) {
                         ret.put("fl_lat", strLat); // TODO Keep the meta data handling for the early version
                         ret.put("fl_long", strLong); // TODO Keep the meta data handling for the early version
                     }
@@ -445,7 +447,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     translateDateStr(tmp, "pldae");
                     plArr.add(tmp);
                     if (plArr.size() == 1) {
-                        ret.put("pdate", translateDateStr(line.substring(3, 8).trim())); // TODO keep for the early version
+                        ret.put("pdate", tmp.get("pdate")); // TODO keep for the early version
                     }
                 } else {
                 }
@@ -638,7 +640,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     translateDateStr(tmp, "hdate");
                     haArr.add(tmp);
                     if (haArr.size() == 1) {
-                        ret.put("hdate", translateDateStr(line.substring(3, 8).trim())); // TODO keep for early version
+                        ret.put("hdate", tmp.get("hdate")); // TODO keep for early version
                     }
                 } else {
                 }
@@ -857,6 +859,13 @@ public class DssatXFileInput extends DssatCommonInput {
             brw.close();
         }
 
+        // Get Observed data info
+        AdvancedHashMap obvAFile = obvReaderA.readFileWithoutCompress(brMap);
+        ArrayList obvAArr = (ArrayList) obvAFile.getOr(eventKey, new ArrayList());
+        AdvancedHashMap obvTFile = obvReaderT.readFileWithoutCompress(brMap);
+        ArrayList obvTArr = (ArrayList) obvTFile.getOr(eventKey, new ArrayList());
+
+        // Combine all the sections data into the related treatment block
         for (int i = 0; i < trArr.size(); i++) {
             AdvancedHashMap treatment = (AdvancedHashMap) trArr.get(i);
 
@@ -925,6 +934,19 @@ public class DssatXFileInput extends DssatCommonInput {
                 treatment.put("simulation", getSectionData(smArr, "sm", treatment.get("sm").toString()));
             }
 
+            // observed data (summary)
+            AdvancedHashMap obv = new AdvancedHashMap();
+            treatment.put("observed", obv);
+            if (!treatment.getOr("trno", "0").equals("0")) {
+                obv.put("summary", getSectionData(obvAArr, "trno_a", treatment.get("trno").toString()));
+            }
+
+            // observed data (time-series)
+            if (!treatment.getOr("trno", "0").equals("0")) {
+                obv.put("time_series", getSectionData(obvTArr, "trno_t", treatment.get("trno").toString()));
+            }
+
+
             // Revise the date value for FEDATE, IDATE, MLADAT
             // Get Planting date
             String pdate = "";
@@ -936,13 +958,13 @@ public class DssatXFileInput extends DssatCommonInput {
                 }
             }
 
+            // Date adjust based on realted treatment info (handling for DOY type value)
             // Fertilizer Date
             ArrayList feTmps = (ArrayList) treatment.getOr("fertilizer", new ArrayList());
             AdvancedHashMap feTmp;
             for (int j = 0; j < feTmps.size(); j++) {
                 feTmp = (AdvancedHashMap) feTmps.get(j);
                 translateDateStrForDOY(feTmp, "fdate", pdate);
-//                feTmp.put("fdate", translateDateStrForDOY((String) feTmp.get("fdate"), pdate));
             }
 
             // Irrigation date
@@ -952,7 +974,6 @@ public class DssatXFileInput extends DssatCommonInput {
                 for (int j = 0; j < irTmpSubs.size(); j++) {
                     AdvancedHashMap irTmpSub = (AdvancedHashMap) irTmpSubs.get(j);
                     translateDateStrForDOY(irTmpSub, "idate", pdate);
-//                    irTmpSub.put("idate", translateDateStrForDOY((String) irTmpSub.getOr("idate", ""), pdate));
                 }
             }
 
@@ -962,7 +983,6 @@ public class DssatXFileInput extends DssatCommonInput {
             for (int j = 0; j < omTmps.size(); j++) {
                 omTmp = (AdvancedHashMap) omTmps.get(j);
                 translateDateStrForDOY(omTmp, "omdat", pdate);
-//                omTmp.put("omdat", translateDateStrForDOY((String) omTmp.getOr("omdat"), pdate));
             }
 
         }
@@ -982,15 +1002,24 @@ public class DssatXFileInput extends DssatCommonInput {
         idNames.add("em");
         idNames.add("ha");
         idNames.add("sm");
+//        idNames.add("trno");
+        idNames.add("trno_a");
+//        idNames.add("trno_t");
         removeIndex(trArr, idNames);
         ret.put("treatment", trArr);
+        if (!obvAFile.getOr("local_name", "").equals(ret.getOr("local_name", ""))) {
+            ret.put("local_name_a", obvAFile.get("local_name"));
+        }
+        if (!obvTFile.getOr("local_name", "").equals(ret.getOr("local_name", ""))) {
+            ret.put("local_name_t", obvTFile.get("local_name"));
+        }
         compressData(ret);
 
         return ret;
     }
 
     /**
-     * Set reading flgs for title lines (marked with *)
+     * Set reading flags for title lines (marked with *)
      * 
      * @param line  the string of reading line
      */
@@ -1020,26 +1049,50 @@ public class DssatXFileInput extends DssatCommonInput {
         singleSubRecSecList.add("ge");
         singleSubRecSecList.add("fl");
         singleSubRecSecList.add("pl");
-//        singleSubRecSecList.add("om");  // P.S. wait for confirmation that single sub record
-//        singleSubRecSecList.add("ti");  // P.S. wait for confirmation that single sub record
         singleSubRecSecList.add("sm");
-        AdvancedHashMap fstNode = (AdvancedHashMap) secArr.get(0);
-        // If it contains multiple sub array of data, or it does not have multiple sub records
-        if (fstNode.containsKey("data") || singleSubRecSecList.contains(key)) {
-            for (int i = 0; i < secArr.size(); i++) {
-                if (value.equals(((AdvancedHashMap) secArr.get(i)).get(key))) {
-                    return CopyMap((AdvancedHashMap) secArr.get(i));
-                }
-            }
+        singleSubRecSecList.add("trno_a");
 
-        } // If it is simple array
-        else {
+        // TFile data
+        if (key.equals("trno_t")) {
+
             ret = new ArrayList();
-            AdvancedHashMap node;
+            // Loop blocks with different titles
             for (int i = 0; i < secArr.size(); i++) {
-                node = (AdvancedHashMap) secArr.get(i);
-                if (value.equals(node.get(key))) {
-                    ret.add(CopyMap(node));
+                ArrayList secSubArr = (ArrayList) secArr.get(i);
+                // Loop blocks with differnt treatment number
+                for (int j = 0; j < secSubArr.size(); j++) {
+                    ArrayList secSubSubArr = (ArrayList) secSubArr.get(j);
+                    if (!secSubSubArr.isEmpty()) {
+                        AdvancedHashMap fstNode = (AdvancedHashMap) secSubSubArr.get(0);
+                        if (value.equals(fstNode.get(key))) {
+                            ret.add(CopyList(secSubSubArr));
+                            break;
+                        }
+                    }
+                }
+
+            }
+            return ret;
+
+        } else {
+            AdvancedHashMap fstNode = (AdvancedHashMap) secArr.get(0);
+            // If it contains multiple sub array of data, or it does not have multiple sub records
+            if (fstNode.containsKey("data") || singleSubRecSecList.contains(key)) {
+                for (int i = 0; i < secArr.size(); i++) {
+                    if (value.equals(((AdvancedHashMap) secArr.get(i)).get(key))) {
+                        return CopyList((AdvancedHashMap) secArr.get(i));
+                    }
+                }
+
+            } // If it is simple array
+            else {
+                ret = new ArrayList();
+                AdvancedHashMap node;
+                for (int i = 0; i < secArr.size(); i++) {
+                    node = (AdvancedHashMap) secArr.get(i);
+                    if (value.equals(node.get(key))) {
+                        ret.add(CopyList(node));
+                    }
                 }
             }
         }

@@ -14,9 +14,9 @@ public class DssatControllerInput {
     private DssatCommonInput[] inputs = {
         new DssatSoilInput(),
         new DssatWeatherInput(),
-        new DssatXFileInput(),
-        new DssatAFileInput(),
-        new DssatTFileInput()};
+        new DssatXFileInput()};
+//        new DssatAFileInput(),
+//        new DssatTFileInput()};
 
     /**
      * All DSSAT Data input method
@@ -34,9 +34,9 @@ public class DssatControllerInput {
         }
 
         for (int i = 0; i < inputs.length; i++) {
-            
+
             tmp = inputs[i].readFile(brMap);
-            
+
             // Check if reading result is empty. If so, ignore it.
             if (!tmp.isEmpty()) {
                 // If return map contains multiple file, like soil or weather, get ArrayList from the return map
@@ -51,13 +51,13 @@ public class DssatControllerInput {
                         ret.put(inputs[i].jsonKey, tmp);
                     }
                 } else {
-                    ret.put(inputs[i].jsonKey,tmp);
+                    ret.put(inputs[i].jsonKey, tmp);
                 }
-                
+
             } else {
             }
         }
-        
+
         return ret;
     }
 }
