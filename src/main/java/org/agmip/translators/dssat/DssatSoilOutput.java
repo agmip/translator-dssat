@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import org.agmip.core.types.AdvancedHashMap;
-import org.agmip.util.JSONAdapter;
+import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Soil Data I/O API Class
@@ -33,14 +33,13 @@ public class DssatSoilOutput extends DssatCommonOutput {
      * @param result  data holder object
      */
     @Override
-    public void writeFile(String arg0, AdvancedHashMap result) {
+    public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        JSONAdapter adapter = new JSONAdapter();        // JSON Adapter
         ArrayList soilSites;                            // Soil site data array
-        AdvancedHashMap soilSite;                       // Data holder for one site of soil data
+        LinkedHashMap soilSite;                       // Data holder for one site of soil data
         ArrayList soilRecords;                          // Soil layer data array
-        AdvancedHashMap soilRecord;                     // Data holder for one layer data
+        LinkedHashMap soilRecord;                     // Data holder for one layer data
         BufferedWriter bwS;                             // output object
         StringBuilder sbData = new StringBuilder();     // construct the data info in the output
         StringBuilder sbLyrP2 = new StringBuilder();    // output string for second part of layer data
@@ -53,7 +52,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
             // Set default value for missing data
             setDefVal();
 
-            soilSites = (ArrayList) result.getOr("soil", new ArrayList());
+            soilSites = (ArrayList) getValueOr(result, "soil", new ArrayList());
             if (soilSites.isEmpty()) {
                 return;
             }
@@ -84,7 +83,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
             String slNote = "";
             String tmp;
             for (int i = 0; i < soilSites.size(); i++) {
-                tmp = (String) ((AdvancedHashMap) soilSites.get(i)).getOr("sl_notes", defValC);
+                tmp = (String) getValueOr((LinkedHashMap) soilSites.get(i), "sl_notes", defValC);
                 if (!slNote.equals(tmp)) {
                     slNote = tmp;
                     bwS.write(slNote + "; ");
@@ -94,51 +93,51 @@ public class DssatSoilOutput extends DssatCommonOutput {
 
             // Loop sites of data
             for (int i = 0; i < soilSites.size(); i++) {
-                soilSite = adapter.exportRecord((Map) soilSites.get(i));
+                soilSite = (LinkedHashMap) soilSites.get(i);
 
                 // Site Info Section
                 sbData.append(String.format("*%1$-10s  %2$-11s %3$-5s %4$5s %5$s\r\n",
-                        soilSite.getOr("soil_id", defValC).toString(),
-                        soilSite.getOr("sl_source", defValC).toString(),
-                        soilSite.getOr("sltx", defValC).toString(),
-                        formatNumStr(5, soilSite.getOr("sldp", defValR).toString()),
-                        soilSite.getOr("soil_name", defValC).toString()));
+                        getValueOr(soilSite, "soil_id", defValC).toString(),
+                        getValueOr(soilSite, "sl_source", defValC).toString(),
+                        getValueOr(soilSite, "sltx", defValC).toString(),
+                        formatNumStr(5, getValueOr(soilSite, "sldp", defValR).toString()),
+                        getValueOr(soilSite, "soil_name", defValC).toString()));
                 sbData.append("@SITE        COUNTRY          LAT     LONG SCS FAMILY\r\n");
                 sbData.append(String.format(" %1$-11s %2$-11s %3$9s%4$8s %5$s\r\n",
-                        soilSite.getOr("sl_loc_3", defValC).toString(),
-                        soilSite.getOr("sl_loc_1", defValC).toString(),
-                        formatNumStr(8, soilSite.getOr("soil_lat", defValR).toString()), // P.S. Definition changed 9 -> 10 (06/24)
-                        formatNumStr(8, soilSite.getOr("soil_long", defValR).toString()), // P.S. Definition changed 9 -> 8  (06/24)
-                        soilSite.getOr("classification", defValC).toString()));
+                        getValueOr(soilSite, "sl_loc_3", defValC).toString(),
+                        getValueOr(soilSite, "sl_loc_1", defValC).toString(),
+                        formatNumStr(8, getValueOr(soilSite, "soil_lat", defValR).toString()), // P.S. Definition changed 9 -> 10 (06/24)
+                        formatNumStr(8, getValueOr(soilSite, "soil_long", defValR).toString()), // P.S. Definition changed 9 -> 8  (06/24)
+                        getValueOr(soilSite, "classification", defValC).toString()));
                 sbData.append("@ SCOM  SALB  SLU1  SLDR  SLRO  SLNF  SLPF  SMHB  SMPX  SMKE\r\n");
                 sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$-5s %9$-5s %10$-5s\r\n",
-                        soilSite.getOr("scom", defValC).toString(),
-                        formatNumStr(5, soilSite.getOr("salb", defValR).toString()),
-                        formatNumStr(5, soilSite.getOr("slu1", defValR).toString()),
-                        formatNumStr(5, soilSite.getOr("sldr", defValR).toString()),
-                        formatNumStr(5, soilSite.getOr("slro", defValR).toString()),
-                        formatNumStr(5, soilSite.getOr("slnf", defValR).toString()),
-                        formatNumStr(5, soilSite.getOr("slpf", defValR).toString()),
-                        soilSite.getOr("smhb", defValC).toString(),
-                        soilSite.getOr("smpx", defValC).toString(),
-                        soilSite.getOr("smke", defValC).toString()));
+                        getValueOr(soilSite, "scom", defValC).toString(),
+                        formatNumStr(5, getValueOr(soilSite, "salb", defValR).toString()),
+                        formatNumStr(5, getValueOr(soilSite, "slu1", defValR).toString()),
+                        formatNumStr(5, getValueOr(soilSite, "sldr", defValR).toString()),
+                        formatNumStr(5, getValueOr(soilSite, "slro", defValR).toString()),
+                        formatNumStr(5, getValueOr(soilSite, "slnf", defValR).toString()),
+                        formatNumStr(5, getValueOr(soilSite, "slpf", defValR).toString()),
+                        getValueOr(soilSite, "smhb", defValC).toString(),
+                        getValueOr(soilSite, "smpx", defValC).toString(),
+                        getValueOr(soilSite, "smke", defValC).toString()));
 
                 // Soil Layer data section
-                soilRecords = (ArrayList) soilSite.getOr(layerKey, new ArrayList());
+                soilRecords = (ArrayList) getValueOr(soilSite, layerKey, new ArrayList());
 
                 // part one
                 sbData.append("@  SLB  SLMH  SLLL  SDUL  SSAT  SRGF  SSKS  SBDM  SLOC  SLCL  SLSI  SLCF  SLNI  SLHW  SLHB  SCEC  SADC\r\n");
                 // part two
                 // Get first site record
-                AdvancedHashMap fstRecord = new AdvancedHashMap();
+                LinkedHashMap fstRecord = new LinkedHashMap();
                 if (!soilRecords.isEmpty()) {
-                    fstRecord = adapter.exportRecord((Map) soilRecords.get(0));
+                    fstRecord = (LinkedHashMap) soilRecords.get(0);
                 }
 
                 // Check if there is 2nd part of layer data for output
                 p2Flg = false;
                 for (int j = 0; j < p2Ids.length; j++) {
-                    if (!fstRecord.getOr(p2Ids[j], "").toString().equals("")) {
+                    if (!getValueOr(fstRecord, p2Ids[j], "").toString().equals("")) {
                         p2Flg = true;
                         break;
                     }
@@ -151,47 +150,47 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 // Loop for laryer data
                 for (int j = 0; j < soilRecords.size(); j++) {
 
-                    soilRecord = adapter.exportRecord((Map) soilRecords.get(j));
+                    soilRecord = (LinkedHashMap) soilRecords.get(j);
                     // part one
                     sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s %16$5s %17$5s\r\n",
-                            formatNumStr(5, soilRecord.getOr("sllb", defValR).toString()), //TODO Do I need to check if sllb is a valid value
-                            soilRecord.getOr("slmh", defValC).toString(),
-                            formatNumStr(5, soilRecord.getOr("slll", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("sldul", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("slsat", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("slrgf", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("sksat", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("slbdm", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("sloc", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("slcly", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("slsil", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("slcf", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("slni", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("slphw", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("slphb", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("slcec", defValR).toString()),
-                            formatNumStr(5, soilRecord.getOr("sadc", defValR).toString())));
+                            formatNumStr(5, getValueOr(soilRecord, "sllb", defValR).toString()), //TODO Do I need to check if sllb is a valid value
+                            getValueOr(soilRecord, "slmh", defValC).toString(),
+                            formatNumStr(5, getValueOr(soilRecord, "slll", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "sldul", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "slsat", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "slrgf", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "sksat", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "slbdm", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "sloc", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "slcly", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "slsil", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "slcf", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "slni", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "slphw", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "slphb", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "slcec", defValR).toString()),
+                            formatNumStr(5, getValueOr(soilRecord, "sadc", defValR).toString())));
 
                     // part two
                     if (p2Flg) {
                         sbLyrP2.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s %16$5s %17$5s\r\n",
-                                formatNumStr(5, soilRecord.getOr("sllb", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slpx", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slpt", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slpo", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("caco3", defValR).toString()), // P.S. Different with document (DSSAT vol2.pdf)
-                                formatNumStr(5, soilRecord.getOr("slal", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slfe", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slmn", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slbs", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slpa", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slpb", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slke", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slmg", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slna", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slsu", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slec", defValR).toString()),
-                                formatNumStr(5, soilRecord.getOr("slca", defValR).toString())));
+                                formatNumStr(5, getValueOr(soilRecord, "sllb", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slpx", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slpt", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slpo", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "caco3", defValR).toString()), // P.S. Different with document (DSSAT vol2.pdf)
+                                formatNumStr(5, getValueOr(soilRecord, "slal", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slfe", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slmn", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slbs", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slpa", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slpb", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slke", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slmg", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slna", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slsu", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slec", defValR).toString()),
+                                formatNumStr(5, getValueOr(soilRecord, "slca", defValR).toString())));
                     }
                 }
 

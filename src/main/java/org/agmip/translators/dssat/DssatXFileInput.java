@@ -987,6 +987,7 @@ public class DssatXFileInput extends DssatCommonInput {
 
         }
 
+        compressData(trArr);
         // Remove relational index
         ArrayList idNames = new ArrayList();
         idNames.add("ge");
@@ -1002,9 +1003,9 @@ public class DssatXFileInput extends DssatCommonInput {
         idNames.add("em");
         idNames.add("ha");
         idNames.add("sm");
-//        idNames.add("trno");
+        idNames.add("trno");
         idNames.add("trno_a");
-//        idNames.add("trno_t");
+        idNames.add("trno_t");
         removeIndex(trArr, idNames);
         ret.put("treatment", trArr);
         if (!obvAFile.getOr("local_name", "").equals(ret.getOr("local_name", ""))) {
@@ -1013,7 +1014,7 @@ public class DssatXFileInput extends DssatCommonInput {
         if (!obvTFile.getOr("local_name", "").equals(ret.getOr("local_name", ""))) {
             ret.put("local_name_t", obvTFile.get("local_name"));
         }
-        compressData(ret);
+//        compressData(ret);
 
         return ret;
     }
