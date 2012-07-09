@@ -265,7 +265,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         secData.getOr("soil_id", defValC).toString(),
                         secData.getOr("fl_name", defValC).toString()));
 
-                eventPart2.append(String.format("%1$2s %2$15s %3$15s %4$9s %5$17s %6$5s %7$5s %8$5s %9$-5s %10$5s\r\n",
+                eventPart2.append(String.format("%1$2s %2$15s %3$15s %4$9s %5$17s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
                         idx + 1, //secData.getOr("fl", defValI).toString(),
                         formatNumStr(15, secData.getOr("fl_lat", defValR).toString()),
                         formatNumStr(15, secData.getOr("fl_long", defValR).toString()),

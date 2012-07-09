@@ -53,16 +53,14 @@ public class DssatAFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            AdvancedHashMap obvFile = adapter.exportRecord((Map) result.getOr("observed", result));
-            AdvancedHashMap obvAFile = adapter.exportRecord((Map) obvFile.getOr("summary", obvFile));
-            ArrayList observeRecords = ((ArrayList) obvAFile.getOr("data", new ArrayList()));
-            
-            if (observeRecords.isEmpty()) {
+            AdvancedHashMap expFile = adapter.exportRecord((Map) result.getOr("experiment", result));
+            ArrayList trArr = (ArrayList) expFile.getOr("treatment", new ArrayList());
+            if (trArr.isEmpty()) {
                 return;
             }
 
             // Initial BufferedWriter
-            String exName = getExName(obvAFile);
+            String exName = getExName(expFile);
             String fileName = exName;
             if (fileName.equals("")) {
                 fileName = "a.tmp";
@@ -75,14 +73,14 @@ public class DssatAFileOutput extends DssatCommonOutput {
 
             // Output Observation File
             // Titel Section
-            sbData.append(String.format("*EXP.DATA (A): %1$-10s %2$s\r\n\r\n", exName, obvAFile.getOr("local_name", defValC).toString()));
+            sbData.append(String.format("*EXP.DATA (A): %1$-10s %2$s\r\n\r\n", exName, expFile.getOr("local_name_a", expFile.getOr("local_name", defValC)).toString()));
 
             // Get first record of observed data
             AdvancedHashMap fstObvData;
-            if (observeRecords.isEmpty()) {
+            if (trArr.isEmpty()) {
                 fstObvData = new AdvancedHashMap();
             } else {
-                fstObvData = adapter.exportRecord((Map) observeRecords.get(0));
+                fstObvData = getObvData(trArr, 0);
             }
 
             // Check if which field is available
@@ -93,9 +91,9 @@ public class DssatAFileOutput extends DssatCommonOutput {
 
                 } // check if the additional data is too long to output
                 else if (key.toString().length() <= 5) {
-                    if (!key.equals("trno")) {
-                        titleOutput.put(key, key);
-                    }
+//                    if (!key.equals("trno")) {
+                    titleOutput.put(key, key);
+//                    }
 
                 } // If it is too long for DSSAT, give a warning message
                 else {
@@ -121,7 +119,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
             }
 
             // decompress observed data
-            decompressData(observeRecords);
+            decompressData(trArr);
             // Observation Data Section
             Object[] titleOutputId = titleOutput.keySet().toArray();
             for (int i = 0; i < (titleOutputId.length / 40 + titleOutputId.length % 40 == 0 ? 0 : 1); i++) {
@@ -133,10 +131,11 @@ public class DssatAFileOutput extends DssatCommonOutput {
                 }
                 sbData.append("\r\n");
 
-                for (int j = 0; j < observeRecords.size(); j++) {
+                for (int j = 0; j < trArr.size(); j++) {
 
-                    record = adapter.exportRecord((Map) observeRecords.get(j));
-                    sbData.append(String.format(" %1$5s", record.getOr("trno", j + 1)));
+//                    record = adapter.exportRecord((Map) trArr.get(j));
+                    record = getObvData(trArr, j);
+                    sbData.append(String.format(" %1$5s", j + 1));
                     for (int k = i * 40; k < limit; k++) {
 
                         if (obvDataList.isDapDateType(titleOutputId[k], titleOutput.get(titleOutputId[k]))) {
@@ -173,5 +172,24 @@ public class DssatAFileOutput extends DssatCommonOutput {
         defValR = "-99";
         defValC = "-99";    // TODO wait for confirmation
         defValI = "-99";
+    }
+
+    /**
+     * Get observed data map from treatment array
+     * 
+     * @param trArr treatment data array include all related info
+     * @param idx   treatment index in the input array
+     * 
+     * @return the observed data map
+     */
+    private AdvancedHashMap getObvData(ArrayList trArr, int idx) {
+
+        JSONAdapter adapter = new JSONAdapter();
+
+        AdvancedHashMap trData = adapter.exportRecord((Map) trArr.get(idx));
+        AdvancedHashMap obvFile = adapter.exportRecord((Map) trData.getOr("observed", new AdvancedHashMap()));
+        AdvancedHashMap obvData = adapter.exportRecord((Map) obvFile.getOr("summary", new AdvancedHashMap()));
+
+        return obvData;
     }
 }

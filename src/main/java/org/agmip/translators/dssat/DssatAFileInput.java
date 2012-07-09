@@ -36,6 +36,22 @@ public class DssatAFileInput extends DssatCommonInput {
     protected AdvancedHashMap readFile(HashMap brMap) throws IOException {
 
         AdvancedHashMap ret = new AdvancedHashMap();
+        AdvancedHashMap file = readFileWithoutCompress(brMap);
+        String obvFileKey = "summary";  // P.S. the key name might change
+
+        compressData(file);
+        ret.put(obvFileKey, file);
+        return ret;
+    }
+
+    /**
+     * DSSAT AFile Data input method for Controller using (return map will not be compressed)
+     * 
+     * @param brMap  The holder for BufferReader objects for all files
+     * @return result data holder object
+     */
+    protected AdvancedHashMap readFileWithoutCompress(HashMap brMap) throws IOException {
+
         AdvancedHashMap file = new AdvancedHashMap();
         String line;
         BufferedReader brA;
@@ -45,7 +61,6 @@ public class DssatAFileInput extends DssatCommonInput {
         ArrayList obvData = new ArrayList();
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
         String obvDataKey = "data";     // P.S. the key name might change
-        String obvFileKey = "summary";  // P.S. the key name might change
         String pdate;
 
         buf = brMap.get("A");
@@ -53,7 +68,7 @@ public class DssatAFileInput extends DssatCommonInput {
         // If AFile File is no been found
         if (buf == null) {
             // TODO reprot file not exist error
-            return ret;
+            return file;
         } else {
             if (buf instanceof char[]) {
                 brA = new BufferedReader(new CharArrayReader((char[]) buf));
@@ -92,13 +107,13 @@ public class DssatAFileInput extends DssatCommonInput {
                     }
                     // Read line and save into return holder
                     AdvancedHashMap tmp = readLine(line, formats, "");
-                    pdate = getPdate(brMap, (String) tmp.get("trno"));
+                    pdate = getPdate(brMap, (String) tmp.get("trno_a"));
                     for (int i = 0; i < titles.size(); i++) {
                         if (obvDataList.isDateType(titles.get(i))) {
                             translateDateStrForDOY(tmp, (String) titles.get(i), pdate);
                         }
                     }
-                    addToArray(obvData, tmp, "trno");
+                    addToArray(obvData, tmp, "trno_a");
                 }
 
             } // Read Observed title
@@ -110,6 +125,8 @@ public class DssatAFileInput extends DssatCommonInput {
                     String titleStr = line.substring(i, Math.min(i + 6, line.length())).trim().toLowerCase();
                     if (titleStr.equals("")) {
                         titles.add("null" + i);
+                    } else if (titleStr.equals("trno")) {
+                        titles.add(titleStr + "_a");
                     } else {
                         titles.add(titleStr);
                     }
@@ -119,12 +136,10 @@ public class DssatAFileInput extends DssatCommonInput {
             }
         }
 
-        ret.put(obvFileKey, file);
         file.put(obvDataKey, obvData);
         brA.close();
-        compressData(ret);
 
-        return ret;
+        return file;
     }
 
     /**
