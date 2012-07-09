@@ -39,7 +39,7 @@ public class DssatTFileInput extends DssatCommonInput {
         AdvancedHashMap file = readFileWithoutCompress(brMap);
         String obvFileKey = "time_series";  // TODO the key name might change
 
-//        ret.put(obvFileKey, file);
+        ret.put(obvFileKey, file);
         compressData(ret);
 
         return ret;

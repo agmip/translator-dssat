@@ -50,16 +50,16 @@ public class DssatTFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            AdvancedHashMap obvFile = adapter.exportRecord((Map) result.getOr("observed", result));
-            AdvancedHashMap obvTFile = adapter.exportRecord((Map) obvFile.getOr("time_series", obvFile));
-            ArrayList observeRecordsSections = ((ArrayList) obvTFile.getOr("data", new ArrayList()));
-
-            if (observeRecordsSections.isEmpty()) {
+            AdvancedHashMap expFile = adapter.exportRecord((Map) result.getOr("experiment", result));
+//            AdvancedHashMap obvTFile = adapter.exportRecord((Map) expFile.getOr("time_series", expFile));
+//            ArrayList observeRecordsSections = ((ArrayList) obvTFile.getOr("data", new ArrayList()));
+            ArrayList trArr = (ArrayList) expFile.getOr("treatment", new ArrayList());
+            if (trArr.isEmpty()) {
                 return;
             }
 
             // Initial BufferedWriter
-            String exName = getExName(obvTFile);
+            String exName = getExName(expFile);
             String fileName = exName;
             if (fileName.equals("")) {
                 fileName = "a.tmp";
@@ -72,12 +72,31 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
             // Output Observation File
             // Titel Section
-            sbData.append(String.format("*EXP.DATA (T): %1$-10s %2$s\r\n\r\n", exName, obvTFile.getOr("local_name", defValC).toString()));
+            sbData.append(String.format("*EXP.DATA (T): %1$-10s %2$s\r\n\r\n", exName, expFile.getOr("local_name_t", expFile.getOr("local_name", defValC).toString())));
 
             // Loop Data Sections
             ArrayList observeRecords;
-            for (int id = 0; id < observeRecordsSections.size(); id++) {
-                observeRecords = (ArrayList) observeRecordsSections.get(id);
+//            ArrayList<StringBuilder> sbArr = new ArrayList<StringBuilder>();
+//            StringBuilder sbSub = new StringBuilder();
+//            ArrayList<Set> titleSetArr = new ArrayList<Set>();
+            for (int id = 0; id < trArr.size(); id++) {
+                observeRecords = getObvData(trArr, id);
+                
+//                for (int i = 0; i < observeRecords.size(); i++) {
+//                    ArrayList obvSubArr = (ArrayList) observeRecords.get(i);
+//                    if (!obvSubArr.isEmpty()) {
+//                        AdvancedHashMap fstData = adapter.exportRecord((Map) obvSubArr.get(0));
+//                        if (titleSetArr.contains(fstData.keySet())) {
+//                            
+//                        } else {
+//                            titleSetArr.add(fstData.keySet());
+//                        }
+//                        
+//                        
+//                    }
+//                    
+//                }
+                
                 titleOutput = new LinkedHashMap();
 
                 // Get first record of observed data
@@ -181,5 +200,24 @@ public class DssatTFileOutput extends DssatCommonOutput {
         defValR = "-99";
         defValC = "-99";    // TODO wait for confirmation
         defValI = "-99";
+    }
+
+    /**
+     * Get observed data map from treatment array
+     * 
+     * @param trArr treatment data array include all related info
+     * @param idx   treatment index in the input array
+     * 
+     * @return the observed data map
+     */
+    private ArrayList getObvData(ArrayList trArr, int idx) {
+
+        JSONAdapter adapter = new JSONAdapter();
+
+        AdvancedHashMap trData = adapter.exportRecord((Map) trArr.get(idx));
+        AdvancedHashMap obvFile = adapter.exportRecord((Map) trData.getOr("observed", new AdvancedHashMap()));
+        ArrayList obvData = (ArrayList) obvFile.getOr("time_series", new ArrayList());
+
+        return obvData;
     }
 }
