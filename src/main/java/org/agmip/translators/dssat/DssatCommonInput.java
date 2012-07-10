@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import org.agmip.core.types.AdvancedHashMap;
 import org.agmip.core.types.TranslatorInput;
 
 /**
@@ -37,7 +36,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param m  The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected abstract AdvancedHashMap readFile(HashMap m) throws IOException;
+    protected abstract LinkedHashMap readFile(HashMap m) throws IOException;
 
     /**
      * DSSAT XFile Data input method
@@ -46,9 +45,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @return result data holder object
      */
     @Override
-    public AdvancedHashMap readFile(String arg0) {
+    public LinkedHashMap readFile(String arg0) {
 
-        AdvancedHashMap ret = new AdvancedHashMap();
+        LinkedHashMap ret = new LinkedHashMap();
         String filePath = arg0;
 
         try {
@@ -119,7 +118,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param id date string with format of "yyddd"
      * @return result date string with format of "yyyymmdd"
      */
-    protected void translateDateStr(AdvancedHashMap m, String id) {
+    protected void translateDateStr(LinkedHashMap m, String id) {
 
         if (m.containsKey(id)) {
             m.put(id, translateDateStr((String) m.get(id)));
@@ -144,7 +143,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @pdate the related planting date
      * @return result date string with format of "yyyymmdd"
      */
-    protected void translateDateStrForDOY(AdvancedHashMap m, String id, String pdate) {
+    protected void translateDateStrForDOY(LinkedHashMap m, String id, String pdate) {
 
         if (m.containsKey(id)) {
             m.put(id, translateDateStrForDOY((String) m.get(id), pdate));
@@ -212,7 +211,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param formats The definition of length for each data field (String itemName : Integer length)
      * @return the map contains divided data with keys from original string
      */
-    protected AdvancedHashMap readLine(String line, LinkedHashMap<String, Integer> formats) {
+    protected LinkedHashMap readLine(String line, LinkedHashMap<String, Integer> formats) {
         
         return readLine(line, formats, null);
     }
@@ -225,9 +224,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param invalidValue  The text will replace the original reading when its value is invalid 
      * @return the map contains divided data with keys from original string
      */
-    protected AdvancedHashMap readLine(String line, LinkedHashMap<String, Integer> formats, String invalidValue) {
+    protected LinkedHashMap readLine(String line, LinkedHashMap<String, Integer> formats, String invalidValue) {
 
-        AdvancedHashMap ret = new AdvancedHashMap();
+        LinkedHashMap ret = new LinkedHashMap();
         int length;
         String tmp;
 
@@ -355,7 +354,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      *
      * @param m input map
      */
-    protected void compressData(AdvancedHashMap m) {
+    protected void compressData(LinkedHashMap m) {
 
         Object[] keys = m.keySet().toArray();
         Object key;
@@ -370,13 +369,13 @@ public abstract class DssatCommonInput implements TranslatorInput {
                     // iterate sub array nodes
                     compressData((ArrayList) m.get(key));
                 }
-            } else if (m.get(key) instanceof AdvancedHashMap) {
-                if (((AdvancedHashMap) m.get(key)).isEmpty()) {
+            } else if (m.get(key) instanceof LinkedHashMap) {
+                if (((LinkedHashMap) m.get(key)).isEmpty()) {
                     // Delete the empty list
                     m.remove(key);
                 } else {
                     // iterate sub data nodes
-                    compressData((AdvancedHashMap) m.get(key));
+                    compressData((LinkedHashMap) m.get(key));
                 }
 
             } else {
@@ -394,32 +393,32 @@ public abstract class DssatCommonInput implements TranslatorInput {
      */
     protected void compressData(ArrayList arr) {
 
-        AdvancedHashMap fstData = null; // The first data record (Map type)
-        AdvancedHashMap cprData = null; // The following data record which will be compressed
+        LinkedHashMap fstData = null; // The first data record (Map type)
+        LinkedHashMap cprData = null; // The following data record which will be compressed
 
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i) instanceof ArrayList) {
                 // iterate sub array nodes
                 compressData((ArrayList) arr.get(i));
 
-            } else if (arr.get(i) instanceof AdvancedHashMap) {
+            } else if (arr.get(i) instanceof LinkedHashMap) {
                 // iterate sub data nodes
-                compressData((AdvancedHashMap) arr.get(i));
+                compressData((LinkedHashMap) arr.get(i));
 
                 // Compress data for current array
                 if (fstData == null) {
                     // Get first data node
-                    fstData = (AdvancedHashMap) arr.get(i);
+                    fstData = (LinkedHashMap) arr.get(i);
                 } else {
-                    cprData = (AdvancedHashMap) arr.get(i);
+                    cprData = (LinkedHashMap) arr.get(i);
                     Object[] keys = cprData.keySet().toArray();
                     // The missing data will be given a "" value; Only data item (String type) will be processed
                     for (Object key : fstData.keySet()) {
                         if (!cprData.containsKey(key)) {
                             if (fstData.get(key) instanceof String) {
                                 cprData.put(key, "");
-                            } else if (fstData.get(key) instanceof AdvancedHashMap) {
-                                cprData.put(key, new AdvancedHashMap());
+                            } else if (fstData.get(key) instanceof LinkedHashMap) {
+                                cprData.put(key, new LinkedHashMap());
                             } else if (fstData.get(key) instanceof ArrayList) {
                                 cprData.put(key, new ArrayList());
                             }
@@ -444,14 +443,14 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param m input map
      * @return the copy of whole input map
      */
-    protected AdvancedHashMap CopyList(AdvancedHashMap m) {
-        AdvancedHashMap ret = new AdvancedHashMap();
+    protected LinkedHashMap CopyList(LinkedHashMap m) {
+        LinkedHashMap ret = new LinkedHashMap();
         
         for (Object key : m.keySet()) {
             if (m.get(key) instanceof String) {
                 ret.put(key, m.get(key));
-            } else if (m.get(key) instanceof AdvancedHashMap) {
-                ret.put(key, CopyList((AdvancedHashMap) m.get(key)));
+            } else if (m.get(key) instanceof LinkedHashMap) {
+                ret.put(key, CopyList((LinkedHashMap) m.get(key)));
             } else if (m.get(key) instanceof ArrayList) {
                 ret.put(key, CopyList((ArrayList) m.get(key)));
             }
@@ -471,8 +470,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i) instanceof String) {
                 ret.add(arr.get(i));
-            } else if (arr.get(i) instanceof AdvancedHashMap) {
-                ret.add(CopyList((AdvancedHashMap) arr.get(i)));
+            } else if (arr.get(i) instanceof LinkedHashMap) {
+                ret.add(CopyList((LinkedHashMap) arr.get(i)));
             } else if (arr.get(i) instanceof ArrayList) {
                 ret.add(CopyList((ArrayList) arr.get(i)));
             }
@@ -488,11 +487,11 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param item  the input item which will be added into array
      * @param key   the primary key item's name
      */
-    protected void addToArray(ArrayList arr, AdvancedHashMap item, Object key) {
-        AdvancedHashMap elem;
+    protected void addToArray(ArrayList arr, LinkedHashMap item, Object key) {
+        LinkedHashMap elem;
         boolean unmatchFlg = true;
         for (int i = 0; i < arr.size(); i++) {
-            elem = (AdvancedHashMap) arr.get(i);
+            elem = (LinkedHashMap) arr.get(i);
             if (!key.getClass().isArray()) {
                 if (elem.get(key).equals(item.get(key))) {
                     elem.put(item);
@@ -565,7 +564,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                         formats.put("", 44);
                         formats.put("pl", 3);
                         // Read line and get related planting info number
-                        AdvancedHashMap tmp = readLine(line, formats);
+                        LinkedHashMap tmp = readLine(line, formats);
                         if (tmp.get("trno").equals(trno)) {
                             pl = (String) tmp.get("pl");
                         }
@@ -587,7 +586,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                         formats.put("pl", 2);
                         formats.put("pdate", 6);
                         // Read line and save into defValD
-                        AdvancedHashMap tmp = readLine(line, formats);
+                        LinkedHashMap tmp = readLine(line, formats);
                         if (tmp.get("pl").equals(pl)) {
                             return (String) tmp.get("pdate");
                         }
