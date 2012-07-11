@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import org.agmip.core.types.AdvancedHashMap;
 
 /**
  * DSSAT Weather Data I/O API Class
@@ -33,13 +32,13 @@ public class DssatWeatherInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected AdvancedHashMap readFile(HashMap brMap) throws IOException {
+    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
 
-        AdvancedHashMap ret = new AdvancedHashMap();
+        LinkedHashMap ret = new LinkedHashMap();
         ArrayList files = new ArrayList();
         ArrayList daily = new ArrayList();
         ArrayList titles = new ArrayList();
-        AdvancedHashMap file;
+        LinkedHashMap file;
         String line;
         BufferedReader brW = null;
         Object buf;
@@ -63,7 +62,7 @@ public class DssatWeatherInput extends DssatCommonInput {
             } else {
                 brW = (BufferedReader) buf;
             }
-            file = new AdvancedHashMap();
+            file = new LinkedHashMap();
             daily = new ArrayList();
             titles = new ArrayList();
             files.add(file);
@@ -87,7 +86,7 @@ public class DssatWeatherInput extends DssatCommonInput {
 
                         // Set variables' formats
                         formats.clear();
-                        formats.put("wst_insi", 6);
+                        formats.put("wst_id", 6);
                         formats.put("wst_lat", 9);
                         formats.put("wst_long", 9);
                         formats.put("elev", 6);
@@ -96,7 +95,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                         formats.put("refht", 6);
                         formats.put("wndht", 6);
                         // Read line and save into return holder
-                        file.put(readLine(line, formats));
+                        file.putAll(readLine(line, formats));
 
                     } // Weather daily data
                     else if (flg[1].startsWith("date ")) {
@@ -108,7 +107,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                             formats.put(titles.get(i), 6);
                         }
                         // Read line and save into return holder
-                        AdvancedHashMap tmp = readLine(line, formats, "");
+                        LinkedHashMap tmp = readLine(line, formats, "");
                         // translate date from yyddd format to yyyymmdd format
                         translateDateStr(tmp, "w_date");
                         daily.add(tmp);

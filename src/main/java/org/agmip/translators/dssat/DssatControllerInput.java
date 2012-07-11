@@ -3,7 +3,7 @@ package org.agmip.translators.dssat;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import org.agmip.core.types.AdvancedHashMap;
+import java.util.LinkedHashMap;
 
 /**
  *
@@ -24,11 +24,11 @@ public class DssatControllerInput {
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    public AdvancedHashMap readFiles(String arg0) throws FileNotFoundException, IOException {
+    public LinkedHashMap readFiles(String arg0) throws FileNotFoundException, IOException {
 
         HashMap brMap = new HashMap();
-        AdvancedHashMap ret = new AdvancedHashMap();
-        AdvancedHashMap tmp;
+        LinkedHashMap ret = new LinkedHashMap();
+        LinkedHashMap tmp;
         if (inputs.length > 0) {
             brMap = inputs[0].getBufferReader(arg0);
         }
@@ -46,7 +46,7 @@ public class DssatControllerInput {
                 } // if read Observed data file, need to save them under the same key (currently is "observed")
                 else if (inputs[i] instanceof DssatAFileInput || inputs[i] instanceof DssatTFileInput) {
                     if (ret.containsKey(inputs[i].jsonKey)) {
-                        ((AdvancedHashMap) ret.get(inputs[i].jsonKey)).put(tmp);
+                        ((LinkedHashMap) ret.get(inputs[i].jsonKey)).putAll(tmp);
                     } else {
                         ret.put(inputs[i].jsonKey, tmp);
                     }

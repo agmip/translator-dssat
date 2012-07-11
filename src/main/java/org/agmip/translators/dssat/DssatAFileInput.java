@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import org.agmip.core.types.AdvancedHashMap;
 
 /**
  * DSSAT AFile Data I/O API Class
@@ -33,10 +32,10 @@ public class DssatAFileInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected AdvancedHashMap readFile(HashMap brMap) throws IOException {
+    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
 
-        AdvancedHashMap ret = new AdvancedHashMap();
-        AdvancedHashMap file = readFileWithoutCompress(brMap);
+        LinkedHashMap ret = new LinkedHashMap();
+        LinkedHashMap file = readFileWithoutCompress(brMap);
         String obvFileKey = "summary";  // P.S. the key name might change
 
         compressData(file);
@@ -50,9 +49,9 @@ public class DssatAFileInput extends DssatCommonInput {
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected AdvancedHashMap readFileWithoutCompress(HashMap brMap) throws IOException {
+    protected LinkedHashMap readFileWithoutCompress(HashMap brMap) throws IOException {
 
-        AdvancedHashMap file = new AdvancedHashMap();
+        LinkedHashMap file = new LinkedHashMap();
         String line;
         BufferedReader brA;
         Object buf;
@@ -96,7 +95,7 @@ public class DssatAFileInput extends DssatCommonInput {
                     formats.put("exname", 10);
                     formats.put("local_name", line.length());
                     // Read line and save into return holder
-                    file.put(readLine(line, formats, ""));
+                    file.putAll(readLine(line, formats, ""));
 
                 } // Read data info 
                 else {
@@ -106,7 +105,7 @@ public class DssatAFileInput extends DssatCommonInput {
                         formats.put(titles.get(i), 6);
                     }
                     // Read line and save into return holder
-                    AdvancedHashMap tmp = readLine(line, formats, "");
+                    LinkedHashMap tmp = readLine(line, formats, "");
                     pdate = getPdate(brMap, (String) tmp.get("trno_a"));
                     for (int i = 0; i < titles.size(); i++) {
                         if (obvDataList.isDateType(titles.get(i))) {
