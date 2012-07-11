@@ -55,7 +55,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
 
             // Get Data from input holder
             LinkedHashMap expFile = (LinkedHashMap) getValueOr(result, "experiment", result);
-            ArrayList trArr = (ArrayList) getValueOr(expFile, "treatment", new ArrayList());
+            ArrayList trArr = (ArrayList) getValueOr(expFile, "management", new ArrayList());
             if (trArr.isEmpty()) {
                 return;
             }

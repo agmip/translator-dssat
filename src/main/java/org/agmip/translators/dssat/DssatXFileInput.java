@@ -1007,7 +1007,7 @@ public class DssatXFileInput extends DssatCommonInput {
         idNames.add("trno_a");
         idNames.add("trno_t");
         removeIndex(trArr, idNames);
-        ret.put("treatment", trArr);
+        ret.put("management", trArr);
         if (!obvAFile.getOr("local_name", "").equals(ret.getOr("local_name", ""))) {
             ret.put("local_name_a", obvAFile.get("local_name"));
         }

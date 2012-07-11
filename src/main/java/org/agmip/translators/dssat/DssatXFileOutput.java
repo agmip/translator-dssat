@@ -157,7 +157,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             sbData.append("\r\n");
 
             // TREATMENT Section
-            trArr = (ArrayList) getValueOr(data, "treatment", new ArrayList());
+            trArr = (ArrayList) getValueOr(data, "management", new ArrayList());
             if (trArr.isEmpty()) {
                 sbError.append("! Warning: There is no treatment data in the experiment!\r\n");
             } else {
@@ -746,7 +746,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
      */
     private void setDefVal(LinkedHashMap result) {
 
-        ArrayList trDataArr = (ArrayList) getValueOr(result, "treatment", new ArrayList());
+        ArrayList trDataArr = (ArrayList) getValueOr(result, "management", new ArrayList());
         Map trData;
         if (!trDataArr.isEmpty()) {
             trData = (Map) trDataArr.get(0);

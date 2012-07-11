@@ -53,7 +53,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
             LinkedHashMap expFile = (LinkedHashMap) getValueOr(result, "experiment", result);
 //            LinkedHashMap obvTFile = (LinkedHashMap) getValueOr(expFile, "time_series", expFile));
 //            ArrayList observeRecordsSections = ((ArrayList) obvTFile.getOr("data", new ArrayList()));
-            ArrayList trArr = (ArrayList) getValueOr(expFile, "treatment", new ArrayList());
+            ArrayList trArr = (ArrayList) getValueOr(expFile, "management", new ArrayList());
             if (trArr.isEmpty()) {
                 return;
             }
