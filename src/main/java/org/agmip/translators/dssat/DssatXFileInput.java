@@ -861,88 +861,88 @@ public class DssatXFileInput extends DssatCommonInput {
 
         // Get Observed data info
         LinkedHashMap obvAFile = obvReaderA.readFileWithoutCompress(brMap);
-        ArrayList obvAArr = getValueOr(obvAFile, eventKey, new ArrayList());
+        ArrayList obvAArr = getObjectOr(obvAFile, eventKey, new ArrayList());
         LinkedHashMap obvTFile = obvReaderT.readFileWithoutCompress(brMap);
-        ArrayList obvTArr = getValueOr(obvTFile, eventKey, new ArrayList());
+        ArrayList obvTArr = getObjectOr(obvTFile, eventKey, new ArrayList());
 
         // Combine all the sections data into the related treatment block
         for (int i = 0; i < trArr.size(); i++) {
             LinkedHashMap treatment = (LinkedHashMap) trArr.get(i);
 
             // cultivar
-            if (!getValueOr(treatment, "ge", "0").equals("0")) {
+            if (!getObjectOr(treatment, "ge", "0").equals("0")) {
                 treatment.put("cultivar", getSectionData(cuArr, "ge", treatment.get("ge").toString()));
             }
 
             // field
-            if (!getValueOr(treatment, "fl", "0").equals("0")) {
+            if (!getObjectOr(treatment, "fl", "0").equals("0")) {
                 treatment.put("field", getSectionData(flArr, "fl", treatment.get("fl").toString()));
             }
 
             // soil_analysis
-            if (!getValueOr(treatment, "sa", "0").equals("0")) {
+            if (!getObjectOr(treatment, "sa", "0").equals("0")) {
                 treatment.put("soil_analysis", getSectionData(saArr, "sa", treatment.get("sa").toString()));
             }
 
             // initial_condition
-            if (!getValueOr(treatment, "ic", "0").equals("0")) {
+            if (!getObjectOr(treatment, "ic", "0").equals("0")) {
                 treatment.put("initial_condition", getSectionData(icArr, "ic", treatment.get("ic").toString()));
             }
 
             // plant
-            if (!getValueOr(treatment, "pl", "0").equals("0")) {
+            if (!getObjectOr(treatment, "pl", "0").equals("0")) {
                 treatment.put("plant", getSectionData(plArr, "pl", treatment.get("pl").toString()));
             }
 
             // irrigation
-            if (!getValueOr(treatment, "ir", "0").equals("0")) {
+            if (!getObjectOr(treatment, "ir", "0").equals("0")) {
                 treatment.put("irrigation", getSectionData(irArr, "ir", treatment.get("ir").toString()));
             }
 
             // fertilizer
-            if (!getValueOr(treatment, "fe", "0").equals("0")) {
+            if (!getObjectOr(treatment, "fe", "0").equals("0")) {
                 treatment.put("fertilizer", getSectionData(feArr, "fe", treatment.get("fe").toString()));
             }
 
             // residue_organic
-            if (!getValueOr(treatment, "om", "0").equals("0")) {
+            if (!getObjectOr(treatment, "om", "0").equals("0")) {
                 treatment.put("residue_organic", getSectionData(omArr, "om", treatment.get("om").toString()));
             }
 
             // chemical
-            if (!getValueOr(treatment, "ch", "0").equals("0")) {
+            if (!getObjectOr(treatment, "ch", "0").equals("0")) {
                 treatment.put("chemical", getSectionData(chArr, "ch", treatment.get("ch").toString()));
             }
 
             // tillage
-            if (!getValueOr(treatment, "ti", "0").equals("0")) {
+            if (!getObjectOr(treatment, "ti", "0").equals("0")) {
                 treatment.put("tillage", getSectionData(tiArr, "ti", treatment.get("ti").toString()));
             }
 
             // emvironment
-            if (!getValueOr(treatment, "em", "0").equals("0")) {
+            if (!getObjectOr(treatment, "em", "0").equals("0")) {
                 treatment.put("emvironment", getSectionData(emArr, "em", treatment.get("em").toString()));
             }
 
             // harvest
-            if (!getValueOr(treatment, "ha", "0").equals("0")) {
+            if (!getObjectOr(treatment, "ha", "0").equals("0")) {
                 treatment.put("harvest", getSectionData(haArr, "ha", treatment.get("ha").toString()));
             }
 
             // simulation
-            if (!getValueOr(treatment, "sm", "0").equals("0")) {
+            if (!getObjectOr(treatment, "sm", "0").equals("0")) {
                 treatment.put("simulation", getSectionData(smArr, "sm", treatment.get("sm").toString()));
             }
 
             // observed data (summary)
             LinkedHashMap obv = new LinkedHashMap();
             treatment.put("observed", obv);
-            if (!getValueOr(treatment, "trno", "0").equals("0")) {
+            if (!getObjectOr(treatment, "trno", "0").equals("0")) {
                 obv.put("summary", getSectionData(obvAArr, "trno_a", treatment.get("trno").toString()));
             }
 
             // observed data (time-series)
-            if (!getValueOr(treatment, "trno", "0").equals("0")) {
+            if (!getObjectOr(treatment, "trno", "0").equals("0")) {
                 obv.put("time_series", getSectionData(obvTArr, "trno_t", treatment.get("trno").toString()));
             }
 
@@ -950,9 +950,9 @@ public class DssatXFileInput extends DssatCommonInput {
             // Revise the date value for FEDATE, IDATE, MLADAT
             // Get Planting date
             String pdate = "";
-            ArrayList plTmps = (ArrayList) getValueOr(treatment, "planting", new ArrayList());
+            ArrayList plTmps = (ArrayList) getObjectOr(treatment, "planting", new ArrayList());
             if (!plTmps.isEmpty()) {
-                pdate = getValueOr((LinkedHashMap) plTmps.get(0), "pdate", "");
+                pdate = getObjectOr((LinkedHashMap) plTmps.get(0), "pdate", "");
                 if (pdate.length() > 5) {
                     pdate = pdate.substring(2);
                 }
@@ -960,7 +960,7 @@ public class DssatXFileInput extends DssatCommonInput {
 
             // Date adjust based on realted treatment info (handling for DOY type value)
             // Fertilizer Date
-            ArrayList feTmps = (ArrayList) getValueOr(treatment, "fertilizer", new ArrayList());
+            ArrayList feTmps = (ArrayList) getObjectOr(treatment, "fertilizer", new ArrayList());
             LinkedHashMap feTmp;
             for (int j = 0; j < feTmps.size(); j++) {
                 feTmp = (LinkedHashMap) feTmps.get(j);
@@ -970,7 +970,7 @@ public class DssatXFileInput extends DssatCommonInput {
             // Irrigation date
             LinkedHashMap irTmp = (LinkedHashMap) treatment.get("irrigation");
             if (irTmp != null) {
-                ArrayList irTmpSubs = getValueOr(irTmp, "data", new ArrayList());
+                ArrayList irTmpSubs = getObjectOr(irTmp, "data", new ArrayList());
                 for (int j = 0; j < irTmpSubs.size(); j++) {
                     LinkedHashMap irTmpSub = (LinkedHashMap) irTmpSubs.get(j);
                     translateDateStrForDOY(irTmpSub, "idate", pdate);
@@ -978,7 +978,7 @@ public class DssatXFileInput extends DssatCommonInput {
             }
 
             // Mulch application date
-            ArrayList omTmps = (ArrayList) getValueOr(treatment, "residue_organic", new ArrayList());
+            ArrayList omTmps = (ArrayList) getObjectOr(treatment, "residue_organic", new ArrayList());
             LinkedHashMap omTmp;
             for (int j = 0; j < omTmps.size(); j++) {
                 omTmp = (LinkedHashMap) omTmps.get(j);
@@ -1008,11 +1008,11 @@ public class DssatXFileInput extends DssatCommonInput {
         idNames.add("trno_t");
         removeIndex(trArr, idNames);
         ret.put("management", trArr);
-        if (!getValueOr(obvAFile, "local_name", "").equals(getValueOr(ret, "local_name", ""))) {
+        if (!getObjectOr(obvAFile, "local_name", "").equals(getObjectOr(ret, "local_name", ""))) {
             
             ret.put("local_name_a", obvAFile.get("local_name"));
         }
-        if (!getValueOr(obvTFile, "local_name", "").equals(getValueOr(ret, "local_name", ""))) {
+        if (!getObjectOr(obvTFile, "local_name", "").equals(getObjectOr(ret, "local_name", ""))) {
             ret.put("local_name_t", obvTFile.get("local_name"));
         }
 //        compressData(ret);

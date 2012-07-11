@@ -82,7 +82,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get weather files
-            wthFiles = (ArrayList) getValueOr(result, "weather", new ArrayList());
+            wthFiles = (ArrayList) getObjectOr(result, "weather", new ArrayList());
             if (wthFiles.isEmpty()) {
                 return;
             }
@@ -92,18 +92,18 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             // Output all weather files
             for (int i = 0; i < wthFiles.size(); i++) {
                 wthFile = (LinkedHashMap) wthFiles.get(i);
-                wthRecords = (ArrayList) getValueOr(wthFile, dailyKey, new ArrayList());
+                wthRecords = (ArrayList) getObjectOr(wthFile, dailyKey, new ArrayList());
 
                 // Initial BufferedWriter
                 // Get File name
-                String fileName = getValueOr(wthFile, "wst_insi", "").toString();
+                String fileName = getObjectOr(wthFile, "wst_insi", "").toString();
                 if (fileName.equals("")) {
                     fileName = "a.tmp";
                 } else {
                     if (wthRecords.isEmpty()) {
                         fileName += "0001.WTH";
                     } else {
-                        fileName += getValueOr(((LinkedHashMap) wthRecords.get(0)), "w_date", "2000").toString().substring(2, 4) + "01.WTH";
+                        fileName += getObjectOr(((LinkedHashMap) wthRecords.get(0)), "w_date", "2000").toString().substring(2, 4) + "01.WTH";
                     }
                 }
                 arg0 = revisePath(arg0);
@@ -112,19 +112,19 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
                 // Output Weather File
                 // Titel Section
-                sbData.append(String.format("*WEATHER DATA : %1$s\r\n\r\n", getValueOr(wthFile, "wst_name", defValC).toString()));
+                sbData.append(String.format("*WEATHER DATA : %1$s\r\n\r\n", getObjectOr(wthFile, "wst_name", defValC).toString()));
 
                 // Weather Station Section
                 sbData.append("@ INSI      LAT     LONG  ELEV   TAV   AMP REFHT WNDHT\r\n");
                 sbData.append(String.format("  %1$-4s %2$8s %3$8s %4$5s %5$5s %6$5s %7$5s %8$5s\r\n",
-                        getValueOr(wthFile, "wst_insi", defValC).toString(),
-                        formatNumStr(8, getValueOr(wthFile, "wst_lat", defValR).toString()),
-                        formatNumStr(8, getValueOr(wthFile, "wst_long", defValR).toString()),
-                        formatNumStr(5, getValueOr(wthFile, "elev", defValR).toString()),
-                        formatNumStr(5, getValueOr(wthFile, "tav", defValR).toString()),
-                        formatNumStr(5, getValueOr(wthFile, "tamp", defValR).toString()),
-                        formatNumStr(5, getValueOr(wthFile, "refht", defValR).toString()),
-                        formatNumStr(5, getValueOr(wthFile, "wndht", defValR).toString())));
+                        getObjectOr(wthFile, "wst_insi", defValC).toString(),
+                        formatNumStr(8, getObjectOr(wthFile, "wst_lat", defValR).toString()),
+                        formatNumStr(8, getObjectOr(wthFile, "wst_long", defValR).toString()),
+                        formatNumStr(5, getObjectOr(wthFile, "elev", defValR).toString()),
+                        formatNumStr(5, getObjectOr(wthFile, "tav", defValR).toString()),
+                        formatNumStr(5, getObjectOr(wthFile, "tamp", defValR).toString()),
+                        formatNumStr(5, getObjectOr(wthFile, "refht", defValR).toString()),
+                        formatNumStr(5, getObjectOr(wthFile, "wndht", defValR).toString())));
 
                 // Daily weather data section
                 // Fixed Title
@@ -169,14 +169,14 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
                     wthRecord = (LinkedHashMap) wthRecords.get(j);
                     // if date is missing, jump the record
-                    if (!getValueOr(wthRecord, "w_date", "").toString().equals("")) {
+                    if (!getObjectOr(wthRecord, "w_date", "").toString().equals("")) {
                         // Fixed data part
                         sbData.append(String.format("%1$5s %2$5s %3$5s %4$5s %5$5s",
-                                formatDateStr(getValueOr(wthRecord, "w_date", defValD).toString()),
-                                formatNumStr(5, getValueOr(wthRecord, "srad", defValR).toString()),
-                                formatNumStr(5, getValueOr(wthRecord, "tmax", defValR).toString()),
-                                formatNumStr(5, getValueOr(wthRecord, "tmin", defValR).toString()),
-                                formatNumStr(5, getValueOr(wthRecord, "rain", defValR).toString())));
+                                formatDateStr(getObjectOr(wthRecord, "w_date", defValD).toString()),
+                                formatNumStr(5, getObjectOr(wthRecord, "srad", defValR).toString()),
+                                formatNumStr(5, getObjectOr(wthRecord, "tmax", defValR).toString()),
+                                formatNumStr(5, getObjectOr(wthRecord, "tmin", defValR).toString()),
+                                formatNumStr(5, getObjectOr(wthRecord, "rain", defValR).toString())));
 
                         // Optional data part
                         for (int k = 0; k < adtDaily.size(); k++) {
@@ -184,7 +184,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                                 sbData.append("      ");
                             } else {
                                 sbData.append(String.format(" %1$5s",
-                                        formatNumStr(5, getValueOr(wthRecord, adtDaily.get(k).toString(), defValR).toString())));
+                                        formatNumStr(5, getObjectOr(wthRecord, adtDaily.get(k).toString(), defValR).toString())));
                             }
                         }
                         sbData.append("\r\n");

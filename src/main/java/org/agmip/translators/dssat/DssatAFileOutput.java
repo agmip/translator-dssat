@@ -54,8 +54,8 @@ public class DssatAFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            LinkedHashMap expFile = (LinkedHashMap) getValueOr(result, "experiment", result);
-            ArrayList trArr = (ArrayList) getValueOr(expFile, "management", new ArrayList());
+            LinkedHashMap expFile = (LinkedHashMap) getObjectOr(result, "experiment", result);
+            ArrayList trArr = (ArrayList) getObjectOr(expFile, "management", new ArrayList());
             if (trArr.isEmpty()) {
                 return;
             }
@@ -74,7 +74,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
 
             // Output Observation File
             // Titel Section
-            sbData.append(String.format("*EXP.DATA (A): %1$-10s %2$s\r\n\r\n", exName, getValueOr(expFile,"local_name_a", getValueOr(expFile,"local_name", defValC)).toString()));
+            sbData.append(String.format("*EXP.DATA (A): %1$-10s %2$s\r\n\r\n", exName, getObjectOr(expFile,"local_name_a", getObjectOr(expFile,"local_name", defValC)).toString()));
 
             // Get first record of observed data
             LinkedHashMap fstObvData;
@@ -139,12 +139,12 @@ public class DssatAFileOutput extends DssatCommonOutput {
                     for (int k = i * 40; k < limit; k++) {
 
                         if (obvDataList.isDapDateType(titleOutputId[k], titleOutput.get(titleOutputId[k]))) {
-                            String pdate = (String) getValueOr(((LinkedHashMap) getValueOr(result,"experiment", new LinkedHashMap())),"pdate", defValD); // TODO need be updated after ear;y version
-                            sbData.append(String.format("%1$6s", formatDateStr(pdate, getValueOr(record,titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
+                            String pdate = (String) getObjectOr(((LinkedHashMap) getObjectOr(result,"experiment", new LinkedHashMap())),"pdate", defValD); // TODO need be updated after ear;y version
+                            sbData.append(String.format("%1$6s", formatDateStr(pdate, getObjectOr(record,titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
                         } else if (obvDataList.isDateType(titleOutputId[k])) {
-                            sbData.append(String.format("%1$6s", formatDateStr(getValueOr(record,titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
+                            sbData.append(String.format("%1$6s", formatDateStr(getObjectOr(record,titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
                         } else {
-                            sbData.append(" ").append(formatNumStr(5, getValueOr(record,titleOutput.get(titleOutputId[k]).toString(), defValI).toString()));
+                            sbData.append(" ").append(formatNumStr(5, getObjectOr(record,titleOutput.get(titleOutputId[k]).toString(), defValI).toString()));
                         }
                     }
                     sbData.append("\r\n");
@@ -185,8 +185,8 @@ public class DssatAFileOutput extends DssatCommonOutput {
     private LinkedHashMap getObvData(ArrayList trArr, int idx) {
 
         LinkedHashMap trData = (LinkedHashMap) trArr.get(idx);
-        LinkedHashMap obvFile = (LinkedHashMap) getValueOr(trData,"observed", new LinkedHashMap());
-        LinkedHashMap obvData = (LinkedHashMap) getValueOr(obvFile,"summary", new LinkedHashMap());
+        LinkedHashMap obvFile = (LinkedHashMap) getObjectOr(trData,"observed", new LinkedHashMap());
+        LinkedHashMap obvData = (LinkedHashMap) getObjectOr(obvFile,"summary", new LinkedHashMap());
 
         return obvData;
     }

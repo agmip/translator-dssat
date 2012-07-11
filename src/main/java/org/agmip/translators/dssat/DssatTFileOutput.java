@@ -50,10 +50,10 @@ public class DssatTFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            LinkedHashMap expFile = (LinkedHashMap) getValueOr(result, "experiment", result);
-//            LinkedHashMap obvTFile = (LinkedHashMap) getValueOr(expFile, "time_series", expFile));
+            LinkedHashMap expFile = (LinkedHashMap) getObjectOr(result, "experiment", result);
+//            LinkedHashMap obvTFile = (LinkedHashMap) getObjectOr(expFile, "time_series", expFile));
 //            ArrayList observeRecordsSections = ((ArrayList) obvTFile.getOr("data", new ArrayList()));
-            ArrayList trArr = (ArrayList) getValueOr(expFile, "management", new ArrayList());
+            ArrayList trArr = (ArrayList) getObjectOr(expFile, "management", new ArrayList());
             if (trArr.isEmpty()) {
                 return;
             }
@@ -72,7 +72,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
             // Output Observation File
             // Titel Section
-            sbData.append(String.format("*EXP.DATA (T): %1$-10s %2$s\r\n\r\n", exName, getValueOr(expFile, "local_name_t", getValueOr(expFile, "local_name", defValC).toString())));
+            sbData.append(String.format("*EXP.DATA (T): %1$-10s %2$s\r\n\r\n", exName, getObjectOr(expFile, "local_name_t", getObjectOr(expFile, "local_name", defValC).toString())));
 
             // Loop Data Sections
             ArrayList observeRecords;
@@ -159,17 +159,17 @@ public class DssatTFileOutput extends DssatCommonOutput {
                     for (int j = 0; j < observeRecords.size(); j++) {
 
                         record = (LinkedHashMap) observeRecords.get(j);
-                        sbData.append(String.format(" %1$5s", getValueOr(record, "trno", 1).toString())); // TODO wait for confirmation that other model only have single treatment in one file
-                        sbData.append(String.format(" %1$5d", Integer.parseInt(formatDateStr(getValueOr(record, "date", defValI).toString()))));
+                        sbData.append(String.format(" %1$5s", getObjectOr(record, "trno", 1).toString())); // TODO wait for confirmation that other model only have single treatment in one file
+                        sbData.append(String.format(" %1$5d", Integer.parseInt(formatDateStr(getObjectOr(record, "date", defValI).toString()))));
                         for (int k = i * 39; k < limit; k++) {
 
                             if (obvDataList.isDapDateType(titleOutputId[k], titleOutput.get(titleOutputId[k]))) {
-                                String pdate = (String) getValueOr((LinkedHashMap) getValueOr(result, "experiment", new LinkedHashMap()), "pdate", defValD); // TODO need be updated after ear;y version
-                                sbData.append(String.format("%1$6s", formatDateStr(pdate, getValueOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
+                                String pdate = (String) getObjectOr((LinkedHashMap) getObjectOr(result, "experiment", new LinkedHashMap()), "pdate", defValD); // TODO need be updated after ear;y version
+                                sbData.append(String.format("%1$6s", formatDateStr(pdate, getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
                             } else if (obvDataList.isDateType(titleOutputId[k])) {
-                                sbData.append(String.format("%1$6s", formatDateStr(getValueOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
+                                sbData.append(String.format("%1$6s", formatDateStr(getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
                             } else {
-                                sbData.append(" ").append(formatNumStr(5, getValueOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString()));
+                                sbData.append(" ").append(formatNumStr(5, getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString()));
                             }
 
                         }
@@ -216,8 +216,8 @@ public class DssatTFileOutput extends DssatCommonOutput {
         JSONAdapter adapter = new JSONAdapter();
 
         LinkedHashMap trData = (LinkedHashMap) trArr.get(idx);
-        LinkedHashMap obvFile = (LinkedHashMap) getValueOr(trData, "observed", new LinkedHashMap());
-        ArrayList obvData = (ArrayList) getValueOr(obvFile, "time_series", new ArrayList());
+        LinkedHashMap obvFile = (LinkedHashMap) getObjectOr(trData, "observed", new LinkedHashMap());
+        ArrayList obvData = (ArrayList) getObjectOr(obvFile, "time_series", new ArrayList());
 
         return obvData;
     }
