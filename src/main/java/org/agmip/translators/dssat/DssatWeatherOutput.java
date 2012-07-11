@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.agmip.util.JSONAdapter;
 import static org.agmip.util.MapUtil.*;
 
 /**
@@ -56,7 +55,6 @@ public class DssatWeatherOutput extends DssatCommonOutput {
     public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        JSONAdapter adapter = new JSONAdapter();    // JSON Adapter
         ArrayList wthFiles;                     // Weather files array
         LinkedHashMap wthFile;                  // Data holder for whole weather data
         ArrayList wthRecords;                   // Daily data array

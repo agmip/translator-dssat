@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.agmip.util.JSONAdapter;
+
 import static org.agmip.util.MapUtil.*;
 
 /**
@@ -37,7 +37,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
     public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        JSONAdapter adapter = new JSONAdapter();    // JSON Adapter
         LinkedHashMap<String, Object> data;       // Data holder for section data
         BufferedWriter bwX;                          // output object
         StringBuilder sbData = new StringBuilder();     // construct the data info in the output
@@ -666,7 +665,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
     private String createSMMAStr(int smid, LinkedHashMap expData, LinkedHashMap trData) {
 
         StringBuilder sb = new StringBuilder();
-        JSONAdapter adapter = new JSONAdapter();
         String nitro;
         String water;
         String sdate;

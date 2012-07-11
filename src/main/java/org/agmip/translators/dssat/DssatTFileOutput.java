@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import org.agmip.util.JSONAdapter;
+
 import static org.agmip.util.MapUtil.*;
 
 /**
@@ -35,7 +35,6 @@ public class DssatTFileOutput extends DssatCommonOutput {
     public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        JSONAdapter adapter = new JSONAdapter();    // JSON Adapter
         LinkedHashMap<String, Object> record;     // Data holder for daily data
         BufferedWriter bwT;                         // output object
         StringBuilder sbData = new StringBuilder();         // construct the data info in the output
@@ -212,8 +211,6 @@ public class DssatTFileOutput extends DssatCommonOutput {
      * @return the observed data map
      */
     private ArrayList getObvData(ArrayList trArr, int idx) {
-
-        JSONAdapter adapter = new JSONAdapter();
 
         LinkedHashMap trData = (LinkedHashMap) trArr.get(idx);
         LinkedHashMap obvFile = (LinkedHashMap) getObjectOr(trData, "observed", new LinkedHashMap());
