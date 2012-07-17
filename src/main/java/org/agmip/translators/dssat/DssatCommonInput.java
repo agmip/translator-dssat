@@ -282,7 +282,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    protected HashMap getBufferReader(String filePath) throws FileNotFoundException, IOException {
+    protected static HashMap getBufferReader(String filePath) throws FileNotFoundException, IOException {
 
         HashMap result = new HashMap();
         InputStream in;
@@ -342,7 +342,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @return result The char array for current entry
      * @throws IOException
      */
-    private char[] getBuf(InputStream in, int size) throws IOException {
+    private static char[] getBuf(InputStream in, int size) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         char[] buf = new char[size];
         br.read(buf);
@@ -443,7 +443,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param m input map
      * @return the copy of whole input map
      */
-    protected LinkedHashMap CopyList(LinkedHashMap m) {
+    protected static LinkedHashMap CopyList(LinkedHashMap m) {
         LinkedHashMap ret = new LinkedHashMap();
         
         for (Object key : m.keySet()) {
@@ -465,7 +465,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param arr input ArrayList
      * @return the copy of whole input array
      */
-    protected ArrayList CopyList(ArrayList arr) {
+    protected static ArrayList CopyList(ArrayList arr) {
         ArrayList ret = new ArrayList();
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i) instanceof String) {
@@ -605,5 +605,10 @@ public abstract class DssatCommonInput implements TranslatorInput {
         }
 
         return "";
+    }
+    
+    public static void setDataVersionInfo(LinkedHashMap m) {
+        m.put("data_source", "DSSAT");
+        m.put("crop_model_version", "v4.5");
     }
 }

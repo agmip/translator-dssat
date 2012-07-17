@@ -26,17 +26,31 @@ public class DssatSoilInput extends DssatCommonInput {
     }
 
     /**
-     * DSSAT Soil Data input method for Controller using
+     * DSSAT Soil Data input method for only inputing soil file
      * 
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
      */
     @Override
     protected LinkedHashMap readFile(HashMap brMap) throws IOException {
-
         LinkedHashMap ret = new LinkedHashMap();
+        ArrayList sites = readSoilSites(brMap, ret);
+
+//        compressData(sites);
+        ret.put(jsonKey, sites);
+        return ret;
+    }
+
+    /**
+     * DSSAT Soil Data input method for Controller using (return map will not be compressed)
+     * 
+     * @param brMap  The holder for BufferReader objects for all files
+     * @return result data holder object
+     */
+    protected ArrayList<LinkedHashMap> readSoilSites(HashMap brMap, LinkedHashMap ret) throws IOException {
+
         String slNotes = null;
-        ArrayList sites;
+        ArrayList<LinkedHashMap> sites = new ArrayList<LinkedHashMap>();
         LinkedHashMap site = new LinkedHashMap();
         ArrayList layers = new ArrayList();
         String line;
@@ -44,14 +58,14 @@ public class DssatSoilInput extends DssatCommonInput {
         Object buf;
         LinkedHashMap mapS;
         LinkedHashMap formats = new LinkedHashMap();
-        String layerKey = "data";  // TODO the key name might change
+        String layerKey = "soilLayer";  // TODO the key name might change
 
         mapS = (LinkedHashMap) brMap.get("S");
 
         // If Soil File is no been found
         if (mapS.isEmpty()) {
             // TODO reprot file not exist error
-            return ret;
+            return sites;
         }
 
         sites = new ArrayList();
@@ -201,11 +215,11 @@ public class DssatSoilInput extends DssatCommonInput {
             }
         }
 
-        compressData(sites);
-        ret.put(jsonKey, sites);
+//        compressData(sites);
+//        ret.put(jsonKey, sites);
         brS.close();
 
-        return ret;
+        return sites;
     }
 
     /**

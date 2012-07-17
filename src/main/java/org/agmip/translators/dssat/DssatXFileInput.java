@@ -16,6 +16,9 @@ import static org.agmip.util.MapUtil.*;
  */
 public class DssatXFileInput extends DssatCommonInput {
 
+    private String eventKey = "data";
+    private String icEventKey = "soilLayer";
+    
     /**
      * Constructor with no parameters
      * Set jsonKey as "experiment"
@@ -23,11 +26,11 @@ public class DssatXFileInput extends DssatCommonInput {
      */
     public DssatXFileInput() {
         super();
-        jsonKey = "experiment";
+        jsonKey = "management";
     }
 
     /**
-     * DSSAT XFile Data input method for Controller using
+     * DSSAT XFile Data input method for only inputing experiment file
      * 
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
@@ -35,7 +38,22 @@ public class DssatXFileInput extends DssatCommonInput {
     @Override
     protected LinkedHashMap readFile(HashMap brMap) throws IOException {
 
+        // TODO need to be revised later
         LinkedHashMap ret = new LinkedHashMap();
+        ArrayList<LinkedHashMap> trArr = readTreatments(brMap, ret);
+//        compressData(trArr);
+        ret.put(jsonKey, trArr);
+        return ret;
+    }
+
+    /**
+     * DSSAT XFile Data input method for Controller using (no compressing data)
+     * 
+     * @param brMap  The holder for BufferReader objects for all files
+     * @return trArr The array of treatment data
+     */
+    protected ArrayList<LinkedHashMap> readTreatments(HashMap brMap, LinkedHashMap metaData) throws IOException {
+
         String line;
         BufferedReader br;
         Object buf;
@@ -45,28 +63,32 @@ public class DssatXFileInput extends DssatCommonInput {
         String wid;
         String fileName;
         LinkedHashMap formats = new LinkedHashMap();
-        ArrayList trArr = new ArrayList();
-        ArrayList cuArr = new ArrayList();
-        ArrayList flArr = new ArrayList();
-        ArrayList saArr = new ArrayList();
-        ArrayList sadArr = new ArrayList();
-        ArrayList icArr = new ArrayList();
-        ArrayList icdArr = new ArrayList();
-        ArrayList plArr = new ArrayList();
-        ArrayList irArr = new ArrayList();
-        ArrayList irdArr = new ArrayList();
-        ArrayList feArr = new ArrayList();
-        ArrayList omArr = new ArrayList();
-        ArrayList chArr = new ArrayList();
-        ArrayList tiArr = new ArrayList();
-        ArrayList emArr = new ArrayList();
-        ArrayList haArr = new ArrayList();
-        ArrayList smArr = new ArrayList();
+        ArrayList<LinkedHashMap> trArr = new ArrayList<LinkedHashMap>();
+        LinkedHashMap trData = new LinkedHashMap();
+        ArrayList<LinkedHashMap> evtArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> sqArr = new ArrayList<LinkedHashMap>();
+        LinkedHashMap sqData;
+        ArrayList<LinkedHashMap> cuArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> flArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> saArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> sadArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> icArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> icdArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> plArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> irArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> irdArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> feArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> omArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> chArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> tiArr = new ArrayList<LinkedHashMap>();
+//        ArrayList<LinkedHashMap> emArr = new ArrayList<LinkedHashMap>();    // TODO add in the future
+        ArrayList<LinkedHashMap> haArr = new ArrayList<LinkedHashMap>();
+        ArrayList<LinkedHashMap> smArr = new ArrayList<LinkedHashMap>();
         ArrayList smSubArr = new ArrayList();
-        String eventKey = "data";
         String ireff = "";    // P.S. special handling for EFIR in irrigation section
         DssatAFileInput obvReaderA = new DssatAFileInput();
         DssatTFileInput obvReaderT = new DssatTFileInput();
+//        DssatSoilInput soilReader = new DssatSoilInput(); // TODO will be deleted
 
         buf = brMap.get("X");
         mapW = (HashMap) brMap.get("W");
@@ -76,7 +98,7 @@ public class DssatXFileInput extends DssatCommonInput {
         // If XFile is no been found
         if (buf == null) {
             // TODO reprot file not exist error
-            return ret;
+            return trArr;
         } else {
             if (buf instanceof char[]) {
                 br = new BufferedReader(new CharArrayReader((char[]) buf));
@@ -85,8 +107,6 @@ public class DssatXFileInput extends DssatCommonInput {
             }
         }
 
-        ret.put("data_source", "DSSAT");
-        ret.put("crop_model_version", "v4.5");
 //        ret.put("cultivar", cuArr);
 //        ret.put("field", flArr);
 //        ret.put("soil_analysis", saArr);
@@ -114,54 +134,54 @@ public class DssatXFileInput extends DssatCommonInput {
                 formats.put("exname", 11);
                 formats.put("local_name", 61);
                 // Read line and save into return holder
-                ret.putAll(readLine(line.substring(13), formats));
-                ret.put("institutes", line.substring(14, 16).trim());
+                metaData.putAll(readLine(line.substring(13), formats));
+                metaData.put("institutes", line.substring(14, 16).trim());
             } // Read General Section
             else if (flg[0].startsWith("general")) {
 
                 // People info
                 if (flg[1].equals("people") && flg[2].equals("data")) {
-                    ret.put("people", line.trim());
+                    metaData.put("people", line.trim());
 
                 } // Address info
                 else if (flg[1].equals("address") && flg[2].equals("data")) {
                     String[] addr = line.split(",[ ]*");
-                    ret.put("fl_loc_1", "");
-                    ret.put("fl_loc_2", "");
-                    ret.put("fl_loc_3", "");
-                    ret.put("institutes", line.trim());
+                    metaData.put("fl_loc_1", "");
+                    metaData.put("fl_loc_2", "");
+                    metaData.put("fl_loc_3", "");
+                    metaData.put("institutes", line.trim());
 //                    ret.put("address", line.trim());    // P.S. no longer to use this field
 
                     switch (addr.length) {
                         case 0:
                             break;
                         case 1:
-                            ret.put("fl_loc_1", addr[0]);
+                            metaData.put("fl_loc_1", addr[0]);
                             break;
                         case 2:
-                            ret.put("fl_loc_1", addr[1]);
-                            ret.put("fl_loc_2", addr[0]);
+                            metaData.put("fl_loc_1", addr[1]);
+                            metaData.put("fl_loc_2", addr[0]);
                             break;
                         case 3:
-                            ret.put("fl_loc_1", addr[2]);
-                            ret.put("fl_loc_2", addr[1]);
-                            ret.put("fl_loc_3", addr[0]);
+                            metaData.put("fl_loc_1", addr[2]);
+                            metaData.put("fl_loc_2", addr[1]);
+                            metaData.put("fl_loc_3", addr[0]);
                             break;
                         default:
-                            ret.put("fl_loc_1", addr[addr.length - 1]);
-                            ret.put("fl_loc_2", addr[addr.length - 2]);
+                            metaData.put("fl_loc_1", addr[addr.length - 1]);
+                            metaData.put("fl_loc_2", addr[addr.length - 2]);
                             String loc3 = "";
                             for (int i = 0; i < addr.length - 2; i++) {
                                 loc3 += addr[i] + ", ";
                             }
-                            ret.put("fl_loc_3", loc3.substring(0, loc3.length() - 2));
+                            metaData.put("fl_loc_3", loc3.substring(0, loc3.length() - 2));
                     }
 
                 } // Site info
                 else if ((flg[1].equals("site") || flg[1].equals("sites")) && flg[2].equals("data")) {
                     //$ret[$flg[0]]["site"] = trim($line);
                     // P.S. site is missing in the master variables list
-                    ret.put("site", line.trim());
+                    metaData.put("site", line.trim());
 
                 } // Plot Info
                 else if (flg[1].startsWith("parea") && flg[2].equals("data")) {
@@ -179,17 +199,16 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("hlen", 6);
                     formats.put("plthm", 16);
                     // Read line and save into return holder
-                    ret.put("plot_info", readLine(line, formats));
+                    metaData.putAll(readLine(line, formats));
 
                 } // Notes field
-                else if (flg[1].equals("notes") && flg[2].equals("data")) {
-                    //$ret[$flg[0]]["notes"] = addArray($ret[$flg[0]]["notes"], " ". trim($line), "");
-                    if (!ret.containsKey("notes")) {
-                        ret.put("notes", line.trim() + "\\r\\n");
+                else if (flg[1].equals("tr_notes") && flg[2].equals("data")) {
+                    if (!metaData.containsKey("tr_notes")) {
+                        metaData.put("tr_notes", line.trim() + "\\r\\n");
                     } else {
-                        String notes = (String) ret.get("notes");
+                        String notes = (String) metaData.get("tr_notes");
                         notes += line.trim() + "\\r\\n";
-                        ret.put("notes", notes);
+                        metaData.put("tr_notes", notes);
                     }
                 } else {
                 }
@@ -197,7 +216,7 @@ public class DssatXFileInput extends DssatCommonInput {
             } // Read TREATMENTS Section
             else if (flg[0].startsWith("treatments")) {
 
-                // Read TREATMENTS data
+                // Read TREATMENTS data / Rotation data
                 if (flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
@@ -220,7 +239,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("ha", 3);
                     formats.put("sm", 3);
                     // Read line and save into return holder
-                    trArr.add(readLine(line, formats));
+                    sqArr.add(readLine(line, formats));
                 } else {
                 }
 
@@ -238,9 +257,9 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("cul_name", 17);
                     // Read line and save into return holder
                     cuArr.add(readLine(line, formats));
-                    if (cuArr.size() == 1) {
-                        ret.put("crid", line.substring(3, 5).trim()); // TODO keep for the early version; just first entry
-                    }
+//                    if (cuArr.size() == 1) {
+//                        metaData.put("crid", line.substring(3, 5).trim()); // TODO keep for the early version; just first entry
+//                    }
                 } else {
                 }
             } // Read FIELDS Section
@@ -253,7 +272,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.clear();
                     formats.put("fl", 2);
                     formats.put("id_field", 9);
-                    formats.put("wsta_id", 9);      //P.S. id do not match with the master list "wth_id"; might have another id name
+                    formats.put("wst_id", 9);       //P.S. id do not match with the master list "wth_id"; might have another id name
                     formats.put("flsl", 6);
                     formats.put("flob", 6);
                     formats.put("fl_drntype", 6);
@@ -324,10 +343,10 @@ public class DssatXFileInput extends DssatCommonInput {
                             strLong = null;
                         }
                     }
-                    if (flArr.size() == 1) {
-                        ret.put("fl_lat", strLat); // TODO Keep the meta data handling for the early version
-                        ret.put("fl_long", strLong); // TODO Keep the meta data handling for the early version
-                    }
+//                    if (flArr.size() == 1) {
+//                        metaData.put("fl_lat", strLat); // TODO Keep the meta data handling for the early version
+//                        metaData.put("fl_long", strLong); // TODO Keep the meta data handling for the early version
+//                    }
                     if (tmp.containsKey("fl_lat")) {
                         tmp.put("fl_lat", strLat);
                     }
@@ -353,7 +372,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     LinkedHashMap tmp = readLine(line, formats);
                     translateDateStr(tmp, "sadat");
                     saArr.add(tmp);
-                    sadArr = new ArrayList();
+                    sadArr = new ArrayList<LinkedHashMap>();
                     tmp.put(eventKey, sadArr);
 
                 } // Read SOIL ANALYSIS layer data
@@ -400,8 +419,8 @@ public class DssatXFileInput extends DssatCommonInput {
                     LinkedHashMap tmp = readLine(line, formats);
                     translateDateStr(tmp, "icdat");
                     icArr.add(tmp);
-                    icdArr = new ArrayList();
-                    tmp.put(eventKey, icdArr);
+                    icdArr = new ArrayList<LinkedHashMap>();
+                    tmp.put(icEventKey, icdArr);
 
                 } else // INITIAL CONDITIONS layer data
                 if (flg[1].startsWith("c  icbl") && flg[2].equals("data")) {
@@ -430,7 +449,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("pldae", 6);
                     formats.put("plpop", 6);
                     formats.put("plpoe", 6);
-                    formats.put("plme", 6);
+                    formats.put("plma", 6);     // P.S. 2012.07.13 changed from plme to plma
                     formats.put("plds", 6);
                     formats.put("plrs", 6);
                     formats.put("plrd", 6);
@@ -446,9 +465,9 @@ public class DssatXFileInput extends DssatCommonInput {
                     translateDateStr(tmp, "pdate");
                     translateDateStr(tmp, "pldae");
                     plArr.add(tmp);
-                    if (plArr.size() == 1) {
-                        ret.put("pdate", tmp.get("pdate")); // TODO keep for the early version
-                    }
+//                    if (plArr.size() == 1) {
+//                        metaData.put("pdate", tmp.get("pdate")); // TODO keep for the early version
+//                    }
                 } else {
                 }
 
@@ -475,7 +494,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         tmp.remove("ireff");
                     }
                     irArr.add(tmp);
-                    irdArr = new ArrayList();
+                    irdArr = new ArrayList<LinkedHashMap>();
                     tmp.put(eventKey, irdArr);
 
                 } // Read IRRIGATION appliction data
@@ -587,38 +606,38 @@ public class DssatXFileInput extends DssatCommonInput {
                 } else {
                 }
 
-            } // Read ENVIRONMENT MODIFICATIONS Section
-            else if (flg[0].startsWith("environment")) {
-
-                // Read ENVIRONMENT MODIFICATIONS data
-                if (flg[2].equals("data")) {
-                    // Set variables' formats
-                    formats.clear();
-                    formats.put("em", 2);
-                    formats.put("emday", 6);
-                    formats.put("ecdyl", 2);
-                    formats.put("emdyl", 4);
-                    formats.put("ecrad", 2);
-                    formats.put("emrad", 4);
-                    formats.put("ecmax", 2);
-                    formats.put("emmax", 4);
-                    formats.put("ecmin", 2);
-                    formats.put("emmin", 4);
-                    formats.put("ecrai", 2);
-                    formats.put("emrai", 4);
-                    formats.put("ecco2", 2);
-                    formats.put("emco2", 4);
-                    formats.put("ecdew", 2);
-                    formats.put("emdew", 4);
-                    formats.put("ecwnd", 2);
-                    formats.put("emwnd", 4);
-                    formats.put("em_name", line.length());
-                    // Read line and save into return holder
-                    LinkedHashMap tmp = readLine(line, formats);
-                    translateDateStr(tmp, "emday");
-                    emArr.add(tmp);
-                } else {
-                }
+//            } // Read ENVIRONMENT MODIFICATIONS Section
+//            else if (flg[0].startsWith("environment")) {
+//
+//                // Read ENVIRONMENT MODIFICATIONS data
+//                if (flg[2].equals("data")) {
+//                    // Set variables' formats
+//                    formats.clear();
+//                    formats.put("em", 2);
+//                    formats.put("emday", 6);
+//                    formats.put("ecdyl", 2);
+//                    formats.put("emdyl", 4);
+//                    formats.put("ecrad", 2);
+//                    formats.put("emrad", 4);
+//                    formats.put("ecmax", 2);
+//                    formats.put("emmax", 4);
+//                    formats.put("ecmin", 2);
+//                    formats.put("emmin", 4);
+//                    formats.put("ecrai", 2);
+//                    formats.put("emrai", 4);
+//                    formats.put("ecco2", 2);
+//                    formats.put("emco2", 4);
+//                    formats.put("ecdew", 2);
+//                    formats.put("emdew", 4);
+//                    formats.put("ecwnd", 2);
+//                    formats.put("emwnd", 4);
+//                    formats.put("em_name", line.length());
+//                    // Read line and save into return holder
+//                    LinkedHashMap tmp = readLine(line, formats);
+//                    translateDateStr(tmp, "emday");
+//                    emArr.add(tmp);
+//                } else {
+//                }
 
             } // Read HARVEST DETAILS Section
             else if (flg[0].startsWith("harvest")) {
@@ -639,9 +658,9 @@ public class DssatXFileInput extends DssatCommonInput {
                     LinkedHashMap tmp = readLine(line, formats);
                     translateDateStr(tmp, "hdate");
                     haArr.add(tmp);
-                    if (haArr.size() == 1) {
-                        ret.put("hdate", tmp.get("hdate")); // TODO keep for early version
-                    }
+//                    if (haArr.size() == 1) {
+//                        metaData.put("hdate", tmp.get("hdate")); // TODO keep for early version
+//                    }
                 } else {
                 }
 
@@ -861,133 +880,255 @@ public class DssatXFileInput extends DssatCommonInput {
 
         // Get Observed data info
         LinkedHashMap obvAFile = obvReaderA.readFileWithoutCompress(brMap);
-        ArrayList obvAArr = getObjectOr(obvAFile, eventKey, new ArrayList());
+        ArrayList<LinkedHashMap> obvAArr = getObjectOr(obvAFile, eventKey, new ArrayList<LinkedHashMap>());
         LinkedHashMap obvTFile = obvReaderT.readFileWithoutCompress(brMap);
-        ArrayList obvTArr = getObjectOr(obvTFile, eventKey, new ArrayList());
+        ArrayList<LinkedHashMap> obvTArr = getObjectOr(obvTFile, eventKey, new ArrayList<LinkedHashMap>());
+
+        // Set meta data info for each treatment
+        ArrayList<LinkedHashMap> trMetaArr = new ArrayList<LinkedHashMap>();
+        LinkedHashMap trMetaData;
+        metaData.put("tr_meta", trMetaArr);
 
         // Combine all the sections data into the related treatment block
-        for (int i = 0; i < trArr.size(); i++) {
-            LinkedHashMap treatment = (LinkedHashMap) trArr.get(i);
+        String trno = null;
+        LinkedHashMap dssatSq = new LinkedHashMap();
+        dssatSq.put("data", sqArr);
+        metaData.put("dssat_sequence", dssatSq);
+        for (int i = 0, seqid = 1; i < sqArr.size(); i++, seqid++) {
+            sqData = (LinkedHashMap) sqArr.get(i);
+
+            trMetaData = new LinkedHashMap();
+            trMetaArr.add(trMetaData);
+
+            if (!sqData.get("trno").equals(trno)) {
+                trno = sqData.get("trno").toString();
+                trData = new LinkedHashMap();
+                evtArr = new ArrayList<LinkedHashMap>();
+                trArr.add(trData);
+                trData.put("events", evtArr);
+            }
+            sqData.put("seqid", seqid);
 
             // cultivar
-            if (!getObjectOr(treatment, "ge", "0").equals("0")) {
-                treatment.put("cultivar", getSectionData(cuArr, "ge", treatment.get("ge").toString()));
+            LinkedHashMap geTmp;
+            if (!getObjectOr(sqData, "ge", "0").equals("0")) {
+//                treatment.put("cultivar", getSectionData(cuArr, "ge", treatment.get("ge").toString()));
+                // TODO move some stuff into dssat_info block or planting event
+                trData.putAll((LinkedHashMap) getSectionData(cuArr, "ge", sqData.get("ge").toString()));
+                geTmp = (LinkedHashMap) getSectionData(cuArr, "ge", sqData.get("ge").toString());
+            } else {
+                geTmp = new LinkedHashMap();
             }
 
             // field
-            if (!getObjectOr(treatment, "fl", "0").equals("0")) {
-                treatment.put("field", getSectionData(flArr, "fl", treatment.get("fl").toString()));
-            }
-
-            // soil_analysis
-            if (!getObjectOr(treatment, "sa", "0").equals("0")) {
-                treatment.put("soil_analysis", getSectionData(saArr, "sa", treatment.get("sa").toString()));
+            if (!getObjectOr(sqData, "fl", "0").equals("0")) {
+                // TODO move some stuff into dssat_info block
+                trMetaData.putAll((LinkedHashMap) getSectionData(flArr, "fl", sqData.get("fl").toString()));
+                trMetaData.remove("fl");
             }
 
             // initial_condition
-            if (!getObjectOr(treatment, "ic", "0").equals("0")) {
-                treatment.put("initial_condition", getSectionData(icArr, "ic", treatment.get("ic").toString()));
+            if (!getObjectOr(sqData, "ic", "0").equals("0")) {
+                // TODO move out to top block
+                trData.put("initial_condition", getSectionData(icArr, "ic", sqData.get("ic").toString()));
             }
 
-            // plant
-            if (!getObjectOr(treatment, "pl", "0").equals("0")) {
-                treatment.put("plant", getSectionData(plArr, "pl", treatment.get("pl").toString()));
+            // planting
+            if (!getObjectOr(sqData, "pl", "0").equals("0")) {
+                LinkedHashMap plTmp = CopyList((LinkedHashMap) getSectionData(plArr, "pl", sqData.get("pl").toString()), "pdate", "planting", i+1);
+                if (geTmp.containsKey("cul_name"))
+                plTmp.put("cul_name", geTmp.get("cul_name"));
+
+                evtArr.add(plTmp);
             }
 
-            // irrigation
-            if (!getObjectOr(treatment, "ir", "0").equals("0")) {
-                treatment.put("irrigation", getSectionData(irArr, "ir", treatment.get("ir").toString()));
-            }
-
-            // fertilizer
-            if (!getObjectOr(treatment, "fe", "0").equals("0")) {
-                treatment.put("fertilizer", getSectionData(feArr, "fe", treatment.get("fe").toString()));
-            }
-
-            // residue_organic
-            if (!getObjectOr(treatment, "om", "0").equals("0")) {
-                treatment.put("residue_organic", getSectionData(omArr, "om", treatment.get("om").toString()));
-            }
-
-            // chemical
-            if (!getObjectOr(treatment, "ch", "0").equals("0")) {
-                treatment.put("chemical", getSectionData(chArr, "ch", treatment.get("ch").toString()));
-            }
-
-            // tillage
-            if (!getObjectOr(treatment, "ti", "0").equals("0")) {
-                treatment.put("tillage", getSectionData(tiArr, "ti", treatment.get("ti").toString()));
-            }
-
-            // emvironment
-            if (!getObjectOr(treatment, "em", "0").equals("0")) {
-                treatment.put("emvironment", getSectionData(emArr, "em", treatment.get("em").toString()));
-            }
-
-            // harvest
-            if (!getObjectOr(treatment, "ha", "0").equals("0")) {
-                treatment.put("harvest", getSectionData(haArr, "ha", treatment.get("ha").toString()));
-            }
-
-            // simulation
-            if (!getObjectOr(treatment, "sm", "0").equals("0")) {
-                treatment.put("simulation", getSectionData(smArr, "sm", treatment.get("sm").toString()));
-            }
-
-            // observed data (summary)
-            LinkedHashMap obv = new LinkedHashMap();
-            treatment.put("observed", obv);
-            if (!getObjectOr(treatment, "trno", "0").equals("0")) {
-                obv.put("summary", getSectionData(obvAArr, "trno_a", treatment.get("trno").toString()));
-            }
-
-            // observed data (time-series)
-            if (!getObjectOr(treatment, "trno", "0").equals("0")) {
-                obv.put("time_series", getSectionData(obvTArr, "trno_t", treatment.get("trno").toString()));
-            }
-
-
-            // Revise the date value for FEDATE, IDATE, MLADAT
-            // Get Planting date
-            String pdate = "";
-            ArrayList plTmps = (ArrayList) getObjectOr(treatment, "planting", new ArrayList());
-            if (!plTmps.isEmpty()) {
-                pdate = getObjectOr((LinkedHashMap) plTmps.get(0), "pdate", "");
-                if (pdate.length() > 5) {
-                    pdate = pdate.substring(2);
-                }
-            }
-
-            // Date adjust based on realted treatment info (handling for DOY type value)
-            // Fertilizer Date
-            ArrayList feTmps = (ArrayList) getObjectOr(treatment, "fertilizer", new ArrayList());
-            LinkedHashMap feTmp;
-            for (int j = 0; j < feTmps.size(); j++) {
-                feTmp = (LinkedHashMap) feTmps.get(j);
-                translateDateStrForDOY(feTmp, "fdate", pdate);
-            }
-
-            // Irrigation date
-            LinkedHashMap irTmp = (LinkedHashMap) treatment.get("irrigation");
-            if (irTmp != null) {
-                ArrayList irTmpSubs = getObjectOr(irTmp, "data", new ArrayList());
-                for (int j = 0; j < irTmpSubs.size(); j++) {
-                    LinkedHashMap irTmpSub = (LinkedHashMap) irTmpSubs.get(j);
-                    translateDateStrForDOY(irTmpSub, "idate", pdate);
-                }
-            }
-
-            // Mulch application date
-            ArrayList omTmps = (ArrayList) getObjectOr(treatment, "residue_organic", new ArrayList());
-            LinkedHashMap omTmp;
-            for (int j = 0; j < omTmps.size(); j++) {
-                omTmp = (LinkedHashMap) omTmps.get(j);
-                translateDateStrForDOY(omTmp, "omdat", pdate);
-            }
+//            // irrigation
+//            if (!getObjectOr(sqData, "ir", "0").equals("0")) {
+//                sqData.put("irrigation", getSectionData(irArr, "ir", sqData.get("ir").toString()));
+//            }
+//
+//            // fertilizer
+//            if (!getObjectOr(sqData, "fe", "0").equals("0")) {
+//                sqData.put("fertilizer", getSectionData(feArr, "fe", sqData.get("fe").toString()));
+//            }
+//
+//            // residue_organic
+//            if (!getObjectOr(sqData, "om", "0").equals("0")) {
+//                sqData.put("residue_organic", getSectionData(omArr, "om", sqData.get("om").toString()));
+//            }
+//
+//            // chemical
+//            if (!getObjectOr(sqData, "ch", "0").equals("0")) {
+//                sqData.put("chemical", getSectionData(chArr, "ch", sqData.get("ch").toString()));
+//            }
+//
+//            // tillage
+//            if (!getObjectOr(sqData, "ti", "0").equals("0")) {
+//                sqData.put("tillage", getSectionData(tiArr, "ti", sqData.get("ti").toString()));
+//            }
+//
+//            // emvironment
+////            if (!getObjectOr(treatment, "em", "0").equals("0")) {
+////                treatment.put("emvironment", getSectionData(emArr, "em", treatment.get("em").toString()));
+////            }
+//
+//            // harvest
+//            if (!getObjectOr(sqData, "ha", "0").equals("0")) {
+//                sqData.putAll((LinkedHashMap) getSectionData(haArr, "ha", sqData.get("ha").toString()));
+//            }
+//
+//            // simulation
+//            if (!getObjectOr(sqData, "sm", "0").equals("0")) {
+//                sqData.put("simulation", getSectionData(smArr, "sm", sqData.get("sm").toString()));
+//            }
+//
+//            // soil_analysis
+//            if (!getObjectOr(sqData, "sa", "0").equals("0")) {
+//                LinkedHashMap saTmp = (LinkedHashMap) getSectionData(saArr, "sa", sqData.get("sa").toString());
+//                ArrayList<LinkedHashMap> saSubArr = (ArrayList) saTmp.get("data");
+//
+//                // Add SADAT into soil block
+////                // If there is soil data come with experiment data
+////                if (!ret.containsKey("soil")) {
+////                    if (saTmp.containsKey("sadat")) {
+////                        treatment.put("sadat", saTmp.get("sadat"));
+////                    }
+////                }
+////                // If there is no soil data, create dummy soil section
+////                else {
+////                    // TODO create dummy soil block to hold SADAT
+////                    LinkedHashMap soilData = new LinkedHashMap();
+////                    ArrayList<LinkedHashMap> soilDataArr = new ArrayList<LinkedHashMap>();
+////                    soilData.put("sadat", saTmp.get("sadat"));
+////                    
+////                    
+////                    LinkedHashMap soilTmp = (LinkedHashMap) treatment.get("soil");
+////                    if (saTmp.containsKey("sadat")) {
+////                        soilTmp.put("sadat", saTmp.get("sadat"));
+////                    }
+////                }
+//
+//                if (saTmp.containsKey("sadat")) {
+//                    sqData.put("sadat", saTmp.get("sadat"));
+//                }
+//
+//
+//
+//                // Add SASC into initial condition block
+//                if (!sqData.containsKey("initial_condition")) {
+//                    // TODO add a dummy ic block to hold SASC
+//                } else {
+//                    LinkedHashMap icTmp = (LinkedHashMap) sqData.get("initial_condition");
+//                    ArrayList<LinkedHashMap> icSubArr = (ArrayList) icTmp.get("data");
+//                    ArrayList<LinkedHashMap> icSubArrNew = new ArrayList<LinkedHashMap>();
+//                    ArrayList<String> sablArr = getLayerNumArray(saSubArr, "sabl");
+//                    ArrayList<String> icblArr = getLayerNumArray(icSubArr, "icbl");
+//
+//                    int cnt = 0;
+//                    for (int j = 0; j < sablArr.size(); j++) {
+//                        LinkedHashMap tmp;
+//                        String sabl = sablArr.get(j);
+//                        String icbl = "";
+//                        String sasc = getValueOr((LinkedHashMap) saSubArr.get(j), "sasc", "");
+//
+//                        for (int k = cnt; k < icblArr.size(); k++, cnt++) {
+//                            icbl = icblArr.get(k);
+//                            if (Double.parseDouble(icbl) == Double.parseDouble(sabl)) {
+//                                tmp = (LinkedHashMap) getSectionData(icSubArr, "icbl", icbl);
+//                                icSubArrNew.add(tmp);
+//                                tmp.put("sasc", sasc);
+//                                break;
+//                            } else if (Double.parseDouble(icbl) > Double.parseDouble(sabl)) {
+//                                tmp = CopyList((LinkedHashMap) getSectionData(icSubArr, "icbl", icbl));
+//                                tmp.put("icbl", sabl);
+//                                icSubArrNew.add(tmp);
+//                                tmp.put("sasc", sasc);
+//                                break;
+//                            } else if (!sablArr.contains(icbl)) {
+//                                tmp = (LinkedHashMap) getSectionData(icSubArr, "icbl", icbl);
+//                                icSubArrNew.add(tmp);
+//                                tmp.put("sasc", sasc);
+//                            }
+//                        }
+//                    }
+//
+//                    for (int j = cnt; j < icblArr.size(); j++) {
+//                        icSubArrNew.add((LinkedHashMap) getSectionData(icSubArr, "icbl", icblArr.get(j)));
+//                    }
+//
+//                    String sasc = null;
+//                    for (int j = icSubArrNew.size() - 1; j > 0; j--) {
+//                        if (icSubArrNew.get(j).containsKey("sasc")) {
+//                            sasc = (String) icSubArrNew.get(j).get("sasc");
+//                        } else {
+//                            if (sasc == null) {
+//                                for (int k = icSubArrNew.size() - 1; k > 0; k--) {
+//                                    if (icSubArrNew.get(k).get("sasc") != null) {
+//                                        sasc = (String) icSubArrNew.get(k).get("sasc");
+//                                        break;
+//                                    }
+//                                }
+//                            }
+//                            icSubArrNew.get(j).put("sasc", sasc);
+//
+//                        }
+//                    }
+//                    icTmp.put("data", icSubArrNew);
+//                }
+//            }
+//
+//            // observed data (summary)
+//            LinkedHashMap obv = new LinkedHashMap();
+//            sqData.put("observed", obv);
+//            if (!getObjectOr(sqData, "trno", "0").equals("0")) {
+//                obv.put("summary", getSectionData(obvAArr, "trno_a", sqData.get("trno").toString()));
+//            }
+//
+//            // observed data (time-series)
+//            if (!getObjectOr(sqData, "trno", "0").equals("0")) {
+//                obv.put("time_series", getSectionData(obvTArr, "trno_t", sqData.get("trno").toString()));
+//            }
+//
+//            // Revise the date value for FEDATE, IDATE, MLADAT
+//            // Get Planting date
+//            String pdate = "";
+//            ArrayList<LinkedHashMap> plTmps = (ArrayList) getObjectOr(sqData, "planting", new ArrayList());
+//            if (!plTmps.isEmpty()) {
+//                pdate = getObjectOr(plTmps.get(0), "pdate", "");
+//                if (pdate.length() > 5) {
+//                    pdate = pdate.substring(2);
+//                }
+//            }
+//
+//            // Date adjust based on realted treatment info (handling for DOY type value)
+//            // Fertilizer Date
+//            ArrayList<LinkedHashMap> feTmps = (ArrayList) getObjectOr(sqData, "fertilizer", new ArrayList());
+//            LinkedHashMap feTmp;
+//            for (int j = 0; j < feTmps.size(); j++) {
+//                feTmp = (LinkedHashMap) feTmps.get(j);
+//                translateDateStrForDOY(feTmp, "fdate", pdate);
+//            }
+//
+//            // Irrigation date
+//            LinkedHashMap irTmp = (LinkedHashMap) sqData.get("irrigation");
+//            if (irTmp != null) {
+//                ArrayList<LinkedHashMap> irTmpSubs = getObjectOr(irTmp, "data", new ArrayList());
+//                for (int j = 0; j < irTmpSubs.size(); j++) {
+//                    LinkedHashMap irTmpSub = irTmpSubs.get(j);
+//                    translateDateStrForDOY(irTmpSub, "idate", pdate);
+//                }
+//            }
+//
+//            // Mulch application date
+//            ArrayList<LinkedHashMap> omTmps = (ArrayList) getObjectOr(sqData, "residue_organic", new ArrayList());
+//            LinkedHashMap omTmp;
+//            for (int j = 0; j < omTmps.size(); j++) {
+//                omTmp = omTmps.get(j);
+//                translateDateStrForDOY(omTmp, "omdat", pdate);
+//            }
 
         }
 
-        compressData(trArr);
         // Remove relational index
         ArrayList idNames = new ArrayList();
         idNames.add("ge");
@@ -1007,17 +1148,17 @@ public class DssatXFileInput extends DssatCommonInput {
         idNames.add("trno_a");
         idNames.add("trno_t");
         removeIndex(trArr, idNames);
-        ret.put("management", trArr);
-        if (!getObjectOr(obvAFile, "local_name", "").equals(getObjectOr(ret, "local_name", ""))) {
-            
-            ret.put("local_name_a", obvAFile.get("local_name"));
-        }
-        if (!getObjectOr(obvTFile, "local_name", "").equals(getObjectOr(ret, "local_name", ""))) {
-            ret.put("local_name_t", obvTFile.get("local_name"));
-        }
-//        compressData(ret);
 
-        return ret;
+        // TODO
+//        if (!getObjectOr(obvAFile, "local_name", "").equals(getObjectOr(ret, "local_name", ""))) {
+//
+//            ret.put("local_name_a", obvAFile.get("local_name"));
+//        }
+//        if (!getObjectOr(obvTFile, "local_name", "").equals(getObjectOr(ret, "local_name", ""))) {
+//            ret.put("local_name_t", obvTFile.get("local_name"));
+//        }
+
+        return trArr;
     }
 
     /**
@@ -1051,6 +1192,7 @@ public class DssatXFileInput extends DssatCommonInput {
         singleSubRecSecList.add("ge");
         singleSubRecSecList.add("fl");
         singleSubRecSecList.add("pl");
+        singleSubRecSecList.add("ha");
         singleSubRecSecList.add("sm");
         singleSubRecSecList.add("trno_a");
 
@@ -1076,10 +1218,17 @@ public class DssatXFileInput extends DssatCommonInput {
             }
             return ret;
 
+        } else if (key.equals("icbl")) {
+            for (int i = 0; i < secArr.size(); i++) {
+                LinkedHashMap m = (LinkedHashMap) secArr.get(i);
+                if (value.equals(m.get(key))) {
+                    return m;
+                }
+            }
         } else {
             LinkedHashMap fstNode = (LinkedHashMap) secArr.get(0);
             // If it contains multiple sub array of data, or it does not have multiple sub records
-            if (fstNode.containsKey("data") || singleSubRecSecList.contains(key)) {
+            if (fstNode.containsKey(eventKey) || fstNode.containsKey(icEventKey) || singleSubRecSecList.contains(key)) {
                 for (int i = 0; i < secArr.size(); i++) {
                     if (value.equals(((LinkedHashMap) secArr.get(i)).get(key))) {
                         return CopyList((LinkedHashMap) secArr.get(i));
@@ -1140,5 +1289,37 @@ public class DssatXFileInput extends DssatCommonInput {
                 m.remove(key);
             }
         }
+    }
+
+    private ArrayList<String> getLayerNumArray(ArrayList<LinkedHashMap> arr, String key) {
+
+        ArrayList<String> ret = new ArrayList();
+        for (int i = 0; i < arr.size(); i++) {
+            ret.add((String) (arr.get(i).get(key)));
+        }
+        return ret;
+    }
+
+    /**
+     * Get a copy of input map
+     *
+     * @param m input map
+     * @return the copy of whole input map
+     */
+    private static LinkedHashMap CopyList(LinkedHashMap m, String dateId, String eventName, int seqId) {
+
+        LinkedHashMap<String, String> ret = new LinkedHashMap();
+//        LinkedHashMap ret = new LinkedHashMap();
+        if (m.containsKey(dateId)) {
+            ret.put("date", m.get(dateId).toString());
+        }
+        ret.put("event", eventName);
+        ret.putAll(CopyList(m));
+        if (ret.containsKey(dateId)) {
+            ret.remove(dateId);
+        }
+        ret.put("seqid", seqId + "");
+
+        return ret;
     }
 }

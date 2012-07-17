@@ -26,32 +26,46 @@ public class DssatWeatherInput extends DssatCommonInput {
     }
 
     /**
-     * DSSAT Weather Data input method for Controller using
+     * DSSAT Weather Data input method for only inputing weather file
      * 
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
      */
     @Override
     protected LinkedHashMap readFile(HashMap brMap) throws IOException {
-
         LinkedHashMap ret = new LinkedHashMap();
-        ArrayList files = new ArrayList();
-        ArrayList daily = new ArrayList();
+        ArrayList<LinkedHashMap> files = readDailyData(brMap, ret);
+//        compressData(files);
+        ret.put(jsonKey, files);
+        return ret;
+    }
+
+    /**
+     * DSSAT Weather Data input method for Controller using (return value will not be compressed)
+     * 
+     * @param brMap  The holder for BufferReader objects for all files
+     * @return result data holder object
+     */
+    protected ArrayList<LinkedHashMap> readDailyData(HashMap brMap, LinkedHashMap ret) throws IOException {
+
+        ArrayList<LinkedHashMap> files = new ArrayList();
+        ArrayList<LinkedHashMap> daily = new ArrayList();
         ArrayList titles = new ArrayList();
-        LinkedHashMap file;
+        LinkedHashMap fileTmp = null;
+        LinkedHashMap file = null;
         String line;
         BufferedReader brW = null;
         Object buf;
         LinkedHashMap mapW;
         LinkedHashMap formats = new LinkedHashMap();
-        String dailyKey = "data";  // P.S. the key name might change
+        String dailyKey = "dailyWeather";  // P.S. the key name might change
 
         mapW = (LinkedHashMap) brMap.get("W");
 
         // If Weather File is no been found
         if (mapW.isEmpty()) {
             // TODO reprot file not exist error
-            return ret;
+            return files;
         }
 
         for (Object key : mapW.keySet()) {
@@ -62,10 +76,9 @@ public class DssatWeatherInput extends DssatCommonInput {
             } else {
                 brW = (BufferedReader) buf;
             }
-            file = new LinkedHashMap();
+            fileTmp = new LinkedHashMap();
             daily = new ArrayList();
             titles = new ArrayList();
-            files.add(file);
 
             while ((line = brW.readLine()) != null) {
 
@@ -76,7 +89,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                 if (flg[0].equals("weather") && flg[1].equals("") && flg[2].equals("data")) {
 
                     // header info
-                    file.put("wst_name", line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*[Dd][Aa][Tt][Aa]\\s*:?", "").trim());
+                    fileTmp.put("wst_name", line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*[Dd][Aa][Tt][Aa]\\s*:?", "").trim());
 
                 } // Read Weather Data
                 else if (flg[2].equals("data")) {
@@ -95,7 +108,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                         formats.put("refht", 6);
                         formats.put("wndht", 6);
                         // Read line and save into return holder
-                        file.putAll(readLine(line, formats));
+                        fileTmp.putAll(readLine(line, formats));
 
                     } // Weather daily data
                     else if (flg[1].startsWith("date ")) {
@@ -135,15 +148,22 @@ public class DssatWeatherInput extends DssatCommonInput {
                 } else {
                 }
             }
-            
-            file.put(dailyKey, daily);
+
+            if (file == null || !file.get("wst_id").equals(fileTmp.get("wst_id"))) {
+                file = fileTmp;
+                fileTmp.put(dailyKey, daily);
+                files.add(file);
+            } else {
+                ArrayList tmpArr = (ArrayList)file.get(dailyKey);
+                for (int i = 0; i < daily.size(); i++) {
+                    tmpArr.add(daily.get(i));
+                }
+            }
         }
 
-        compressData(files);
-        ret.put(jsonKey, files);
         brW.close();
 
-        return ret;
+        return files;
     }
 
     /**
