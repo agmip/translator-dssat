@@ -35,12 +35,12 @@ public class DssatXFileTest {
         result = obDssatXFileInput.readFile(filePath);
         System.out.println(JSONAdapter.toJSON(result));
 
-        obDssatXFileOutput.writeFile("", result);
-        File file = obDssatXFileOutput.getOutputFile();
-        if (file != null) {
-            assertTrue(file.exists());
-            assertTrue(file.getName().equals("UFGA7801.SBX"));
-            assertTrue(file.delete());
-        }
+//        obDssatXFileOutput.writeFile("", result);
+//        File file = obDssatXFileOutput.getOutputFile();
+//        if (file != null) {
+//            assertTrue(file.exists());
+//            assertTrue(file.getName().equals("UFGA7801.SBX"));
+//            assertTrue(file.delete());
+//        }
     }
 }

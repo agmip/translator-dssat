@@ -35,15 +35,15 @@ public class DssatWeatherTest {
         result = obDssatWeatherInput.readFile(filePath);
         System.out.println(JSONAdapter.toJSON(result));
         
-        obDssatWeatherOutput.writeFile("", result);
-        File[] files = obDssatWeatherOutput.getOutputFiles();
-        if (files != null) {
-            for (int i = 0; i < files.length; i++) {
-                assertTrue(files[i].exists());
-                assertTrue(files[i].delete());
-            }
-            assertTrue(files[0].getName().equals("UFGA7801.WTH"));
-            assertTrue(files[1].getName().equals("UFGA7901.WTH"));
-        }
+//        obDssatWeatherOutput.writeFile("", result);
+//        File[] files = obDssatWeatherOutput.getOutputFiles();
+//        if (files != null) {
+//            for (int i = 0; i < files.length; i++) {
+//                assertTrue(files[i].exists());
+//                assertTrue(files[i].delete());
+//            }
+//            assertTrue(files[0].getName().equals("UFGA7801.WTH"));
+//            assertTrue(files[1].getName().equals("UFGA7901.WTH"));
+//        }
     }
 }

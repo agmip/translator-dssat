@@ -38,13 +38,13 @@ public class DssatSoilTest {
         resultX = obDssatXFileInput.readFile(filePath);
         System.out.println(JSONAdapter.toJSON(result));
 
-        result.putAll(resultX);
-        obDssatSoilOutput.writeFile("", result);
-        File file = obDssatSoilOutput.getOutputFile();
-        if (file != null) {
-            assertTrue(file.exists());
-            assertTrue(file.getName().equals("UFGA7801_SBX.SOL"));
-            assertTrue(file.delete());
-        }
+//        result.putAll(resultX);
+//        obDssatSoilOutput.writeFile("", result);
+//        File file = obDssatSoilOutput.getOutputFile();
+//        if (file != null) {
+//            assertTrue(file.exists());
+//            assertTrue(file.getName().equals("UFGA7801_SBX.SOL"));
+//            assertTrue(file.delete());
+//        }
     }
 }
