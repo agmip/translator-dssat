@@ -15,6 +15,8 @@ import java.util.LinkedHashMap;
  */
 public class DssatSoilInput extends DssatCommonInput {
 
+    public String layerKey = "soilLayer";  // TODO the key name might change
+
     /**
      * Constructor with no parameters
      * Set jsonKey as "soil"
@@ -58,7 +60,6 @@ public class DssatSoilInput extends DssatCommonInput {
         Object buf;
         LinkedHashMap mapS;
         LinkedHashMap formats = new LinkedHashMap();
-        String layerKey = "soilLayer";  // TODO the key name might change
 
         mapS = (LinkedHashMap) brMap.get("S");
 

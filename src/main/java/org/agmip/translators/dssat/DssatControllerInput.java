@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import static org.agmip.util.MapUtil.*;
+import static org.agmip.translators.dssat.DssatCommonInput.*;
 
 /**
  *
@@ -45,10 +46,10 @@ public class DssatControllerInput {
         LinkedHashMap wthData;
 
         // Get buffered input file holder
-        brMap = DssatCommonInput.getBufferReader(arg0);
+        brMap = getBufferReader(arg0);
 
         // Set Data source and version info
-        DssatCommonInput.setDataVersionInfo(metaData);
+        setDataVersionInfo(metaData);
 
         // Try to read XFile (treatment; management)
         mgnArr = mgnReader.readTreatments(brMap, metaData);
@@ -65,12 +66,12 @@ public class DssatControllerInput {
         // TODO
 
         // Get meta data for per treatment
-        trMetaArr = DssatCommonInput.CopyList((ArrayList<LinkedHashMap>) metaData.get("tr_meta"));
+        trMetaArr = CopyList((ArrayList<LinkedHashMap>) metaData.get("tr_meta"));
         metaData.remove("tr_meta");
         // Combine the each part of data
         for (int i = 0; i < mgnArr.size(); i++) {
             // Set meta data for all treatment
-            expData = DssatCommonInput.CopyList(metaData);
+            expData = CopyList(metaData);
             // Set meta data per treatment
             trMetaData = trMetaArr.get(i);
             expData.putAll(trMetaData);
@@ -83,7 +84,27 @@ public class DssatControllerInput {
 
             // Set weather data for this treatment
             if (!getObjectOr(trMetaData, "soil_id", "0").equals("0")) {
-                expData.put(soilReader.jsonKey, getSectionData(soilArr, "soil_id", trMetaData.get("soil_id").toString()));
+                soilData = getSectionData(soilArr, "soil_id", trMetaData.get("soil_id").toString());
+                // if there is soil analysis data, create new soil block by using soil analysis info
+                if (expData.containsKey("soil_analysis")) {
+                    soilData = CopyList(soilData);
+                    LinkedHashMap saTmp = (LinkedHashMap) expData.remove("soil_analysis");
+
+                    // Update soil site data
+                    copyItem(soilData, saTmp, "sadat");
+                    copyItem(soilData, saTmp, "smhb");
+                    copyItem(soilData, saTmp, "smpx");
+                    copyItem(soilData, saTmp, "smke");
+                    soilData.put("soil_id", "AG" + getValueOr(soilData, "soil_id", "AG").substring(2));    // TODO create new soil_id
+
+                    // Update soil layer data
+                    ArrayList<LinkedHashMap> soilLyrs = (ArrayList) soilData.get(soilReader.layerKey);
+                    ArrayList<LinkedHashMap> saLyrs = (ArrayList) saTmp.get("data");
+                    String[] copyKeys = {"slbdm", "sloc", "slni", "slphw", "slphb", "slpx", "slke"};
+                    soilData.put(soilReader.layerKey, combinLayers(soilLyrs, saLyrs, "sllb", "sabl", copyKeys));
+                }
+
+                expData.put(soilReader.jsonKey, soilData);
             }
 
             // Set management data for this treatment
@@ -130,33 +151,16 @@ public class DssatControllerInput {
         return expArr;
     }
 
-    /**
-     * Get the section data by given index value and key
-     * 
-     * @param secArr    Section data array
-     * @param key       index variable name
-     * @param value     index variable value
-     */
-    private LinkedHashMap getSectionData(ArrayList secArr, Object key, String value) {
-
-        LinkedHashMap ret = null;
-        // Get First data node
-        if (secArr.isEmpty() || value == null) {
-            return ret;
-        }
-        for (int i = 0; i < secArr.size(); i++) {
-            if (value.equals(((LinkedHashMap) secArr.get(i)).get(key))) {
-                return DssatCommonInput.CopyList((LinkedHashMap) secArr.get(i));
-            }
-        }
-
-        return ret;
-    }
-
     private void cutDataBlock(LinkedHashMap from, LinkedHashMap to, String key) {
         if (from.containsKey(key)) {
-            to.put(key, DssatCommonInput.CopyList((LinkedHashMap) from.get(key)));
+            to.put(key, CopyList((LinkedHashMap) from.get(key)));
             from.remove(key);
+        }
+    }
+
+    private void copyItem(LinkedHashMap to, LinkedHashMap from, String key) {
+        if (from.get(key) != null) {
+            to.put(key, from.get(key));
         }
     }
 }

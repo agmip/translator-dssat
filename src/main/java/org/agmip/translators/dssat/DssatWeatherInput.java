@@ -15,6 +15,8 @@ import java.util.LinkedHashMap;
  */
 public class DssatWeatherInput extends DssatCommonInput {
 
+    public String dailyKey = "dailyWeather";  // P.S. the key name might change
+
     /**
      * Constructor with no parameters
      * Set jsonKey as "weather"
@@ -58,7 +60,6 @@ public class DssatWeatherInput extends DssatCommonInput {
         Object buf;
         LinkedHashMap mapW;
         LinkedHashMap formats = new LinkedHashMap();
-        String dailyKey = "dailyWeather";  // P.S. the key name might change
 
         mapW = (LinkedHashMap) brMap.get("W");
 
@@ -154,7 +155,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                 fileTmp.put(dailyKey, daily);
                 files.add(file);
             } else {
-                ArrayList tmpArr = (ArrayList)file.get(dailyKey);
+                ArrayList tmpArr = (ArrayList) file.get(dailyKey);
                 for (int i = 0; i < daily.size(); i++) {
                     tmpArr.add(daily.get(i));
                 }
