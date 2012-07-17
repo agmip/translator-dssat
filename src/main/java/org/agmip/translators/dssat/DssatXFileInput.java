@@ -891,9 +891,8 @@ public class DssatXFileInput extends DssatCommonInput {
 
         // Combine all the sections data into the related treatment block
         String trno = null;
-        LinkedHashMap dssatSq = new LinkedHashMap();
-        dssatSq.put("data", sqArr);
-        metaData.put("dssat_sequence", dssatSq);
+        LinkedHashMap dssatSq;
+        ArrayList<LinkedHashMap> sqArrNew = new ArrayList<LinkedHashMap>();
         for (int i = 0, seqid = 1; i < sqArr.size(); i++, seqid++) {
             sqData = (LinkedHashMap) sqArr.get(i);
 
@@ -906,8 +905,18 @@ public class DssatXFileInput extends DssatCommonInput {
                 evtArr = new ArrayList<LinkedHashMap>();
                 trArr.add(trData);
                 trData.put("events", evtArr);
+                
+                dssatSq = new LinkedHashMap();
+                sqArrNew = new ArrayList<LinkedHashMap>();
+                dssatSq.put("data", sqArrNew);
+                trData.put("dssat_sequence", dssatSq);
+                trMetaData.put("tr_name", sqData.get("tr_name"));
+                seqid = 1;
+            } else {
+                trMetaData.remove("tr_name");
             }
-            sqData.put("seqid", seqid);
+            sqData.put("seqid", seqid + "");
+            sqArrNew.add(CopyList(sqData));
 
             // cultivar
             LinkedHashMap geTmp;
@@ -935,7 +944,7 @@ public class DssatXFileInput extends DssatCommonInput {
 
             // planting
             if (!getObjectOr(sqData, "pl", "0").equals("0")) {
-                LinkedHashMap plTmp = CopyList((LinkedHashMap) getSectionData(plArr, "pl", sqData.get("pl").toString()), "pdate", "planting", i+1);
+                LinkedHashMap plTmp = CopyList((LinkedHashMap) getSectionData(plArr, "pl", sqData.get("pl").toString()), "pdate", "planting", seqid);
                 if (geTmp.containsKey("cul_name"))
                 plTmp.put("cul_name", geTmp.get("cul_name"));
 
