@@ -18,7 +18,7 @@ public class DssatXFileInput extends DssatCommonInput {
 
     private String eventKey = "data";
     private String icEventKey = "soilLayer";
-    
+
     /**
      * Constructor with no parameters
      * Set jsonKey as "experiment"
@@ -892,6 +892,7 @@ public class DssatXFileInput extends DssatCommonInput {
         // Combine all the sections data into the related treatment block
         String trno = null;
         LinkedHashMap dssatSq;
+        LinkedHashMap dssatInfo = new LinkedHashMap();
         ArrayList<LinkedHashMap> sqArrNew = new ArrayList<LinkedHashMap>();
         for (int i = 0, seqid = 1; i < sqArr.size(); i++, seqid++) {
             sqData = (LinkedHashMap) sqArr.get(i);
@@ -905,28 +906,29 @@ public class DssatXFileInput extends DssatCommonInput {
                 evtArr = new ArrayList<LinkedHashMap>();
                 trArr.add(trData);
                 trData.put("events", evtArr);
-                
+
                 dssatSq = new LinkedHashMap();
                 sqArrNew = new ArrayList<LinkedHashMap>();
+                dssatInfo = new LinkedHashMap();
                 dssatSq.put("data", sqArrNew);
                 trData.put("dssat_sequence", dssatSq);
+//                trData.put("dssat_info", dssatInfo);
                 trMetaData.put("tr_name", sqData.get("tr_name"));
                 seqid = 1;
             } else {
                 trMetaData.remove("tr_name");
             }
             sqData.put("seqid", seqid + "");
-            sqArrNew.add(CopyList(sqData));
+            sqArrNew.add(sqData);
 
             // cultivar
-            LinkedHashMap geTmp;
+            String cul_name = null;
             if (!getObjectOr(sqData, "ge", "0").equals("0")) {
 //                treatment.put("cultivar", getSectionData(cuArr, "ge", treatment.get("ge").toString()));
                 // TODO move some stuff into dssat_info block or planting event
-                trData.putAll((LinkedHashMap) getSectionData(cuArr, "ge", sqData.get("ge").toString()));
-                geTmp = (LinkedHashMap) getSectionData(cuArr, "ge", sqData.get("ge").toString());
-            } else {
-                geTmp = new LinkedHashMap();
+                sqData.putAll((LinkedHashMap) getSectionData(cuArr, "ge", sqData.get("ge").toString()));
+                sqData.remove("cul_name");
+                cul_name = (String) ((LinkedHashMap) getSectionData(cuArr, "ge", sqData.get("ge").toString())).get("cul_name");
             }
 
             // field
@@ -943,19 +945,36 @@ public class DssatXFileInput extends DssatCommonInput {
             }
 
             // planting
+            String pdate = "";
             if (!getObjectOr(sqData, "pl", "0").equals("0")) {
-                LinkedHashMap plTmp = CopyList((LinkedHashMap) getSectionData(plArr, "pl", sqData.get("pl").toString()), "pdate", "planting", seqid);
-                if (geTmp.containsKey("cul_name"))
-                plTmp.put("cul_name", geTmp.get("cul_name"));
-
-                evtArr.add(plTmp);
+                // add event data into array
+                addEvent(evtArr, (LinkedHashMap) getSectionData(plArr, "pl", sqData.get("pl").toString()), "pdate", "planting", seqid);
+                
+                // Get planting date for DOY value handling
+                if (cul_name != null) {
+                    evtArr.get(evtArr.size() - 1).put("cul_name", cul_name);
+                }
+                pdate = getValueOr(evtArr.get(evtArr.size() - 1), "pdate", "");
+                if (pdate.length() > 5) {
+                    pdate = pdate.substring(2);
+                }
             }
 
-//            // irrigation
-//            if (!getObjectOr(sqData, "ir", "0").equals("0")) {
+            // irrigation
+            if (!getObjectOr(sqData, "ir", "0").equals("0")) {
+                // Date adjust based on realted treatment info (handling for DOY type value)
+                LinkedHashMap irTmp = (LinkedHashMap) getSectionData(irArr, "ir", sqData.get("ir").toString());
+                ArrayList<LinkedHashMap> irTmpSubs = getObjectOr(irTmp, "data", new ArrayList());
+                for (int j = 0; j < irTmpSubs.size(); j++) {
+                    LinkedHashMap irTmpSub = irTmpSubs.get(j);
+                    translateDateStrForDOY(irTmpSub, "idate", pdate);
+                }
+
+                // add event data into array
+                addEvent(evtArr, irTmp, "idate", "irrigation", seqid);
 //                sqData.put("irrigation", getSectionData(irArr, "ir", sqData.get("ir").toString()));
-//            }
-//
+            }
+
 //            // fertilizer
 //            if (!getObjectOr(sqData, "fe", "0").equals("0")) {
 //                sqData.put("fertilizer", getSectionData(feArr, "fe", sqData.get("fe").toString()));
@@ -1310,25 +1329,43 @@ public class DssatXFileInput extends DssatCommonInput {
     }
 
     /**
-     * Get a copy of input map
+     * Add event data into event array from input data holder (map)
      *
-     * @param m input map
-     * @return the copy of whole input map
+     * @param events    event array
+     * @param mCopy     input map
+     * @param dateId    the key name of event date variable
+     * @param eventName the event name
+     * @param seqId     the sequence id for DSSAT
      */
-    private static LinkedHashMap CopyList(LinkedHashMap m, String dateId, String eventName, int seqId) {
+    private void addEvent(ArrayList events, LinkedHashMap m, String dateId, String eventName, int seqId) {
 
-        LinkedHashMap<String, String> ret = new LinkedHashMap();
-//        LinkedHashMap ret = new LinkedHashMap();
-        if (m.containsKey(dateId)) {
-            ret.put("date", m.get(dateId).toString());
+        LinkedHashMap<String, String> ret = new LinkedHashMap<String, String>();
+        LinkedHashMap mCopy = CopyList(m);
+        if (mCopy.containsKey(dateId)) {
+            ret.put("date", mCopy.remove(dateId).toString());
         }
         ret.put("event", eventName);
-        ret.putAll(CopyList(m));
-        if (ret.containsKey(dateId)) {
-            ret.remove(dateId);
-        }
-        ret.put("seqid", seqId + "");
+        if (mCopy.containsKey(eventKey)) {
+            ArrayList<LinkedHashMap> subArr = (ArrayList) mCopy.remove(eventKey);
 
-        return ret;
+            if (subArr == null || subArr.isEmpty()) {
+                ret.putAll(mCopy);
+                events.add(ret);
+            }
+
+            for (int i = 0; i < subArr.size(); i++) {
+
+                LinkedHashMap tmp = subArr.get(i);
+                ret.put("date", tmp.remove(dateId).toString());
+                ret.putAll(mCopy);
+                ret.putAll(tmp);
+                ret.put("seqid", seqId + "");
+                events.add(CopyList(ret));
+            }
+        } else {
+            ret.putAll(mCopy);
+            ret.put("seqid", seqId + "");
+            events.add(ret);
+        }
     }
 }
