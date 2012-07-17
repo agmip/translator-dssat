@@ -38,7 +38,7 @@ public class DssatAFileInput extends DssatCommonInput {
         LinkedHashMap file = readFileWithoutCompress(brMap);
         String obvFileKey = "summary";  // P.S. the key name might change
 
-        compressData(file);
+//        compressData(file);
         ret.put(obvFileKey, file);
         return ret;
     }

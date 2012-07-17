@@ -40,7 +40,7 @@ public class DssatTFileInput extends DssatCommonInput {
         String obvFileKey = "time_series";  // TODO the key name might change
 
         ret.put(obvFileKey, file);
-        compressData(ret);
+//        compressData(ret);
 
         return ret;
     }
