@@ -124,7 +124,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             m.put(id, translateDateStr((String) m.get(id)));
         }
     }
-    
+
     /**
      * Translate data str from "yyddd" to "yyyymmdd"
      *
@@ -135,7 +135,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
         return translateDateStr(str, "0");
     }
-    
+
     /**
      * Translate data str from "yyddd" or "doy" to "yyyymmdd"
      *
@@ -164,7 +164,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 str = String.format("%1$2s%2$03d", pdate.substring(0, 2), Integer.parseInt(str));
             }
         }
-        
+
         return translateDateStr(str, "0");
     }
 
@@ -203,7 +203,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
         }
 
     }
-    
+
     /**
      * Divide the data in the line into a map (Default invalid value is null, which means not to be sore in the json)
      *
@@ -212,7 +212,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @return the map contains divided data with keys from original string
      */
     protected LinkedHashMap readLine(String line, LinkedHashMap<String, Integer> formats) {
-        
+
         return readLine(line, formats, null);
     }
 
@@ -239,7 +239,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 if (checkValidValue(tmp)) {
                     ret.put(key, tmp);
                 } else {
-                    ret.put(key, invalidValue);   // P.S. "" means missing or invalid value
+                    if (invalidValue != null) {
+                        ret.put(key, invalidValue);   // P.S. "" means missing or invalid value
+                    }
                 }
             }
             line = line.substring(length);
@@ -423,7 +425,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                                 cprData.put(key, new ArrayList());
                             }
                         }
-                        
+
                     }
                     // The repeated data will be deleted; Only data item (String type) will be processed
                     for (Object key : keys) {
@@ -436,7 +438,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             }
         }
     }
-    
+
     /**
      * Get a copy of input map
      *
@@ -445,7 +447,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      */
     protected static LinkedHashMap CopyList(LinkedHashMap m) {
         LinkedHashMap ret = new LinkedHashMap();
-        
+
         for (Object key : m.keySet()) {
             if (m.get(key) instanceof String) {
                 ret.put(key, m.get(key));
@@ -455,10 +457,10 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 ret.put(key, CopyList((ArrayList) m.get(key)));
             }
         }
-        
+
         return ret;
     }
-    
+
     /**
      * Get a copy of input array
      *
@@ -476,7 +478,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 ret.add(CopyList((ArrayList) arr.get(i)));
             }
         }
-        
+
         return ret;
     }
 
@@ -590,14 +592,14 @@ public abstract class DssatCommonInput implements TranslatorInput {
                         if (tmp.get("pl").equals(pl)) {
                             return (String) tmp.get("pdate");
                         }
-                        
+
                     } else {
                     }
-                    
+
                 } else {
                 }
             }
-            
+
             br.close();
         } catch (IOException ex) {
 //            Logger.getLogger(DssatCommonInput.class.getName()).log(Level.SEVERE, null, ex);
@@ -606,7 +608,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
         return "";
     }
-    
+
     public static void setDataVersionInfo(LinkedHashMap m) {
         m.put("data_source", "DSSAT");
         m.put("crop_model_version", "v4.5");
