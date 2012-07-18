@@ -125,8 +125,7 @@ public class DssatControllerInput {
 
             // observed data (time-series)
             if (!getObjectOr(trMetaData, "trno", "0").equals("0")) {
-                // TODO need to wait for the update of tfile structure (single array)
-                obv.put("time_series", getSectionDataArr(obvTArr, "trno_t", trMetaData.get("trno").toString()));
+                obv.put("time_series", getSectionData(obvTArr, "trno_t", trMetaData.get("trno").toString()));
             }
 
             // Set management data for this treatment
@@ -141,15 +140,20 @@ public class DssatControllerInput {
             cutDataBlock(mgnData, expData, "dssat_sequence");
             // dssat_info
 //            cutDataBlock(mgnData, expData, "dssat_info");
+            // Create dssat info holder
             LinkedHashMap dssatInfo = new LinkedHashMap();
-            // TODO field history code
+            // Move field history code into dssat_info block
+            dssatInfo.put("flhst", expData.remove("flhst"));
+            dssatInfo.put("fhdur", expData.remove("fhdur"));
+            // AFile local_name
             if (!getObjectOr(obvAFile, "local_name", "").equals(getObjectOr(expData, "local_name", ""))) {
-
                 dssatInfo.put("local_name_a", obvAFile.get("local_name"));
             }
+            // TFile local_name
             if (!getObjectOr(obvTFile, "local_name", "").equals(getObjectOr(expData, "local_name", ""))) {
                 dssatInfo.put("local_name_t", obvTFile.get("local_name"));
             }
+            // Set dssat_info if it is available
             if (!dssatInfo.isEmpty()) {
                 expData.put("dssat_info", dssatInfo);
             }
@@ -164,31 +168,6 @@ public class DssatControllerInput {
             // Add to output array
             expArr.add(expData);
         }
-
-//        for (int i = 0; i < inputs.length; i++) {
-//
-//            tmp = inputs[i].readFile(brMap);
-//
-//            // Check if reading result is empty. If so, ignore it.
-//            if (!tmp.isEmpty()) {
-//                // If return map contains multiple file, like soil or weather, get ArrayList from the return map
-//                if (inputs[i] instanceof DssatSoilInput || inputs[i] instanceof DssatWeatherInput) {
-//                    ret.put(inputs[i].jsonKey, tmp.get(inputs[i].jsonKey));
-//
-//                } // if read Observed data file, need to save them under the same key (currently is "observed")
-//                else if (inputs[i] instanceof DssatAFileInput || inputs[i] instanceof DssatTFileInput) {
-//                    if (ret.containsKey(inputs[i].jsonKey)) {
-//                        ((LinkedHashMap) ret.get(inputs[i].jsonKey)).putAll(tmp);
-//                    } else {
-//                        ret.put(inputs[i].jsonKey, tmp);
-//                    }
-//                } else {
-//                    ret.put(inputs[i].jsonKey, tmp);
-//                }
-//
-//            } else {
-//            }
-//        }
 
         return expArr;
     }
@@ -206,27 +185,7 @@ public class DssatControllerInput {
         }
     }
 
-//    private ArrayList<LinkedHashMap> getSectionDataArr(ArrayList secArr, Object key, String value) {
     private ArrayList getSectionDataArr(ArrayList secArr, Object key, String value) {
-//        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
-        ArrayList ret = new ArrayList();
-        // Loop blocks with different titles
-        for (int i = 0; i < secArr.size(); i++) {
-            ArrayList secSubArr = (ArrayList) secArr.get(i);
-            // Loop blocks with differnt treatment number
-            for (int j = 0; j < secSubArr.size(); j++) {
-                ArrayList secSubSubArr = (ArrayList) secSubArr.get(j);
-                if (!secSubSubArr.isEmpty()) {
-                    LinkedHashMap fstNode = (LinkedHashMap) secSubSubArr.get(0);
-                    if (value.equals(fstNode.get(key))) {
-                        ret.add(CopyList(secSubSubArr));
-                        break;
-                    }
-                }
-            }
-
-        }
-
-        return ret;
+        return (ArrayList) getSectionData(secArr, key, value).get(obvTReader.obvDataKey);
     }
 }

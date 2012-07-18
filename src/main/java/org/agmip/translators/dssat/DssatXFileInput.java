@@ -268,15 +268,15 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.clear();
                     formats.put("fl", 2);
                     formats.put("id_field", 9);
-                    formats.put("wst_id", 9);       //P.S. id do not match with the master list "wth_id"; might have another id name
-                    formats.put("flsl", 6);
-                    formats.put("flob", 6);
+                    formats.put("wst_id", 9);       // P.S. id do not match with the master list "wth_id"; might have another id name
+                    formats.put("flsl", 6);         // TODO need to confirm if it is necessary to be hold in meta data
+                    formats.put("flob", 6);         // TODO need to confirm if it is necessary to be hold in meta data
                     formats.put("fl_drntype", 6);
                     formats.put("fldrd", 6);
                     formats.put("fldrs", 6);
                     formats.put("flst", 6);
-                    formats.put("sltx", 6);
-                    formats.put("sldp", 6);
+                    formats.put("null_1", 6);       // P.S. no longer reading sltx since it is repeated with soil info
+                    formats.put("null_2", 6);       // P.S. no longer reading sldp since it is repeated with soil info
                     formats.put("soil_id", 11);
                     formats.put("fl_name", line.length());
                     // Read line and save into return holder

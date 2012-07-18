@@ -630,7 +630,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                         for (int j = 0; j < subDataArr.size(); j++) {
                             sbData.append(smTitles.get(j));
-                            sbData.append(String.format("%2s", idx + 1)).append(((String) subDataArr.get(j)).substring(2)).append("\r\n");
+                            sbData.append(String.format("%2s", idx + 1)).append(((String) subDataArr.get(j))).append("\r\n");
                             if (j == 4) {
                                 sbData.append("\r\n");
                             }

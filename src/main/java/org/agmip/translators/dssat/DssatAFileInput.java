@@ -96,7 +96,7 @@ public class DssatAFileInput extends DssatCommonInput {
                     formats.put("exname", 10);
                     formats.put("local_name", line.length());
                     // Read line and save into return holder
-                    file.putAll(readLine(line, formats, ""));
+                    file.putAll(readLine(line, formats));
 
                 } // Read data info 
                 else {
