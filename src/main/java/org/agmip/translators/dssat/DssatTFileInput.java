@@ -16,6 +16,8 @@ import static org.agmip.util.MapUtil.*;
  */
 public class DssatTFileInput extends DssatCommonInput {
 
+    public String obvFileKey = "time_series";  // TODO the key name might change
+    public String obvDataKey = "data";  // TODO the key name might change
     /**
      * Constructor with no parameters
      * Set jsonKey as "observed"
@@ -37,7 +39,6 @@ public class DssatTFileInput extends DssatCommonInput {
 
         LinkedHashMap ret = new LinkedHashMap();
         LinkedHashMap file = readFileWithoutCompress(brMap);
-        String obvFileKey = "time_series";  // TODO the key name might change
 
         ret.put(obvFileKey, file);
 //        compressData(ret);
@@ -63,7 +64,6 @@ public class DssatTFileInput extends DssatCommonInput {
         ArrayList obvDataSection = new ArrayList();
         ArrayList obvDataSecByTrno = new ArrayList();
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
-        String obvDataKey = "data";  // TODO the key name might change
         String pdate;
         String trno = "0";
 

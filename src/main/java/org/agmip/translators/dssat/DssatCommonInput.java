@@ -755,4 +755,44 @@ public abstract class DssatCommonInput implements TranslatorInput {
             }
         }
     }
+
+    /**
+     * remove all the relation index for the input array
+     * 
+     * @param arr    The array of treatment data 
+     * @param idNames The array of id want be removed
+     */
+    public static void removeIndex(ArrayList arr, ArrayList idNames) {
+
+        for (int i = 0; i < arr.size(); i++) {
+            Object item = arr.get(i);
+            if (item instanceof ArrayList) {
+                removeIndex((ArrayList) item, idNames);
+            } else if (item instanceof LinkedHashMap) {
+                removeIndex((LinkedHashMap) item, idNames);
+            }
+
+        }
+
+    }
+
+    /**
+     * remove all the relation index for the input map
+     * 
+     * @param m    the array of treatment data 
+     */
+    public static void removeIndex(LinkedHashMap m, ArrayList idNames) {
+
+        Object[] keys = m.keySet().toArray();
+        for (Object key : keys) {
+            Object item = m.get(key);
+            if (item instanceof ArrayList) {
+                removeIndex((ArrayList) item, idNames);
+            } else if (item instanceof LinkedHashMap) {
+                removeIndex((LinkedHashMap) item, idNames);
+            } else if (item instanceof String && idNames.contains(key)) {
+                m.remove(key);
+            }
+        }
+    }
 }

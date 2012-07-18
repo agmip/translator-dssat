@@ -84,11 +84,7 @@ public class DssatXFileInput extends DssatCommonInput {
 //        ArrayList<LinkedHashMap> emArr = new ArrayList<LinkedHashMap>();    // TODO add in the future
         ArrayList<LinkedHashMap> haArr = new ArrayList<LinkedHashMap>();
         ArrayList<LinkedHashMap> smArr = new ArrayList<LinkedHashMap>();
-        ArrayList smSubArr = new ArrayList();
         String ireff = "";    // P.S. special handling for EFIR in irrigation section
-        DssatAFileInput obvReaderA = new DssatAFileInput();
-        DssatTFileInput obvReaderT = new DssatTFileInput();
-//        DssatSoilInput soilReader = new DssatSoilInput(); // TODO will be deleted
 
         buf = brMap.get("X");
         mapW = (HashMap) brMap.get("W");
@@ -879,12 +875,6 @@ public class DssatXFileInput extends DssatCommonInput {
             brw.close();
         }
 
-        // Get Observed data info
-        LinkedHashMap obvAFile = obvReaderA.readFileWithoutCompress(brMap);
-        ArrayList<LinkedHashMap> obvAArr = getObjectOr(obvAFile, eventKey, new ArrayList<LinkedHashMap>());
-        LinkedHashMap obvTFile = obvReaderT.readFileWithoutCompress(brMap);
-        ArrayList<LinkedHashMap> obvTArr = getObjectOr(obvTFile, eventKey, new ArrayList<LinkedHashMap>());
-
         // Set meta data info for each treatment
         ArrayList<LinkedHashMap> trMetaArr = new ArrayList<LinkedHashMap>();
         LinkedHashMap trMetaData;
@@ -893,7 +883,7 @@ public class DssatXFileInput extends DssatCommonInput {
         // Combine all the sections data into the related treatment block
         String trno = null;
         LinkedHashMap dssatSq;
-        LinkedHashMap dssatInfo = new LinkedHashMap();
+//        LinkedHashMap dssatInfo = new LinkedHashMap();
         ArrayList<LinkedHashMap> sqArrNew = new ArrayList<LinkedHashMap>();
         for (int i = 0, seqid = 1; i < sqArr.size(); i++, seqid++) {
             sqData = (LinkedHashMap) sqArr.get(i);
@@ -910,11 +900,12 @@ public class DssatXFileInput extends DssatCommonInput {
 
                 dssatSq = new LinkedHashMap();
                 sqArrNew = new ArrayList<LinkedHashMap>();
-                dssatInfo = new LinkedHashMap();
+//                dssatInfo = new LinkedHashMap();
                 dssatSq.put(eventKey, sqArrNew);
                 trData.put("dssat_sequence", dssatSq);
 //                trData.put("dssat_info", dssatInfo);
                 trMetaData.put("tr_name", sqData.get("tr_name"));
+                trMetaData.put("trno", trno);
                 seqid = 1;
             } else {
                 trMetaData.remove("tr_name");
@@ -1063,29 +1054,6 @@ public class DssatXFileInput extends DssatCommonInput {
                 icTmp.put(icEventKey, icSubArrNew);
             }
 
-//            // observed data (summary)
-//            LinkedHashMap obv = new LinkedHashMap();
-//            sqData.put("observed", obv);
-//            if (!getObjectOr(sqData, "trno", "0").equals("0")) {
-//                obv.put("summary", getSectionData(obvAArr, "trno_a", sqData.get("trno").toString()));
-//            }
-//
-//            // observed data (time-series)
-//            if (!getObjectOr(sqData, "trno", "0").equals("0")) {
-//                obv.put("time_series", getSectionData(obvTArr, "trno_t", sqData.get("trno").toString()));
-//            }
-//
-//            // Revise the date value for FEDATE, IDATE, MLADAT
-//            // Get Planting date
-//            String pdate = "";
-//            ArrayList<LinkedHashMap> plTmps = (ArrayList) getObjectOr(sqData, "planting", new ArrayList());
-//            if (!plTmps.isEmpty()) {
-//                pdate = getObjectOr(plTmps.get(0), "pdate", "");
-//                if (pdate.length() > 5) {
-//                    pdate = pdate.substring(2);
-//                }
-//            }
-
         }
 
         // Remove relational index
@@ -1103,20 +1071,8 @@ public class DssatXFileInput extends DssatCommonInput {
         idNames.add("em");
         idNames.add("ha");
         idNames.add("sm");
-        idNames.add("trno");
-        idNames.add("trno_a");
-        idNames.add("trno_t");
         removeIndex(trArr, idNames);
         removeIndex(metaData, idNames);
-
-        // TODO
-//        if (!getObjectOr(obvAFile, "local_name", "").equals(getObjectOr(ret, "local_name", ""))) {
-//
-//            ret.put("local_name_a", obvAFile.get("local_name"));
-//        }
-//        if (!getObjectOr(obvTFile, "local_name", "").equals(getObjectOr(ret, "local_name", ""))) {
-//            ret.put("local_name_t", obvTFile.get("local_name"));
-//        }
 
         return trArr;
     }
@@ -1154,31 +1110,32 @@ public class DssatXFileInput extends DssatCommonInput {
         singleSubRecSecList.add("pl");
         singleSubRecSecList.add("ha");
         singleSubRecSecList.add("sm");
-        singleSubRecSecList.add("trno_a");
+//        singleSubRecSecList.add("trno_a");
 
         // TFile data
-        if (key.equals("trno_t")) {
-
-            ret = new ArrayList();
-            // Loop blocks with different titles
-            for (int i = 0; i < secArr.size(); i++) {
-                ArrayList secSubArr = (ArrayList) secArr.get(i);
-                // Loop blocks with differnt treatment number
-                for (int j = 0; j < secSubArr.size(); j++) {
-                    ArrayList secSubSubArr = (ArrayList) secSubArr.get(j);
-                    if (!secSubSubArr.isEmpty()) {
-                        LinkedHashMap fstNode = (LinkedHashMap) secSubSubArr.get(0);
-                        if (value.equals(fstNode.get(key))) {
-                            ret.add(CopyList(secSubSubArr));
-                            break;
-                        }
-                    }
-                }
-
-            }
-            return ret;
-
-        } else if (key.equals("icbl")) {
+//        if (key.equals("trno_t")) {
+//
+//            ret = new ArrayList();
+//            // Loop blocks with different titles
+//            for (int i = 0; i < secArr.size(); i++) {
+//                ArrayList secSubArr = (ArrayList) secArr.get(i);
+//                // Loop blocks with differnt treatment number
+//                for (int j = 0; j < secSubArr.size(); j++) {
+//                    ArrayList secSubSubArr = (ArrayList) secSubArr.get(j);
+//                    if (!secSubSubArr.isEmpty()) {
+//                        LinkedHashMap fstNode = (LinkedHashMap) secSubSubArr.get(0);
+//                        if (value.equals(fstNode.get(key))) {
+//                            ret.add(CopyList(secSubSubArr));
+//                            break;
+//                        }
+//                    }
+//                }
+//
+//            }
+//            return ret;
+//
+//        } else
+            if (key.equals("icbl")) {
 //            for (int i = 0; i < secArr.size(); i++) {
 //                LinkedHashMap m = (LinkedHashMap) secArr.get(i);
 //                if (value.equals(m.get(key))) {
@@ -1210,46 +1167,6 @@ public class DssatXFileInput extends DssatCommonInput {
         }
 
         return ret;
-    }
-
-    /**
-     * remove all the relation index for the input array
-     * 
-     * @param arr    The array of treatment data 
-     * @param idNames The array of id want be removed
-     */
-    private void removeIndex(ArrayList arr, ArrayList idNames) {
-
-        for (int i = 0; i < arr.size(); i++) {
-            Object item = arr.get(i);
-            if (item instanceof ArrayList) {
-                removeIndex((ArrayList) item, idNames);
-            } else if (item instanceof LinkedHashMap) {
-                removeIndex((LinkedHashMap) item, idNames);
-            }
-
-        }
-
-    }
-
-    /**
-     * remove all the relation index for the input map
-     * 
-     * @param m    the array of treatment data 
-     */
-    private void removeIndex(LinkedHashMap m, ArrayList idNames) {
-
-        Object[] keys = m.keySet().toArray();
-        for (Object key : keys) {
-            Object item = m.get(key);
-            if (item instanceof ArrayList) {
-                removeIndex((ArrayList) item, idNames);
-            } else if (item instanceof LinkedHashMap) {
-                removeIndex((LinkedHashMap) item, idNames);
-            } else if (item instanceof String && idNames.contains(key)) {
-                m.remove(key);
-            }
-        }
     }
 
     /**

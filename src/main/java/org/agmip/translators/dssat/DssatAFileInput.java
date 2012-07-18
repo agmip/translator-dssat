@@ -15,6 +15,9 @@ import java.util.LinkedHashMap;
  */
 public class DssatAFileInput extends DssatCommonInput {
 
+    public String obvFileKey = "summary";  // P.S. the key name might change
+    public String obvDataKey = "data";     // P.S. the key name might change
+
     /**
      * Constructor with no parameters
      * Set jsonKey as "observed"
@@ -36,7 +39,6 @@ public class DssatAFileInput extends DssatCommonInput {
 
         LinkedHashMap ret = new LinkedHashMap();
         LinkedHashMap file = readFileWithoutCompress(brMap);
-        String obvFileKey = "summary";  // P.S. the key name might change
 
 //        compressData(file);
         ret.put(obvFileKey, file);
@@ -59,7 +61,6 @@ public class DssatAFileInput extends DssatCommonInput {
         ArrayList titles = new ArrayList();
         ArrayList obvData = new ArrayList();
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
-        String obvDataKey = "data";     // P.S. the key name might change
         String pdate;
 
         buf = brMap.get("A");
