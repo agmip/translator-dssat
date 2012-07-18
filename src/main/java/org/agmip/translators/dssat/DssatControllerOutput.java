@@ -8,9 +8,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import org.agmip.core.types.AdvancedHashMap;
 
 /**
  *
@@ -35,7 +35,7 @@ public class DssatControllerOutput {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public void writeFiles(String arg0, AdvancedHashMap result) throws FileNotFoundException, IOException {
+    public void writeFiles(String arg0, LinkedHashMap result) throws FileNotFoundException, IOException {
 
         for (int i = 0; i < outputs.length; i++) {
             outputs[i].writeFile(arg0, result);

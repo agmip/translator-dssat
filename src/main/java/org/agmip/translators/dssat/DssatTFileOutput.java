@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import org.agmip.core.types.AdvancedHashMap;
-import org.agmip.util.JSONAdapter;
+
+import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Observation Data I/O API Class
@@ -32,11 +32,10 @@ public class DssatTFileOutput extends DssatCommonOutput {
      * @param result data holder object
      */
     @Override
-    public void writeFile(String arg0, AdvancedHashMap result) {
+    public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        JSONAdapter adapter = new JSONAdapter();    // JSON Adapter
-        AdvancedHashMap<String, Object> record;     // Data holder for daily data
+        LinkedHashMap<String, Object> record;     // Data holder for daily data
         BufferedWriter bwT;                         // output object
         StringBuilder sbData = new StringBuilder();         // construct the data info in the output
         HashMap altTitleList = new HashMap();               // Define alternative fields for the necessary observation data fields; key is necessary field
@@ -50,10 +49,10 @@ public class DssatTFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            AdvancedHashMap expFile = adapter.exportRecord((Map) result.getOr("experiment", result));
-//            AdvancedHashMap obvTFile = adapter.exportRecord((Map) expFile.getOr("time_series", expFile));
+            LinkedHashMap expFile = (LinkedHashMap) getObjectOr(result, "experiment", result);
+//            LinkedHashMap obvTFile = (LinkedHashMap) getObjectOr(expFile, "time_series", expFile));
 //            ArrayList observeRecordsSections = ((ArrayList) obvTFile.getOr("data", new ArrayList()));
-            ArrayList trArr = (ArrayList) expFile.getOr("treatment", new ArrayList());
+            ArrayList trArr = (ArrayList) getObjectOr(expFile, "management", new ArrayList());
             if (trArr.isEmpty()) {
                 return;
             }
@@ -72,7 +71,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
             // Output Observation File
             // Titel Section
-            sbData.append(String.format("*EXP.DATA (T): %1$-10s %2$s\r\n\r\n", exName, expFile.getOr("local_name_t", expFile.getOr("local_name", defValC).toString())));
+            sbData.append(String.format("*EXP.DATA (T): %1$-10s %2$s\r\n\r\n", exName, getObjectOr(expFile, "local_name_t", getObjectOr(expFile, "local_name", defValC).toString())));
 
             // Loop Data Sections
             ArrayList observeRecords;
@@ -85,7 +84,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
 //                for (int i = 0; i < observeRecords.size(); i++) {
 //                    ArrayList obvSubArr = (ArrayList) observeRecords.get(i);
 //                    if (!obvSubArr.isEmpty()) {
-//                        AdvancedHashMap fstData = adapter.exportRecord((Map) obvSubArr.get(0));
+//                        LinkedHashMap fstData = (LinkedHashMap) obvSubArr.get(0));
 //                        if (titleSetArr.contains(fstData.keySet())) {
 //                            
 //                        } else {
@@ -100,11 +99,12 @@ public class DssatTFileOutput extends DssatCommonOutput {
                 titleOutput = new LinkedHashMap();
 
                 // Get first record of observed data
-                AdvancedHashMap fstObvData;
+                LinkedHashMap fstObvData;
                 if (observeRecords.isEmpty()) {
-                    fstObvData = new AdvancedHashMap();
+                    fstObvData = new LinkedHashMap();
                 } else {
-                    fstObvData = adapter.exportRecord((Map) observeRecords.get(0));
+                    return;
+//                    fstObvData = (LinkedHashMap) observeRecords.get(0);
                 }
 
                 // Check if which field is available
@@ -157,18 +157,18 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
                     for (int j = 0; j < observeRecords.size(); j++) {
 
-                        record = adapter.exportRecord((Map) observeRecords.get(j));
-                        sbData.append(String.format(" %1$5s", record.getOr("trno", 1).toString())); // TODO wait for confirmation that other model only have single treatment in one file
-                        sbData.append(String.format(" %1$5d", Integer.parseInt(formatDateStr(record.getOr("date", defValI).toString()))));
+                        record = (LinkedHashMap) observeRecords.get(j);
+                        sbData.append(String.format(" %1$5s", getObjectOr(record, "trno", 1).toString())); // TODO wait for confirmation that other model only have single treatment in one file
+                        sbData.append(String.format(" %1$5d", Integer.parseInt(formatDateStr(getObjectOr(record, "date", defValI).toString()))));
                         for (int k = i * 39; k < limit; k++) {
 
                             if (obvDataList.isDapDateType(titleOutputId[k], titleOutput.get(titleOutputId[k]))) {
-                                String pdate = (String) ((AdvancedHashMap) result.getOr("experiment", new AdvancedHashMap())).getOr("pdate", defValD); // TODO need be updated after ear;y version
-                                sbData.append(String.format("%1$6s", formatDateStr(pdate, record.getOr(titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
+                                String pdate = (String) getObjectOr((LinkedHashMap) getObjectOr(result, "experiment", new LinkedHashMap()), "pdate", defValD); // TODO need be updated after ear;y version
+                                sbData.append(String.format("%1$6s", formatDateStr(pdate, getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
                             } else if (obvDataList.isDateType(titleOutputId[k])) {
-                                sbData.append(String.format("%1$6s", formatDateStr(record.getOr(titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
+                                sbData.append(String.format("%1$6s", formatDateStr(getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
                             } else {
-                                sbData.append(" ").append(formatNumStr(5, record.getOr(titleOutput.get(titleOutputId[k]).toString(), defValI).toString()));
+                                sbData.append(" ").append(formatNumStr(5, getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString()));
                             }
 
                         }
@@ -212,12 +212,32 @@ public class DssatTFileOutput extends DssatCommonOutput {
      */
     private ArrayList getObvData(ArrayList trArr, int idx) {
 
-        JSONAdapter adapter = new JSONAdapter();
-
-        AdvancedHashMap trData = adapter.exportRecord((Map) trArr.get(idx));
-        AdvancedHashMap obvFile = adapter.exportRecord((Map) trData.getOr("observed", new AdvancedHashMap()));
-        ArrayList obvData = (ArrayList) obvFile.getOr("time_series", new ArrayList());
+        LinkedHashMap trData = (LinkedHashMap) trArr.get(idx);
+        LinkedHashMap obvFile = (LinkedHashMap) getObjectOr(trData, "observed", new LinkedHashMap());
+        ArrayList obvData = (ArrayList) getObjectOr(obvFile, "time_series", new ArrayList());
 
         return obvData;
+    }
+    
+    private ArrayList getObvData(ArrayList trArr) {
+        
+        ArrayList obvDataArr = new ArrayList();
+        ArrayList obvArrByTrnoIn;
+//        ArrayList obvArrByTrnoOut;
+        ArrayList obvArrByTitleIn;
+        LinkedHashMap<Set, ArrayList> obvArrByTitleOut;
+        
+        for (int i = 0; i < trArr.size(); i++) {
+            obvArrByTrnoIn = getObvData(trArr, i);
+            for (int j = 0; j < obvArrByTrnoIn.size(); j++) {
+                Object object = obvArrByTrnoIn.get(j);
+                
+            }
+            
+            
+//            if (obvArrByTitleOut.containsKey(obvArrByTitleIn))
+        }
+        
+        return obvDataArr;
     }
 }

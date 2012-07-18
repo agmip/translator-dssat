@@ -3,8 +3,8 @@ package org.agmip.translators.dssat;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import org.agmip.core.types.AdvancedHashMap;
 import org.agmip.core.types.TranslatorOutput;
 
 /**
@@ -141,7 +141,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @param result date holder for experiment data
      * @return exname
      */
-    protected String getExName(AdvancedHashMap result) {
+    protected String getExName(Map result) {
 
         Map expData;
         if (result.containsKey("experiment")) {
@@ -149,7 +149,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         } else if (result.containsKey("exname")) {
             expData = result;
         } else {
-            expData = new AdvancedHashMap();
+            expData = new LinkedHashMap();
             expData.put("exname", "");
         }
         String ret = (String) expData.get("exname");
@@ -180,21 +180,21 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * Get output file object
      */
     public abstract File getOutputFile();
-    
+
     /**
      * decompress the data in a map object
      *
      * @param m input map
      */
-    protected void decompressData(AdvancedHashMap m) {
+    protected void decompressData(LinkedHashMap m) {
 
         for (Object key : m.keySet()) {
             if (m.get(key) instanceof ArrayList) {
                 // iterate sub array nodes
                 decompressData((ArrayList) m.get(key));
-            } else if (m.get(key) instanceof AdvancedHashMap) {
+            } else if (m.get(key) instanceof LinkedHashMap) {
                 // iterate sub data nodes
-                decompressData((AdvancedHashMap) m.get(key));
+                decompressData((LinkedHashMap) m.get(key));
             } else {
                 // ignore other type nodes
             }
@@ -210,24 +210,24 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      */
     protected void decompressData(ArrayList arr) {
 
-        AdvancedHashMap fstData = null; // The first data record (Map type)
-        AdvancedHashMap cprData = null; // The following data record which will be compressed
+        LinkedHashMap fstData = null; // The first data record (Map type)
+        LinkedHashMap cprData = null; // The following data record which will be compressed
 
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i) instanceof ArrayList) {
                 // iterate sub array nodes
                 decompressData((ArrayList) arr.get(i));
 
-            } else if (arr.get(i) instanceof AdvancedHashMap) {
+            } else if (arr.get(i) instanceof LinkedHashMap) {
                 // iterate sub data nodes
-                decompressData((AdvancedHashMap) arr.get(i));
+                decompressData((LinkedHashMap) arr.get(i));
 
                 // Compress data for current array
                 if (fstData == null) {
                     // Get first data node
-                    fstData = (AdvancedHashMap) arr.get(i);
+                    fstData = (LinkedHashMap) arr.get(i);
                 } else {
-                    cprData = (AdvancedHashMap) arr.get(i);
+                    cprData = (LinkedHashMap) arr.get(i);
                     // The omitted data will be recovered to the following map; Only data item (String type) will be processed
                     for (Object key : fstData.keySet()) {
                         if (!cprData.containsKey(key)) {

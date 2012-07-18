@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import org.agmip.core.types.AdvancedHashMap;
+import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT TFile Data I/O API Class
@@ -16,6 +16,8 @@ import org.agmip.core.types.AdvancedHashMap;
  */
 public class DssatTFileInput extends DssatCommonInput {
 
+    public String obvFileKey = "time_series";  // TODO the key name might change
+    public String obvDataKey = "data";  // TODO the key name might change
     /**
      * Constructor with no parameters
      * Set jsonKey as "observed"
@@ -33,14 +35,13 @@ public class DssatTFileInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected AdvancedHashMap readFile(HashMap brMap) throws IOException {
+    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
 
-        AdvancedHashMap ret = new AdvancedHashMap();
-        AdvancedHashMap file = readFileWithoutCompress(brMap);
-        String obvFileKey = "time_series";  // TODO the key name might change
+        LinkedHashMap ret = new LinkedHashMap();
+        LinkedHashMap file = readFileWithoutCompress(brMap);
 
         ret.put(obvFileKey, file);
-        compressData(ret);
+//        compressData(ret);
 
         return ret;
     }
@@ -51,9 +52,9 @@ public class DssatTFileInput extends DssatCommonInput {
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected AdvancedHashMap readFileWithoutCompress(HashMap brMap) throws IOException {
+    protected LinkedHashMap readFileWithoutCompress(HashMap brMap) throws IOException {
 
-        AdvancedHashMap file = new AdvancedHashMap();
+        LinkedHashMap file = new LinkedHashMap();
         String line;
         BufferedReader brT;
         Object buf;
@@ -63,7 +64,6 @@ public class DssatTFileInput extends DssatCommonInput {
         ArrayList obvDataSection = new ArrayList();
         ArrayList obvDataSecByTrno = new ArrayList();
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
-        String obvDataKey = "data";  // TODO the key name might change
         String pdate;
         String trno = "0";
 
@@ -98,7 +98,7 @@ public class DssatTFileInput extends DssatCommonInput {
                     formats.put("exname", 10);
                     formats.put("local_name", line.length());
                     // Read line and save into return holder
-                    file.put(readLine(line, formats, ""));
+                    file.putAll(readLine(line, formats, ""));
 
                 } // Read data info 
                 else {
@@ -109,7 +109,7 @@ public class DssatTFileInput extends DssatCommonInput {
                     }
 
                     // Read line and save into return holder
-                    AdvancedHashMap tmp = readLine(line, formats, "");
+                    LinkedHashMap tmp = readLine(line, formats, "");
                     // translate date from yyddd format to yyyymmdd format
                     tmp.put("date", translateDateStr((String) tmp.get("date")));
                     pdate = getPdate(brMap, (String) tmp.get("trno_t"));
@@ -121,7 +121,7 @@ public class DssatTFileInput extends DssatCommonInput {
 
                     // Check if the record's trno becomes the next treatment's trno
                     if (!trno.equals(tmp.get("trno_t"))) {
-                        trno = tmp.getOr("trno_t", "").toString();
+                        trno = getValueOr(tmp, "trno_t", "");
                         obvDataSecByTrno = new ArrayList();
                         obvDataSection.add(obvDataSecByTrno);
                     }
@@ -179,17 +179,17 @@ public class DssatTFileInput extends DssatCommonInput {
         ArrayList obvDataSection;
         ArrayList obvDataNew = new ArrayList();
         ArrayList obvDataSectionNew = new ArrayList();
-        AdvancedHashMap tmp;
+        LinkedHashMap tmp;
         String trno = "0";
 
         for (int i = 0; i < obvData.size(); i++) {
             obvDataSection = (ArrayList) obvData.get(i);
 
             for (int j = 0; j < obvDataSection.size(); j++) {
-                tmp = (AdvancedHashMap) obvDataSection.get(j);
+                tmp = (LinkedHashMap) obvDataSection.get(j);
                 if (trno.equals(tmp.get("trno_t"))) {
                 } else {
-                    trno = tmp.getOr("trno_t", "").toString();
+                    trno = getValueOr(tmp, "trno_t", "");
                     obvDataSectionNew = new ArrayList();
                     obvDataNew.add(obvDataSectionNew);
 

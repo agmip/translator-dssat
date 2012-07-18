@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.agmip.core.types.TranslatorInput;
+import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Experiment Data I/O API Class
@@ -124,7 +125,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             m.put(id, translateDateStr((String) m.get(id)));
         }
     }
-    
+
     /**
      * Translate data str from "yyddd" to "yyyymmdd"
      *
@@ -135,7 +136,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
         return translateDateStr(str, "0");
     }
-    
+
     /**
      * Translate data str from "yyddd" or "doy" to "yyyymmdd"
      *
@@ -164,7 +165,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 str = String.format("%1$2s%2$03d", pdate.substring(0, 2), Integer.parseInt(str));
             }
         }
-        
+
         return translateDateStr(str, "0");
     }
 
@@ -203,7 +204,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
         }
 
     }
-    
+
     /**
      * Divide the data in the line into a map (Default invalid value is null, which means not to be sore in the json)
      *
@@ -212,7 +213,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @return the map contains divided data with keys from original string
      */
     protected LinkedHashMap readLine(String line, LinkedHashMap<String, Integer> formats) {
-        
+
         return readLine(line, formats, null);
     }
 
@@ -239,7 +240,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 if (checkValidValue(tmp)) {
                     ret.put(key, tmp);
                 } else {
-                    ret.put(key, invalidValue);   // P.S. "" means missing or invalid value
+                    if (invalidValue != null) {
+                        ret.put(key, invalidValue);   // P.S. "" means missing or invalid value
+                    }
                 }
             }
             line = line.substring(length);
@@ -282,7 +285,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    protected HashMap getBufferReader(String filePath) throws FileNotFoundException, IOException {
+    protected static HashMap getBufferReader(String filePath) throws FileNotFoundException, IOException {
 
         HashMap result = new HashMap();
         InputStream in;
@@ -342,7 +345,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @return result The char array for current entry
      * @throws IOException
      */
-    private char[] getBuf(InputStream in, int size) throws IOException {
+    private static char[] getBuf(InputStream in, int size) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         char[] buf = new char[size];
         br.read(buf);
@@ -423,7 +426,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                                 cprData.put(key, new ArrayList());
                             }
                         }
-                        
+
                     }
                     // The repeated data will be deleted; Only data item (String type) will be processed
                     for (Object key : keys) {
@@ -436,16 +439,16 @@ public abstract class DssatCommonInput implements TranslatorInput {
             }
         }
     }
-    
+
     /**
      * Get a copy of input map
      *
      * @param m input map
      * @return the copy of whole input map
      */
-    protected LinkedHashMap CopyList(LinkedHashMap m) {
+    protected static LinkedHashMap CopyList(LinkedHashMap m) {
         LinkedHashMap ret = new LinkedHashMap();
-        
+
         for (Object key : m.keySet()) {
             if (m.get(key) instanceof String) {
                 ret.put(key, m.get(key));
@@ -455,17 +458,17 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 ret.put(key, CopyList((ArrayList) m.get(key)));
             }
         }
-        
+
         return ret;
     }
-    
+
     /**
      * Get a copy of input array
      *
      * @param arr input ArrayList
      * @return the copy of whole input array
      */
-    protected ArrayList CopyList(ArrayList arr) {
+    protected static ArrayList CopyList(ArrayList arr) {
         ArrayList ret = new ArrayList();
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i) instanceof String) {
@@ -476,7 +479,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 ret.add(CopyList((ArrayList) arr.get(i)));
             }
         }
-        
+
         return ret;
     }
 
@@ -494,7 +497,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             elem = (LinkedHashMap) arr.get(i);
             if (!key.getClass().isArray()) {
                 if (elem.get(key).equals(item.get(key))) {
-                    elem.put(item);
+                    elem.putAll(item);
                     unmatchFlg = false;
                     break;
                 }
@@ -508,7 +511,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                     }
                 }
                 if (equalFlg) {
-                    elem.put(item);
+                    elem.putAll(item);
                     unmatchFlg = false;
                     break;
                 }
@@ -590,14 +593,14 @@ public abstract class DssatCommonInput implements TranslatorInput {
                         if (tmp.get("pl").equals(pl)) {
                             return (String) tmp.get("pdate");
                         }
-                        
+
                     } else {
                     }
-                    
+
                 } else {
                 }
             }
-            
+
             br.close();
         } catch (IOException ex) {
 //            Logger.getLogger(DssatCommonInput.class.getName()).log(Level.SEVERE, null, ex);
@@ -605,5 +608,191 @@ public abstract class DssatCommonInput implements TranslatorInput {
         }
 
         return "";
+    }
+
+    public static void setDataVersionInfo(LinkedHashMap m) {
+        m.put("data_source", "DSSAT");
+        m.put("crop_model_version", "v4.5");
+    }
+
+    /**
+     * Get the section data by given index value and key
+     * 
+     * @param secArr    Section data array
+     * @param key       index variable name
+     * @param value     index variable value
+     */
+    public static LinkedHashMap getSectionData(ArrayList secArr, Object key, String value) {
+
+        LinkedHashMap ret = null;
+        // Get First data node
+        if (secArr.isEmpty() || value == null) {
+            return ret;
+        }
+        for (int i = 0; i < secArr.size(); i++) {
+            if (value.equals(((LinkedHashMap) secArr.get(i)).get(key))) {
+                return DssatCommonInput.CopyList((LinkedHashMap) secArr.get(i));
+            }
+        }
+
+        return ret;
+    }
+
+    /**
+     * Combine two layer data array into a new array by matching the pointed id, and only combine the pointed variables
+     * 
+     * @param toArr     the array which the data will be combined to
+     * @param fromArr   the array which the data will be combined from
+     * @param toKey     the index variable name of to array
+     * @param fromKey   the index variable name of from array
+     * @param copyKeys  the array of variable names which will be handled
+     * 
+     * @return the combined new array
+     */
+    public static ArrayList<LinkedHashMap> combinLayers(ArrayList<LinkedHashMap> toArr, ArrayList<LinkedHashMap> fromArr, String toKey, String fromKey, String[] copyKeys) {
+
+        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
+        ArrayList<String> fromKeyArr = getLayerNumArray(fromArr, fromKey);
+        ArrayList<String> toKeyArr = getLayerNumArray(toArr, toKey);
+
+        int cnt = 0;
+        for (int j = 0; j < fromKeyArr.size(); j++) {
+            LinkedHashMap toTmp = new LinkedHashMap();
+            LinkedHashMap fromTmp = (LinkedHashMap) fromArr.get(j);
+            String fromKeyVal = fromKeyArr.get(j);
+            String toKeyVal = "";
+
+            for (int k = cnt; k < toKeyArr.size(); k++, cnt++) {
+                toKeyVal = toKeyArr.get(k);
+                if (Double.parseDouble(toKeyVal) == Double.parseDouble(fromKeyVal)) {
+                    toTmp = (LinkedHashMap) getSectionData(toArr, toKey, toKeyVal);
+                    ret.add(toTmp);
+                    copyItems(toTmp, fromTmp, copyKeys);
+                    break;
+                } else if (Double.parseDouble(toKeyVal) > Double.parseDouble(fromKeyVal)) {
+                    toTmp = CopyList((LinkedHashMap) getSectionData(toArr, toKey, toKeyVal));
+                    toTmp.put(toKey, fromKeyVal);
+                    ret.add(toTmp);
+                    copyItems(toTmp, fromTmp, copyKeys);
+                    break;
+                } else if (!fromKeyArr.contains(toKeyVal)) {
+                    toTmp = (LinkedHashMap) getSectionData(toArr, toKey, toKeyVal);
+                    ret.add(toTmp);
+                    copyItems(toTmp, fromTmp, copyKeys);
+                }
+            }
+
+            if (toKeyArr.isEmpty()) {
+                ret.add(toTmp);
+                copyItems(toTmp, fromTmp, copyKeys);
+            } else if (toKeyArr.size() <= cnt) {
+                toTmp = CopyList(getSectionData(toArr, toKey, toKeyArr.get(toKeyArr.size() - 1)));
+                toTmp.put(toKey, fromKeyVal);
+                ret.add(toTmp);
+                copyItems(toTmp, fromTmp, copyKeys);
+            }
+        }
+
+        for (int j = cnt; j < toKeyArr.size(); j++) {
+            ret.add((LinkedHashMap) getSectionData(toArr, toKey, toKeyArr.get(j)));
+        }
+
+        // Auto-fill the copy data in the missing layer with nearby layer data
+        String copyItem = null;
+        for (int i = 0; i < copyKeys.length; i++) {
+            for (int j = ret.size() - 1; j > 0; j--) {
+                if (ret.get(j).containsKey(copyKeys[i])) {
+                    copyItem = (String) ret.get(j).get(copyKeys[i]);
+                } else {
+                    if (copyItem == null) {
+                        for (int k = ret.size() - 1; k > 0; k--) {
+                            if (ret.get(k).get(copyKeys[i]) != null) {
+                                copyItem = (String) ret.get(k).get(copyKeys[i]);
+                                break;
+                            }
+                        }
+                    }
+                    if (copyItem != null) {
+                        ret.get(j).put(copyKeys[i], copyItem);
+                    }
+                }
+            }
+        }
+
+
+        return ret;
+    }
+
+    /**
+     * Get the array of key variables from original array
+     * 
+     * @param arr     the input array
+     * @param key     the key name
+     * 
+     * @return the array of key variable value
+     */
+    private static ArrayList<String> getLayerNumArray(ArrayList<LinkedHashMap> arr, String key) {
+
+        ArrayList<String> ret = new ArrayList();
+        for (int i = 0; i < arr.size(); i++) {
+            ret.add((String) (arr.get(i).get(key)));
+        }
+        return ret;
+    }
+
+    /**
+     * copy items from one map to another map
+     * 
+     * @param to     the map which data will be copied to
+     * @param from   the map which data will be copied from
+     * @param copyKeys     the array of key name which will be copied
+     * 
+     */
+    private static void copyItems(LinkedHashMap to, LinkedHashMap from, String[] copyKeys) {
+        for (int i = 0; i < copyKeys.length; i++) {
+            if (from.containsKey(copyKeys[i])) {
+                to.put(copyKeys[i], from.get(copyKeys[i]));
+            }
+        }
+    }
+
+    /**
+     * remove all the relation index for the input array
+     * 
+     * @param arr    The array of treatment data 
+     * @param idNames The array of id want be removed
+     */
+    public static void removeIndex(ArrayList arr, ArrayList idNames) {
+
+        for (int i = 0; i < arr.size(); i++) {
+            Object item = arr.get(i);
+            if (item instanceof ArrayList) {
+                removeIndex((ArrayList) item, idNames);
+            } else if (item instanceof LinkedHashMap) {
+                removeIndex((LinkedHashMap) item, idNames);
+            }
+
+        }
+
+    }
+
+    /**
+     * remove all the relation index for the input map
+     * 
+     * @param m    the array of treatment data 
+     */
+    public static void removeIndex(LinkedHashMap m, ArrayList idNames) {
+
+        Object[] keys = m.keySet().toArray();
+        for (Object key : keys) {
+            Object item = m.get(key);
+            if (item instanceof ArrayList) {
+                removeIndex((ArrayList) item, idNames);
+            } else if (item instanceof LinkedHashMap) {
+                removeIndex((LinkedHashMap) item, idNames);
+            } else if (item instanceof String && idNames.contains(key)) {
+                m.remove(key);
+            }
+        }
     }
 }

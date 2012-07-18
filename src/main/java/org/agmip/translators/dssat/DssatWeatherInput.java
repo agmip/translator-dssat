@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import org.agmip.core.types.Weather;
-import java.lang.reflect.*;
 
 /**
  * DSSAT Weather Data I/O API Class
@@ -16,6 +14,8 @@ import java.lang.reflect.*;
  * @version 1.0
  */
 public class DssatWeatherInput extends DssatCommonInput {
+
+    public String dailyKey = "dailyWeather";  // P.S. the key name might change
 
     /**
      * Constructor with no parameters
@@ -28,33 +28,45 @@ public class DssatWeatherInput extends DssatCommonInput {
     }
 
     /**
-     * DSSAT Weather Data input method for Controller using
+     * DSSAT Weather Data input method for only inputing weather file
      * 
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
      */
     @Override
-    protected Experiment readFile(HashMap brMap) throws IOException {
-
+    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
         LinkedHashMap ret = new LinkedHashMap();
-        Weather wth = new Weather();
-        ArrayList files = new ArrayList();
-        ArrayList daily = new ArrayList();
+        ArrayList<LinkedHashMap> files = readDailyData(brMap, ret);
+//        compressData(files);
+        ret.put(jsonKey, files);
+        return ret;
+    }
+
+    /**
+     * DSSAT Weather Data input method for Controller using (return value will not be compressed)
+     * 
+     * @param brMap  The holder for BufferReader objects for all files
+     * @return result data holder object
+     */
+    protected ArrayList<LinkedHashMap> readDailyData(HashMap brMap, LinkedHashMap ret) throws IOException {
+
+        ArrayList<LinkedHashMap> files = new ArrayList();
+        ArrayList<LinkedHashMap> daily = new ArrayList();
         ArrayList titles = new ArrayList();
-        LinkedHashMap file;
+        LinkedHashMap fileTmp = null;
+        LinkedHashMap file = null;
         String line;
         BufferedReader brW = null;
         Object buf;
         LinkedHashMap mapW;
         LinkedHashMap formats = new LinkedHashMap();
-        String dailyKey = "data";  // P.S. the key name might change
 
         mapW = (LinkedHashMap) brMap.get("W");
 
         // If Weather File is no been found
         if (mapW.isEmpty()) {
             // TODO reprot file not exist error
-            return ret;
+            return files;
         }
 
         for (Object key : mapW.keySet()) {
@@ -65,10 +77,9 @@ public class DssatWeatherInput extends DssatCommonInput {
             } else {
                 brW = (BufferedReader) buf;
             }
-            file = new LinkedHashMap();
+            fileTmp = new LinkedHashMap();
             daily = new ArrayList();
             titles = new ArrayList();
-            files.add(file);
 
             while ((line = brW.readLine()) != null) {
 
@@ -79,7 +90,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                 if (flg[0].equals("weather") && flg[1].equals("") && flg[2].equals("data")) {
 
                     // header info
-                    wth.setWst_name = line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*[Dd][Aa][Tt][Aa]\\s*:?", "").trim();
+                    fileTmp.put("wst_name", line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*[Dd][Aa][Tt][Aa]\\s*:?", "").trim());
 
                 } // Read Weather Data
                 else if (flg[2].equals("data")) {
@@ -89,7 +100,7 @@ public class DssatWeatherInput extends DssatCommonInput {
 
                         // Set variables' formats
                         formats.clear();
-                        formats.put("wst_insi", 6);
+                        formats.put("wst_id", 6);
                         formats.put("wst_lat", 9);
                         formats.put("wst_long", 9);
                         formats.put("elev", 6);
@@ -98,14 +109,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                         formats.put("refht", 6);
                         formats.put("wndht", 6);
                         // Read line and save into return holder
-                        Map insi = readLine(line, formats);
-                        wth.setWst_insi = insi.get("wst_insi");
-                        wth.setWst_lat = Double.parseDouble(insi.get("wst_lat"));
-                        wth.setWst_long = Double.parseDouble(insi.get("wst_long"));
-                        wth.setElev =  Double.parseDouble(insi.get("elev"));
-                        wth.setTav  =  Double.parseDouble(insi.get("tav"));
-                        wth.setRefht = Double.parseDouble(insi.get("refht"));
-                        wth.setWndht = Double.parseDouble(insi.get("wndht"));
+                        fileTmp.putAll(readLine(line, formats));
 
                     } // Weather daily data
                     else if (flg[1].startsWith("date ")) {
@@ -117,8 +121,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                             formats.put(titles.get(i), 6);
                         }
                         // Read line and save into return holder
-                        Map tmp = readLine(line, formats, "");
-                        Weather.DailyWeather t2 = new Weather.DailyWeather();
+                        LinkedHashMap tmp = readLine(line, formats, "");
                         // translate date from yyddd format to yyyymmdd format
                         translateDateStr(tmp, "w_date");
                         t2.setW_date(tmp.get("w_date"));
@@ -148,15 +151,22 @@ public class DssatWeatherInput extends DssatCommonInput {
                 } else {
                 }
             }
-            
-            file.put(dailyKey, daily);
+
+            if (file == null || !file.get("wst_id").equals(fileTmp.get("wst_id"))) {
+                file = fileTmp;
+                fileTmp.put(dailyKey, daily);
+                files.add(file);
+            } else {
+                ArrayList tmpArr = (ArrayList) file.get(dailyKey);
+                for (int i = 0; i < daily.size(); i++) {
+                    tmpArr.add(daily.get(i));
+                }
+            }
         }
 
-        compressData(files);
-        ret.put(jsonKey, files);
         brW.close();
 
-        return ret;
+        return files;
     }
 
     /**
