@@ -49,12 +49,12 @@ public class DssatTFileInput extends DssatCommonInput {
         for (int i = 0; i < obvData.size(); i++) {
             expData = new LinkedHashMap();
             obv = new LinkedHashMap();
-            expData.put(jsonKey, obv);
             copyItem(expData, file, "exname");
             copyItem(expData, file, "local_name");
+            expData.put(jsonKey, obv);
             obv.put(obvFileKey, obvData.get(i));
             
-            retArr.add(obv);
+            retArr.add(expData);
         }
         ret.put("data", retArr);
 

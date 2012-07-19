@@ -819,7 +819,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * 
      */
     public static void copyItem(LinkedHashMap to, LinkedHashMap from, String key, boolean deleteFlg) {
-        copyItem(to, from, key, key, false);
+        copyItem(to, from, key, key, deleteFlg);
     }
     
     /**

@@ -1257,16 +1257,16 @@ public class DssatXFileInput extends DssatCommonInput {
         // Move field history code into dssat_info block
         copyItem(dssatInfo, expData, "flhst", true);
         copyItem(dssatInfo, expData, "fhdur", true);
-        // AFile local_name
-        if (obvAFile.containsKey("local_name") &&
-            !getObjectOr(obvAFile, "local_name", "").equals(getObjectOr(expData, "local_name", ""))) {
-            dssatInfo.put("local_name_a", obvAFile.get("local_name"));
-        }
-        // TFile local_name
-        if (obvTFile.containsKey("local_name") &&
-                !getObjectOr(obvTFile, "local_name", "").equals(getObjectOr(expData, "local_name", ""))) {
-            dssatInfo.put("local_name_t", obvTFile.get("local_name"));
-        }
+//        // AFile local_name
+//        if (obvAFile.containsKey("local_name") &&
+//            !getObjectOr(obvAFile, "local_name", "").equals(getObjectOr(expData, "local_name", ""))) {
+//            dssatInfo.put("local_name_a", obvAFile.get("local_name"));
+//        }
+//        // TFile local_name
+//        if (obvTFile.containsKey("local_name") &&
+//                !getObjectOr(obvTFile, "local_name", "").equals(getObjectOr(expData, "local_name", ""))) {
+//            dssatInfo.put("local_name_t", obvTFile.get("local_name"));
+//        }
         // Set dssat_info if it is available
         if (!dssatInfo.isEmpty()) {
             expData.put("dssat_info", dssatInfo);
