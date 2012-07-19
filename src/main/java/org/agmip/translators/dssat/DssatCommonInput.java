@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.agmip.core.types.TranslatorInput;
-import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Experiment Data I/O API Class
@@ -750,9 +749,10 @@ public abstract class DssatCommonInput implements TranslatorInput {
      */
     private static void copyItems(LinkedHashMap to, LinkedHashMap from, String[] copyKeys) {
         for (int i = 0; i < copyKeys.length; i++) {
-            if (from.containsKey(copyKeys[i])) {
-                to.put(copyKeys[i], from.get(copyKeys[i]));
-            }
+//            if (from.containsKey(copyKeys[i])) {
+//                to.put(copyKeys[i], from.get(copyKeys[i]));
+//            }
+            copyItem(to, from, copyKeys[i]);
         }
     }
 
@@ -792,6 +792,53 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 removeIndex((LinkedHashMap) item, idNames);
             } else if (item instanceof String && idNames.contains(key)) {
                 m.remove(key);
+            }
+        }
+    }
+    
+    /**
+     * copy item from one map to another map
+     * 
+     * @param to     the map which data will be copied to
+     * @param from   the map which data will be copied from
+     * @param key    the key name which will be copied
+     * 
+     */
+    public static void copyItem(LinkedHashMap to, LinkedHashMap from, String key) {
+        copyItem(to, from, key, key, false);
+    }
+    
+    /**
+     * copy item from one map to another map
+     * original data might be delete based on last boolean value
+     * 
+     * @param to     the map which data will be copied to
+     * @param from   the map which data will be copied from
+     * @param key    the key name which will be copied
+     * @param deleteFlg     decide if delete the original data(true for delete)
+     * 
+     */
+    public static void copyItem(LinkedHashMap to, LinkedHashMap from, String key, boolean deleteFlg) {
+        copyItem(to, from, key, key, false);
+    }
+    
+    /**
+     * copy item from one map to another map by using different key
+     * original data might be delete based on last boolean value
+     * 
+     * @param to     the map which data will be copied to
+     * @param from   the map which data will be copied from
+     * @param toKey      the key name used in target holder
+     * @param fromKey    the key name used in original holder
+     * @param deleteFlg     decide if delete the original data(true for delete)
+     * 
+     */
+    public static void copyItem(LinkedHashMap to, LinkedHashMap from, String toKey, String fromKey, boolean deleteFlg) {
+        if (from.get(fromKey) != null) {
+            if (deleteFlg) {
+                to.put(toKey, from.remove(fromKey));
+            } else {
+                to.put(toKey, from.get(fromKey));
             }
         }
     }

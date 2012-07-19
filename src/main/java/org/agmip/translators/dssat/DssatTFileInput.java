@@ -39,11 +39,30 @@ public class DssatTFileInput extends DssatCommonInput {
     protected LinkedHashMap readFile(HashMap brMap) throws IOException {
 
         LinkedHashMap ret = new LinkedHashMap();
+        ArrayList<LinkedHashMap> retArr = new ArrayList<LinkedHashMap>();
         LinkedHashMap file = readFileWithoutCompress(brMap);
+//        compressData(file);
+        ArrayList<LinkedHashMap> obvData = (ArrayList) file.get(obvDataKey);
+        LinkedHashMap obv;
+        LinkedHashMap expData;
 
-        ret.put(obvFileKey, file);
-//        compressData(ret);
+        for (int i = 0; i < obvData.size(); i++) {
+            expData = new LinkedHashMap();
+            obv = new LinkedHashMap();
+            expData.put(jsonKey, obv);
+            copyItem(expData, file, "exname");
+            copyItem(expData, file, "local_name");
+            obv.put(obvFileKey, obvData.get(i));
+            
+            retArr.add(obv);
+        }
+        ret.put("data", retArr);
 
+        // remove index variables
+        ArrayList idNames = new ArrayList();
+        idNames.add("trno_t");
+        removeIndex(retArr, idNames);
+        
         return ret;
     }
 

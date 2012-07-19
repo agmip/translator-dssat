@@ -38,7 +38,7 @@ public class DssatWeatherInput extends DssatCommonInput {
         LinkedHashMap ret = new LinkedHashMap();
         ArrayList<LinkedHashMap> files = readDailyData(brMap, ret);
 //        compressData(files);
-        ret.put(jsonKey, files);
+        ret.put("data", files);
         return ret;
     }
 

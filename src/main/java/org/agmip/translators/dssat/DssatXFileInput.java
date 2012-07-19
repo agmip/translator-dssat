@@ -38,11 +38,30 @@ public class DssatXFileInput extends DssatCommonInput {
     @Override
     protected LinkedHashMap readFile(HashMap brMap) throws IOException {
 
-        // TODO need to be revised later
         LinkedHashMap ret = new LinkedHashMap();
-        ArrayList<LinkedHashMap> trArr = readTreatments(brMap, ret);
-//        compressData(trArr);
-        ret.put(jsonKey, trArr);
+        LinkedHashMap metaData = new LinkedHashMap();
+        ArrayList<LinkedHashMap> expArr = new ArrayList<LinkedHashMap>();
+        LinkedHashMap expData;
+        ArrayList<LinkedHashMap> mgnArr = readTreatments(brMap, metaData);
+
+        for (int i = 0; i < mgnArr.size(); i++) {
+
+            // Set meta data block for this treatment
+            expData = setupMetaData(metaData, i);
+
+            // Set management data for this treatment
+            setupTrnData(expData, mgnArr.get(i));
+            
+            // Set soil_analysis block to soil block
+            copyItem(expData, expData, "soil", "soil_analysis", true);
+
+            // Add to output array
+            expArr.add(expData);
+
+        }
+
+        ret.put(eventKey, expArr);
+//        compressData(ret);
         return ret;
     }
 
@@ -376,7 +395,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     // Set variables' formats
                     formats.clear();
                     formats.put("", 2);         // P.S. ignore the data index "sa"
-                    formats.put("sabl", 6);
+                    formats.put("slbl", 6);     // P.S. changed from sabl  to sllb to match the soil variable name
                     formats.put("slbdm", 6);    // P.S. changed from sabdm to slbdm to match the soil variable name
                     formats.put("sloc", 6);     // P.S. changed from saoc  to sloc to match the soil variable name
                     formats.put("slni", 6);     // P.S. changed from sani  to slni to match the soil variable name
@@ -1045,11 +1064,11 @@ public class DssatXFileInput extends DssatCommonInput {
                     // TODO add a dummy ic block to hold SASC
                     icTmp = new LinkedHashMap();
                     trData.put("initial_condition", icTmp);
-                    icSubArrNew = combinLayers(new ArrayList<LinkedHashMap>(), saSubArr, "icbl", "sabl", copyKeys);
+                    icSubArrNew = combinLayers(new ArrayList<LinkedHashMap>(), saSubArr, "icbl", "slbl", copyKeys);
                 } else {
                     icTmp = (LinkedHashMap) trData.get("initial_condition");
                     ArrayList<LinkedHashMap> icSubArr = (ArrayList) icTmp.get(icEventKey);
-                    icSubArrNew = combinLayers(icSubArr, saSubArr, "icbl", "sabl", copyKeys);
+                    icSubArrNew = combinLayers(icSubArr, saSubArr, "icbl", "slbl", copyKeys);
                 }
                 icTmp.put(icEventKey, icSubArrNew);
             }
@@ -1110,38 +1129,8 @@ public class DssatXFileInput extends DssatCommonInput {
         singleSubRecSecList.add("pl");
         singleSubRecSecList.add("ha");
         singleSubRecSecList.add("sm");
-//        singleSubRecSecList.add("trno_a");
 
-        // TFile data
-//        if (key.equals("trno_t")) {
-//
-//            ret = new ArrayList();
-//            // Loop blocks with different titles
-//            for (int i = 0; i < secArr.size(); i++) {
-//                ArrayList secSubArr = (ArrayList) secArr.get(i);
-//                // Loop blocks with differnt treatment number
-//                for (int j = 0; j < secSubArr.size(); j++) {
-//                    ArrayList secSubSubArr = (ArrayList) secSubArr.get(j);
-//                    if (!secSubSubArr.isEmpty()) {
-//                        LinkedHashMap fstNode = (LinkedHashMap) secSubSubArr.get(0);
-//                        if (value.equals(fstNode.get(key))) {
-//                            ret.add(CopyList(secSubSubArr));
-//                            break;
-//                        }
-//                    }
-//                }
-//
-//            }
-//            return ret;
-//
-//        } else
-            if (key.equals("icbl")) {
-//            for (int i = 0; i < secArr.size(); i++) {
-//                LinkedHashMap m = (LinkedHashMap) secArr.get(i);
-//                if (value.equals(m.get(key))) {
-//                    return m;
-//                }
-//            }
+        if (key.equals("icbl")) {
             return getSectionData(secArr, key, value);
         } else {
             LinkedHashMap fstNode = (LinkedHashMap) secArr.get(0);
@@ -1208,5 +1197,86 @@ public class DssatXFileInput extends DssatCommonInput {
             ret.put("seqid", seqId + "");
             events.add(ret);
         }
+    }
+
+    /**
+     * Setup the meta data block for the treatment
+     *
+     * @param metaData  meta data holder
+     * @param trId      treatment array index for the current treatment
+     * 
+     * @return expData   experiment data holder (contain all blocks)
+     */
+    public LinkedHashMap setupMetaData(LinkedHashMap metaData, int trId) {
+
+        // Set meta data for all treatment
+        LinkedHashMap expData = CopyList(metaData);
+        // Set meta data per treatment
+        ArrayList<LinkedHashMap> trMetaArr = (ArrayList<LinkedHashMap>) expData.remove("tr_meta");
+        expData.putAll(trMetaArr.get(trId));
+
+        return expData;
+    }
+
+    /**
+     * Setup the treatment data, includes management, initial condition and Dssat specific data block
+     * (for the case which only read XFile)
+     *
+     * @param expData   experiment data holder (contain all blocks)
+     * @param mgnData   management data holder (contain events array)
+     */
+    private void setupTrnData(LinkedHashMap expData, LinkedHashMap mgnData) {
+        setupTrnData(expData, mgnData, new LinkedHashMap(), new LinkedHashMap());
+    }
+
+    /**
+     * Setup the treatment data, includes management, initial condition and Dssat specific data block
+     *
+     * @param expData   experiment data holder (contain all blocks)
+     * @param mgnData   management data holder (contain events array)
+     * @param obvAFile  summary observed data holder
+     * @param obvTFile  time series observed data holder
+     */
+    public void setupTrnData(LinkedHashMap expData, LinkedHashMap mgnData, LinkedHashMap obvAFile, LinkedHashMap obvTFile) {
+
+        // remove unused variable
+        expData.remove("wst_id");
+        // Set management data block for this treatment
+        expData.put(jsonKey, mgnData);
+
+        // Set Initial Condition data block for this treatment
+        copyItem(expData, mgnData, "initial_condition", true);
+
+        // Set DSSAT specific data blocks
+        // dssat_sequence
+        copyItem(expData, mgnData, "dssat_sequence", true);
+        // dssat_info
+//        cutDataBlock(mgnData, expData, "dssat_info");
+        // Create dssat info holder
+        LinkedHashMap dssatInfo = new LinkedHashMap();
+        // Move field history code into dssat_info block
+        copyItem(dssatInfo, expData, "flhst", true);
+        copyItem(dssatInfo, expData, "fhdur", true);
+        // AFile local_name
+        if (obvAFile.containsKey("local_name") &&
+            !getObjectOr(obvAFile, "local_name", "").equals(getObjectOr(expData, "local_name", ""))) {
+            dssatInfo.put("local_name_a", obvAFile.get("local_name"));
+        }
+        // TFile local_name
+        if (obvTFile.containsKey("local_name") &&
+                !getObjectOr(obvTFile, "local_name", "").equals(getObjectOr(expData, "local_name", ""))) {
+            dssatInfo.put("local_name_t", obvTFile.get("local_name"));
+        }
+        // Set dssat_info if it is available
+        if (!dssatInfo.isEmpty()) {
+            expData.put("dssat_info", dssatInfo);
+        }
+
+        // remove index variables
+        ArrayList idNames = new ArrayList();
+        idNames.add("trno");
+        idNames.add("trno_a");
+        idNames.add("trno_t");
+        removeIndex(expData, idNames);
     }
 }

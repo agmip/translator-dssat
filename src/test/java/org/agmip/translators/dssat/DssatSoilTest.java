@@ -1,5 +1,7 @@
 package org.agmip.translators.dssat;
 
+import java.io.FileOutputStream;
+import java.io.BufferedOutputStream;
 import java.util.LinkedHashMap;
 import java.io.IOException;
 import java.io.File;
@@ -32,11 +34,15 @@ public class DssatSoilTest {
         LinkedHashMap<String, Object> result;
         LinkedHashMap<String, Object> resultX;
 
-        String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\UFGA7801_SBX.zip";
+        String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\UFGA8201_MZX.zip";
         result = obDssatSoilInput.readFile(filePath);
         DssatXFileInput obDssatXFileInput = new DssatXFileInput();
         resultX = obDssatXFileInput.readFile(filePath);
-        System.out.println(JSONAdapter.toJSON(result));
+//        System.out.println(JSONAdapter.toJSON(result));
+//        File f = new File("outputS.txt");
+//        BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
+//        bo.write(JSONAdapter.toJSON(result).getBytes());
+//        bo.close();
 
 //        result.putAll(resultX);
 //        obDssatSoilOutput.writeFile("", result);

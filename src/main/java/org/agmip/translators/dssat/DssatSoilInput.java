@@ -39,7 +39,7 @@ public class DssatSoilInput extends DssatCommonInput {
         ArrayList sites = readSoilSites(brMap, ret);
 
 //        compressData(sites);
-        ret.put(jsonKey, sites);
+        ret.put("data", sites);
         return ret;
     }
 
