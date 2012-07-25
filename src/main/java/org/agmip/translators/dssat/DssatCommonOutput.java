@@ -21,6 +21,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     protected String defValC = "";
     protected String defValI = "0";
     protected String defValD = "20110101";
+    protected String defValBlank = "";
     // construct the error message in the output
     protected StringBuilder sbError = new StringBuilder();
 

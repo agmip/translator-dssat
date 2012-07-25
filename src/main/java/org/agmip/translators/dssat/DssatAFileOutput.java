@@ -73,7 +73,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
 
             // Output Observation File
             // Titel Section
-            sbData.append(String.format("*EXP.DATA (A): %1$-10s %2$s\r\n\r\n", exName, getObjectOr(result, "local_name", "").toString()));
+            sbData.append(String.format("*EXP.DATA (A): %1$-10s %2$s\r\n\r\n", exName, getObjectOr(result, "local_name", defValBlank).toString()));
 
             // Check if which field is available
             for (Object key : record.keySet()) {

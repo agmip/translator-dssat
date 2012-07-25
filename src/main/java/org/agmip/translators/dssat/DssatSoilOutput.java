@@ -80,7 +80,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
 
             // Output Soil File
             // Titel Section
-            bwS.write("*SOILS: " + getObjectOr((LinkedHashMap) soilSite, "sl_notes", "") + "\r\n\r\n");
+            bwS.write("*SOILS: " + getObjectOr((LinkedHashMap) soilSite, "sl_notes", defValBlank) + "\r\n\r\n");
 
             // Loop sites of data
 //            for (int i = 0; i < soilSites.size(); i++) {
