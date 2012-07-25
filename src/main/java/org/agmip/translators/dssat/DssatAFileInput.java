@@ -35,11 +35,10 @@ public class DssatAFileInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
+    protected ArrayList<LinkedHashMap> readFile(HashMap brMap) throws IOException {
 
-        LinkedHashMap ret = new LinkedHashMap();
-        ArrayList<LinkedHashMap> retArr = new ArrayList<LinkedHashMap>();
-        LinkedHashMap file = readFileWithoutCompress(brMap);
+        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
+        LinkedHashMap file = readObvData(brMap);
 //        compressData(file);
         ArrayList<LinkedHashMap> obvData = (ArrayList) file.get(obvDataKey);
         LinkedHashMap obv;
@@ -52,16 +51,15 @@ public class DssatAFileInput extends DssatCommonInput {
             copyItem(expData, file, "local_name");
             expData.put(jsonKey, obv);
             obv.put(obvFileKey, obvData.get(i));
-            
-            retArr.add(expData);
+
+            ret.add(expData);
         }
 
         // remove index variables
         ArrayList idNames = new ArrayList();
         idNames.add("trno_a");
-        removeIndex(retArr, idNames);
-        
-        ret.put("data", retArr);
+        removeIndex(ret, idNames);
+
         return ret;
     }
 
@@ -71,7 +69,7 @@ public class DssatAFileInput extends DssatCommonInput {
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected LinkedHashMap readFileWithoutCompress(HashMap brMap) throws IOException {
+    protected LinkedHashMap readObvData(HashMap brMap) throws IOException {
 
         LinkedHashMap file = new LinkedHashMap();
         String line;
@@ -87,7 +85,6 @@ public class DssatAFileInput extends DssatCommonInput {
 
         // If AFile File is no been found
         if (buf == null) {
-            // TODO reprot file not exist error
             return file;
         } else {
             if (buf instanceof char[]) {

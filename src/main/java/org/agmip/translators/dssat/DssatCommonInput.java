@@ -36,10 +36,10 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param m  The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected abstract LinkedHashMap readFile(HashMap m) throws IOException;
+    protected abstract ArrayList<LinkedHashMap> readFile(HashMap m) throws IOException;
 
     /**
-     * DSSAT XFile Data input method
+     * DSSAT XFile Data input method, always return the first data object
      * 
      * @param arg0  file name
      * @return result data holder object
@@ -47,7 +47,59 @@ public abstract class DssatCommonInput implements TranslatorInput {
     @Override
     public LinkedHashMap readFile(String arg0) {
 
-        LinkedHashMap ret = new LinkedHashMap();
+//        LinkedHashMap ret = new LinkedHashMap();
+//        String filePath = arg0;
+//
+//        try {
+//            // read file by file
+//            ret = readFile2(getBufferReader(filePath));
+//
+//        } catch (Exception e) {
+//            //System.out.println(e.getMessage());
+//            e.printStackTrace();
+//        }
+//
+//        return ret;
+        return readFileById(arg0, 0);  // TODO
+    }
+
+    /**
+     * DSSAT XFile Data input method, get the data object by array index
+     * 
+     * @param arg0  file name
+     * @return result data holder object
+     */
+    public LinkedHashMap readFileById(String arg0, int id) {
+
+        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
+        String filePath = arg0;
+
+        try {
+            // read file by file
+            ret = readFileAll(filePath);
+
+        } catch (Exception e) {
+            //System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+
+        // If read failed, return blank map
+        if (ret.isEmpty() || id >= ret.size() || id < 0) {
+            return new LinkedHashMap();
+        } else {
+            return ret.get(id);
+        }
+    }
+
+    /**
+     * DSSAT XFile Data input method, return whole array
+     * 
+     * @param arg0  file name
+     * @return result data holder object
+     */
+    public ArrayList<LinkedHashMap> readFileAll(String arg0) {
+
+        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
         String filePath = arg0;
 
         try {
@@ -246,19 +298,6 @@ public abstract class DssatCommonInput implements TranslatorInput {
             }
             line = line.substring(length);
         }
-
-        return ret;
-    }
-
-    /**
-     * Get exname with normal format
-     *
-     * @return exname
-     */
-    protected String getExName() {
-
-        // TODO
-        String ret = "";
 
         return ret;
     }
@@ -795,7 +834,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             }
         }
     }
-    
+
     /**
      * copy item from one map to another map
      * 
@@ -807,7 +846,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
     public static void copyItem(LinkedHashMap to, LinkedHashMap from, String key) {
         copyItem(to, from, key, key, false);
     }
-    
+
     /**
      * copy item from one map to another map
      * original data might be delete based on last boolean value
@@ -821,7 +860,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
     public static void copyItem(LinkedHashMap to, LinkedHashMap from, String key, boolean deleteFlg) {
         copyItem(to, from, key, key, deleteFlg);
     }
-    
+
     /**
      * copy item from one map to another map by using different key
      * original data might be delete based on last boolean value

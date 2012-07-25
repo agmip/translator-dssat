@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
  */
 public class DssatSoilInput extends DssatCommonInput {
 
-    public String layerKey = "soilLayer";  // TODO the key name might change
+    public String layerKey = "soilLayer";  // P.S. the key name might change
 
     /**
      * Constructor with no parameters
@@ -34,12 +34,17 @@ public class DssatSoilInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
-        LinkedHashMap ret = new LinkedHashMap();
-        ArrayList sites = readSoilSites(brMap, ret);
-
+    protected ArrayList<LinkedHashMap> readFile(HashMap brMap) throws IOException {
+        LinkedHashMap metaData = new LinkedHashMap();
+        ArrayList<LinkedHashMap> sites = readSoilSites(brMap, metaData);
 //        compressData(sites);
-        ret.put("data", sites);
+        ArrayList<LinkedHashMap> ret = new ArrayList();
+        for (int i = 0; i < sites.size(); i++) {
+            LinkedHashMap tmp = new LinkedHashMap();
+            tmp.put(jsonKey, sites.get(i));
+            ret.add(tmp);
+        }
+
         return ret;
     }
 
@@ -65,7 +70,6 @@ public class DssatSoilInput extends DssatCommonInput {
 
         // If Soil File is no been found
         if (mapS.isEmpty()) {
-            // TODO reprot file not exist error
             return sites;
         }
 
@@ -106,7 +110,7 @@ public class DssatSoilInput extends DssatCommonInput {
                         // Read line and save into return holder
 //                        sites.add(readLine(line.substring(1), formats));
                         site = readLine(line.substring(1), formats);
-                        if (slNotes != null) {
+                        if (slNotes != null || slNotes.equals("")) {
                             site.put("sl_notes", slNotes);
                         }
                         sites.add(site);

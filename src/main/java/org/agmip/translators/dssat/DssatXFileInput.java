@@ -36,9 +36,8 @@ public class DssatXFileInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
+    protected ArrayList<LinkedHashMap> readFile(HashMap brMap) throws IOException {
 
-        LinkedHashMap ret = new LinkedHashMap();
         LinkedHashMap metaData = new LinkedHashMap();
         ArrayList<LinkedHashMap> expArr = new ArrayList<LinkedHashMap>();
         LinkedHashMap expData;
@@ -51,7 +50,7 @@ public class DssatXFileInput extends DssatCommonInput {
 
             // Set management data for this treatment
             setupTrnData(expData, mgnArr.get(i));
-            
+
             // Set soil_analysis block to soil block
             copyItem(expData, expData, "soil", "soil_analysis", true);
 
@@ -60,9 +59,8 @@ public class DssatXFileInput extends DssatCommonInput {
 
         }
 
-        ret.put(eventKey, expArr);
-//        compressData(ret);
-        return ret;
+//        compressData(expArr);
+        return expArr;
     }
 
     /**
@@ -100,7 +98,7 @@ public class DssatXFileInput extends DssatCommonInput {
         ArrayList<LinkedHashMap> omArr = new ArrayList<LinkedHashMap>();
         ArrayList<LinkedHashMap> chArr = new ArrayList<LinkedHashMap>();
         ArrayList<LinkedHashMap> tiArr = new ArrayList<LinkedHashMap>();
-//        ArrayList<LinkedHashMap> emArr = new ArrayList<LinkedHashMap>();    // TODO add in the future
+//        ArrayList<LinkedHashMap> emArr = new ArrayList<LinkedHashMap>();    // P.S. add in the future
         ArrayList<LinkedHashMap> haArr = new ArrayList<LinkedHashMap>();
         ArrayList<LinkedHashMap> smArr = new ArrayList<LinkedHashMap>();
         String ireff = "";    // P.S. special handling for EFIR in irrigation section
@@ -112,7 +110,6 @@ public class DssatXFileInput extends DssatCommonInput {
 
         // If XFile is no been found
         if (buf == null) {
-            // TODO reprot file not exist error
             return trArr;
         } else {
             if (buf instanceof char[]) {
@@ -272,9 +269,6 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("cul_name", 17);
                     // Read line and save into return holder
                     cuArr.add(readLine(line, formats));
-//                    if (cuArr.size() == 1) {
-//                        metaData.put("crid", line.substring(3, 5).trim()); // TODO keep for the early version; just first entry
-//                    }
                 } else {
                 }
             } // Read FIELDS Section
@@ -288,8 +282,8 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("fl", 2);
                     formats.put("id_field", 9);
                     formats.put("wst_id", 9);       // P.S. id do not match with the master list "wth_id"; might have another id name
-                    formats.put("flsl", 6);         // TODO need to confirm if it is necessary to be hold in meta data
-                    formats.put("flob", 6);         // TODO need to confirm if it is necessary to be hold in meta data
+                    formats.put("flsl", 6);
+                    formats.put("flob", 6);
                     formats.put("fl_drntype", 6);
                     formats.put("fldrd", 6);
                     formats.put("fldrs", 6);
@@ -358,10 +352,7 @@ public class DssatXFileInput extends DssatCommonInput {
                             strLong = null;
                         }
                     }
-//                    if (flArr.size() == 1) {
-//                        metaData.put("fl_lat", strLat); // TODO Keep the meta data handling for the early version
-//                        metaData.put("fl_long", strLong); // TODO Keep the meta data handling for the early version
-//                    }
+
                     if (tmp.containsKey("fl_lat")) {
                         tmp.put("fl_lat", strLat);
                     }
@@ -480,9 +471,6 @@ public class DssatXFileInput extends DssatCommonInput {
                     translateDateStr(tmp, "pdate");
                     translateDateStr(tmp, "pldae");
                     plArr.add(tmp);
-//                    if (plArr.size() == 1) {
-//                        metaData.put("pdate", tmp.get("pdate")); // TODO keep for the early version
-//                    }
                 } else {
                 }
 
@@ -522,7 +510,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("irval", 6);
                     // Read line and save into return holder
                     LinkedHashMap tmp = readLine(line, formats);
-//                    tmp.put("idate", translateDateStr((String) tmp.getOr("idate"))); // TODO DOY handling
+//                    tmp.put("idate", translateDateStr((String) tmp.getOr("idate"))); // P.S. DOY handling
                     tmp.put("ireff", ireff);
                     irdArr.add(tmp);
 
@@ -550,7 +538,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("fe_name", line.length());
                     // Read line and save into return holder
                     LinkedHashMap tmp = readLine(line, formats);
-//                    translateDateStr(tmp, "fdate"); // TODO DOY handling
+//                    translateDateStr(tmp, "fdate"); // P.S. DOY handling
                     feArr.add(tmp);
                 } else {
                 }
@@ -575,7 +563,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("om_name", line.length());
                     // Read line and save into return holder
                     LinkedHashMap tmp = readLine(line, formats);
-//                    translateDateStr(tmp, "omdat"); // TODO DOY handling
+//                    translateDateStr(tmp, "omdat"); // P.S. DOY handling
                     omArr.add(tmp);
                 } else {
                 }
@@ -673,9 +661,6 @@ public class DssatXFileInput extends DssatCommonInput {
                     LinkedHashMap tmp = readLine(line, formats);
                     translateDateStr(tmp, "hdate");
                     haArr.add(tmp);
-//                    if (haArr.size() == 1) {
-//                        metaData.put("hdate", tmp.get("hdate")); // TODO keep for early version
-//                    }
                 } else {
                 }
 
@@ -935,8 +920,7 @@ public class DssatXFileInput extends DssatCommonInput {
             // cultivar
             String cul_name = null;
             if (!getObjectOr(sqData, "ge", "0").equals("0")) {
-//                treatment.put("cultivar", getSectionData(cuArr, "ge", treatment.get("ge").toString()));
-                // TODO move some stuff into dssat_info block or planting event
+                // Move cultivals info into dssat_info block except cul_name which will be located in the planting event
                 sqData.putAll((LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString()));
                 sqData.remove("cul_name");
                 cul_name = (String) ((LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString())).get("cul_name");
@@ -944,14 +928,13 @@ public class DssatXFileInput extends DssatCommonInput {
 
             // field
             if (!getObjectOr(sqData, "fl", "0").equals("0")) {
-                // TODO move some stuff into dssat_info block
+                // Move field info into meta data block
                 trMetaData.putAll((LinkedHashMap) getSectionDataObj(flArr, "fl", sqData.get("fl").toString()));
                 trMetaData.remove("fl");
             }
 
             // initial_condition
             if (!getObjectOr(sqData, "ic", "0").equals("0")) {
-                // TODO move out to top block
                 trData.put("initial_condition", getSectionDataObj(icArr, "ic", sqData.get("ic").toString()));
             }
 
@@ -1031,8 +1014,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 }
             }
 
-            // emvironment
-            // TODO deleted
+            // emvironment  // P.S. keep for furture using
 //            if (!getObjectOr(treatment, "em", "0").equals("0")) {
 //                treatment.put("emvironment", getSectionData(emArr, "em", treatment.get("em").toString()));
 //            }
@@ -1061,11 +1043,12 @@ public class DssatXFileInput extends DssatCommonInput {
                 LinkedHashMap icTmp;
                 String[] copyKeys = {"sasc"};
                 if (!trData.containsKey("initial_condition")) {
-                    // TODO add a dummy ic block to hold SASC
+                    // Add a dummy ic block to hold SASC
                     icTmp = new LinkedHashMap();
                     trData.put("initial_condition", icTmp);
                     icSubArrNew = combinLayers(new ArrayList<LinkedHashMap>(), saSubArr, "icbl", "slbl", copyKeys);
                 } else {
+                    // Add SASC into initial condition block
                     icTmp = (LinkedHashMap) trData.get("initial_condition");
                     ArrayList<LinkedHashMap> icSubArr = (ArrayList) icTmp.get(icEventKey);
                     icSubArrNew = combinLayers(icSubArr, saSubArr, "icbl", "slbl", copyKeys);
@@ -1257,16 +1240,6 @@ public class DssatXFileInput extends DssatCommonInput {
         // Move field history code into dssat_info block
         copyItem(dssatInfo, expData, "flhst", true);
         copyItem(dssatInfo, expData, "fhdur", true);
-//        // AFile local_name
-//        if (obvAFile.containsKey("local_name") &&
-//            !getObjectOr(obvAFile, "local_name", "").equals(getObjectOr(expData, "local_name", ""))) {
-//            dssatInfo.put("local_name_a", obvAFile.get("local_name"));
-//        }
-//        // TFile local_name
-//        if (obvTFile.containsKey("local_name") &&
-//                !getObjectOr(obvTFile, "local_name", "").equals(getObjectOr(expData, "local_name", ""))) {
-//            dssatInfo.put("local_name_t", obvTFile.get("local_name"));
-//        }
         // Set dssat_info if it is available
         if (!dssatInfo.isEmpty()) {
             expData.put("dssat_info", dssatInfo);

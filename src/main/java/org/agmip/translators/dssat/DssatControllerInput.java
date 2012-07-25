@@ -57,11 +57,11 @@ public class DssatControllerInput {
         wthArr = wthReader.readDailyData(brMap, metaData);
 
         // Try to read Observed AFile (summary data)
-        obvAFile = obvAReader.readFileWithoutCompress(brMap);
+        obvAFile = obvAReader.readObvData(brMap);
         obvAArr = getObjectOr(obvAFile, obvAReader.obvDataKey, new ArrayList<LinkedHashMap>());
 
         // Try to read Observed AFile (time-series data)
-        obvTFile = obvTReader.readFileWithoutCompress(brMap);
+        obvTFile = obvTReader.readObvData(brMap);
         obvTArr = getObjectOr(obvTFile, obvTReader.obvDataKey, new ArrayList<LinkedHashMap>());
 
         // Combine the each part of data
