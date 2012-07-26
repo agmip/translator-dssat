@@ -16,8 +16,8 @@ import static org.agmip.util.MapUtil.*;
  */
 public class DssatXFileInput extends DssatCommonInput {
 
-    private String eventKey = "data";
-    private String icEventKey = "soilLayer";
+    public String eventKey = "data";
+    public String icEventKey = "soilLayer";
 
     /**
      * Constructor with no parameters
@@ -47,12 +47,25 @@ public class DssatXFileInput extends DssatCommonInput {
 
             // Set meta data block for this treatment
             expData = setupMetaData(metaData, i);
-
-            // Set management data for this treatment
-            setupTrnData(expData, mgnArr.get(i));
+            // TODO need to be confirmed
+            LinkedHashMap wthTmp = new LinkedHashMap();
+            copyItem(wthTmp, expData, "wst_id");
+            expData.put("weather", wthTmp);
 
             // Set soil_analysis block to soil block
             copyItem(expData, expData, "soil", "soil_analysis", true);
+            LinkedHashMap soilTmp = getObjectOr(expData, "soil", new LinkedHashMap());
+            copyItem(soilTmp, expData, "soil_id");
+            copyItem(soilTmp, expData, "sltx");
+            copyItem(soilTmp, expData, "sldp");
+            ArrayList<LinkedHashMap> soilSubArr = getObjectOr(soilTmp, icEventKey, new ArrayList());
+            for (int j = 0; j < soilSubArr.size(); j++) {
+                soilSubArr.get(j).remove("sasc");
+            }
+            expData.put("soil", soilTmp);
+
+            // Set management data for this treatment
+            setupTrnData(expData, mgnArr.get(i));
 
             // Add to output array
             expArr.add(expData);
@@ -118,20 +131,6 @@ public class DssatXFileInput extends DssatCommonInput {
                 br = (BufferedReader) buf;
             }
         }
-
-//        ret.put("cultivar", cuArr);
-//        ret.put("field", flArr);
-//        ret.put("soil_analysis", saArr);
-//        ret.put("initial_condition", icArr);
-//        ret.put("plant", plArr);
-//        ret.put("irrigation", irArr);
-//        ret.put("fertilizer", feArr);
-//        ret.put("organic_matter", omArr);
-//        ret.put("chemical", chArr);
-//        ret.put("tillage", tiArr);
-//        ret.put("emvironment", emArr);
-//        ret.put("harvest", haArr);
-//        ret.put("simulation", smArr);
 
         while ((line = br.readLine()) != null) {
 
@@ -200,15 +199,15 @@ public class DssatXFileInput extends DssatCommonInput {
 
                     // Set variables' formats
                     formats.clear();
-                    formats.put("parea", 7);
-                    formats.put("prno", 6);
-                    formats.put("plen", 6);
+                    formats.put("plta", 7);
+                    formats.put("pltrno", 6);
+                    formats.put("pltln", 6);
                     formats.put("pldr", 6);
-                    formats.put("plsp", 6);
-                    formats.put("play", 6);
+                    formats.put("pltsp", 6);
+                    formats.put("plot_layout", 6);
                     formats.put("pltha", 6);
-                    formats.put("hrno", 6);
-                    formats.put("hlen", 6);
+                    formats.put("plthno", 6);
+                    formats.put("plthl", 6);
                     formats.put("plthm", 16);
                     // Read line and save into return holder
                     metaData.putAll(readLine(line, formats));
@@ -288,8 +287,8 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("fldrd", 6);
                     formats.put("fldrs", 6);
                     formats.put("flst", 6);
-                    formats.put("null_1", 6);       // P.S. no longer reading sltx since it is repeated with soil info
-                    formats.put("null_2", 6);       // P.S. no longer reading sldp since it is repeated with soil info
+                    formats.put("sltx", 6);
+                    formats.put("sldp", 6);
                     formats.put("soil_id", 11);
                     formats.put("fl_name", line.length());
                     // Read line and save into return holder
@@ -379,7 +378,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     translateDateStr(tmp, "sadat");
                     saArr.add(tmp);
                     sadArr = new ArrayList<LinkedHashMap>();
-                    tmp.put(eventKey, sadArr);
+                    tmp.put(icEventKey, sadArr);
 
                 } // Read SOIL ANALYSIS layer data
                 else if (flg[1].startsWith("a  sabl") && flg[2].equals("data")) {
@@ -412,7 +411,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("icdat", 6);
                     formats.put("icrt", 6);
                     formats.put("icnd", 6);
-                    formats.put("icrz#", 6);    // P.S. use the "icrz#" instead of "icrzno"
+                    formats.put("icrzno", 6);
                     formats.put("icrze", 6);
                     formats.put("icwt", 6);
                     formats.put("icrag", 6);
@@ -554,9 +553,9 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("omdat", 6);    // P.S. id do not match with the master list "omday"
                     formats.put("omcd", 6);
                     formats.put("omamt", 6);
-                    formats.put("omn%", 6);      // P.S. id do not match with the master list "omnpct"
-                    formats.put("omp%", 6);      // P.S. id do not match with the master list "omppct"
-                    formats.put("omk%", 6);      // P.S. id do not match with the master list "omkpct"
+                    formats.put("omnpct", 6);
+                    formats.put("omppct", 6);
+                    formats.put("omkpct", 6);
                     formats.put("ominp", 6);
                     formats.put("omdep", 6);
                     formats.put("omacd", 6);
@@ -1033,7 +1032,7 @@ public class DssatXFileInput extends DssatCommonInput {
             // soil_analysis
             if (!getObjectOr(sqData, "sa", "0").equals("0")) {
                 LinkedHashMap saTmp = (LinkedHashMap) getSectionDataObj(saArr, "sa", sqData.get("sa").toString());
-                ArrayList<LinkedHashMap> saSubArr = (ArrayList) saTmp.get(eventKey);
+                ArrayList<LinkedHashMap> saSubArr = (ArrayList) saTmp.get(icEventKey);
 
                 // temporally put soil_analysis block into treatment meta data
                 trMetaData.put("soil_analysis", saTmp);
@@ -1224,6 +1223,8 @@ public class DssatXFileInput extends DssatCommonInput {
 
         // remove unused variable
         expData.remove("wst_id");
+        expData.remove("sltx");
+        expData.remove("sldp");
         // Set management data block for this treatment
         expData.put(jsonKey, mgnData);
 

@@ -41,7 +41,7 @@ public class DssatSoilTest {
         BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
         bo.write(JSONAdapter.toJSON(result).getBytes());
         bo.close();
-//        f.delete();
+        f.delete();
 
         result.get(0).put("exname", "UFGA8201MZ");
         obDssatSoilOutput.writeFile("", result.get(0));

@@ -41,7 +41,7 @@ public class DssatTFileTest {
         BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
         bo.write(JSONAdapter.toJSON(result).getBytes());
         bo.close();
-//        f.delete();
+        f.delete();
         
         obDssatTFileOutput.writeFile("", result.get(4));
         File file = obDssatTFileOutput.getOutputFile();

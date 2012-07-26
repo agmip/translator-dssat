@@ -41,7 +41,7 @@ public class DssatWeatherTest {
         BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
         bo.write(JSONAdapter.toJSON(result).getBytes());
         bo.close();
-//        f.delete();
+        f.delete();
 
         obDssatWeatherOutput.writeFile("", result.get(0));
         File file = obDssatWeatherOutput.getOutputFile();

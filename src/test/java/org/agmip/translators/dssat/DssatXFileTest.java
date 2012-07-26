@@ -41,14 +41,14 @@ public class DssatXFileTest {
         BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
         bo.write(JSONAdapter.toJSON(result).getBytes());
         bo.close();
-//        f.delete();
+        f.delete();
 
-//        obDssatXFileOutput.writeFile("", result.get(0));
-//        File file = obDssatXFileOutput.getOutputFile();
-//        if (file != null) {
-//            assertTrue(file.exists());
-//            assertTrue(file.getName().equals("UFGA8201.MZX"));
-//            assertTrue(file.delete());
-//        }
+        obDssatXFileOutput.writeFile("", result.get(0));
+        File file = obDssatXFileOutput.getOutputFile();
+        if (file != null) {
+            assertTrue(file.exists());
+            assertTrue(file.getName().equals("UFGA8201.MZX"));
+            assertTrue(file.delete());
+        }
     }
 }
