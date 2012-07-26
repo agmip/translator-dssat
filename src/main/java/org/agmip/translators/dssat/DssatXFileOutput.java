@@ -754,7 +754,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 for (int idx = 0; idx < smArr.size(); idx++) {
                     secData = (LinkedHashMap) smArr.get(idx);
 
-                    System.out.print(idx);
                     if (secData.containsKey("sm_general")) {
                         sbData.append("*SIMULATION CONTROLS\r\n");
                         Object[] keys = secData.keySet().toArray();

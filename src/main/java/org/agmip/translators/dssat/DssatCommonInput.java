@@ -736,8 +736,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
         }
 
         // Auto-fill the copy data in the missing layer with nearby layer data
-        String copyItem = null;
+        String copyItem;
         for (int i = 0; i < copyKeys.length; i++) {
+            copyItem = null;
             for (int j = ret.size() - 1; j > 0; j--) {
                 if (ret.get(j).containsKey(copyKeys[i])) {
                     copyItem = (String) ret.get(j).get(copyKeys[i]);
