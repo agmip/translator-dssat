@@ -1,5 +1,6 @@
 package org.agmip.translators.dssat;
 
+import java.util.Calendar;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -79,8 +80,13 @@ public class DssatSoilOutput extends DssatCommonOutput {
             bwS = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Soil File
+            // Description info for output by translator
+            bwS.write("!This soil file is created by DSSAT translator tool on " + Calendar.getInstance().getTime() + ".\r\n");
+            bwS.write("!The ACE ID is " + getValueOr(result, "id", "N/A") + ".\r\n");
+            bwS.write("!This soil data is used for the experiment which name is " + getValueOr(result, "exname", "N/A") + ".\r\n\r\n");
+
             // Titel Section
-            bwS.write("*SOILS: " + getObjectOr((LinkedHashMap) soilSite, "sl_notes", defValBlank) + "\r\n\r\n");
+            sbData.append("*SOILS: ").append(getObjectOr((LinkedHashMap) soilSite, "sl_notes", defValBlank)).append("\r\n\r\n");
 
             // Loop sites of data
 //            for (int i = 0; i < soilSites.size(); i++) {

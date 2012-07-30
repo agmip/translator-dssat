@@ -48,6 +48,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         LinkedHashMap subData;
         ArrayList secDataArr;                       // Arraylist for section data holder
         LinkedHashMap sqData;
+        LinkedHashMap trData = new LinkedHashMap();
         ArrayList<LinkedHashMap> evtArr;            // Arraylist for section data holder
         LinkedHashMap evtData;
 //        int trmnNum;                            // total numbers of treatment in the data holder
@@ -88,7 +89,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 return;
             }
 //            decompressData((LinkedHashMap) result);
-            setDefVal(expData);
+            setDefVal();
 
             // Initial BufferedWriter
             exName = getExName(expData);
@@ -181,7 +182,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             // Set field info
             LinkedHashMap flData = new LinkedHashMap();
             copyItem(flData, expData, "id_field");
-            copyItem(flData, getObjectOr(expData, "weather", new LinkedHashMap()), "wst_id");
+            copyItem(flData, expData, "wst_id");
             copyItem(flData, expData, "flsl");
             copyItem(flData, expData, "flob");
             copyItem(flData, expData, "fl_drntype");
@@ -200,6 +201,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
             copyItem(flData, expData, "flsla");
             copyItem(flData, getObjectOr(expData, "dssat_info", new LinkedHashMap()), "flhst");
             copyItem(flData, getObjectOr(expData, "dssat_info", new LinkedHashMap()), "fhdur");
+            // remove the "_trno" in the soil_id when soil analysis is available
+            String soilId = getValueOr(expData, "soil_id", "");
+            if (soilId.length() > 10 && soilId.matches("\\w+_\\d+")) {
+                expData.put("soil_id", soilId.replaceAll("_\\d+$", ""));
+            }
             flNum = setSecDataArr(flData, flArr);
 
             // Set initial condition info
@@ -251,8 +257,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     smData.put("sm_nitrogen", getValueOr(sqData, "sm_nitrogen", defValBlank));
                     smData.put("sm_residues", getValueOr(sqData, "sm_residues", defValBlank));
                     smData.put("sm_harvests", getValueOr(sqData, "sm_harvests", defValBlank));
+                } else {
+                    smData.put("fertilizer", mfSubArr);
+                    smData.put("irrigation", miSubArr);
+                    smData.put("planting", mpData);
                 }
-                // TODO add seq related info into smData to help create auto-info for sm
 
                 // Loop all sequence data
                 for (int j = 0; j < evtArr.size(); j++) {
@@ -460,7 +469,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$s\r\n",
                             idx + 1, //getObjectOr(secData, "ic", defValI).toString(),
                             getObjectOr(secData, "icpcr", defValC).toString(),
-                            formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. icdat -> date
+                            formatDateStr(getObjectOr(secData, "date", getPdate(result)).toString()), // P.S. icdat -> date
                             formatNumStr(5, getObjectOr(secData, "icrt", defValR).toString()),
                             formatNumStr(5, getObjectOr(secData, "icnd", defValR).toString()),
                             formatNumStr(5, getObjectOr(secData, "icrzno", defValR).toString()),
@@ -739,7 +748,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 // Set Title list
                 ArrayList smTitles = new ArrayList();
-                smTitles.add("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
+                smTitles.add("@@N GENERAL     NYERS NREPS START SDATE RSEED SNAME.................... SMODEL\r\n");
                 smTitles.add("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
                 smTitles.add("@N METHODS     WTHER INCON LIGHT EVAPO INFIL PHOTO HYDRO NSWIT MESOM MESEV MESOL\r\n");
                 smTitles.add("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
@@ -795,56 +804,55 @@ public class DssatXFileOutput extends DssatCommonOutput {
     private String createSMMAStr(int smid, LinkedHashMap expData, LinkedHashMap trData) {
 
         StringBuilder sb = new StringBuilder();
-        String nitro;
-        String water;
+        String nitro = "Y";
+        String water = "Y";
         String sdate;
         String sm = String.format("%2d", smid);
-        ArrayList dataArr;
-        LinkedHashMap data;
+        ArrayList<LinkedHashMap> dataArr;
         LinkedHashMap subData;
+        
+        // Check if the meta data of fertilizer is not "N" ("Y" or null)
+        if (!getValueOr(expData, "fertilizer", "").equals("N")) {
 
-        // TODO to confirm the logic again for the new structure of json
-        dataArr = (ArrayList) getObjectOr(trData, "fertilizer", new ArrayList());
-        if (!dataArr.isEmpty()) {
-            subData = (LinkedHashMap) dataArr.get(0);
-        } else {
-            subData = new LinkedHashMap();
-        }
-        if (!getObjectOr(subData, "fdate", "").toString().equals("")) {
-            nitro = "Y";
-        } else if (getObjectOr(expData, "fertilizer", "").toString().equals("N")) {
-            nitro = "Y";
-        } else {
-            nitro = "N";
+            // Check if necessary data is missing in all the event records
+            dataArr = (ArrayList) getObjectOr(trData, "fertilizer", new ArrayList());
+            for (int i = 0; i < dataArr.size(); i++) {
+                subData = dataArr.get(i);
+                if (getValueOr(subData, "date", "").equals("")
+                        || getValueOr(subData, "fecd", "").equals("")
+                        || getValueOr(subData, "feacd", "").equals("")
+                        || getValueOr(subData, "feamn", "").equals("")) {
+                    nitro = "N";
+                    break;
+                }
+            }
         }
 
-        // TODO to confirm the logic again for the new structure of json
-        data = (LinkedHashMap) getObjectOr(trData, "irrigation", new LinkedHashMap());
-        dataArr = (ArrayList) getObjectOr(data, "data", new ArrayList());
-        if (!dataArr.isEmpty()) {
-            subData = (LinkedHashMap) dataArr.get(0);
-        } else {
-            subData = new LinkedHashMap();
-        }
-        if (!getObjectOr(subData, "ireff", "").toString().equals("")) {
-            water = "Y";
-        } else if (getObjectOr(subData, "irrig", "").toString().equals("N")) {
-            water = "Y";
-        } else {
-            water = "N";
+        // Check if the meta data of irrigation is not "N" ("Y" or null)
+        if (!getValueOr(expData, "irrigation", "").equals("N")) {
+
+            // Check if necessary data is missing in all the event records
+            dataArr = (ArrayList) getObjectOr(trData, "irrigation", new ArrayList());
+            for (int i = 0; i < dataArr.size(); i++) {
+                subData = dataArr.get(i);
+                if (getValueOr(subData, "date", "").equals("")
+                        || getValueOr(subData, "irval", "").equals("")) {
+                    water = "N";
+                    break;
+                }
+            }
         }
 
         sdate = getObjectOr(expData, "sdat", "").toString();
         if (sdate.equals("")) {
-//            data = (LinkedHashMap) getObjectOr(trData, "plant", new LinkedHashMap());
-//            sdate = getObjectOr(data, "pdate", defValD).toString();
-            sdate = getPdate(expData);  // TODO find a way to match seqid
+            subData = (LinkedHashMap) getObjectOr(trData, "planting", new LinkedHashMap());
+            sdate = getValueOr(subData, "date", defValD);
         }
         sdate = formatDateStr(sdate);
 
 
         sb.append("*SIMULATION CONTROLS\r\n");
-        sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
+        sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME.................... SMODEL\r\n");
         sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
         sb.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
         sb.append(sm).append(" OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     Y     M\r\n");
@@ -872,27 +880,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
     /**
      * Set default value for missing data
      * 
-     * @param result  date holder for experiment data
      */
-    private void setDefVal(LinkedHashMap expData) {
+    private void setDefVal() {
 
-        Map icData = (Map) expData.get("initial_condition");
-        String icdat = null;
-        String pdate = getPdate(expData);
-        if (icData != null) {
-            icdat = (String) icData.get("icdat");
-        }
-
-        if (icdat != null && !icdat.equals("")) {
-            defValD = icdat;
-//        } else if (!getObjectOr(result, "sdat", "").toString().equals("")) {
-//            defValD = getObjectOr(result, "sdat", "").toString(); // TODO to confirm if we still need sdat
-        } else if (pdate != null && !pdate.equals("")) {
-            defValD = pdate;
-        } else {
-            sbError.append("! Warning: There is no available date info in the experiment.\r\n");
-            defValD = "20110101";
-        }
         defValR = "-99";
         defValC = "-99";
         defValI = "-99";

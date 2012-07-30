@@ -47,7 +47,7 @@ public class DssatWeatherTest {
         File file = obDssatWeatherOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
-            assertTrue(file.getName().equals("UFGA8201.WTH"));
+            assertTrue(file.getName().equals("UFGA8202.WTH"));
             assertTrue(file.delete());
         }
     }

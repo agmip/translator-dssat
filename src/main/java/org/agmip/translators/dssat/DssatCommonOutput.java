@@ -20,7 +20,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     protected String defValR = "0.00";
     protected String defValC = "";
     protected String defValI = "0";
-    protected String defValD = "20110101";
+    protected String defValD = "-99";
     protected String defValBlank = "";
     // construct the error message in the output
     protected StringBuilder sbError = new StringBuilder();
@@ -144,9 +144,13 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      */
     protected String getExName(Map result) {
 
-        String ret = (String) getValueOr(result, "exname", "");
+        String ret = getValueOr(result, "exname", "");
         if (ret.contains(".")) {
             ret = ret.substring(0, ret.length() - 1).replace(".", "");
+        }
+        // TODO need to be updated with a translate rule for other models' exname
+        if (ret.length() > 10 && ret.matches("\\w+_\\d+")) {
+            ret = ret.replaceAll("_\\d+$", "");
         }
 
         return ret;

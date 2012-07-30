@@ -78,7 +78,23 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                 if (wthRecords.isEmpty()) {
                     fileName += ".WTH";
                 } else {
-                    fileName += getObjectOr(((LinkedHashMap) wthRecords.get(0)), "w_date", "2000").toString().substring(2, 4) + "01.WTH";
+                    // Get the year of starting date and end date
+                    String startYear = getValueOr(((LinkedHashMap) wthRecords.get(0)), "w_date", "    ").substring(2, 4).trim();
+                    String endYear = getValueOr(((LinkedHashMap) wthRecords.get(wthRecords.size() - 1)), "w_date", "    ").substring(2, 4).trim();
+                    // If not available, do not show year and duration in the file name
+                    if (startYear.equals("") || endYear.equals("")) {
+                        fileName += ".WTH";
+                    } else {
+                        fileName += startYear;
+                        try {
+                            int duration = Integer.parseInt(endYear) - Integer.parseInt(startYear) + 1;
+                            // P.S. Currently the system only support the maximum of 99 years for duration
+                            duration = duration > 99 ? 99 : duration;
+                            fileName += String.format("%02d.WTH", duration);
+                        } catch (Exception e) {
+                            fileName += "01.WTH";   // Default duration uses 01 (minimum value)
+                        }
+                    }
                 }
             }
             arg0 = revisePath(arg0);

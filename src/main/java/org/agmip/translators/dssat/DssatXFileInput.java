@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 import static org.agmip.util.MapUtil.*;
 
 /**
- * DSSAT Experiment Data I/O API Class
+ * DSSAT Experiment Data I/O API Class1
  * 
  * @author Meng Zhang
  * @version 1.0
@@ -47,14 +47,11 @@ public class DssatXFileInput extends DssatCommonInput {
 
             // Set meta data block for this treatment
             expData = setupMetaData(metaData, i);
-            // TODO need to be confirmed
-            LinkedHashMap wthTmp = new LinkedHashMap();
-            copyItem(wthTmp, expData, "wst_id");
-            expData.put("weather", wthTmp);
 
             // Set soil_analysis block to soil block
             copyItem(expData, expData, "soil", "soil_analysis", true);
             LinkedHashMap soilTmp = getObjectOr(expData, "soil", new LinkedHashMap());
+            expData.put("soil_id", expData.get("soil_id") + "_" + (i + 1));
             copyItem(soilTmp, expData, "soil_id");
             copyItem(soilTmp, expData, "sltx");
             copyItem(soilTmp, expData, "sldp");
@@ -1196,6 +1193,9 @@ public class DssatXFileInput extends DssatCommonInput {
         // Set meta data per treatment
         ArrayList<LinkedHashMap> trMetaArr = (ArrayList<LinkedHashMap>) expData.remove("tr_meta");
         expData.putAll(trMetaArr.get(trId));
+        if (!getValueOr(expData, "exname", "").equals("")) {
+            expData.put("exname", expData.get("exname") + "_" + (trId + 1));
+        }
 
         return expData;
     }
@@ -1222,7 +1222,6 @@ public class DssatXFileInput extends DssatCommonInput {
     public void setupTrnData(LinkedHashMap expData, LinkedHashMap mgnData, LinkedHashMap obvAFile, LinkedHashMap obvTFile) {
 
         // remove unused variable
-        expData.remove("wst_id");
         expData.remove("sltx");
         expData.remove("sldp");
         // Set management data block for this treatment
