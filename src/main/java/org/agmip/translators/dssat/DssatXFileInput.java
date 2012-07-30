@@ -108,7 +108,7 @@ public class DssatXFileInput extends DssatCommonInput {
         ArrayList<LinkedHashMap> omArr = new ArrayList<LinkedHashMap>();
         ArrayList<LinkedHashMap> chArr = new ArrayList<LinkedHashMap>();
         ArrayList<LinkedHashMap> tiArr = new ArrayList<LinkedHashMap>();
-//        ArrayList<LinkedHashMap> emArr = new ArrayList<LinkedHashMap>();    // P.S. add in the future
+        ArrayList<LinkedHashMap> emArr = new ArrayList<LinkedHashMap>();
         ArrayList<LinkedHashMap> haArr = new ArrayList<LinkedHashMap>();
         ArrayList<LinkedHashMap> smArr = new ArrayList<LinkedHashMap>();
         String ireff = "";    // P.S. special handling for EFIR in irrigation section
@@ -605,14 +605,14 @@ public class DssatXFileInput extends DssatCommonInput {
                 } else {
                 }
 
-//            } // Read ENVIRONMENT MODIFICATIONS Section
-//            else if (flg[0].startsWith("environment")) {
-//
-//                // Read ENVIRONMENT MODIFICATIONS data
-//                if (flg[2].equals("data")) {
-//                    // Set variables' formats
-//                    formats.clear();
-//                    formats.put("em", 2);
+            } // Read ENVIRONMENT MODIFICATIONS Section
+            else if (flg[0].startsWith("environment")) {
+
+                // Read ENVIRONMENT MODIFICATIONS data
+                if (flg[2].equals("data")) {
+                    // Set variables' formats
+                    formats.clear();
+                    formats.put("em", 2);
 //                    formats.put("emday", 6);
 //                    formats.put("ecdyl", 2);
 //                    formats.put("emdyl", 4);
@@ -631,12 +631,13 @@ public class DssatXFileInput extends DssatCommonInput {
 //                    formats.put("ecwnd", 2);
 //                    formats.put("emwnd", 4);
 //                    formats.put("em_name", line.length());
-//                    // Read line and save into return holder
-//                    LinkedHashMap tmp = readLine(line, formats);
+                    // Read line and save into return holder
+                    LinkedHashMap tmp = readLine(line, formats);
 //                    translateDateStr(tmp, "emday");
-//                    emArr.add(tmp);
-//                } else {
-//                }
+                    tmp.put("em_data", line.substring(2));
+                    emArr.add(tmp);
+                } else {
+                }
 
             } // Read HARVEST DETAILS Section
             else if (flg[0].startsWith("harvest")) {
@@ -1011,9 +1012,14 @@ public class DssatXFileInput extends DssatCommonInput {
             }
 
             // emvironment  // P.S. keep for furture using
-//            if (!getObjectOr(treatment, "em", "0").equals("0")) {
-//                treatment.put("emvironment", getSectionData(emArr, "em", treatment.get("em").toString()));
-//            }
+            if (!getObjectOr(sqData, "em", "0").equals("0")) {
+                ArrayList<LinkedHashMap> emDataArr = (ArrayList) getSectionDataObj(emArr, "em", sqData.get("em").toString());
+                ArrayList arr = new ArrayList();
+                for (int j = 0; j < emDataArr.size(); j++) {
+                    arr.add(emDataArr.get(j).get("em_data"));
+                }
+                sqData.put("em_data", arr);
+            }
 
             // harvest
             if (!getObjectOr(sqData, "ha", "0").equals("0")) {

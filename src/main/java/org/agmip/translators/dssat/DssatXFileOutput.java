@@ -202,9 +202,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
             copyItem(flData, getObjectOr(expData, "dssat_info", new LinkedHashMap()), "flhst");
             copyItem(flData, getObjectOr(expData, "dssat_info", new LinkedHashMap()), "fhdur");
             // remove the "_trno" in the soil_id when soil analysis is available
-            String soilId = getValueOr(expData, "soil_id", "");
+            String soilId = getValueOr(flData, "soil_id", "");
             if (soilId.length() > 10 && soilId.matches("\\w+_\\d+")) {
-                expData.put("soil_id", soilId.replaceAll("_\\d+$", ""));
+                flData.put("soil_id", soilId.replaceAll("_\\d+$", ""));
             }
             flNum = setSecDataArr(flData, flArr);
 
@@ -241,9 +241,12 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 ArrayList<LinkedHashMap> mrSubArr = new ArrayList<LinkedHashMap>();
                 ArrayList<LinkedHashMap> mcSubArr = new ArrayList<LinkedHashMap>();
                 ArrayList<LinkedHashMap> mtSubArr = new ArrayList<LinkedHashMap>();
-//                ArrayList<LinkedHashMap> meSubArr = new ArrayList<LinkedHashMap>();
+                ArrayList<LinkedHashMap> meSubArr = new ArrayList<LinkedHashMap>();
                 ArrayList<LinkedHashMap> mhSubArr = new ArrayList<LinkedHashMap>();
                 LinkedHashMap smData = new LinkedHashMap();
+                
+                // Set environment modification info
+                meSubArr = getObjectOr(sqData, "em_data", meSubArr);
 
                 // Set simulation control info
                 if (!getValueOr(sqData, "sm_general", "").equals("")) {
@@ -263,7 +266,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     smData.put("planting", mpData);
                 }
 
-                // Loop all sequence data
+                // Loop all event data
                 for (int j = 0; j < evtArr.size(); j++) {
                     evtData = new LinkedHashMap();
                     evtData.putAll(evtArr.get(j));
@@ -295,8 +298,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         } // tillage event
                         else if (getValueOr(evtData, "event", "").equals("tillage")) {
                             mtSubArr.add(evtData);
-//                        } // evironment_modification event
-//                        else if (getValueOr(evtData, "event", "").equals("evironment_modification")) {
+//                        } // environment_modification event
+//                        else if (getValueOr(evtData, "event", "").equals("environment_modification")) {
 //                            meSubArr.add(evtData);
                         } // harvest event
                         else if (getValueOr(evtData, "event", "").equals("harvest")) {
@@ -315,8 +318,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 mrNum = setSecDataArr(mrSubArr, mrArr);
                 mcNum = setSecDataArr(mcSubArr, mcArr);
                 mtNum = setSecDataArr(mtSubArr, mtArr);
-//                meNum = setSecDataArr(meSubArr, meArr);
-                meNum = 0;      // P.S. keep evironment modification info disabled
+                meNum = setSecDataArr(meSubArr, meArr);
                 mhNum = setSecDataArr(mhSubArr, mhArr);
                 smNum = setSecDataArr(smData, smArr);
                 if (smNum == 0) {
@@ -691,27 +693,29 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     secDataArr = (ArrayList) meArr.get(idx);
 
                     for (int i = 0; i < secDataArr.size(); i++) {
-                        secData = (LinkedHashMap) secDataArr.get(i);
-                        sbData.append(String.format("%1$2s %2$5s %3$-1s%4$4s %5$-1s%6$4s %7$-1s%8$4s %9$-1s%10$4s %11$-1s%12$4s %13$-1s%14$4s %15$-1s%16$4s %17$-1s%18$4s %19$s\r\n",
-                                idx + 1, //getObjectOr(secData, "em", defValI).toString(),
-                                formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. emday -> date
-                                getObjectOr(secData, "ecdyl", defValC).toString(),
-                                formatNumStr(4, getObjectOr(secData, "emdyl", defValR).toString()),
-                                getObjectOr(secData, "ecrad", defValC).toString(),
-                                formatNumStr(4, getObjectOr(secData, "emrad", defValR).toString()),
-                                getObjectOr(secData, "ecmax", defValC).toString(),
-                                formatNumStr(4, getObjectOr(secData, "emmax", defValR).toString()),
-                                getObjectOr(secData, "ecmin", defValC).toString(),
-                                formatNumStr(4, getObjectOr(secData, "emmin", defValR).toString()),
-                                getObjectOr(secData, "ecrai", defValC).toString(),
-                                formatNumStr(4, getObjectOr(secData, "emrai", defValR).toString()),
-                                getObjectOr(secData, "ecco2", defValC).toString(),
-                                formatNumStr(4, getObjectOr(secData, "emco2", defValR).toString()),
-                                getObjectOr(secData, "ecdew", defValC).toString(),
-                                formatNumStr(4, getObjectOr(secData, "emdew", defValR).toString()),
-                                getObjectOr(secData, "ecwnd", defValC).toString(),
-                                formatNumStr(4, getObjectOr(secData, "emwnd", defValR).toString()),
-                                getObjectOr(secData, "em_name", defValC).toString()));
+                        sbData.append(String.format("%1$2s%2$s\r\n",
+                                idx + 1,
+                                (String) secDataArr.get(i)));
+//                        sbData.append(String.format("%1$2s %2$5s %3$-1s%4$4s %5$-1s%6$4s %7$-1s%8$4s %9$-1s%10$4s %11$-1s%12$4s %13$-1s%14$4s %15$-1s%16$4s %17$-1s%18$4s %19$s\r\n",
+//                                idx + 1, //getObjectOr(secData, "em", defValI).toString(),
+//                                formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. emday -> date
+//                                getObjectOr(secData, "ecdyl", defValC).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emdyl", defValR).toString()),
+//                                getObjectOr(secData, "ecrad", defValC).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emrad", defValR).toString()),
+//                                getObjectOr(secData, "ecmax", defValC).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emmax", defValR).toString()),
+//                                getObjectOr(secData, "ecmin", defValC).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emmin", defValR).toString()),
+//                                getObjectOr(secData, "ecrai", defValC).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emrai", defValR).toString()),
+//                                getObjectOr(secData, "ecco2", defValC).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emco2", defValR).toString()),
+//                                getObjectOr(secData, "ecdew", defValC).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emdew", defValR).toString()),
+//                                getObjectOr(secData, "ecwnd", defValC).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emwnd", defValR).toString()),
+//                                getObjectOr(secData, "em_name", defValC).toString()));
 
                     }
                 }

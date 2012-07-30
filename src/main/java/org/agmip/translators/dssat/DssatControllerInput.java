@@ -88,8 +88,8 @@ public class DssatControllerInput {
                     copyItem(soilData, saTmp, "smhb");
                     copyItem(soilData, saTmp, "smpx");
                     copyItem(soilData, saTmp, "smke");
-                    soilData.put("soil_id", soilData.get("soil_id" + "_" + (i+1)));
-                    expData.put("soil_id", expData.get("soil_id" + "_" + (i+1)));
+                    soilData.put("soil_id", soilData.get("soil_id") + "_" + (i+1));
+                    expData.put("soil_id", expData.get("soil_id") + "_" + (i+1));
 
                     // Update soil layer data
                     ArrayList<LinkedHashMap> soilLyrs = (ArrayList) soilData.get(soilReader.layerKey);
