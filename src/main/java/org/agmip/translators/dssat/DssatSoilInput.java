@@ -110,7 +110,7 @@ public class DssatSoilInput extends DssatCommonInput {
                         // Read line and save into return holder
 //                        sites.add(readLine(line.substring(1), formats));
                         site = readLine(line.substring(1), formats);
-                        if (slNotes != null || slNotes.equals("")) {
+                        if (slNotes != null && !slNotes.equals("")) {
                             site.put("sl_notes", slNotes);
                         }
                         sites.add(site);

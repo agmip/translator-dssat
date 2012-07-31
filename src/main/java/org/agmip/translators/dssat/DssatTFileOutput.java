@@ -35,7 +35,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
     public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        LinkedHashMap<String, Object> record;       // Data holder for time series data
+        LinkedHashMap<String, String> record;       // Data holder for time series data
         ArrayList<LinkedHashMap> observeRecords;    // Array of data holder for time series data
         BufferedWriter bwT;                         // output object
         StringBuilder sbData = new StringBuilder();             // construct the data info in the output
@@ -101,9 +101,9 @@ public class DssatTFileOutput extends DssatCommonOutput {
                 for (String title : altTitleList.keySet()) {
 
                     // check which optional data is exist, if not, remove from map
-                    if (!record.containsKey(title)) {
+                    if (getValueOr(record, title, "").equals("")) {
 
-                        if (record.containsKey(altTitleList.get(title))) {
+                        if (!getValueOr(record, altTitleList.get(title), "").equals("")) {
                             titleOutput.put(title, altTitleList.get(title));
                         } else {
                             sbError.append("! Waring: Incompleted record because missing data : [").append(title).append("]\r\n");

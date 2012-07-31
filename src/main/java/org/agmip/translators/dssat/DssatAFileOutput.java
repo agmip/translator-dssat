@@ -36,7 +36,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
     public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        LinkedHashMap<String, Object> record;       // Data holder for summary data
+        LinkedHashMap<String, String> record;       // Data holder for summary data
         BufferedWriter bwA;                         // output object
         StringBuilder sbData = new StringBuilder(); // construct the data info in the output
         HashMap<String, String> altTitleList = new HashMap();   // Define alternative fields for the necessary observation data fields; key is necessary field
@@ -53,8 +53,8 @@ public class DssatAFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            record = (LinkedHashMap) getObjectOr(result, "observed", new LinkedHashMap());
-            record = (LinkedHashMap) getObjectOr(record, "summary", new LinkedHashMap());
+            LinkedHashMap tmp = (LinkedHashMap) getObjectOr(result, "observed", new LinkedHashMap());
+            record = (LinkedHashMap) getObjectOr(tmp, "summary", new LinkedHashMap());
             if (record.isEmpty()) {
                 return;
             }
@@ -95,9 +95,9 @@ public class DssatAFileOutput extends DssatCommonOutput {
             for (String title : altTitleList.keySet()) {
 
                 // check which optional data is exist, if not, remove from map
-                if (!record.containsKey(title)) {
+                if (getValueOr(record, title, "").equals("")) {
 
-                    if (record.containsKey(altTitleList.get(title))) {
+                    if (!getValueOr(record, altTitleList.get(title), "").equals("")) {
                         titleOutput.put(title, altTitleList.get(title));
                     } else {
                         sbError.append("! Waring: Incompleted record because missing data : [").append(title).append("]\r\n");

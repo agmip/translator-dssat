@@ -752,7 +752,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 // Set Title list
                 ArrayList smTitles = new ArrayList();
-                smTitles.add("@@N GENERAL     NYERS NREPS START SDATE RSEED SNAME.................... SMODEL\r\n");
+                smTitles.add("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME.................... SMODEL\r\n");
                 smTitles.add("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
                 smTitles.add("@N METHODS     WTHER INCON LIGHT EVAPO INFIL PHOTO HYDRO NSWIT MESOM MESEV MESOL\r\n");
                 smTitles.add("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");

@@ -79,7 +79,7 @@ public class DssatControllerInput {
             if (!getValueOr(expData, "soil_id", "0").equals("0")) {
                 soilData = getSectionData(soilArr, "soil_id", expData.get("soil_id").toString());
                 // if there is soil analysis data, create new soil block by using soil analysis info
-                if (expData.containsKey("soil_analysis")) {
+                if (expData.get("soil_analysis") != null) {
                     soilData = CopyList(soilData);
                     LinkedHashMap saTmp = (LinkedHashMap) expData.remove("soil_analysis");
 

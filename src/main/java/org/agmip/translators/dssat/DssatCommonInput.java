@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.agmip.core.types.TranslatorInput;
+import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Experiment Data I/O API Class
@@ -23,7 +24,7 @@ import org.agmip.core.types.TranslatorInput;
  */
 public abstract class DssatCommonInput implements TranslatorInput {
 
-    protected String[] flg = new String[3];
+    protected String[] flg = {"", "", ""};
     protected String defValR = "-99.0";
     protected String defValC = "";
     protected String defValI = "-99";
@@ -172,7 +173,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      */
     protected void translateDateStr(LinkedHashMap m, String id) {
 
-        if (m.containsKey(id)) {
+        if (m.get(id) != null) {
             m.put(id, translateDateStr((String) m.get(id)));
         }
     }
@@ -197,7 +198,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      */
     protected void translateDateStrForDOY(LinkedHashMap m, String id, String pdate) {
 
-        if (m.containsKey(id)) {
+        if (m.get(id) != null) {
             m.put(id, translateDateStrForDOY((String) m.get(id), pdate));
         }
     }
@@ -213,7 +214,11 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
         if (str != null && str.length() <= 3) {
             if (!pdate.equals("") && pdate.length() >= 2) {
-                str = String.format("%1$2s%2$03d", pdate.substring(0, 2), Integer.parseInt(str));
+                try {
+                    str = String.format("%1$2s%2$03d", pdate.substring(0, 2), Integer.parseInt(str));
+                } catch (NumberFormatException e) {
+                    return "";
+                }
             }
         }
 
@@ -789,9 +794,6 @@ public abstract class DssatCommonInput implements TranslatorInput {
      */
     private static void copyItems(LinkedHashMap to, LinkedHashMap from, String[] copyKeys) {
         for (int i = 0; i < copyKeys.length; i++) {
-//            if (from.containsKey(copyKeys[i])) {
-//                to.put(copyKeys[i], from.get(copyKeys[i]));
-//            }
             copyItem(to, from, copyKeys[i]);
         }
     }

@@ -130,7 +130,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // check if there are optional fields
             for (Object title : optDailyData.keySet()) {
-                if (fstDayRecord.containsKey(title)) {
+                if (getObjectOr(fstDayRecord, title, "").equals("")) {
                     adtDaily.add(title);
                     sbData.append(String.format("%1$6s", optDailyData.get(title).toString()));
                 } else {
