@@ -393,7 +393,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 sbData.append(String.format("%1$2s %2$-8s %3$-8s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$-5s %10$-5s%11$5s  %12$-10s %13$s\r\n", // P.S. change length definition to match current way
                         idx + 1, //getObjectOr(secData, "fl", defValI).toString(),
                         getObjectOr(secData, "id_field", defValC).toString(),
-                        getObjectOr(secData, "wst_id", defValC).toString(),
+                        getWthFileName(getObjectOr(expData, "weather", new LinkedHashMap())), //getObjectOr(secData, "wst_id", defValC).toString(),
                         getObjectOr(secData, "flsl", defValC).toString(),
                         formatNumStr(5, secData, "flob", defValR),
                         getObjectOr(secData, "fl_drntype", defValC).toString(),

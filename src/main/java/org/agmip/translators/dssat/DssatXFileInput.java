@@ -295,9 +295,14 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("soil_id", 11);
                     formats.put("fl_name", line.length());
                     // Read line and save into return holder
-                    addToArray(flArr, readLine(line, formats), "fl");
+                    LinkedHashMap tmp = readLine(line, formats);
+                    addToArray(flArr, tmp, "fl");
                     // Read weather station id
-                    wid = line.substring(12, 20).trim();
+                    wid = (String) tmp.get("wst_id");
+                    if (wid != null && wid.length() > 4) {
+                        wid = wid.substring(0, 4);
+                        tmp.put("wst_id", wid);
+                    }
 
                 }// // Read field info 2nd line
                 else if (flg[1].startsWith("l ...") && flg[2].equals("data")) {

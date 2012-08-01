@@ -2,6 +2,7 @@ package org.agmip.translators.dssat;
 
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -347,18 +348,21 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
             ZipEntry entry;
             in = new ZipInputStream(new FileInputStream(filePath));
+            File f = new File(filePath);
+            String fileName = f.getName().toUpperCase();
+            String subFileName = fileName.replaceAll("X\\.ZIP", "").replaceAll("_", ".");
 
             while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
-                    if (entry.getName().matches(".+\\.\\w{2}[Xx]")) {
+                    if (entry.getName().equalsIgnoreCase(subFileName + "X")) {
                         result.put("X", getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".WTH")) {
                         mapW.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".SOL")) {
                         mapS.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
-                    } else if (entry.getName().matches(".+\\.\\w{2}[Aa]")) {
+                    } else if (entry.getName().equalsIgnoreCase(subFileName + "A")) {
                         result.put("A", getBuf(in, (int) entry.getSize()));
-                    } else if (entry.getName().matches(".+\\.\\w{2}[Tt]")) {
+                    } else if (entry.getName().equalsIgnoreCase(subFileName + "T")) {
                         result.put("T", getBuf(in, (int) entry.getSize()));
                     }
                 }

@@ -71,32 +71,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // Initial BufferedWriter
             // Get File name
-            String fileName = getObjectOr(wthFile, "wst_id", "").toString();
-            if (fileName.equals("")) {
-                fileName = "a.tmp";
-            } else {
-                if (wthRecords.isEmpty()) {
-                    fileName += ".WTH";
-                } else {
-                    // Get the year of starting date and end date
-                    String startYear = getValueOr(((LinkedHashMap) wthRecords.get(0)), "w_date", "    ").substring(2, 4).trim();
-                    String endYear = getValueOr(((LinkedHashMap) wthRecords.get(wthRecords.size() - 1)), "w_date", "    ").substring(2, 4).trim();
-                    // If not available, do not show year and duration in the file name
-                    if (startYear.equals("") || endYear.equals("")) {
-                        fileName += ".WTH";
-                    } else {
-                        fileName += startYear;
-                        try {
-                            int duration = Integer.parseInt(endYear) - Integer.parseInt(startYear) + 1;
-                            // P.S. Currently the system only support the maximum of 99 years for duration
-                            duration = duration > 99 ? 99 : duration;
-                            fileName += String.format("%02d.WTH", duration);
-                        } catch (Exception e) {
-                            fileName += "01.WTH";   // Default duration uses 01 (minimum value)
-                        }
-                    }
-                }
-            }
+            String fileName = getWthFileName(wthFile) + ".WTH";
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
             bwW = new BufferedWriter(new FileWriter(outputFile));
@@ -130,7 +105,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // check if there are optional fields
             for (Object title : optDailyData.keySet()) {
-                if (getObjectOr(fstDayRecord, title, "").equals("")) {
+                if (!getObjectOr(fstDayRecord, title, "").equals("")) {
                     adtDaily.add(title);
                     sbData.append(String.format("%1$6s", optDailyData.get(title).toString()));
                 } else {

@@ -258,4 +258,38 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 
         return "";
     }
+    
+    /**
+     * Get the weather file name for auto-generating (extend name not included)
+     * 
+     * @param wthFile   weather data holder
+     * @return 
+     */
+    protected String getWthFileName(LinkedHashMap wthFile) {
+        ArrayList wthRecords = (ArrayList) getObjectOr(wthFile, "dailyWeather", new ArrayList());
+        String ret = getObjectOr(wthFile, "wst_id", "").toString();
+            if (ret.equals("")) {
+                ret = "AGMP";
+            } else {
+                if (!wthRecords.isEmpty()) {
+                    // Get the year of starting date and end date
+                    String startYear = getValueOr(((LinkedHashMap) wthRecords.get(0)), "w_date", "    ").substring(2, 4).trim();
+                    String endYear = getValueOr(((LinkedHashMap) wthRecords.get(wthRecords.size() - 1)), "w_date", "    ").substring(2, 4).trim();
+                    // If not available, do not show year and duration in the file name
+                    if (!startYear.equals("") && !endYear.equals("")) {
+                        ret += startYear;
+                        try {
+                            int duration = Integer.parseInt(endYear) - Integer.parseInt(startYear) + 1;
+                            // P.S. Currently the system only support the maximum of 99 years for duration
+                            duration = duration > 99 ? 99 : duration;
+                            ret += String.format("%02d", duration);
+                        } catch (Exception e) {
+                            ret += "01";    // Default duration uses 01 (minimum value)
+                        }
+                    }
+                }
+            }
+        
+        return ret;
+    }
 }
