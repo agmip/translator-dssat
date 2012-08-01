@@ -53,7 +53,6 @@ public class DssatSoilOutput extends DssatCommonOutput {
             // Set default value for missing data
             setDefVal();
 
-//            soilSites = (ArrayList) getObjectOr(result, "soil", new ArrayList());
             soilSite = (LinkedHashMap) getObjectOr(result, "soil", new LinkedHashMap());
             if (soilSite.isEmpty()) {
                 return;
@@ -86,10 +85,6 @@ public class DssatSoilOutput extends DssatCommonOutput {
 
             // Titel Section
             sbData.append("*SOILS: ").append(getObjectOr((LinkedHashMap) soilSite, "sl_notes", defValBlank)).append("\r\n\r\n");
-
-            // Loop sites of data
-//            for (int i = 0; i < soilSites.size(); i++) {
-//                soilSite = (LinkedHashMap) soilSites.get(i);
 
             // Site Info Section
             sbData.append(String.format("*%1$-10s  %2$-11s %3$-5s %4$5s %5$s\r\n",
@@ -196,7 +191,6 @@ public class DssatSoilOutput extends DssatCommonOutput {
             } else {
                 sbData.append("\r\n");
             }
-//            }
 
             // Output finish
             bwS.write(sbError.toString());
