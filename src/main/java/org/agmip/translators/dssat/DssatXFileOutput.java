@@ -115,7 +115,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 sbData.append(String.format("@PEOPLE\r\n %1$s\r\n", getObjectOr(expData, "people", defValBlank).toString()));
             }
             // Address
-            if (getObjectOr(expData, "institutes", "").equals("")) {
+            if (getObjectOr(expData, "institution", "").equals("")) {
                 if (!getObjectOr(expData, "fl_loc_1", "").equals("")
                         && getObjectOr(expData, "fl_loc_2", "").equals("")
                         && getObjectOr(expData, "fl_loc_3", "").equals("")) {
@@ -125,7 +125,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             getObjectOr(expData, "fl_loc_3", defValBlank).toString()));
                 }
             } else {
-                sbData.append(String.format("@ADDRESS\r\n %1$s\r\n", getObjectOr(expData, "institutes", defValBlank).toString()));
+                sbData.append(String.format("@ADDRESS\r\n %1$s\r\n", getObjectOr(expData, "institution", defValBlank).toString()));
             }
 
             // Site
@@ -137,15 +137,15 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 sbData.append("@ PAREA  PRNO  PLEN  PLDR  PLSP  PLAY HAREA  HRNO  HLEN  HARM.........\r\n");
                 sbData.append(String.format(" %1$6s %2$5s %3$5s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$5s %10$-15s\r\n",
-                        formatNumStr(6, getObjectOr(expData, "plta", defValR).toString()),
-                        formatNumStr(5, getObjectOr(expData, "pltrno", defValI).toString()),
-                        formatNumStr(5, getObjectOr(expData, "pltln", defValR).toString()),
-                        formatNumStr(5, getObjectOr(expData, "pldr", defValI).toString()),
-                        formatNumStr(5, getObjectOr(expData, "pltsp", defValI).toString()),
+                        formatNumStr(6, expData, "plta", defValR),
+                        formatNumStr(5, expData, "pltrno", defValI),
+                        formatNumStr(5, expData, "pltln", defValR),
+                        formatNumStr(5, expData, "pldr", defValI),
+                        formatNumStr(5, expData, "pltsp", defValI),
                         getObjectOr(expData, "plot_layout", defValC).toString(),
-                        formatNumStr(5, getObjectOr(expData, "pltha", defValR).toString()),
-                        formatNumStr(5, getObjectOr(expData, "plthno", defValI).toString()),
-                        formatNumStr(5, getObjectOr(expData, "plthl", defValR).toString()),
+                        formatNumStr(5, expData, "pltha", defValR),
+                        formatNumStr(5, expData, "plthno", defValI),
+                        formatNumStr(5, expData, "plthl", defValR),
                         getObjectOr(expData, "plthm", defValC).toString()));
             }
             // Notes
@@ -363,7 +363,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     }
                     sbData.append(String.format("%1$2s %2$-2s %3$-6s %4$s\r\n",
                             idx + 1, //getObjectOr(secData, "ge", defValI).toString(),
-                            getObjectOr(secData, "crid", defValC).toString(),
+                            getObjectOr(secData, "crid", defValBlank).toString(),   // P.S. if missing, default value use blank string
                             getObjectOr(secData, "cul_id", defValC).toString(),
                             getObjectOr(secData, "cul_name", defValC).toString()));
                 }
@@ -394,27 +394,27 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         getObjectOr(secData, "id_field", defValC).toString(),
                         getObjectOr(secData, "wst_id", defValC).toString(),
                         getObjectOr(secData, "flsl", defValC).toString(),
-                        formatNumStr(5, getObjectOr(secData, "flob", defValR).toString()),
+                        formatNumStr(5, secData, "flob", defValR),
                         getObjectOr(secData, "fl_drntype", defValC).toString(),
-                        formatNumStr(5, getObjectOr(secData, "fldrd", defValR).toString()),
-                        formatNumStr(5, getObjectOr(secData, "fldrs", defValR).toString()),
+                        formatNumStr(5, secData, "fldrd", defValR),
+                        formatNumStr(5, secData, "fldrs", defValR),
                         getObjectOr(secData, "flst", defValC).toString(),
                         getObjectOr(secData, "sltx", defValC).toString(),
-                        formatNumStr(5, getObjectOr(secData, "sldp", defValR).toString()),
+                        formatNumStr(5, secData, "sldp", defValR),
                         getObjectOr(secData, "soil_id", defValC).toString(),
                         getObjectOr(secData, "fl_name", defValC).toString()));
 
                 eventPart2.append(String.format("%1$2s %2$15s %3$15s %4$9s %5$17s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
                         idx + 1, //getObjectOr(secData, "fl", defValI).toString(),
-                        formatNumStr(15, getObjectOr(secData, "fl_lat", defValR).toString()),
-                        formatNumStr(15, getObjectOr(secData, "fl_long", defValR).toString()),
-                        formatNumStr(9, getObjectOr(secData, "flele", defValR).toString()),
-                        formatNumStr(17, getObjectOr(secData, "farea", defValR).toString()),
-                        formatNumStr(5, defValR), // P.S. SLEN keeps -99
-                        formatNumStr(5, getObjectOr(secData, "fllwr", defValR).toString()),
-                        formatNumStr(5, getObjectOr(secData, "flsla", defValR).toString()),
+                        formatNumStr(15, secData, "fl_lat", defValR),
+                        formatNumStr(15, secData, "fl_long", defValR),
+                        formatNumStr(9, secData, "flele", defValR),
+                        formatNumStr(17, secData, "farea", defValR),
+                        "-99", // P.S. SLEN keeps -99
+                        formatNumStr(5, secData, "fllwr", defValR),
+                        formatNumStr(5, secData, "flsla", defValR),
                         getObjectOr(secData, "flhst", defValC).toString(),
-                        formatNumStr(5, getObjectOr(secData, "fhdur", defValR).toString())));
+                        formatNumStr(5, secData, "fhdur", defValR)));
             }
             if (!flArr.isEmpty()) {
                 sbData.append(eventPart2.toString()).append("\r\n");
@@ -444,15 +444,15 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         subData = (LinkedHashMap) subDataArr.get(j);
                         sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
                                 idx + 1, //getObjectOr(subData, "sa", defValI).toString(),
-                                formatNumStr(5, getObjectOr(subData, "sabl", defValR).toString()),
-                                formatNumStr(5, getObjectOr(subData, "sabdm", defValR).toString()),
-                                formatNumStr(5, getObjectOr(subData, "saoc", defValR).toString()),
-                                formatNumStr(5, getObjectOr(subData, "sani", defValR).toString()),
-                                formatNumStr(5, getObjectOr(subData, "saphw", defValR).toString()),
-                                formatNumStr(5, getObjectOr(subData, "saphb", defValR).toString()),
-                                formatNumStr(5, getObjectOr(subData, "sapx", defValR).toString()),
-                                formatNumStr(5, getObjectOr(subData, "sake", defValR).toString()),
-                                formatNumStr(5, getObjectOr(subData, "sasc", defValR).toString())));
+                                formatNumStr(5, subData, "sabl", defValR),
+                                formatNumStr(5, subData, "sabdm", defValR),
+                                formatNumStr(5, subData, "saoc", defValR),
+                                formatNumStr(5, subData, "sani", defValR),
+                                formatNumStr(5, subData, "saphw", defValR),
+                                formatNumStr(5, subData, "saphb", defValR),
+                                formatNumStr(5, subData, "sapx", defValR),
+                                formatNumStr(5, subData, "sake", defValR),
+                                formatNumStr(5, subData, "sasc", defValR)));
                     }
 
 
@@ -472,16 +472,16 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             idx + 1, //getObjectOr(secData, "ic", defValI).toString(),
                             getObjectOr(secData, "icpcr", defValC).toString(),
                             formatDateStr(getObjectOr(secData, "date", getPdate(result)).toString()), // P.S. icdat -> date
-                            formatNumStr(5, getObjectOr(secData, "icrt", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "icnd", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "icrzno", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "icrze", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "icwt", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "icrag", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "icrn", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "icrp", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "icrip", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "icrdp", defValR).toString()),
+                            formatNumStr(5, secData, "icrt", defValR),
+                            formatNumStr(5, secData, "icnd", defValR),
+                            formatNumStr(5, secData, "icrzno", defValR),
+                            formatNumStr(5, secData, "icrze", defValR),
+                            formatNumStr(5, secData, "icwt", defValR),
+                            formatNumStr(5, secData, "icrag", defValR),
+                            formatNumStr(5, secData, "icrn", defValR),
+                            formatNumStr(5, secData, "icrp", defValR),
+                            formatNumStr(5, secData, "icrip", defValR),
+                            formatNumStr(5, secData, "icrdp", defValR),
                             getObjectOr(secData, "ic_name", defValC).toString()));
 
                     subDataArr = (ArrayList) getObjectOr(secData, "soilLayer", new ArrayList());
@@ -492,10 +492,10 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         subData = (LinkedHashMap) subDataArr.get(j);
                         sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s\r\n",
                                 idx + 1, //getObjectOr(subData, "ic", defValI).toString(),
-                                formatNumStr(5, getObjectOr(subData, "icbl", defValR).toString()),
-                                formatNumStr(5, getObjectOr(subData, "ich2o", defValR).toString()),
-                                formatNumStr(5, getObjectOr(subData, "icnh4", defValR).toString()),
-                                formatNumStr(5, getObjectOr(subData, "icno3", defValR).toString())));
+                                formatNumStr(5, subData, "icbl", defValR),
+                                formatNumStr(5, subData, "ich2o", defValR),
+                                formatNumStr(5, subData, "icnh4", defValR),
+                                formatNumStr(5, subData, "icno3", defValR)));
                     }
                 }
                 sbData.append("\r\n");
@@ -522,18 +522,18 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             idx + 1, //getObjectOr(data, "pl", defValI).toString(),
                             formatDateStr(getObjectOr(secData, "date", defValD).toString()),
                             formatDateStr(getObjectOr(secData, "pldae", defValD).toString()),
-                            formatNumStr(5, getObjectOr(secData, "plpop", getObjectOr(secData, "plpoe", defValR)).toString()),
-                            formatNumStr(5, getObjectOr(secData, "plpoe", getObjectOr(secData, "plpop", defValR)).toString()),
+                            formatNumStr(5, secData, "plpop", getObjectOr(secData, "plpoe", defValR)),
+                            formatNumStr(5, secData, "plpoe", getObjectOr(secData, "plpop", defValR)),
                             getObjectOr(secData, "plma", defValC).toString(),
                             getObjectOr(secData, "plds", defValC).toString(),
-                            formatNumStr(5, getObjectOr(secData, "plrs", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "plrd", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "pldp", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "plmwt", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "page", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "penv", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "plph", defValR).toString()),
-                            formatNumStr(5, getObjectOr(secData, "plspl", defValR).toString()),
+                            formatNumStr(5, secData, "plrs", defValR),
+                            formatNumStr(5, secData, "plrd", defValR),
+                            formatNumStr(5, secData, "pldp", defValR),
+                            formatNumStr(5, secData, "plmwt", defValR),
+                            formatNumStr(5, secData, "page", defValR),
+                            formatNumStr(5, secData, "penv", defValR),
+                            formatNumStr(5, secData, "plph", defValR),
+                            formatNumStr(5, secData, "plspl", defValR),
                             getObjectOr(secData, "pl_name", defValC).toString()));
 
                 }
@@ -558,13 +558,13 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     sbData.append("@I  EFIR  IDEP  ITHR  IEPT  IOFF  IAME  IAMT IRNAME\r\n");
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$s\r\n",
                             idx + 1, //getObjectOr(data, "ir", defValI).toString(),
-                            formatNumStr(5, getObjectOr(subData, "ireff", defValR).toString()),
-                            formatNumStr(5, getObjectOr(subData, "irmdp", defValR).toString()),
-                            formatNumStr(5, getObjectOr(subData, "irthr", defValR).toString()),
-                            formatNumStr(5, getObjectOr(subData, "irept", defValR).toString()),
+                            formatNumStr(5, subData, "ireff", defValR),
+                            formatNumStr(5, subData, "irmdp", defValR),
+                            formatNumStr(5, subData, "irthr", defValR),
+                            formatNumStr(5, subData, "irept", defValR),
                             getObjectOr(subData, "irstg", defValC).toString(),
                             getObjectOr(subData, "iame", defValC).toString(),
-                            formatNumStr(5, getObjectOr(subData, "iamt", defValR).toString()),
+                            formatNumStr(5, subData, "iamt", defValR),
                             getObjectOr(subData, "ir_name", defValC).toString()));
 
                     if (!subDataArr.isEmpty()) {
@@ -576,7 +576,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                 idx + 1, //getObjectOr(subData, "ir", defValI).toString(),
                                 formatDateStr(getObjectOr(subData, "date", defValD).toString()), // P.S. idate -> date
                                 getObjectOr(subData, "irop", defValC).toString(),
-                                formatNumStr(5, getObjectOr(subData, "irval", defValR).toString())));
+                                formatNumStr(5, subData, "irval", defValR)));
                     }
                 }
                 sbData.append("\r\n");
@@ -592,17 +592,17 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                     for (int i = 0; i < secDataArr.size(); i++) {
                         secData = (LinkedHashMap) secDataArr.get(i);
-                        sbData.append(String.format("%1$2s %2$5s %3$-5s %4$-5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$s\r\n",
+                        sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$s\r\n",
                                 idx + 1, //getObjectOr(data, "fe", defValI).toString(),
                                 formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. fdate -> date
                                 getObjectOr(secData, "fecd", defValC).toString(),
                                 getObjectOr(secData, "feacd", defValC).toString(),
-                                formatNumStr(5, getObjectOr(secData, "fedep", defValR).toString()),
-                                formatNumStr(5, getObjectOr(secData, "feamn", defValR).toString()),
-                                formatNumStr(5, getObjectOr(secData, "feamp", defValR).toString()),
-                                formatNumStr(5, getObjectOr(secData, "feamk", defValR).toString()),
-                                formatNumStr(5, getObjectOr(secData, "feamc", defValR).toString()),
-                                formatNumStr(5, getObjectOr(secData, "feamo", defValR).toString()),
+                                formatNumStr(5, secData, "fedep", defValR),
+                                formatNumStr(5, secData, "feamn", defValR),
+                                formatNumStr(5, secData, "feamp", defValR),
+                                formatNumStr(5, secData, "feamk", defValR),
+                                formatNumStr(5, secData, "feamc", defValR),
+                                formatNumStr(5, secData, "feamo", defValR),
                                 getObjectOr(secData, "feocd", defValC).toString(),
                                 getObjectOr(secData, "fe_name", defValC).toString()));
 
@@ -625,13 +625,13 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                 idx + 1, //getObjectOr(secData, "om", defValI).toString(),
                                 formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. omdat -> date
                                 getObjectOr(secData, "omcd", defValC).toString(),
-                                formatNumStr(5, getObjectOr(secData, "omamt", defValR).toString()),
-                                formatNumStr(5, getObjectOr(secData, "omnpct", defValR).toString()),
-                                formatNumStr(5, getObjectOr(secData, "omppct", defValR).toString()),
-                                formatNumStr(5, getObjectOr(secData, "omkpct", defValR).toString()),
-                                formatNumStr(5, getObjectOr(secData, "ominp", defValR).toString()),
-                                formatNumStr(5, getObjectOr(secData, "omdep", defValR).toString()),
-                                formatNumStr(5, getObjectOr(secData, "omacd", defValR).toString()),
+                                formatNumStr(5, secData, "omamt", defValR),
+                                formatNumStr(5, secData, "omnpct", defValR),
+                                formatNumStr(5, secData, "omppct", defValR),
+                                formatNumStr(5, secData, "omkpct", defValR),
+                                formatNumStr(5, secData, "ominp", defValR),
+                                formatNumStr(5, secData, "omdep", defValR),
+                                formatNumStr(5, secData, "omacd", defValR),
                                 getObjectOr(secData, "om_name", defValC).toString()));
                     }
                 }
@@ -652,7 +652,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                 idx + 1, //getObjectOr(secData, "ch", defValI).toString(),
                                 formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. cdate -> date
                                 getObjectOr(secData, "chcd", defValC).toString(),
-                                formatNumStr(5, getObjectOr(secData, "chamt", defValR).toString()),
+                                formatNumStr(5, secData, "chamt", defValR),
                                 getObjectOr(secData, "chacd", defValC).toString(),
                                 getObjectOr(secData, "chdep", defValC).toString(),
                                 getObjectOr(secData, "ch_targets", defValC).toString(),
@@ -676,7 +676,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                 idx + 1, //getObjectOr(secData, "ti", defValI).toString(),
                                 formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. tdate -> date
                                 getObjectOr(secData, "tiimp", defValC).toString(),
-                                formatNumStr(5, getObjectOr(secData, "tidep", defValR).toString()),
+                                formatNumStr(5, secData, "tidep", defValR),
                                 getObjectOr(secData, "ti_name", defValC).toString()));
 
                     }
@@ -699,22 +699,22 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                        sbData.append(String.format("%1$2s %2$5s %3$-1s%4$4s %5$-1s%6$4s %7$-1s%8$4s %9$-1s%10$4s %11$-1s%12$4s %13$-1s%14$4s %15$-1s%16$4s %17$-1s%18$4s %19$s\r\n",
 //                                idx + 1, //getObjectOr(secData, "em", defValI).toString(),
 //                                formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. emday -> date
-//                                getObjectOr(secData, "ecdyl", defValC).toString(),
-//                                formatNumStr(4, getObjectOr(secData, "emdyl", defValR).toString()),
-//                                getObjectOr(secData, "ecrad", defValC).toString(),
-//                                formatNumStr(4, getObjectOr(secData, "emrad", defValR).toString()),
-//                                getObjectOr(secData, "ecmax", defValC).toString(),
-//                                formatNumStr(4, getObjectOr(secData, "emmax", defValR).toString()),
-//                                getObjectOr(secData, "ecmin", defValC).toString(),
-//                                formatNumStr(4, getObjectOr(secData, "emmin", defValR).toString()),
-//                                getObjectOr(secData, "ecrai", defValC).toString(),
-//                                formatNumStr(4, getObjectOr(secData, "emrai", defValR).toString()),
-//                                getObjectOr(secData, "ecco2", defValC).toString(),
-//                                formatNumStr(4, getObjectOr(secData, "emco2", defValR).toString()),
-//                                getObjectOr(secData, "ecdew", defValC).toString(),
-//                                formatNumStr(4, getObjectOr(secData, "emdew", defValR).toString()),
-//                                getObjectOr(secData, "ecwnd", defValC).toString(),
-//                                formatNumStr(4, getObjectOr(secData, "emwnd", defValR).toString()),
+//                                getObjectOr(secData, "ecdyl", defValBlank).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emdyl", defValR),
+//                                getObjectOr(secData, "ecrad", defValBlank).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emrad", defValR),
+//                                getObjectOr(secData, "ecmax", defValBlank).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emmax", defValR),
+//                                getObjectOr(secData, "ecmin", defValBlank).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emmin", defValR),
+//                                getObjectOr(secData, "ecrai", defValBlank).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emrai", defValR),
+//                                getObjectOr(secData, "ecco2", defValBlank).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emco2", defValR),
+//                                getObjectOr(secData, "ecdew", defValBlank).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emdew", defValR),
+//                                getObjectOr(secData, "ecwnd", defValBlank).toString(),
+//                                formatNumStr(4, getObjectOr(secData, "emwnd", defValR),
 //                                getObjectOr(secData, "em_name", defValC).toString()));
 
                     }
@@ -738,8 +738,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                 getObjectOr(secData, "hastg", defValC).toString(),
                                 getObjectOr(secData, "hacom", defValC).toString(),
                                 getObjectOr(secData, "hasiz", defValC).toString(),
-                                formatNumStr(5, getObjectOr(secData, "hapc", defValR).toString()),
-                                formatNumStr(5, getObjectOr(secData, "habpc", defValR).toString()),
+                                formatNumStr(5, secData, "hapc", defValR),
+                                formatNumStr(5, secData, "habpc", defValR),
                                 getObjectOr(secData, "ha_name", defValC).toString()));
 
                     }

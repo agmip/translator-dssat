@@ -131,7 +131,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
                     } else if (obvDataList.isDateType(titleOutputId[k])) {
                         sbData.append(String.format("%1$6s", formatDateStr(getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
                     } else {
-                        sbData.append(" ").append(formatNumStr(5, getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString()));
+                        sbData.append(" ").append(formatNumStr(5, record, titleOutput.get(titleOutputId[k]), defValI));
                     }
                 }
                 sbData.append("\r\n");

@@ -109,13 +109,13 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             sbData.append("@ INSI      LAT     LONG  ELEV   TAV   AMP REFHT WNDHT\r\n");
             sbData.append(String.format("  %1$-4s %2$8s %3$8s %4$5s %5$5s %6$5s %7$5s %8$5s\r\n",
                     getObjectOr(wthFile, "wst_id", defValC).toString(),
-                    formatNumStr(8, getObjectOr(wthFile, "wst_lat", defValR).toString()),
-                    formatNumStr(8, getObjectOr(wthFile, "wst_long", defValR).toString()),
-                    formatNumStr(5, getObjectOr(wthFile, "elev", defValR).toString()),
-                    formatNumStr(5, getObjectOr(wthFile, "tav", defValR).toString()),
-                    formatNumStr(5, getObjectOr(wthFile, "tamp", defValR).toString()),
-                    formatNumStr(5, getObjectOr(wthFile, "refht", defValR).toString()),
-                    formatNumStr(5, getObjectOr(wthFile, "wndht", defValR).toString())));
+                    formatNumStr(8, wthFile, "wst_lat", defValR),
+                    formatNumStr(8, wthFile, "wst_long", defValR),
+                    formatNumStr(5, wthFile, "elev", defValR),
+                    formatNumStr(5, wthFile, "tav", defValR),
+                    formatNumStr(5, wthFile, "tamp", defValR),
+                    formatNumStr(5, wthFile, "refht", defValR),
+                    formatNumStr(5, wthFile, "wndht", defValR)));
 
             // Daily weather data section
             // Fixed Title
@@ -164,10 +164,10 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                     // Fixed data part
                     sbData.append(String.format("%1$5s %2$5s %3$5s %4$5s %5$5s",
                             formatDateStr(getObjectOr(wthRecord, "w_date", defValD).toString()),
-                            formatNumStr(5, getObjectOr(wthRecord, "srad", defValR).toString()),
-                            formatNumStr(5, getObjectOr(wthRecord, "tmax", defValR).toString()),
-                            formatNumStr(5, getObjectOr(wthRecord, "tmin", defValR).toString()),
-                            formatNumStr(5, getObjectOr(wthRecord, "rain", defValR).toString())));
+                            formatNumStr(5, wthRecord, "srad", defValR),
+                            formatNumStr(5, wthRecord, "tmax", defValR),
+                            formatNumStr(5, wthRecord, "tmin", defValR),
+                            formatNumStr(5, wthRecord, "rain", defValR)));
 
                     // Optional data part
                     for (int k = 0; k < adtDaily.size(); k++) {
@@ -175,7 +175,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                             sbData.append("      ");
                         } else {
                             sbData.append(String.format(" %1$5s",
-                                    formatNumStr(5, getObjectOr(wthRecord, adtDaily.get(k).toString(), defValR).toString())));
+                                    formatNumStr(5, wthRecord, adtDaily.get(k).toString(), defValR)));
                         }
                     }
                     sbData.append("\r\n");

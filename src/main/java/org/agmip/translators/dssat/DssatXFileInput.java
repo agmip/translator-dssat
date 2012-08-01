@@ -143,7 +143,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 formats.put("local_name", 61);
                 // Read line and save into return holder
                 metaData.putAll(readLine(line.substring(13), formats));
-                metaData.put("institutes", line.substring(14, 16).trim());
+                metaData.put("in", line.substring(14, 16).trim());
             } // Read General Section
             else if (flg[0].startsWith("general")) {
 
@@ -157,7 +157,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     metaData.put("fl_loc_1", "");
                     metaData.put("fl_loc_2", "");
                     metaData.put("fl_loc_3", "");
-                    metaData.put("institutes", line.trim());
+                    metaData.put("institution", line.trim());
 //                    ret.put("address", line.trim());    // P.S. no longer to use this field
 
                     switch (addr.length) {

@@ -57,16 +57,20 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @param str Input string of number
      * @return formated string of number
      */
-    protected String formatNumStr(int bits, String str) {
+    protected String formatNumStr(int bits, LinkedHashMap m, Object key, String defVal) {
 
         String ret = "";
+        String str = getObjectOr(m, key, defVal);
         double decimalPower;
         long decimalPart;
         double input;
         String[] inputStr = str.split("\\.");
-        if (inputStr[0].length() > bits) {
+        if (str.trim().equals("")) {
+            return String.format("%" + bits + "s", defVal);
+        } else if (inputStr[0].length() > bits) {
             //throw new Exception();
-            sbError.append("! Waring: There is a oversized number [").append(str).append("] (Limitation is ").append(bits).append("bits)\r\n");
+            sbError.append("! Waring: There is a variable [").append(key).append("] with oversized number [").append(str).append("] (Limitation is ").append(bits).append("bits)\r\n");
+            return String.format("%" + bits + "s", defVal);
         } else {
             ret = inputStr[0];
 
