@@ -218,10 +218,10 @@ public class DssatXFileInput extends DssatCommonInput {
                 } // Notes field
                 else if (flg[1].equals("notes") && flg[2].equals("data")) {
                     if (!metaData.containsKey("tr_notes")) {
-                        metaData.put("tr_notes", line + "\\r\\n");
+                        metaData.put("tr_notes", line + "\r\n");
                     } else {
                         String notes = (String) metaData.get("tr_notes");
-                        notes += line + "\\r\\n";
+                        notes += line + "\r\n";
                         metaData.put("tr_notes", notes);
                     }
                 } else {

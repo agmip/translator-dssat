@@ -346,23 +346,33 @@ public abstract class DssatCommonInput implements TranslatorInput {
         // If input File is ZIP file
         if (filePath.toUpperCase().endsWith(".ZIP")) {
 
+            // Get experiment name
             ZipEntry entry;
+            String exname = "";
             in = new ZipInputStream(new FileInputStream(filePath));
-            File f = new File(filePath);
-            String fileName = f.getName().toUpperCase();
-            String subFileName = fileName.replaceAll("X\\.ZIP", "").replaceAll("_", ".");
-
             while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
-                    if (entry.getName().equalsIgnoreCase(subFileName + "X")) {
+                    if (entry.getName().matches(".+\\.\\w{2}[Xx]")) {
+                        exname = entry.getName().replaceAll("[Xx]$", "");
+                        break;
+                    }
+                }
+            }
+            
+            // Read Files
+            in = new ZipInputStream(new FileInputStream(filePath));
+            
+            while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
+                if (!entry.isDirectory()) {
+                    if (entry.getName().equalsIgnoreCase(exname + "X")) {
                         result.put("X", getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".WTH")) {
                         mapW.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".SOL")) {
                         mapS.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
-                    } else if (entry.getName().equalsIgnoreCase(subFileName + "A")) {
+                    } else if (entry.getName().equalsIgnoreCase(exname + "A")) {
                         result.put("A", getBuf(in, (int) entry.getSize()));
-                    } else if (entry.getName().equalsIgnoreCase(subFileName + "T")) {
+                    } else if (entry.getName().equalsIgnoreCase(exname + "T")) {
                         result.put("T", getBuf(in, (int) entry.getSize()));
                     }
                 }

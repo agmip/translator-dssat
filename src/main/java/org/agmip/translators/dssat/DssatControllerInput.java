@@ -77,7 +77,10 @@ public class DssatControllerInput {
 
             // Set soil data for this treatment
             if (!getValueOr(expData, "wst_id", "0").equals("0")) {
-                expData.put(wthReader.jsonKey, getSectionData(wthArr, "wst_id", expData.get("wst_id").toString()));
+                LinkedHashMap tmp = getSectionData(wthArr, "wst_id", expData.get("wst_id").toString());
+                if (tmp != null && tmp.size() != 0) {
+                    expData.put(wthReader.jsonKey, tmp);
+                }
             }
 
             // Set weather data for this treatment
@@ -102,12 +105,14 @@ public class DssatControllerInput {
 
                     // Update soil layer data
                     ArrayList<LinkedHashMap> soilLyrs = getObjectOr(soilData, soilReader.layerKey, new ArrayList());
-                    ArrayList<LinkedHashMap> saLyrs =  getObjectOr(saTmp, mgnReader.icEventKey, new ArrayList());
+                    ArrayList<LinkedHashMap> saLyrs = getObjectOr(saTmp, mgnReader.icEventKey, new ArrayList());
                     String[] copyKeys = {"slbdm", "sloc", "slni", "slphw", "slphb", "slpx", "slke"};
                     soilData.put(soilReader.layerKey, combinLayers(soilLyrs, saLyrs, "sllb", "slbl", copyKeys));
                 }
 
-                expData.put(soilReader.jsonKey, soilData);
+                if (soilData != null && soilData.size() != 0) {
+                    expData.put(soilReader.jsonKey, soilData);
+                }
             }
 
             // observed data (summary)
