@@ -48,7 +48,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
         LinkedHashMap subData;
         ArrayList secDataArr;                       // Arraylist for section data holder
         LinkedHashMap sqData;
-        LinkedHashMap trData = new LinkedHashMap();
         ArrayList<LinkedHashMap> evtArr;            // Arraylist for section data holder
         LinkedHashMap evtData;
 //        int trmnNum;                            // total numbers of treatment in the data holder

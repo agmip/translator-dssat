@@ -139,25 +139,30 @@ public class DssatXFileInput extends DssatCommonInput {
 
                 // Set variables' formats
                 formats.clear();
+                formats.put("null", 14);
                 formats.put("exname", 11);
                 formats.put("local_name", 61);
                 // Read line and save into return holder
-                metaData.putAll(readLine(line.substring(13), formats));
-                metaData.put("in", line.substring(14, 16).trim());
+                metaData.putAll(readLine(line, formats));
+                metaData.put("in", getObjectOr(metaData, "exname", "  ").substring(0, 2).trim());
             } // Read General Section
             else if (flg[0].startsWith("general")) {
 
                 // People info
                 if (flg[1].equals("people") && flg[2].equals("data")) {
-                    metaData.put("people", line.trim());
+                    if (checkValidValue(line.trim())) {
+                        metaData.put("people", line.trim());
+                    }
 
                 } // Address info
                 else if (flg[1].equals("address") && flg[2].equals("data")) {
-                    String[] addr = line.split(",[ ]*");
-                    metaData.put("fl_loc_1", "");
-                    metaData.put("fl_loc_2", "");
-                    metaData.put("fl_loc_3", "");
-                    metaData.put("institution", line.trim());
+                    String[] addr;
+                    if (checkValidValue(line.trim())) {
+                        addr = line.split(",[ ]*");
+                        metaData.put("institution", line.trim());
+                    } else {
+                        addr = new String[0];
+                    }
 //                    ret.put("address", line.trim());    // P.S. no longer to use this field
 
                     switch (addr.length) {
@@ -187,9 +192,10 @@ public class DssatXFileInput extends DssatCommonInput {
 
                 } // Site info
                 else if ((flg[1].equals("site") || flg[1].equals("sites")) && flg[2].equals("data")) {
-                    //$ret[$flg[0]]["site"] = trim($line);
                     // P.S. site is missing in the master variables list
-                    metaData.put("site", line.trim());
+                    if (checkValidValue(line.trim())) {
+                        metaData.put("site", line.trim());
+                    }
 
                 } // Plot Info
                 else if (flg[1].startsWith("parea") && flg[2].equals("data")) {
