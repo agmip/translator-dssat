@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.agmip.core.types.TranslatorInput;
-import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Experiment Data I/O API Class
@@ -24,7 +23,7 @@ import static org.agmip.util.MapUtil.*;
  */
 public abstract class DssatCommonInput implements TranslatorInput {
 
-    protected String[] flg = new String[3];
+    protected String[] flg = {"", "", ""};
     protected String defValR = "-99.0";
     protected String defValC = "";
     protected String defValI = "-99";
@@ -37,10 +36,10 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param m  The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected abstract LinkedHashMap readFile(HashMap m) throws IOException;
+    protected abstract ArrayList<LinkedHashMap> readFile(HashMap m) throws IOException;
 
     /**
-     * DSSAT XFile Data input method
+     * DSSAT XFile Data input method, always return the first data object
      * 
      * @param arg0  file name
      * @return result data holder object
@@ -48,13 +47,68 @@ public abstract class DssatCommonInput implements TranslatorInput {
     @Override
     public LinkedHashMap readFile(String arg0) {
 
-        LinkedHashMap ret = new LinkedHashMap();
+//        LinkedHashMap ret = new LinkedHashMap();
+//        String filePath = arg0;
+//
+//        try {
+//            // read file by file
+//            ret = readFile2(getBufferReader(filePath));
+//
+//        } catch (Exception e) {
+//            //System.out.println(e.getMessage());
+//            e.printStackTrace();
+//        }
+//
+//        return ret;
+        return readFileById(arg0, 0);  // TODO
+    }
+
+    /**
+     * DSSAT XFile Data input method, get the data object by array index
+     * 
+     * @param arg0  file name
+     * @return result data holder object
+     */
+    public LinkedHashMap readFileById(String arg0, int id) {
+
+        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
+        String filePath = arg0;
+
+        try {
+            // read file by file
+            ret = readFileAll(filePath);
+
+        } catch (Exception e) {
+            //System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+
+        // If read failed, return blank map
+        if (ret.isEmpty() || id >= ret.size() || id < 0) {
+            return new LinkedHashMap();
+        } else {
+            return ret.get(id);
+        }
+    }
+
+    /**
+     * DSSAT XFile Data input method, return whole array
+     * 
+     * @param arg0  file name
+     * @return result data holder object
+     */
+    public ArrayList<LinkedHashMap> readFileAll(String arg0) {
+
+        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
         String filePath = arg0;
 
         try {
             // read file by file
             ret = readFile(getBufferReader(filePath));
 
+        } catch (FileNotFoundException fe) {
+            System.out.println("File not found under following path : [" + filePath + "]!");
+            return ret;
         } catch (Exception e) {
             //System.out.println(e.getMessage());
             e.printStackTrace();
@@ -121,7 +175,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      */
     protected void translateDateStr(LinkedHashMap m, String id) {
 
-        if (m.containsKey(id)) {
+        if (m.get(id) != null) {
             m.put(id, translateDateStr((String) m.get(id)));
         }
     }
@@ -146,7 +200,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      */
     protected void translateDateStrForDOY(LinkedHashMap m, String id, String pdate) {
 
-        if (m.containsKey(id)) {
+        if (m.get(id) != null) {
             m.put(id, translateDateStrForDOY((String) m.get(id), pdate));
         }
     }
@@ -162,7 +216,11 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
         if (str != null && str.length() <= 3) {
             if (!pdate.equals("") && pdate.length() >= 2) {
-                str = String.format("%1$2s%2$03d", pdate.substring(0, 2), Integer.parseInt(str));
+                try {
+                    str = String.format("%1$2s%2$03d", pdate.substring(0, 2), Integer.parseInt(str));
+                } catch (NumberFormatException e) {
+                    return "";
+                }
             }
         }
 
@@ -247,19 +305,6 @@ public abstract class DssatCommonInput implements TranslatorInput {
             }
             line = line.substring(length);
         }
-
-        return ret;
-    }
-
-    /**
-     * Get exname with normal format
-     *
-     * @return exname
-     */
-    protected String getExName() {
-
-        // TODO
-        String ret = "";
 
         return ret;
     }
@@ -698,8 +743,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
         }
 
         // Auto-fill the copy data in the missing layer with nearby layer data
-        String copyItem = null;
+        String copyItem;
         for (int i = 0; i < copyKeys.length; i++) {
+            copyItem = null;
             for (int j = ret.size() - 1; j > 0; j--) {
                 if (ret.get(j).containsKey(copyKeys[i])) {
                     copyItem = (String) ret.get(j).get(copyKeys[i]);
@@ -750,9 +796,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      */
     private static void copyItems(LinkedHashMap to, LinkedHashMap from, String[] copyKeys) {
         for (int i = 0; i < copyKeys.length; i++) {
-            if (from.containsKey(copyKeys[i])) {
-                to.put(copyKeys[i], from.get(copyKeys[i]));
-            }
+            copyItem(to, from, copyKeys[i]);
         }
     }
 
@@ -792,6 +836,53 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 removeIndex((LinkedHashMap) item, idNames);
             } else if (item instanceof String && idNames.contains(key)) {
                 m.remove(key);
+            }
+        }
+    }
+
+    /**
+     * copy item from one map to another map
+     * 
+     * @param to     the map which data will be copied to
+     * @param from   the map which data will be copied from
+     * @param key    the key name which will be copied
+     * 
+     */
+    public static void copyItem(LinkedHashMap to, LinkedHashMap from, String key) {
+        copyItem(to, from, key, key, false);
+    }
+
+    /**
+     * copy item from one map to another map
+     * original data might be delete based on last boolean value
+     * 
+     * @param to     the map which data will be copied to
+     * @param from   the map which data will be copied from
+     * @param key    the key name which will be copied
+     * @param deleteFlg     decide if delete the original data(true for delete)
+     * 
+     */
+    public static void copyItem(LinkedHashMap to, LinkedHashMap from, String key, boolean deleteFlg) {
+        copyItem(to, from, key, key, deleteFlg);
+    }
+
+    /**
+     * copy item from one map to another map by using different key
+     * original data might be delete based on last boolean value
+     * 
+     * @param to     the map which data will be copied to
+     * @param from   the map which data will be copied from
+     * @param toKey      the key name used in target holder
+     * @param fromKey    the key name used in original holder
+     * @param deleteFlg     decide if delete the original data(true for delete)
+     * 
+     */
+    public static void copyItem(LinkedHashMap to, LinkedHashMap from, String toKey, String fromKey, boolean deleteFlg) {
+        if (from.get(fromKey) != null) {
+            if (deleteFlg) {
+                to.put(toKey, from.remove(fromKey));
+            } else {
+                to.put(toKey, from.get(fromKey));
             }
         }
     }

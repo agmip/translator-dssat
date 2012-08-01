@@ -14,12 +14,6 @@ import static org.agmip.translators.dssat.DssatCommonInput.*;
  */
 public class DssatControllerInput {
 
-    private DssatCommonInput[] inputs = {
-        //        new DssatSoilInput(),
-        new DssatWeatherInput(),
-        new DssatXFileInput()};
-//        new DssatAFileInput(),
-//        new DssatTFileInput()};
     private DssatXFileInput mgnReader = new DssatXFileInput();
     private DssatSoilInput soilReader = new DssatSoilInput();
     private DssatWeatherInput wthReader = new DssatWeatherInput();
@@ -38,21 +32,22 @@ public class DssatControllerInput {
         LinkedHashMap metaData = new LinkedHashMap();
         ArrayList<LinkedHashMap> expArr = new ArrayList<LinkedHashMap>();
         LinkedHashMap expData;
-        ArrayList<LinkedHashMap> trMetaArr;
-        LinkedHashMap trMetaData;
         ArrayList<LinkedHashMap> mgnArr;
-        LinkedHashMap mgnData;
         ArrayList<LinkedHashMap> soilArr;
         LinkedHashMap soilData;
         ArrayList<LinkedHashMap> wthArr;
-        LinkedHashMap wthData;
         LinkedHashMap obvAFile;
         ArrayList<LinkedHashMap> obvAArr;
         LinkedHashMap obvTFile;
         ArrayList<LinkedHashMap> obvTArr;
 
         // Get buffered input file holder
-        brMap = getBufferReader(arg0);
+        try {
+            brMap = getBufferReader(arg0);
+        } catch (FileNotFoundException fe) {
+            System.out.println("File not found under following path : [" + arg0 + "]!");
+            return expArr;
+        }
 
         // Set Data source and version info
         setDataVersionInfo(metaData);
@@ -67,36 +62,34 @@ public class DssatControllerInput {
         wthArr = wthReader.readDailyData(brMap, metaData);
 
         // Try to read Observed AFile (summary data)
-        obvAFile = obvAReader.readFileWithoutCompress(brMap);
+        obvAFile = obvAReader.readObvData(brMap);
         obvAArr = getObjectOr(obvAFile, obvAReader.obvDataKey, new ArrayList<LinkedHashMap>());
 
         // Try to read Observed AFile (time-series data)
-        obvTFile = obvTReader.readFileWithoutCompress(brMap);
+        obvTFile = obvTReader.readObvData(brMap);
         obvTArr = getObjectOr(obvTFile, obvTReader.obvDataKey, new ArrayList<LinkedHashMap>());
 
-        // Get meta data for per treatment
-        trMetaArr = CopyList((ArrayList<LinkedHashMap>) metaData.get("tr_meta"));
-        metaData.remove("tr_meta");
         // Combine the each part of data
         for (int i = 0; i < mgnArr.size(); i++) {
-            // Set meta data for all treatment
-            expData = CopyList(metaData);
-            // Set meta data per treatment
-            trMetaData = trMetaArr.get(i);
-            expData.putAll(trMetaData);
-            expData.remove("wst_id");
+
+            // Set meta data block for this treatment
+            expData = mgnReader.setupMetaData(metaData, i);
 
             // Set soil data for this treatment
-            if (!getObjectOr(trMetaData, "wst_id", "0").equals("0")) {
-                expData.put(wthReader.jsonKey, getSectionData(wthArr, "wst_id", trMetaData.get("wst_id").toString()));
+            if (!getValueOr(expData, "wst_id", "0").equals("0")) {
+                expData.put(wthReader.jsonKey, getSectionData(wthArr, "wst_id", expData.get("wst_id").toString()));
             }
 
             // Set weather data for this treatment
-            if (!getObjectOr(trMetaData, "soil_id", "0").equals("0")) {
-                soilData = getSectionData(soilArr, "soil_id", trMetaData.get("soil_id").toString());
+            if (!getValueOr(expData, "soil_id", "0").equals("0")) {
+                soilData = getSectionData(soilArr, "soil_id", expData.get("soil_id").toString());
                 // if there is soil analysis data, create new soil block by using soil analysis info
-                if (expData.containsKey("soil_analysis")) {
-                    soilData = CopyList(soilData);
+                if (expData.get("soil_analysis") != null) {
+                    if (soilData == null) {
+                        soilData = new LinkedHashMap();
+                    } else {
+                        soilData = CopyList(soilData);
+                    }
                     LinkedHashMap saTmp = (LinkedHashMap) expData.remove("soil_analysis");
 
                     // Update soil site data
@@ -104,13 +97,14 @@ public class DssatControllerInput {
                     copyItem(soilData, saTmp, "smhb");
                     copyItem(soilData, saTmp, "smpx");
                     copyItem(soilData, saTmp, "smke");
-                    soilData.put("soil_id", "AG" + getValueOr(soilData, "soil_id", "AG").substring(2));    // TODO create new soil_id
+                    soilData.put("soil_id", soilData.get("soil_id") + "_" + (i + 1));
+                    expData.put("soil_id", expData.get("soil_id") + "_" + (i + 1));
 
                     // Update soil layer data
-                    ArrayList<LinkedHashMap> soilLyrs = (ArrayList) soilData.get(soilReader.layerKey);
-                    ArrayList<LinkedHashMap> saLyrs = (ArrayList) saTmp.get("data");
+                    ArrayList<LinkedHashMap> soilLyrs = getObjectOr(soilData, soilReader.layerKey, new ArrayList());
+                    ArrayList<LinkedHashMap> saLyrs =  getObjectOr(saTmp, mgnReader.icEventKey, new ArrayList());
                     String[] copyKeys = {"slbdm", "sloc", "slni", "slphw", "slphb", "slpx", "slke"};
-                    soilData.put(soilReader.layerKey, combinLayers(soilLyrs, saLyrs, "sllb", "sabl", copyKeys));
+                    soilData.put(soilReader.layerKey, combinLayers(soilLyrs, saLyrs, "sllb", "slbl", copyKeys));
                 }
 
                 expData.put(soilReader.jsonKey, soilData);
@@ -118,115 +112,25 @@ public class DssatControllerInput {
 
             // observed data (summary)
             LinkedHashMap obv = new LinkedHashMap();
-            expData.put("observed", obv);
-            if (!getObjectOr(trMetaData, "trno", "0").equals("0")) {
-                obv.put("summary", getSectionData(obvAArr, "trno_a", trMetaData.get("trno").toString()));
+            expData.put(obvAReader.jsonKey, obv);
+            if (!getValueOr(expData, "trno", "0").equals("0")) {
+                obv.put(obvAReader.obvFileKey, getSectionData(obvAArr, "trno_a", expData.get("trno").toString()));
             }
 
             // observed data (time-series)
-            if (!getObjectOr(trMetaData, "trno", "0").equals("0")) {
-                // TODO need to wait for the update of tfile structure (single array)
-                obv.put("time_series", getSectionDataArr(obvTArr, "trno_t", trMetaData.get("trno").toString()));
+            if (!getValueOr(expData, "trno", "0").equals("0")) {
+                obv.put(obvTReader.obvFileKey, getSectionData(obvTArr, "trno_t", expData.get("trno").toString()));
+//                obv.put("time_series", getSectionData(obvTArr, "trno_t", expData.get("trno").toString()).get(obvTReader.obvDataKey));
+                // TODO wait for confirmation
             }
 
-            // Set management data for this treatment
-            mgnData = mgnArr.get(i);
-            expData.put(mgnReader.jsonKey, mgnData);
-
-            // Set Initial Condition data for this treatment
-            cutDataBlock(mgnData, expData, "initial_condition");
-
-            // Set DSSAT specific data blocks
-            // dssat_sequence
-            cutDataBlock(mgnData, expData, "dssat_sequence");
-            // dssat_info
-//            cutDataBlock(mgnData, expData, "dssat_info");
-            LinkedHashMap dssatInfo = new LinkedHashMap();
-            // TODO field history code
-            if (!getObjectOr(obvAFile, "local_name", "").equals(getObjectOr(expData, "local_name", ""))) {
-
-                dssatInfo.put("local_name_a", obvAFile.get("local_name"));
-            }
-            if (!getObjectOr(obvTFile, "local_name", "").equals(getObjectOr(expData, "local_name", ""))) {
-                dssatInfo.put("local_name_t", obvTFile.get("local_name"));
-            }
-            if (!dssatInfo.isEmpty()) {
-                expData.put("dssat_info", dssatInfo);
-            }
-            
-            // remove index variables
-            ArrayList idNames = new ArrayList();
-            idNames.add("trno");
-            idNames.add("trno_a");
-            idNames.add("trno_t");
-            removeIndex(expData, idNames);
+            // Set experiment data include management, Initial Condition and DSSAT specific data blocks for this treatment
+            mgnReader.setupTrnData(expData, mgnArr.get(i), obvAFile, obvTFile);
 
             // Add to output array
             expArr.add(expData);
         }
 
-//        for (int i = 0; i < inputs.length; i++) {
-//
-//            tmp = inputs[i].readFile(brMap);
-//
-//            // Check if reading result is empty. If so, ignore it.
-//            if (!tmp.isEmpty()) {
-//                // If return map contains multiple file, like soil or weather, get ArrayList from the return map
-//                if (inputs[i] instanceof DssatSoilInput || inputs[i] instanceof DssatWeatherInput) {
-//                    ret.put(inputs[i].jsonKey, tmp.get(inputs[i].jsonKey));
-//
-//                } // if read Observed data file, need to save them under the same key (currently is "observed")
-//                else if (inputs[i] instanceof DssatAFileInput || inputs[i] instanceof DssatTFileInput) {
-//                    if (ret.containsKey(inputs[i].jsonKey)) {
-//                        ((LinkedHashMap) ret.get(inputs[i].jsonKey)).putAll(tmp);
-//                    } else {
-//                        ret.put(inputs[i].jsonKey, tmp);
-//                    }
-//                } else {
-//                    ret.put(inputs[i].jsonKey, tmp);
-//                }
-//
-//            } else {
-//            }
-//        }
-
         return expArr;
-    }
-
-    private void cutDataBlock(LinkedHashMap from, LinkedHashMap to, String key) {
-        if (from.containsKey(key)) {
-            to.put(key, CopyList((LinkedHashMap) from.get(key)));
-            from.remove(key);
-        }
-    }
-
-    private void copyItem(LinkedHashMap to, LinkedHashMap from, String key) {
-        if (from.get(key) != null) {
-            to.put(key, from.get(key));
-        }
-    }
-
-//    private ArrayList<LinkedHashMap> getSectionDataArr(ArrayList secArr, Object key, String value) {
-    private ArrayList getSectionDataArr(ArrayList secArr, Object key, String value) {
-//        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
-        ArrayList ret = new ArrayList();
-        // Loop blocks with different titles
-        for (int i = 0; i < secArr.size(); i++) {
-            ArrayList secSubArr = (ArrayList) secArr.get(i);
-            // Loop blocks with differnt treatment number
-            for (int j = 0; j < secSubArr.size(); j++) {
-                ArrayList secSubSubArr = (ArrayList) secSubArr.get(j);
-                if (!secSubSubArr.isEmpty()) {
-                    LinkedHashMap fstNode = (LinkedHashMap) secSubSubArr.get(0);
-                    if (value.equals(fstNode.get(key))) {
-                        ret.add(CopyList(secSubSubArr));
-                        break;
-                    }
-                }
-            }
-
-        }
-
-        return ret;
     }
 }
