@@ -216,12 +216,12 @@ public class DssatXFileInput extends DssatCommonInput {
                     metaData.putAll(readLine(line, formats));
 
                 } // Notes field
-                else if (flg[1].equals("tr_notes") && flg[2].equals("data")) {
+                else if (flg[1].equals("notes") && flg[2].equals("data")) {
                     if (!metaData.containsKey("tr_notes")) {
-                        metaData.put("tr_notes", line.trim() + "\\r\\n");
+                        metaData.put("tr_notes", line + "\\r\\n");
                     } else {
                         String notes = (String) metaData.get("tr_notes");
-                        notes += line.trim() + "\\r\\n";
+                        notes += line + "\\r\\n";
                         metaData.put("tr_notes", notes);
                     }
                 } else {
@@ -480,7 +480,7 @@ public class DssatXFileInput extends DssatCommonInput {
             else if (flg[0].startsWith("irrigation")) {
 
                 // Read IRRIGATION global data
-                if (flg[1].startsWith("i  efir") && flg[2].equals("data")) {
+                if ((flg[1].startsWith("i  efir") || flg4 % 2 == 1) && flg[2].equals("data")) {
                     // Set variables' formats
                     formats.clear();
                     formats.put("ir", 2);

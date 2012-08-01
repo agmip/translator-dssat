@@ -24,6 +24,7 @@ import org.agmip.core.types.TranslatorInput;
 public abstract class DssatCommonInput implements TranslatorInput {
 
     protected String[] flg = {"", "", ""};
+    protected int flg4 = 0;
     protected String defValR = "-99.0";
     protected String defValC = "";
     protected String defValI = "-99";
@@ -127,12 +128,14 @@ public abstract class DssatCommonInput implements TranslatorInput {
         if (line.startsWith("*")) {
 
             setTitleFlgs(line);
+            flg4 = 0;
 
         } // Data title line
         else if (line.startsWith("@")) {
 
             flg[1] = line.substring(1).trim().toLowerCase();
             flg[2] = "title";
+            flg4++;
 
         } // Comment line
         else if (line.startsWith("!")) {
@@ -150,6 +153,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             flg[0] = "";
             flg[1] = "";
             flg[2] = "blank";
+            flg4 = 0;
 
         } else {
 

@@ -62,14 +62,13 @@ public class DssatSoilOutput extends DssatCommonOutput {
 
             // Initial BufferedWriter
             // Get File name
-            String exName = getExName(result);
+            String soilId = getObjectOr(soilSite, "soil_id", "");
             String fileName;
-            if (exName.equals("")) {
+            if (soilId.equals("")) {
                 fileName = "soil.SOL";
             } else {
                 try {
-                    exName = exName.replace("\\.", "");
-                    fileName = exName.substring(0, 8) + "_" + exName.substring(8) + "X.SOL";
+                    fileName = soilId.substring(0, 2) + ".SOL";
                 } catch (Exception e) {
                     fileName = "soil.SOL";
                 }

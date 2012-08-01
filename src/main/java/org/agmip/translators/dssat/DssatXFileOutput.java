@@ -148,13 +148,15 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         getObjectOr(expData, "plthm", defValC).toString()));
             }
             // Notes
-            if (!getObjectOr(expData, "notes", "").equals("")) {
+            if (!getObjectOr(expData, "tr_notes", "").equals("")) {
                 sbData.append("@NOTES\r\n");
-                String notes = getObjectOr(expData, "notes", defValC).toString();
+                String notes = getObjectOr(expData, "tr_notes", defValC).toString();
+                notes = notes.replaceAll("\\\\r\\\\n", "\r\n");
 
                 // If notes contain newline code, then write directly
                 if (notes.indexOf("\r\n") >= 0) {
-                    sbData.append(String.format(" %1$s\r\n", notes));
+//                    sbData.append(String.format(" %1$s\r\n", notes));
+                    sbData.append(notes);
                 } // Otherwise, add newline for every 75-bits charactors
                 else {
                     while (notes.length() > 75) {
@@ -470,7 +472,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$s\r\n",
                             idx + 1, //getObjectOr(secData, "ic", defValI).toString(),
                             getObjectOr(secData, "icpcr", defValC).toString(),
-                            formatDateStr(getObjectOr(secData, "date", getPdate(result)).toString()), // P.S. icdat -> date
+                            formatDateStr(getObjectOr(secData, "icdat", getPdate(result)).toString()),
                             formatNumStr(5, secData, "icrt", defValR),
                             formatNumStr(5, secData, "icnd", defValR),
                             formatNumStr(5, secData, "icrzno", defValR),
