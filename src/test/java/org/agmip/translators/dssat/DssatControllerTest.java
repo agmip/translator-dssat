@@ -64,14 +64,14 @@ public class DssatControllerTest {
             bo.write("\r\n\r\n=================================================================\r\n\r\n".getBytes());
             bo.close();
         }
-//        f.delete();
+        f.delete();
         
-//        obDssatControllerOutput.writeFiles("", resultForWrite);
-//        File file = obDssatControllerOutput.getOutputZipFile();
-//        if (file != null) {
-//            assertTrue(file.exists());
-//            assertTrue(file.delete());
-//        }
+        obDssatControllerOutput.writeFiles("", resultForWrite.get(0));
+        File file = obDssatControllerOutput.getOutputZipFile();
+        if (file != null) {
+            assertTrue(file.exists());
+            assertTrue(file.delete());
+        }
 
     }
 }

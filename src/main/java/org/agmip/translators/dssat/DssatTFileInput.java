@@ -16,8 +16,9 @@ import static org.agmip.util.MapUtil.*;
  */
 public class DssatTFileInput extends DssatCommonInput {
 
-    public String obvFileKey = "time_series";  // TODO the key name might change
-    public String obvDataKey = "data";  // TODO the key name might change
+    public String obvFileKey = "time_series";  // P.S. the key name might change
+    public String obvDataKey = "data";  // P.S. the key name might change
+
     /**
      * Constructor with no parameters
      * Set jsonKey as "observed"
@@ -35,13 +36,30 @@ public class DssatTFileInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
+    protected ArrayList<LinkedHashMap> readFile(HashMap brMap) throws IOException {
 
-        LinkedHashMap ret = new LinkedHashMap();
-        LinkedHashMap file = readFileWithoutCompress(brMap);
+        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
+        LinkedHashMap file = readObvData(brMap);
+//        compressData(file);
+        ArrayList<LinkedHashMap> obvData = (ArrayList) file.get(obvDataKey);
+        LinkedHashMap obv;
+        LinkedHashMap expData;
 
-        ret.put(obvFileKey, file);
-//        compressData(ret);
+        for (int i = 0; i < obvData.size(); i++) {
+            expData = new LinkedHashMap();
+            obv = new LinkedHashMap();
+            copyItem(expData, file, "exname");
+            copyItem(expData, file, "local_name");
+            expData.put(jsonKey, obv);
+            obv.put(obvFileKey, obvData.get(i));
+
+            ret.add(expData);
+        }
+
+        // remove index variables
+        ArrayList idNames = new ArrayList();
+        idNames.add("trno_t");
+        removeIndex(ret, idNames);
 
         return ret;
     }
@@ -52,7 +70,7 @@ public class DssatTFileInput extends DssatCommonInput {
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected LinkedHashMap readFileWithoutCompress(HashMap brMap) throws IOException {
+    protected LinkedHashMap readObvData(HashMap brMap) throws IOException {
 
         LinkedHashMap file = new LinkedHashMap();
         String line;
@@ -60,9 +78,9 @@ public class DssatTFileInput extends DssatCommonInput {
         Object buf;
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
-        ArrayList obvData = new ArrayList();
-        ArrayList obvDataSection = new ArrayList();
+        ArrayList<LinkedHashMap> obvData = new ArrayList();
         ArrayList obvDataSecByTrno = new ArrayList();
+        LinkedHashMap obvDataByTrno;
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
         String pdate;
         String trno = "0";
@@ -71,7 +89,6 @@ public class DssatTFileInput extends DssatCommonInput {
 
         // If AFile File is no been found
         if (buf == null) {
-            // TODO reprot file not exist error
             return file;
         } else {
             if (buf instanceof char[]) {
@@ -98,7 +115,7 @@ public class DssatTFileInput extends DssatCommonInput {
                     formats.put("exname", 10);
                     formats.put("local_name", line.length());
                     // Read line and save into return holder
-                    file.putAll(readLine(line, formats, ""));
+                    file.putAll(readLine(line, formats));
 
                 } // Read data info 
                 else {
@@ -109,7 +126,7 @@ public class DssatTFileInput extends DssatCommonInput {
                     }
 
                     // Read line and save into return holder
-                    LinkedHashMap tmp = readLine(line, formats, "");
+                    LinkedHashMap tmp = readLine(line, formats);    // P.S. if missing data in TFile, no longer hold title name since the combination handling
                     // translate date from yyddd format to yyyymmdd format
                     tmp.put("date", translateDateStr((String) tmp.get("date")));
                     pdate = getPdate(brMap, (String) tmp.get("trno_t"));
@@ -122,8 +139,25 @@ public class DssatTFileInput extends DssatCommonInput {
                     // Check if the record's trno becomes the next treatment's trno
                     if (!trno.equals(tmp.get("trno_t"))) {
                         trno = getValueOr(tmp, "trno_t", "");
-                        obvDataSecByTrno = new ArrayList();
-                        obvDataSection.add(obvDataSecByTrno);
+                        obvDataByTrno = null;
+
+                        // Try to get the reccord which matches with the given treatment number
+                        for (int i = 0; i < obvData.size(); i++) {
+                            if (trno.equals(obvData.get(i).get("trno_t"))) {
+                                obvDataByTrno = obvData.get(i);
+                                obvDataSecByTrno = (ArrayList) obvDataByTrno.get(obvDataKey);
+                                break;
+                            }
+                        }
+
+                        // If not found, create a new record and add into array
+                        if (obvDataByTrno == null) {
+                            obvDataByTrno = new LinkedHashMap();
+                            obvDataSecByTrno = new ArrayList();
+                            obvDataByTrno.put("trno_t", trno);
+                            obvDataByTrno.put(obvDataKey, obvDataSecByTrno);
+                            obvData.add(obvDataByTrno);
+                        }
                     }
 
                     // Add data to the array
@@ -135,8 +169,6 @@ public class DssatTFileInput extends DssatCommonInput {
             else if (flg[2].equals("title")) {
 
                 titles = new ArrayList();
-                obvDataSection = new ArrayList();
-                obvData.add(obvDataSection);
                 trno = "0";
                 line = line.replaceFirst("@", " ");
                 for (int i = 0; i < line.length(); i += 6) {
@@ -154,7 +186,6 @@ public class DssatTFileInput extends DssatCommonInput {
             }
         }
 
-
         file.put(obvDataKey, obvData);
         brT.close();
 
@@ -171,32 +202,5 @@ public class DssatTFileInput extends DssatCommonInput {
         flg[0] = "meta";
         flg[1] = "";
         flg[2] = "data";
-    }
-
-    private ArrayList divideDataById(ArrayList obvData) {
-
-        ArrayList ret = new ArrayList();
-        ArrayList obvDataSection;
-        ArrayList obvDataNew = new ArrayList();
-        ArrayList obvDataSectionNew = new ArrayList();
-        LinkedHashMap tmp;
-        String trno = "0";
-
-        for (int i = 0; i < obvData.size(); i++) {
-            obvDataSection = (ArrayList) obvData.get(i);
-
-            for (int j = 0; j < obvDataSection.size(); j++) {
-                tmp = (LinkedHashMap) obvDataSection.get(j);
-                if (trno.equals(tmp.get("trno_t"))) {
-                } else {
-                    trno = getValueOr(tmp, "trno_t", "");
-                    obvDataSectionNew = new ArrayList();
-                    obvDataNew.add(obvDataSectionNew);
-
-                }
-            }
-
-        }
-        return ret;
     }
 }

@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -44,7 +43,7 @@ public class DssatControllerOutput {
         // compress all output files into one zip file
         ArrayList<File> files = getOutputFiles();
         File file;
-        zipFile = new File(outputs[0].revisePath(arg0) + getZipFileName(files));
+        zipFile = new File(outputs[0].revisePath(arg0) + getZipFileName());
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile));
         ZipEntry entry;
         BufferedInputStream bis;
@@ -77,11 +76,7 @@ public class DssatControllerOutput {
     public ArrayList<File> getOutputFiles() {
         ArrayList<File> files = new ArrayList();
         for (int i = 0; i < outputs.length; i++) {
-            if (outputs[i] instanceof DssatWeatherOutput) {
-                files.addAll(Arrays.asList(((DssatWeatherOutput) outputs[i]).getOutputFiles()));
-            } else {
-                files.add(outputs[i].getOutputFile());
-            }
+            files.add(outputs[i].getOutputFile());
         }
         return files;
     }
@@ -89,9 +84,8 @@ public class DssatControllerOutput {
     /**
      * Get output zip file name by using experiment file name
      * 
-     * @param files the output file array
      */
-    private String getZipFileName(ArrayList<File> files) {
+    private String getZipFileName() {
 
         for (int i = 0; i < outputs.length; i++) {
             if (outputs[i] instanceof DssatXFileOutput) {
