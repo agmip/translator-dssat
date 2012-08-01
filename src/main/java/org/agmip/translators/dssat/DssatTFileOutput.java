@@ -58,7 +58,6 @@ public class DssatTFileOutput extends DssatCommonOutput {
             } else {
                 String[] sortIds = {"date"};
                 Collections.sort(observeRecords, new DssatSortHelper(sortIds));
-                System.out.println(observeRecords.get(0).get("date") + "\r\n");
             }
 
             // Initial BufferedWriter
