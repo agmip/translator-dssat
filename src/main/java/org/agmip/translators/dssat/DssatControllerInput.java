@@ -42,7 +42,12 @@ public class DssatControllerInput {
         ArrayList<LinkedHashMap> obvTArr;
 
         // Get buffered input file holder
-        brMap = getBufferReader(arg0);
+        try {
+            brMap = getBufferReader(arg0);
+        } catch (FileNotFoundException fe) {
+            System.out.println("File not found under following path : [" + arg0 + "]!");
+            return expArr;
+        }
 
         // Set Data source and version info
         setDataVersionInfo(metaData);
@@ -80,7 +85,11 @@ public class DssatControllerInput {
                 soilData = getSectionData(soilArr, "soil_id", expData.get("soil_id").toString());
                 // if there is soil analysis data, create new soil block by using soil analysis info
                 if (expData.get("soil_analysis") != null) {
-                    soilData = CopyList(soilData);
+                    if (soilData == null) {
+                        soilData = new LinkedHashMap();
+                    } else {
+                        soilData = CopyList(soilData);
+                    }
                     LinkedHashMap saTmp = (LinkedHashMap) expData.remove("soil_analysis");
 
                     // Update soil site data
@@ -88,12 +97,12 @@ public class DssatControllerInput {
                     copyItem(soilData, saTmp, "smhb");
                     copyItem(soilData, saTmp, "smpx");
                     copyItem(soilData, saTmp, "smke");
-                    soilData.put("soil_id", soilData.get("soil_id") + "_" + (i+1));
-                    expData.put("soil_id", expData.get("soil_id") + "_" + (i+1));
+                    soilData.put("soil_id", soilData.get("soil_id") + "_" + (i + 1));
+                    expData.put("soil_id", expData.get("soil_id") + "_" + (i + 1));
 
                     // Update soil layer data
-                    ArrayList<LinkedHashMap> soilLyrs = (ArrayList) soilData.get(soilReader.layerKey);
-                    ArrayList<LinkedHashMap> saLyrs = (ArrayList) saTmp.get(mgnReader.icEventKey);
+                    ArrayList<LinkedHashMap> soilLyrs = getObjectOr(soilData, soilReader.layerKey, new ArrayList());
+                    ArrayList<LinkedHashMap> saLyrs =  getObjectOr(saTmp, mgnReader.icEventKey, new ArrayList());
                     String[] copyKeys = {"slbdm", "sloc", "slni", "slphw", "slphb", "slpx", "slke"};
                     soilData.put(soilReader.layerKey, combinLayers(soilLyrs, saLyrs, "sllb", "slbl", copyKeys));
                 }

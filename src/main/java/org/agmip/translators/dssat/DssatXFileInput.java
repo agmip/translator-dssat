@@ -932,7 +932,10 @@ public class DssatXFileInput extends DssatCommonInput {
 
             // initial_condition
             if (!getObjectOr(sqData, "ic", "0").equals("0")) {
-                trData.put("initial_condition", getSectionDataObj(icArr, "ic", sqData.get("ic").toString()));
+                LinkedHashMap icTmpArr = (LinkedHashMap) getSectionDataObj(icArr, "ic", sqData.get("ic").toString());
+                if (!icTmpArr.isEmpty()) {
+                    trData.put("initial_condition", icTmpArr);
+                }
             }
 
             // planting
@@ -1035,7 +1038,7 @@ public class DssatXFileInput extends DssatCommonInput {
             // soil_analysis
             if (!getObjectOr(sqData, "sa", "0").equals("0")) {
                 LinkedHashMap saTmp = (LinkedHashMap) getSectionDataObj(saArr, "sa", sqData.get("sa").toString());
-                ArrayList<LinkedHashMap> saSubArr = (ArrayList) saTmp.get(icEventKey);
+                ArrayList<LinkedHashMap> saSubArr = getObjectOr(saTmp, icEventKey, new ArrayList());
 
                 // temporally put soil_analysis block into treatment meta data
                 trMetaData.put("soil_analysis", saTmp);
@@ -1052,7 +1055,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 } else {
                     // Add SASC into initial condition block
                     icTmp = (LinkedHashMap) trData.get("initial_condition");
-                    ArrayList<LinkedHashMap> icSubArr = (ArrayList) icTmp.get(icEventKey);
+                    ArrayList<LinkedHashMap> icSubArr = getObjectOr(icTmp, icEventKey, new ArrayList());
                     icSubArrNew = combinLayers(icSubArr, saSubArr, "icbl", "slbl", copyKeys);
                 }
                 icTmp.put(icEventKey, icSubArrNew);
@@ -1102,11 +1105,7 @@ public class DssatXFileInput extends DssatCommonInput {
      */
     private Object getSectionDataObj(ArrayList secArr, Object key, String value) {
 
-        ArrayList ret = null;
-        // Get First data node
-        if (secArr.isEmpty() || value == null) {
-            return null;
-        }
+        ArrayList ret = new ArrayList();
         // Define the section with single sub data
         ArrayList singleSubRecSecList = new ArrayList();
         singleSubRecSecList.add("ge");
@@ -1114,6 +1113,14 @@ public class DssatXFileInput extends DssatCommonInput {
         singleSubRecSecList.add("pl");
         singleSubRecSecList.add("ha");
         singleSubRecSecList.add("sm");
+        // Get First data node
+        if (secArr.isEmpty() || value == null) {
+            if (key.equals("icbl") || key.equals("ir") || key.equals("ic") || key.equals("sa") || singleSubRecSecList.contains(key)) {
+                return new LinkedHashMap();
+            } else {
+                return ret;
+            }
+        }
 
         if (key.equals("icbl")) {
             return getSectionData(secArr, key, value);
@@ -1129,7 +1136,6 @@ public class DssatXFileInput extends DssatCommonInput {
 
             } // If it is simple array
             else {
-                ret = new ArrayList();
                 LinkedHashMap node;
                 for (int i = 0; i < secArr.size(); i++) {
                     node = (LinkedHashMap) secArr.get(i);

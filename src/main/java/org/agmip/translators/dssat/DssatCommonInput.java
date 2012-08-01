@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.agmip.core.types.TranslatorInput;
-import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Experiment Data I/O API Class
@@ -107,6 +106,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
             // read file by file
             ret = readFile(getBufferReader(filePath));
 
+        } catch (FileNotFoundException fe) {
+            System.out.println("File not found under following path : [" + filePath + "]!");
+            return ret;
         } catch (Exception e) {
             //System.out.println(e.getMessage());
             e.printStackTrace();
