@@ -126,8 +126,13 @@ public class DssatAFileInput extends DssatCommonInput {
                     LinkedHashMap tmp = readLine(line, formats, "");
                     pdate = getPdate(brMap, (String) tmp.get("trno_a"));
                     for (int i = 0; i < titles.size(); i++) {
-                        if (obvDataList.isDateType(titles.get(i))) {
-                            translateDateStrForDOY(tmp, (String) titles.get(i), pdate);
+                        String title = (String) titles.get(i);
+                        if (obvDataList.isDateType(title)) {
+                            translateDateStrForDOY(tmp, (String) title, pdate);
+//                            String val = (String) tmp.get(title);
+//                            if (val != null && val.length() > 3) {
+//                                tmp.put(title, val.substring(val.length() - 3, val.length()));
+//                            }
                         }
                     }
                     addToArray(obvData, tmp, "trno_a");
