@@ -48,7 +48,7 @@ public class DssatSoilTest {
         File file = obDssatSoilOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
-            assertTrue(file.getName().equals("UFGA8201_MZX.SOL"));
+            assertTrue(file.getName().equals("IB.SOL"));
             assertTrue(file.delete());
         }
     }

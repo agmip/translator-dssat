@@ -2,6 +2,7 @@ package org.agmip.translators.dssat;
 
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,6 +25,7 @@ import org.agmip.core.types.TranslatorInput;
 public abstract class DssatCommonInput implements TranslatorInput {
 
     protected String[] flg = {"", "", ""};
+    protected int flg4 = 0;
     protected String defValR = "-99.0";
     protected String defValC = "";
     protected String defValI = "-99";
@@ -127,12 +129,14 @@ public abstract class DssatCommonInput implements TranslatorInput {
         if (line.startsWith("*")) {
 
             setTitleFlgs(line);
+            flg4 = 0;
 
         } // Data title line
         else if (line.startsWith("@")) {
 
             flg[1] = line.substring(1).trim().toLowerCase();
             flg[2] = "title";
+            flg4++;
 
         } // Comment line
         else if (line.startsWith("!")) {
@@ -150,6 +154,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             flg[0] = "";
             flg[1] = "";
             flg[2] = "blank";
+            flg4 = 0;
 
         } else {
 
@@ -341,20 +346,33 @@ public abstract class DssatCommonInput implements TranslatorInput {
         // If input File is ZIP file
         if (filePath.toUpperCase().endsWith(".ZIP")) {
 
+            // Get experiment name
             ZipEntry entry;
+            String exname = "";
             in = new ZipInputStream(new FileInputStream(filePath));
-
             while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
                     if (entry.getName().matches(".+\\.\\w{2}[Xx]")) {
+                        exname = entry.getName().replaceAll("[Xx]$", "");
+                        break;
+                    }
+                }
+            }
+            
+            // Read Files
+            in = new ZipInputStream(new FileInputStream(filePath));
+            
+            while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
+                if (!entry.isDirectory()) {
+                    if (entry.getName().equalsIgnoreCase(exname + "X")) {
                         result.put("X", getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".WTH")) {
                         mapW.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".SOL")) {
                         mapS.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
-                    } else if (entry.getName().matches(".+\\.\\w{2}[Aa]")) {
+                    } else if (entry.getName().equalsIgnoreCase(exname + "A")) {
                         result.put("A", getBuf(in, (int) entry.getSize()));
-                    } else if (entry.getName().matches(".+\\.\\w{2}[Tt]")) {
+                    } else if (entry.getName().equalsIgnoreCase(exname + "T")) {
                         result.put("T", getBuf(in, (int) entry.getSize()));
                     }
                 }

@@ -40,6 +40,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         // Initial variables
         LinkedHashMap expData = (LinkedHashMap) result;
         LinkedHashMap soilData = getObjectOr(result, "soil", new LinkedHashMap());
+        LinkedHashMap wthData = getObjectOr(result, "weather", new LinkedHashMap());
         BufferedWriter bwX;                          // output object
         StringBuilder sbData = new StringBuilder();     // construct the data info in the output
         StringBuilder eventPart2 = new StringBuilder();                   // output string for second part of event data
@@ -148,13 +149,15 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         getObjectOr(expData, "plthm", defValC).toString()));
             }
             // Notes
-            if (!getObjectOr(expData, "notes", "").equals("")) {
+            if (!getObjectOr(expData, "tr_notes", "").equals("")) {
                 sbData.append("@NOTES\r\n");
-                String notes = getObjectOr(expData, "notes", defValC).toString();
+                String notes = getObjectOr(expData, "tr_notes", defValC).toString();
+                notes = notes.replaceAll("\\\\r\\\\n", "\r\n");
 
                 // If notes contain newline code, then write directly
                 if (notes.indexOf("\r\n") >= 0) {
-                    sbData.append(String.format(" %1$s\r\n", notes));
+//                    sbData.append(String.format(" %1$s\r\n", notes));
+                    sbData.append(notes);
                 } // Otherwise, add newline for every 75-bits charactors
                 else {
                     while (notes.length() > 75) {
@@ -181,7 +184,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
             // Set field info
             LinkedHashMap flData = new LinkedHashMap();
             copyItem(flData, expData, "id_field");
-            copyItem(flData, expData, "wst_id");
+            if (wthData.isEmpty()) {
+                copyItem(flData, expData, "wst_id");
+            } else {
+                flData.put("wst_id", getWthFileName(wthData));
+            }
             copyItem(flData, expData, "flsl");
             copyItem(flData, expData, "flob");
             copyItem(flData, expData, "fl_drntype");
@@ -243,7 +250,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 ArrayList<LinkedHashMap> meSubArr = new ArrayList<LinkedHashMap>();
                 ArrayList<LinkedHashMap> mhSubArr = new ArrayList<LinkedHashMap>();
                 LinkedHashMap smData = new LinkedHashMap();
-                
+
                 // Set environment modification info
                 meSubArr = getObjectOr(sqData, "em_data", meSubArr);
 
@@ -362,7 +369,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     }
                     sbData.append(String.format("%1$2s %2$-2s %3$-6s %4$s\r\n",
                             idx + 1, //getObjectOr(secData, "ge", defValI).toString(),
-                            getObjectOr(secData, "crid", defValBlank).toString(),   // P.S. if missing, default value use blank string
+                            getObjectOr(secData, "crid", defValBlank).toString(), // P.S. if missing, default value use blank string
                             getObjectOr(secData, "cul_id", defValC).toString(),
                             getObjectOr(secData, "cul_name", defValC).toString()));
                 }
@@ -470,7 +477,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$s\r\n",
                             idx + 1, //getObjectOr(secData, "ic", defValI).toString(),
                             getObjectOr(secData, "icpcr", defValC).toString(),
-                            formatDateStr(getObjectOr(secData, "date", getPdate(result)).toString()), // P.S. icdat -> date
+                            formatDateStr(getObjectOr(secData, "icdat", getPdate(result)).toString()),
                             formatNumStr(5, secData, "icrt", defValR),
                             formatNumStr(5, secData, "icnd", defValR),
                             formatNumStr(5, secData, "icrzno", defValR),
@@ -813,7 +820,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         String sm = String.format("%2d", smid);
         ArrayList<LinkedHashMap> dataArr;
         LinkedHashMap subData;
-        
+
         // Check if the meta data of fertilizer is not "N" ("Y" or null)
         if (!getValueOr(expData, "fertilizer", "").equals("N")) {
 
