@@ -10,7 +10,7 @@ import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Experiment Data I/O API Class1
- * 
+ *
  * @author Meng Zhang
  * @version 1.0
  */
@@ -20,9 +20,8 @@ public class DssatXFileInput extends DssatCommonInput {
     public String icEventKey = "soilLayer";
 
     /**
-     * Constructor with no parameters
-     * Set jsonKey as "experiment"
-     * 
+     * Constructor with no parameters Set jsonKey as "experiment"
+     *
      */
     public DssatXFileInput() {
         super();
@@ -31,8 +30,8 @@ public class DssatXFileInput extends DssatCommonInput {
 
     /**
      * DSSAT XFile Data input method for only inputing experiment file
-     * 
-     * @param brMap  The holder for BufferReader objects for all files
+     *
+     * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
     @Override
@@ -75,8 +74,8 @@ public class DssatXFileInput extends DssatCommonInput {
 
     /**
      * DSSAT XFile Data input method for Controller using (no compressing data)
-     * 
-     * @param brMap  The holder for BufferReader objects for all files
+     *
+     * @param brMap The holder for BufferReader objects for all files
      * @return trArr The array of treatment data
      */
     protected ArrayList<LinkedHashMap> readTreatments(HashMap brMap, LinkedHashMap metaData) throws IOException {
@@ -928,7 +927,7 @@ public class DssatXFileInput extends DssatCommonInput {
             // cultivar
 //            String cul_name = null;
 //            String crid = null;
-            LinkedHashMap crData= new LinkedHashMap();
+            LinkedHashMap crData = new LinkedHashMap();
             if (!getObjectOr(sqData, "ge", "0").equals("0")) {
                 // Get related cultivar data
                 crData = (LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString());
@@ -962,7 +961,9 @@ public class DssatXFileInput extends DssatCommonInput {
                 addEvent(evtArr, (LinkedHashMap) getSectionDataObj(plArr, "pl", sqData.get("pl").toString()), "pdate", "planting", seqid);
 
                 // add cultivar data into planting event
-                evtArr.get(evtArr.size() - 1).putAll(crData);
+                if (crData != null) {
+                    evtArr.get(evtArr.size() - 1).putAll(crData);
+                }
                 // Get planting date for DOY value handling
 //                if (cul_name != null) {
 //                    evtArr.get(evtArr.size() - 1).put("cul_name", cul_name);
@@ -1108,8 +1109,8 @@ public class DssatXFileInput extends DssatCommonInput {
 
     /**
      * Set reading flags for title lines (marked with *)
-     * 
-     * @param line  the string of reading line
+     *
+     * @param line the string of reading line
      */
     @Override
     protected void setTitleFlgs(String line) {
@@ -1120,10 +1121,10 @@ public class DssatXFileInput extends DssatCommonInput {
 
     /**
      * Get the section data by given index value and key
-     * 
-     * @param secArr    Section data array
-     * @param key       index variable name
-     * @param value     index variable value
+     *
+     * @param secArr Section data array
+     * @param key index variable name
+     * @param value index variable value
      */
     private Object getSectionDataObj(ArrayList secArr, Object key, String value) {
 
@@ -1174,11 +1175,11 @@ public class DssatXFileInput extends DssatCommonInput {
     /**
      * Add event data into event array from input data holder (map)
      *
-     * @param events    event array
-     * @param mCopy     input map
-     * @param dateId    the key name of event date variable
+     * @param events event array
+     * @param mCopy input map
+     * @param dateId the key name of event date variable
      * @param eventName the event name
-     * @param seqId     the sequence id for DSSAT
+     * @param seqId the sequence id for DSSAT
      */
     private void addEvent(ArrayList events, LinkedHashMap m, String dateId, String eventName, int seqId) {
 
@@ -1215,10 +1216,10 @@ public class DssatXFileInput extends DssatCommonInput {
     /**
      * Setup the meta data block for the treatment
      *
-     * @param metaData  meta data holder
-     * @param trId      treatment array index for the current treatment
-     * 
-     * @return expData   experiment data holder (contain all blocks)
+     * @param metaData meta data holder
+     * @param trId treatment array index for the current treatment
+     *
+     * @return expData experiment data holder (contain all blocks)
      */
     public LinkedHashMap setupMetaData(LinkedHashMap metaData, int trId) {
 
@@ -1235,23 +1236,24 @@ public class DssatXFileInput extends DssatCommonInput {
     }
 
     /**
-     * Setup the treatment data, includes management, initial condition and Dssat specific data block
-     * (for the case which only read XFile)
+     * Setup the treatment data, includes management, initial condition and
+     * Dssat specific data block (for the case which only read XFile)
      *
-     * @param expData   experiment data holder (contain all blocks)
-     * @param mgnData   management data holder (contain events array)
+     * @param expData experiment data holder (contain all blocks)
+     * @param mgnData management data holder (contain events array)
      */
     private void setupTrnData(LinkedHashMap expData, LinkedHashMap mgnData) {
         setupTrnData(expData, mgnData, new LinkedHashMap(), new LinkedHashMap());
     }
 
     /**
-     * Setup the treatment data, includes management, initial condition and Dssat specific data block
+     * Setup the treatment data, includes management, initial condition and
+     * Dssat specific data block
      *
-     * @param expData   experiment data holder (contain all blocks)
-     * @param mgnData   management data holder (contain events array)
-     * @param obvAFile  summary observed data holder
-     * @param obvTFile  time series observed data holder
+     * @param expData experiment data holder (contain all blocks)
+     * @param mgnData management data holder (contain events array)
+     * @param obvAFile summary observed data holder
+     * @param obvTFile time series observed data holder
      */
     public void setupTrnData(LinkedHashMap expData, LinkedHashMap mgnData, LinkedHashMap obvAFile, LinkedHashMap obvTFile) {
 
