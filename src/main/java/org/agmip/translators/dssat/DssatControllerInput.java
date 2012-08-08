@@ -22,8 +22,8 @@ public class DssatControllerInput {
 
     /**
      * All DSSAT Data input method
-     * 
-     * @param brMap  The holder for BufferReader objects for all files
+     *
+     * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
     public ArrayList<LinkedHashMap> readFiles(String arg0) throws FileNotFoundException, IOException {
@@ -119,14 +119,20 @@ public class DssatControllerInput {
             LinkedHashMap obv = new LinkedHashMap();
             expData.put(obvAReader.jsonKey, obv);
             if (!getValueOr(expData, "trno", "0").equals("0")) {
-                obv.putAll(getSectionData(obvAArr, "trno_a", expData.get("trno").toString()));
+                LinkedHashMap tmp = getSectionData(obvAArr, "trno_a", expData.get("trno").toString());
+                if (tmp != null) {
+                    obv.putAll(tmp);
+                }
             }
 
             // observed data (time-series)
             if (!getValueOr(expData, "trno", "0").equals("0")) {
-                obv.put("time_series", getSectionData(obvTArr, "trno_t", expData.get("trno").toString()).get(obvTReader.obvDataKey));
+                LinkedHashMap tmp = getSectionData(obvTArr, "trno_t", expData.get("trno").toString());
+                if (tmp != null) {
+                    obv.put("time_series", tmp.get(obvTReader.obvDataKey));
+                }
             }
-            
+
             // there is no observed data, remove the key from experiment object
             if (obv.isEmpty()) {
                 expData.remove(obvAReader.jsonKey);
