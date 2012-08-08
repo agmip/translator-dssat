@@ -926,12 +926,18 @@ public class DssatXFileInput extends DssatCommonInput {
             sqArrNew.add(sqData);
 
             // cultivar
-            String cul_name = null;
+//            String cul_name = null;
+//            String crid = null;
+            LinkedHashMap crData= new LinkedHashMap();
             if (!getObjectOr(sqData, "ge", "0").equals("0")) {
-                // Move cultivals info into dssat_info block except cul_name which will be located in the planting event
-                sqData.putAll((LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString()));
-                sqData.remove("cul_name");
-                cul_name = (String) ((LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString())).get("cul_name");
+                // Get related cultivar data
+                crData = (LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString());
+//                // Move cultivals info into dssat_info block except cul_name which will be located in the planting event
+//                sqData.putAll((LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString()));
+//                sqData.remove("cul_name");
+//                sqData.remove("crid");
+//                cul_name = (String) ((LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString())).get("cul_name");
+//                crid = (String) ((LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString())).get("crid");
             }
 
             // field
@@ -955,10 +961,15 @@ public class DssatXFileInput extends DssatCommonInput {
                 // add event data into array
                 addEvent(evtArr, (LinkedHashMap) getSectionDataObj(plArr, "pl", sqData.get("pl").toString()), "pdate", "planting", seqid);
 
+                // add cultivar data into planting event
+                evtArr.get(evtArr.size() - 1).putAll(crData);
                 // Get planting date for DOY value handling
-                if (cul_name != null) {
-                    evtArr.get(evtArr.size() - 1).put("cul_name", cul_name);
-                }
+//                if (cul_name != null) {
+//                    evtArr.get(evtArr.size() - 1).put("cul_name", cul_name);
+//                }
+//                if (crid != null) {
+//                    evtArr.get(evtArr.size() - 1).put("crid", crid);
+//                }
                 pdate = getValueOr(evtArr.get(evtArr.size() - 1), "pdate", "");
                 if (pdate.length() > 5) {
                     pdate = pdate.substring(2);

@@ -51,8 +51,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
             // Get Data from input holder
             LinkedHashMap tmp = (LinkedHashMap) getObjectOr(result, "observed", new LinkedHashMap());
-            tmp = (LinkedHashMap) getObjectOr(tmp, "time_series", new LinkedHashMap());
-            observeRecords = (ArrayList<LinkedHashMap>) getObjectOr(tmp, "data", new ArrayList<LinkedHashMap>());
+            observeRecords = (ArrayList<LinkedHashMap>) getObjectOr(tmp, "time_series", new ArrayList<LinkedHashMap>());
             if (observeRecords.isEmpty()) {
                 return;
             } else {

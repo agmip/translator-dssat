@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import static org.agmip.util.MapUtil.*;
+import static org.agmip.translators.dssat.DssatCommonInput.CopyList;
 
 /**
  * DSSAT Observation Data I/O API Class
@@ -53,8 +54,13 @@ public class DssatAFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            LinkedHashMap tmp = (LinkedHashMap) getObjectOr(result, "observed", new LinkedHashMap());
-            record = (LinkedHashMap) getObjectOr(tmp, "summary", new LinkedHashMap());
+            record = CopyList((LinkedHashMap) getObjectOr(result, "observed", new LinkedHashMap()));
+            Object[] keys = record.keySet().toArray();
+            for (Object key : keys) {
+                if (!(record.get(key) instanceof String)) {
+                    record.remove(key);
+                }
+            }
             if (record.isEmpty()) {
                 return;
             }

@@ -51,7 +51,7 @@ public class DssatTFileInput extends DssatCommonInput {
             copyItem(expData, file, "exname");
             copyItem(expData, file, "local_name");
             expData.put(jsonKey, obv);
-            obv.put(obvFileKey, obvData.get(i));
+            obv.put(obvFileKey, obvData.get(i).get(obvDataKey));
 
             ret.add(expData);
         }

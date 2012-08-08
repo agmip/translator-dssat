@@ -119,14 +119,17 @@ public class DssatControllerInput {
             LinkedHashMap obv = new LinkedHashMap();
             expData.put(obvAReader.jsonKey, obv);
             if (!getValueOr(expData, "trno", "0").equals("0")) {
-                obv.put(obvAReader.obvFileKey, getSectionData(obvAArr, "trno_a", expData.get("trno").toString()));
+                obv.putAll(getSectionData(obvAArr, "trno_a", expData.get("trno").toString()));
             }
 
             // observed data (time-series)
             if (!getValueOr(expData, "trno", "0").equals("0")) {
-                obv.put(obvTReader.obvFileKey, getSectionData(obvTArr, "trno_t", expData.get("trno").toString()));
-//                obv.put("time_series", getSectionData(obvTArr, "trno_t", expData.get("trno").toString()).get(obvTReader.obvDataKey));
-                // TODO wait for confirmation
+                obv.put("time_series", getSectionData(obvTArr, "trno_t", expData.get("trno").toString()).get(obvTReader.obvDataKey));
+            }
+            
+            // there is no observed data, remove the key from experiment object
+            if (obv.isEmpty()) {
+                expData.remove(obvAReader.jsonKey);
             }
 
             // Set experiment data include management, Initial Condition and DSSAT specific data blocks for this treatment

@@ -284,8 +284,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         if (getValueOr(evtData, "event", defValBlank).equals("planting")) {
                             // Set cultivals info
                             copyItem(cuData, evtData, "cul_name");
-                            copyItem(cuData, sqData, "crid");
-                            copyItem(cuData, sqData, "cul_id");
+                            copyItem(cuData, evtData, "crid");
+                            copyItem(cuData, evtData, "cul_id");
                             // Set planting info
                             mpData.putAll(evtData);
                             mpData.remove("cul_name");
