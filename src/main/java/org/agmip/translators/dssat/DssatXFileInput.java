@@ -925,18 +925,10 @@ public class DssatXFileInput extends DssatCommonInput {
             sqArrNew.add(sqData);
 
             // cultivar
-//            String cul_name = null;
-//            String crid = null;
             LinkedHashMap crData = new LinkedHashMap();
             if (!getObjectOr(sqData, "ge", "0").equals("0")) {
                 // Get related cultivar data
                 crData = (LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString());
-//                // Move cultivals info into dssat_info block except cul_name which will be located in the planting event
-//                sqData.putAll((LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString()));
-//                sqData.remove("cul_name");
-//                sqData.remove("crid");
-//                cul_name = (String) ((LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString())).get("cul_name");
-//                crid = (String) ((LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString())).get("crid");
             }
 
             // field
@@ -965,12 +957,6 @@ public class DssatXFileInput extends DssatCommonInput {
                     evtArr.get(evtArr.size() - 1).putAll(crData);
                 }
                 // Get planting date for DOY value handling
-//                if (cul_name != null) {
-//                    evtArr.get(evtArr.size() - 1).put("cul_name", cul_name);
-//                }
-//                if (crid != null) {
-//                    evtArr.get(evtArr.size() - 1).put("crid", crid);
-//                }
                 pdate = getValueOr(evtArr.get(evtArr.size() - 1), "pdate", "");
                 if (pdate.length() > 5) {
                     pdate = pdate.substring(2);
@@ -1039,12 +1025,28 @@ public class DssatXFileInput extends DssatCommonInput {
 
             // emvironment  // P.S. keep for furture using
             if (!getObjectOr(sqData, "em", "0").equals("0")) {
-                ArrayList<LinkedHashMap> emDataArr = (ArrayList) getSectionDataObj(emArr, "em", sqData.get("em").toString());
-                ArrayList arr = new ArrayList();
-                for (int j = 0; j < emDataArr.size(); j++) {
-                    arr.add(emDataArr.get(j).get("em_data"));
+                String em = (String) sqData.get("em");
+                ArrayList<LinkedHashMap> emDataArr = (ArrayList) getSectionDataObj(emArr, "em", em);
+//                ArrayList arr = new ArrayList();
+//                for (int j = 0; j < emDataArr.size(); j++) {
+//                    arr.add(emDataArr.get(j).get("em_data"));
+//                }
+//                sqData.put("em_data", arr);
+
+                LinkedHashMap tmp = getObjectOr(trData, "dssat_environment_modification", new LinkedHashMap());
+                ArrayList<LinkedHashMap> arr = getObjectOr(tmp, eventKey, new ArrayList());
+                boolean isExistFlg = false;
+                for (int j = 0; j < arr.size(); j++) {
+                    if (em.equals(arr.get(j).get("em"))) {
+                        isExistFlg = true;
+                        break;
+                    }
                 }
-                sqData.put("em_data", arr);
+                if (!isExistFlg) {
+                    arr.addAll(emDataArr);
+                }
+                tmp.put(eventKey, arr);
+                trData.put("dssat_environment_modification", tmp);
             }
 
             // harvest
@@ -1055,7 +1057,24 @@ public class DssatXFileInput extends DssatCommonInput {
 
             // simulation
             if (!getObjectOr(sqData, "sm", "0").equals("0")) {
-                sqData.putAll((LinkedHashMap) getSectionDataObj(smArr, "sm", sqData.get("sm").toString()));
+                String sm = (String) sqData.get("sm");
+                LinkedHashMap smData = (LinkedHashMap) getSectionDataObj(smArr, "sm", sm);
+//                sqData.putAll((LinkedHashMap) getSectionDataObj(smArr, "sm", sm));
+
+                LinkedHashMap tmp = getObjectOr(trData, "dssat_simulation_control", new LinkedHashMap());
+                ArrayList<LinkedHashMap> arr = getObjectOr(tmp, eventKey, new ArrayList());
+                boolean isExistFlg = false;
+                for (int j = 0; j < arr.size(); j++) {
+                    if (sm.equals(arr.get(j).get("sm"))) {
+                        isExistFlg = true;
+                        break;
+                    }
+                }
+                if (!isExistFlg) {
+                    arr.add(smData);
+                }
+                tmp.put(eventKey, arr);
+                trData.put("dssat_simulation_control", tmp);
             }
 
             // soil_analysis
@@ -1098,9 +1117,9 @@ public class DssatXFileInput extends DssatCommonInput {
         idNames.add("om");
         idNames.add("ch");
         idNames.add("ti");
-        idNames.add("em");
+//        idNames.add("em");
         idNames.add("ha");
-        idNames.add("sm");
+//        idNames.add("sm");
         removeIndex(trArr, idNames);
         removeIndex(metaData, idNames);
 
@@ -1269,6 +1288,10 @@ public class DssatXFileInput extends DssatCommonInput {
         // Set DSSAT specific data blocks
         // dssat_sequence
         copyItem(expData, mgnData, "dssat_sequence", true);
+        // dssat_environment_modification
+        copyItem(expData, mgnData, "dssat_environment_modification", true);
+        // dssat_simulation_control
+        copyItem(expData, mgnData, "dssat_simulation_control", true);
         // dssat_info
 //        cutDataBlock(mgnData, expData, "dssat_info");
         // Create dssat info holder

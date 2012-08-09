@@ -8,12 +8,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import static org.agmip.translators.dssat.DssatCommonInput.copyItem;
-
 import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Experiment Data I/O API Class
- * 
+ *
  * @author Meng Zhang
  * @version 1.0
  */
@@ -30,9 +29,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     /**
      * DSSAT Experiment Data Output method
-     * 
-     * @param arg0  file output path
-     * @param result  data holder object
+     *
+     * @param arg0 file output path
+     * @param result data holder object
      */
     @Override
     public void writeFile(String arg0, Map result) {
@@ -76,15 +75,14 @@ public class DssatXFileOutput extends DssatCommonOutput {
         ArrayList mrArr = new ArrayList();   // array for residues record
         ArrayList mcArr = new ArrayList();   // array for chemical record
         ArrayList mtArr = new ArrayList();   // array for tillage record
-        ArrayList meArr = new ArrayList();   // array for enveronment modification record
+        ArrayList<LinkedHashMap> meArr;     // array for enveronment modification record
         ArrayList mhArr = new ArrayList();   // array for harvest record
-        ArrayList smArr = new ArrayList();   // array for simulation control record
+        ArrayList<LinkedHashMap> smArr;     // array for simulation control record
         String exName;
 
         try {
 
             // Set default value for missing data
-//            result = (LinkedHashMap) getObjectOr(result, "experiment", result);
             if (expData == null || expData.isEmpty()) {
                 return;
             }
@@ -172,7 +170,12 @@ public class DssatXFileOutput extends DssatCommonOutput {
             // TREATMENT Section
             sqArr = getDataList(expData, "dssat_sequence", "data");
             evtArr = getDataList(expData, "management", "events");
+            meArr = getDataList(expData, "dssat_environment_modification", "data");
+            smArr = getDataList(expData, "dssat_simulation_control", "data");
+            boolean isSmExist = !smArr.isEmpty();
             String seqId;
+            String em;
+            String sm;
             sbData.append("*TREATMENTS                        -------------FACTOR LEVELS------------\r\n");
             sbData.append("@N R O C TNAME.................... CU FL SA IC MP MI MF MR MC MT ME MH SM\r\n");
 
@@ -240,6 +243,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
             for (int i = 0; i < sqArr.size(); i++) {
                 sqData = sqArr.get(i);
                 seqId = getValueOr(sqData, "seqid", defValBlank);
+                em = getValueOr(sqData, "em", defValBlank);
+                sm = getValueOr(sqData, "sm", defValBlank);
                 LinkedHashMap cuData = new LinkedHashMap();
                 LinkedHashMap mpData = new LinkedHashMap();
                 ArrayList<LinkedHashMap> miSubArr = new ArrayList<LinkedHashMap>();
@@ -247,30 +252,57 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 ArrayList<LinkedHashMap> mrSubArr = new ArrayList<LinkedHashMap>();
                 ArrayList<LinkedHashMap> mcSubArr = new ArrayList<LinkedHashMap>();
                 ArrayList<LinkedHashMap> mtSubArr = new ArrayList<LinkedHashMap>();
-                ArrayList<LinkedHashMap> meSubArr = new ArrayList<LinkedHashMap>();
+//                ArrayList<LinkedHashMap> meSubArr = new ArrayList<LinkedHashMap>();
                 ArrayList<LinkedHashMap> mhSubArr = new ArrayList<LinkedHashMap>();
                 LinkedHashMap smData = new LinkedHashMap();
 
                 // Set environment modification info
-                meSubArr = getObjectOr(sqData, "em_data", meSubArr);
+//                meSubArr = getObjectOr(sqData, "em_data", meSubArr);
+                String meNumStr = "";
+                meNum = 0;
+                for (int j = 0, cnt = 0; j < meArr.size(); j++) {
+                    if (!meNumStr.equals(meArr.get(j).get("em"))) {
+                        meNumStr = (String) meArr.get(j).get("em");
+                        cnt++;
+                        if (em.equals(meNumStr)) {
+                            meNum = cnt;
+                            break;
+                        }
+                    }
+                }
 
                 // Set simulation control info
-                if (!getValueOr(sqData, "sm_general", "").equals("")) {
-                    smData.put("sm_general", getValueOr(sqData, "sm_general", defValBlank));
-                    smData.put("sm_options", getValueOr(sqData, "sm_options", defValBlank));
-                    smData.put("sm_methods", getValueOr(sqData, "sm_methods", defValBlank));
-                    smData.put("sm_management", getValueOr(sqData, "sm_management", defValBlank));
-                    smData.put("sm_outputs", getValueOr(sqData, "sm_outputs", defValBlank));
-                    smData.put("sm_planting", getValueOr(sqData, "sm_planting", defValBlank));
-                    smData.put("sm_irrigation", getValueOr(sqData, "sm_irrigation", defValBlank));
-                    smData.put("sm_nitrogen", getValueOr(sqData, "sm_nitrogen", defValBlank));
-                    smData.put("sm_residues", getValueOr(sqData, "sm_residues", defValBlank));
-                    smData.put("sm_harvests", getValueOr(sqData, "sm_harvests", defValBlank));
-                } else {
+                smNum = 0;
+                if (isSmExist) {
+                    for (int j = 0; j < smArr.size(); j++) {
+                        if (sm.equals(smArr.get(j).get("sm"))) {
+                            smNum = j + 1;
+                            break;
+                        }
+                    }
+                }
+                if (smNum == 0) {
                     smData.put("fertilizer", mfSubArr);
                     smData.put("irrigation", miSubArr);
                     smData.put("planting", mpData);
+                    smNum = setSecDataArr(smData, smArr);
                 }
+//                if (!getValueOr(sqData, "sm_general", "").equals("")) {
+//                    smData.put("sm_general", getValueOr(sqData, "sm_general", defValBlank));
+//                    smData.put("sm_options", getValueOr(sqData, "sm_options", defValBlank));
+//                    smData.put("sm_methods", getValueOr(sqData, "sm_methods", defValBlank));
+//                    smData.put("sm_management", getValueOr(sqData, "sm_management", defValBlank));
+//                    smData.put("sm_outputs", getValueOr(sqData, "sm_outputs", defValBlank));
+//                    smData.put("sm_planting", getValueOr(sqData, "sm_planting", defValBlank));
+//                    smData.put("sm_irrigation", getValueOr(sqData, "sm_irrigation", defValBlank));
+//                    smData.put("sm_nitrogen", getValueOr(sqData, "sm_nitrogen", defValBlank));
+//                    smData.put("sm_residues", getValueOr(sqData, "sm_residues", defValBlank));
+//                    smData.put("sm_harvests", getValueOr(sqData, "sm_harvests", defValBlank));
+//                } else {
+//                    smData.put("fertilizer", mfSubArr);
+//                    smData.put("irrigation", miSubArr);
+//                    smData.put("planting", mpData);
+//                }
 
                 // Loop all event data
                 for (int j = 0; j < evtArr.size(); j++) {
@@ -324,12 +356,12 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 mrNum = setSecDataArr(mrSubArr, mrArr);
                 mcNum = setSecDataArr(mcSubArr, mcArr);
                 mtNum = setSecDataArr(mtSubArr, mtArr);
-                meNum = setSecDataArr(meSubArr, meArr);
+//                meNum = setSecDataArr(meSubArr, meArr);
                 mhNum = setSecDataArr(mhSubArr, mhArr);
-                smNum = setSecDataArr(smData, smArr);
-                if (smNum == 0) {
-                    smNum = 1;
-                }
+//                smNum = setSecDataArr(smData, smArr);
+//                if (smArr.isEmpty()) {
+//                    smNum = 1;
+//                }
 
                 sbData.append(String.format("%1$2s %2$1s %3$1s %4$1s %5$-25s %6$2s %7$2s %8$2s %9$2s %10$2s %11$2s %12$2s %13$2s %14$2s %15$2s %16$2s %17$2s %18$2s\r\n",
                         getValueOr(sqData, "trno", "1").toString(),
@@ -695,13 +727,21 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 sbData.append("*ENVIRONMENT MODIFICATIONS\r\n");
                 sbData.append("@E ODATE EDAY  ERAD  EMAX  EMIN  ERAIN ECO2  EDEW  EWIND ENVNAME\r\n");
 
-                for (int idx = 0; idx < meArr.size(); idx++) {
-                    secDataArr = (ArrayList) meArr.get(idx);
-
-                    for (int i = 0; i < secDataArr.size(); i++) {
-                        sbData.append(String.format("%1$2s%2$s\r\n",
-                                idx + 1,
-                                (String) secDataArr.get(i)));
+                String emNumStr = "";
+                for (int idx = 0, cnt = 1; idx < meArr.size(); idx++) {
+//                    secDataArr = (ArrayList) meArr.get(idx);
+                    secData = meArr.get(idx);
+                    if (!emNumStr.equals(secData.get("em"))) {
+                        cnt++;
+                        emNumStr = (String) secData.get("em");
+                    }
+                    sbData.append(String.format("%1$2s%2$s\r\n",
+                            cnt,
+                            secData.get("em_data")));
+//                    for (int i = 0; i < secDataArr.size(); i++) {
+//                        sbData.append(String.format("%1$2s%2$s\r\n",
+//                                idx + 1,
+//                                (String) secDataArr.get(i)));
 //                        sbData.append(String.format("%1$2s %2$5s %3$-1s%4$4s %5$-1s%6$4s %7$-1s%8$4s %9$-1s%10$4s %11$-1s%12$4s %13$-1s%14$4s %15$-1s%16$4s %17$-1s%18$4s %19$s\r\n",
 //                                idx + 1, //getObjectOr(secData, "em", defValI).toString(),
 //                                formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. emday -> date
@@ -722,8 +762,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                                getObjectOr(secData, "ecwnd", defValBlank).toString(),
 //                                formatNumStr(4, getObjectOr(secData, "emwnd", defValR),
 //                                getObjectOr(secData, "em_name", defValC).toString()));
-
-                    }
+//                    }
                 }
                 sbData.append("\r\n");
             }
@@ -775,6 +814,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                     if (secData.containsKey("sm_general")) {
                         sbData.append("*SIMULATION CONTROLS\r\n");
+                        secData.remove("sm");
                         Object[] keys = secData.keySet().toArray();
                         for (int i = 0; i < keys.length; i++) {
 
@@ -805,11 +845,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     /**
      * Create string of Simulation Control and Automatic Management Section
-     * 
-     * @param smid      simulation index number
-     * @param expData   date holder for experiment data
-     * @param trData    date holder for one treatment data
-     * @return      date string with format of "yyddd" 
+     *
+     * @param smid simulation index number
+     * @param expData date holder for experiment data
+     * @param trData date holder for one treatment data
+     * @return date string with format of "yyddd"
      */
     private String createSMMAStr(int smid, LinkedHashMap expData, LinkedHashMap trData) {
 
@@ -860,7 +900,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
         }
         sdate = formatDateStr(sdate);
 
-
         sb.append("*SIMULATION CONTROLS\r\n");
         sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME.................... SMODEL\r\n");
         sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
@@ -889,7 +928,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     /**
      * Set default value for missing data
-     * 
+     *
      */
     private void setDefVal() {
 
@@ -900,10 +939,10 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     /**
      * Get index value of the record and set new id value in the array
-     * 
-     * @param m     sub data
-     * @param arr   array of sub data
-     * @return       current index value of the sub data
+     *
+     * @param m sub data
+     * @param arr array of sub data
+     * @return current index value of the sub data
      */
     private int setSecDataArr(LinkedHashMap m, ArrayList arr) {
 
@@ -922,10 +961,10 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     /**
      * Get index value of the record and set new id value in the array
-     * 
-     * @param inArr     sub array of data
-     * @param outArr    array of sub data
-     * @return          current index value of the sub data
+     *
+     * @param inArr sub array of data
+     * @param outArr array of sub data
+     * @return current index value of the sub data
      */
     private int setSecDataArr(ArrayList inArr, ArrayList outArr) {
 
@@ -944,9 +983,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     /**
      * To check if there is plot info data existed in the experiment
-     * 
-     * @param expData   experiment data holder
-     * @return          the boolean value for if plot info exists
+     *
+     * @param expData experiment data holder
+     * @return the boolean value for if plot info exists
      */
     private boolean isPlotInfoExist(Map expData) {
 
@@ -961,9 +1000,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     /**
      * To check if there is soil analysis info data existed in the experiment
-     * 
-     * @param expData   initial condition layer data array
-     * @return          the boolean value for if soil analysis info exists
+     *
+     * @param expData initial condition layer data array
+     * @return the boolean value for if soil analysis info exists
      */
     private boolean isSoilAnalysisExist(ArrayList<LinkedHashMap> icSubArr) {
 
@@ -978,11 +1017,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     /**
      * Get sub data array from experiment data object
-     * 
-     * @param expData       experiment data holder
-     * @param blockName     top level block name
-     * @param dataListName  sub array name
-     * @return              sub data array
+     *
+     * @param expData experiment data holder
+     * @param blockName top level block name
+     * @param dataListName sub array name
+     * @return sub data array
      */
     private ArrayList<LinkedHashMap> getDataList(Map expData, String blockName, String dataListName) {
         LinkedHashMap dataBlock = getObjectOr(expData, blockName, new LinkedHashMap());
