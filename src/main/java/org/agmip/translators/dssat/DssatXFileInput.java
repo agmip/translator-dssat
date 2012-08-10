@@ -56,7 +56,7 @@ public class DssatXFileInput extends DssatCommonInput {
             copyItem(soilTmp, expData, "sldp");
             ArrayList<LinkedHashMap> soilSubArr = getObjectOr(soilTmp, icEventKey, new ArrayList());
             for (int j = 0; j < soilSubArr.size(); j++) {
-                soilSubArr.get(j).remove("sasc");
+                soilSubArr.get(j).remove("slsc");
             }
             expData.put("soil", soilTmp);
 
@@ -400,7 +400,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("slphb", 6);    // P.S. changed from saphb to slphb to match the soil variable name
                     formats.put("slpx", 6);     // P.S. changed from sapx  to slpx to match the soil variable name
                     formats.put("slke", 6);     // P.S. changed from sake  to slke to match the soil variable name
-                    formats.put("sasc", 6);     // P.S. id do not find in the master list (Measured stable organic C by soil layer, g[C]/100g[Soil])
+                    formats.put("slsc", 6);     // P.S. changed from sasc  to slsc to match the soil variable name
                     // Read line and save into return holder
                     sadArr.add(readLine(line, formats));
                 } else {
@@ -1088,7 +1088,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 // Add SASC into initial condition block
                 ArrayList<LinkedHashMap> icSubArrNew;
                 LinkedHashMap icTmp;
-                String[] copyKeys = {"sasc"};
+                String[] copyKeys = {"slsc"};
                 if (!trData.containsKey("initial_condition")) {
                     // Add a dummy ic block to hold SASC
                     icTmp = new LinkedHashMap();

@@ -229,7 +229,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 for (int i = 0; i < icSubArr.size(); i++) {
                     saSubData = new LinkedHashMap();
                     copyItem(saSubData, icSubArr.get(i), "sabl", "icbl", false);
-                    copyItem(saSubData, icSubArr.get(i), "sasc");
+                    copyItem(saSubData, icSubArr.get(i), "sasc", "slsc", false);
                     saSubArr.add(saSubData);
                 }
                 copyItem(saData, soilData, "sadat");
@@ -1007,7 +1007,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
     private boolean isSoilAnalysisExist(ArrayList<LinkedHashMap> icSubArr) {
 
         for (int i = 0; i < icSubArr.size(); i++) {
-            if (!getValueOr(icSubArr.get(i), "sasc", "").equals("")) {
+            if (!getValueOr(icSubArr.get(i), "slsc", "").equals("")) {
                 return true;
             }
 
