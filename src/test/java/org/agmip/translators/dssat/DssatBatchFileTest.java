@@ -30,7 +30,7 @@ public class DssatBatchFileTest {
     public void test() throws IOException, Exception {
         ArrayList<LinkedHashMap> result;
 
-        String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\UFGA8201_MZX_2.ZIP";
+        String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\UFGA8202_MZX.ZIP";
         result = obDssatControllerInput.readFiles(filePath);
 
         obDssatBatchFileOutput.writeFile("", result);
@@ -38,7 +38,7 @@ public class DssatBatchFileTest {
         if (file != null) {
             assertTrue(file.exists());
             assertTrue(file.getName().equals("DSSBatch.v45"));
-//            assertTrue(file.delete());
+            assertTrue(file.delete());
         }
     }
 }
