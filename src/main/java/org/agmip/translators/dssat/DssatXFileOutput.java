@@ -18,15 +18,6 @@ import static org.agmip.util.MapUtil.*;
  */
 public class DssatXFileOutput extends DssatCommonOutput {
 
-    private File outputFile;
-
-    /**
-     * Get output file object
-     */
-    public File getOutputFile() {
-        return outputFile;
-    }
-
     /**
      * DSSAT Experiment Data Output method
      *
@@ -93,9 +84,13 @@ public class DssatXFileOutput extends DssatCommonOutput {
             exName = getExName(expData);
             String fileName = exName;
             if (fileName.equals("")) {
-                fileName = "a.tmp";
+                fileName = "TEMP.XXX";
             } else {
-                fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "X";
+                try {
+                    fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "X";
+                } catch (Exception e) {
+                    fileName = "TEMP.XXX";
+                }
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
@@ -901,7 +896,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         sdate = formatDateStr(sdate);
 
         sb.append("*SIMULATION CONTROLS\r\n");
-        sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME.................... SMODEL\r\n");
+        sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
         sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
         sb.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
         sb.append(sm).append(" OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     Y     M\r\n");
@@ -910,7 +905,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         sb.append("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
         sb.append(sm).append(" MA              R     R     R     R     M\r\n");
         sb.append("@N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT\r\n");
-        sb.append(sm).append(" OU              N     Y     Y     1     Y     Y     Y     Y     Y     N     Y     N     Y\r\n\r\n");
+        sb.append(sm).append(" OU              N     Y     Y     1     Y     Y     N     N     N     N     N     N     N\r\n\r\n");
         sb.append("@  AUTOMATIC MANAGEMENT\r\n");
         sb.append("@N PLANTING    PFRST PLAST PH2OL PH2OU PH2OD PSTMX PSTMN\r\n");
         sb.append(sm).append(" PL          82050 82064    40   100    30    40    10\r\n");
@@ -924,17 +919,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
         sb.append(sm).append(" HA              0 83057   100     0\r\n");
 
         return sb.toString();
-    }
-
-    /**
-     * Set default value for missing data
-     *
-     */
-    private void setDefVal() {
-
-        defValR = "-99";
-        defValC = "-99";
-        defValI = "-99";
     }
 
     /**

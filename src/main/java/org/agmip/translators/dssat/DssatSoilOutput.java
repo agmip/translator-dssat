@@ -12,26 +12,17 @@ import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Soil Data I/O API Class
- * 
+ *
  * @author Meng Zhang
  * @version 1.0
  */
 public class DssatSoilOutput extends DssatCommonOutput {
 
-    private File outputFile;
-
-    /**
-     * Get output file object
-     */
-    public File getOutputFile() {
-        return outputFile;
-    }
-
     /**
      * DSSAT Soil Data Output method
-     * 
-     * @param arg0   file output path
-     * @param result  data holder object
+     *
+     * @param arg0 file output path
+     * @param result data holder object
      */
     @Override
     public void writeFile(String arg0, Map result) {
@@ -168,7 +159,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
                             formatNumStr(5, soilRecord, "slpx", defValR),
                             formatNumStr(5, soilRecord, "slpt", defValR),
                             formatNumStr(5, soilRecord, "slpo", defValR),
-                            formatNumStr(5, soilRecord, "caco3", defValR),  // P.S. Different with document (DSSAT vol2.pdf)
+                            formatNumStr(5, soilRecord, "caco3", defValR), // P.S. Different with document (DSSAT vol2.pdf)
                             formatNumStr(5, soilRecord, "slal", defValR),
                             formatNumStr(5, soilRecord, "slfe", defValR),
                             formatNumStr(5, soilRecord, "slmn", defValR),
@@ -201,17 +192,5 @@ public class DssatSoilOutput extends DssatCommonOutput {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Set default value for missing data
-     *
-     */
-    private void setDefVal() {
-
-        // defValD = ""; No need to set default value for Date type in soil file
-        defValR = "-99";
-        defValC = "-99";
-        defValI = "-99";
     }
 }
