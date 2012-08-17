@@ -177,9 +177,6 @@ public class DssatAcmoCsvTranslator {
         String exname;
         for (int i = 0; i < arr.size(); i++) {
             exname = getObjectOr(arr.get(i), "exname", "");
-            System.out.println(exname);
-            System.out.println(exp_id + cr + "_" + trno);
-            System.out.println();
             if (exname.equals(exp_id + cr + "_" + trno) || exname.equals(exp_id + cr)) {
                 return arr.get(i);
             }
