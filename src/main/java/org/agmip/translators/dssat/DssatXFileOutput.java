@@ -32,7 +32,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
         LinkedHashMap soilData = getObjectOr(result, "soil", new LinkedHashMap());
         LinkedHashMap wthData = getObjectOr(result, "weather", new LinkedHashMap());
         BufferedWriter bwX;                          // output object
-        StringBuilder sbData = new StringBuilder();     // construct the data info in the output
+        StringBuilder sbGenData = new StringBuilder();      // construct the data info in the output
+        StringBuilder sbNotesData = new StringBuilder();      // construct the data info in the output
+        StringBuilder sbData = new StringBuilder();         // construct the data info in the output
         StringBuilder eventPart2 = new StringBuilder();                   // output string for second part of event data
         LinkedHashMap secData;
         ArrayList subDataArr;                       // Arraylist for event data holder
@@ -98,37 +100,37 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
             // Output XFile
             // EXP.DETAILS Section
-            sbData.append(String.format("*EXP.DETAILS: %1$-10s %2$s\r\n\r\n", exName, getObjectOr(expData, "local_name", defValBlank).toString()));
+            sbGenData.append(String.format("*EXP.DETAILS: %1$-10s %2$s\r\n\r\n", exName, getObjectOr(expData, "local_name", defValBlank).toString()));
 
             // GENERAL Section
-            sbData.append("*GENERAL\r\n");
+            sbGenData.append("*GENERAL\r\n");
             // People
             if (!getObjectOr(expData, "people", "").equals("")) {
-                sbData.append(String.format("@PEOPLE\r\n %1$s\r\n", getObjectOr(expData, "people", defValBlank).toString()));
+                sbGenData.append(String.format("@PEOPLE\r\n %1$s\r\n", getObjectOr(expData, "people", defValBlank).toString()));
             }
             // Address
             if (getObjectOr(expData, "institution", "").equals("")) {
                 if (!getObjectOr(expData, "fl_loc_1", "").equals("")
                         && getObjectOr(expData, "fl_loc_2", "").equals("")
                         && getObjectOr(expData, "fl_loc_3", "").equals("")) {
-                    sbData.append(String.format("@ADDRESS\r\n %3$s, %2$s, %1$s\r\n",
+                    sbGenData.append(String.format("@ADDRESS\r\n %3$s, %2$s, %1$s\r\n",
                             getObjectOr(expData, "fl_loc_1", defValBlank).toString(),
                             getObjectOr(expData, "fl_loc_2", defValBlank).toString(),
                             getObjectOr(expData, "fl_loc_3", defValBlank).toString()));
                 }
             } else {
-                sbData.append(String.format("@ADDRESS\r\n %1$s\r\n", getObjectOr(expData, "institution", defValBlank).toString()));
+                sbGenData.append(String.format("@ADDRESS\r\n %1$s\r\n", getObjectOr(expData, "institution", defValBlank).toString()));
             }
 
             // Site
             if (!getObjectOr(expData, "site", "").equals("")) {
-                sbData.append(String.format("@SITE\r\n %1$s\r\n", getObjectOr(expData, "site", defValBlank).toString()));
+                sbGenData.append(String.format("@SITE\r\n %1$s\r\n", getObjectOr(expData, "site", defValBlank).toString()));
             }
             // Plot Info
             if (isPlotInfoExist(expData)) {
 
-                sbData.append("@ PAREA  PRNO  PLEN  PLDR  PLSP  PLAY HAREA  HRNO  HLEN  HARM.........\r\n");
-                sbData.append(String.format(" %1$6s %2$5s %3$5s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$5s %10$-15s\r\n",
+                sbGenData.append("@ PAREA  PRNO  PLEN  PLDR  PLSP  PLAY HAREA  HRNO  HLEN  HARM.........\r\n");
+                sbGenData.append(String.format(" %1$6s %2$5s %3$5s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$5s %10$-15s\r\n",
                         formatNumStr(6, expData, "plta", defValR),
                         formatNumStr(5, expData, "pltrno", defValI),
                         formatNumStr(5, expData, "pltln", defValR),
@@ -142,21 +144,21 @@ public class DssatXFileOutput extends DssatCommonOutput {
             }
             // Notes
             if (!getObjectOr(expData, "tr_notes", "").equals("")) {
-                sbData.append("@NOTES\r\n");
+                sbNotesData.append("@NOTES\r\n");
                 String notes = getObjectOr(expData, "tr_notes", defValC).toString();
                 notes = notes.replaceAll("\\\\r\\\\n", "\r\n");
 
                 // If notes contain newline code, then write directly
                 if (notes.indexOf("\r\n") >= 0) {
 //                    sbData.append(String.format(" %1$s\r\n", notes));
-                    sbData.append(notes);
+                    sbNotesData.append(notes);
                 } // Otherwise, add newline for every 75-bits charactors
                 else {
                     while (notes.length() > 75) {
-                        sbData.append(" ").append(notes.substring(0, 75)).append("\r\n");
+                        sbNotesData.append(" ").append(notes.substring(0, 75)).append("\r\n");
                         notes = notes.substring(75);
                     }
-                    sbData.append(" ").append(notes).append("\r\n");
+                    sbNotesData.append(" ").append(notes).append("\r\n");
                 }
             }
             sbData.append("\r\n");
@@ -312,6 +314,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             copyItem(cuData, evtData, "cul_name");
                             copyItem(cuData, evtData, "crid");
                             copyItem(cuData, evtData, "cul_id");
+                            copyItem(cuData, evtData, "rm");
+                            copyItem(cuData, evtData, "cul_notes");
                             // Set planting info
                             mpData.putAll(evtData);
                             mpData.remove("cul_name");
@@ -393,6 +397,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
             if (!cuArr.isEmpty()) {
                 sbData.append("*CULTIVARS\r\n");
                 sbData.append("@C CR INGENO CNAME\r\n");
+                if (sbNotesData.toString().equals("")) {
+                    sbNotesData.append("@NOTES\r\n");
+                }
+                sbNotesData.append(" Cultivar Additional Info\r\n");
+                sbNotesData.append(" C CRID  CUL_ID   RM CNAME            CUL_NOTES\r\n");
 
                 for (int idx = 0; idx < cuArr.size(); idx++) {
                     secData = (LinkedHashMap) cuArr.get(idx);
@@ -417,6 +426,14 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             getObjectOr(secData, "crid", defValBlank).toString(),   // P.S. if missing, default value use blank string
                             getObjectOr(secData, "cul_id", cul_id).toString(),      // P.S. Set default value which is deponds on crid
                             getObjectOr(secData, "cul_name", defValC).toString()));
+                    sbNotesData.append(String.format("%1$2s %2$-4s %3$7s %4$4s %5$-16s %6$s\r\n",
+                            idx + 1, //getObjectOr(secData, "ge", defValI).toString(),
+                            getObjectOr(secData, "crid", defValC).toString(),   // P.S. if missing, default value use blank string
+                            getObjectOr(secData, "cul_id", defValC).toString(),      // P.S. Set default value which is deponds on crid
+                            getObjectOr(secData, "rm", defValC).toString(),
+                            getObjectOr(secData, "cul_name", defValC).toString(),
+                            getObjectOr(secData, "cul_notes", defValC).toString()));
+                    
                 }
                 sbData.append("\r\n");
             } else {
@@ -877,6 +894,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
             // Output finish
             bwX.write(sbError.toString());
+            bwX.write(sbGenData.toString());
+            bwX.write(sbNotesData.toString());
             bwX.write(sbData.toString());
             bwX.close();
         } catch (IOException e) {
