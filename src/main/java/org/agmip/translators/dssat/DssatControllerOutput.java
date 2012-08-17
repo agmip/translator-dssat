@@ -54,6 +54,18 @@ public class DssatControllerOutput {
             exnames.add(exname);
         }
 
+        // Write all batch files
+        DssatBatchFileOutput batchTran = new DssatBatchFileOutput();
+        batchTran.writeFile(arg0, results);
+        if (batchTran.getOutputFile() != null) {
+            files.add(batchTran.getOutputFile());
+        }
+        DssatRunFileOutput runTran = new DssatRunFileOutput();
+        runTran.writeFile(arg0, results);
+        if (runTran.getOutputFile() != null) {
+            files.add(runTran.getOutputFile());
+        }
+
         // compress all output files into one zip file
         zipFile = new File(arg0 + "AGMIP_DSSAT.zip");
         createZip(files);
