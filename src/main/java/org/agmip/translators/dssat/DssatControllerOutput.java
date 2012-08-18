@@ -25,6 +25,7 @@ public class DssatControllerOutput {
         new DssatWeatherOutput(),
         new DssatAFileOutput(),
         new DssatTFileOutput(),
+        new DssatCulFileOutput(),
         new DssatBatchFileOutput(),
         new DssatRunFileOutput()
     };

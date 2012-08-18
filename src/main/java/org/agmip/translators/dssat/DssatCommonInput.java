@@ -341,6 +341,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
         InputStream in;
         LinkedHashMap mapW = new LinkedHashMap();
         LinkedHashMap mapS = new LinkedHashMap();
+        LinkedHashMap mapC = new LinkedHashMap();
         String[] tmp = filePath.split("[\\/]");
 
         // If input File is ZIP file
@@ -376,6 +377,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
                         result.put("T", getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".OUT")) {
                         result.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
+                    } else if (entry.getName().toUpperCase().endsWith(".CUL")) {
+                        mapC.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
                     }
                 }
             }
@@ -395,11 +398,14 @@ public abstract class DssatCommonInput implements TranslatorInput {
             } else if (filePath.toUpperCase().endsWith(".OUT")) {
                 File f = new File(filePath);
                 result.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
+            } else if (filePath.toUpperCase().endsWith(".CUL")) {
+                mapC.put(filePath, new BufferedReader(new InputStreamReader(in)));
             }
         }
 
         result.put("W", mapW);
         result.put("S", mapS);
+        result.put("C", mapC);
         result.put("Z", tmp[tmp.length - 1]);
 
         return result;

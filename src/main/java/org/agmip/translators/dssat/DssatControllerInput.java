@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import static org.agmip.util.MapUtil.*;
 import static org.agmip.translators.dssat.DssatCommonInput.*;
+import static org.agmip.util.MapUtil.*;
 
 /**
  *
@@ -19,6 +19,7 @@ public class DssatControllerInput {
     private DssatWeatherInput wthReader = new DssatWeatherInput();
     private DssatAFileInput obvAReader = new DssatAFileInput();
     private DssatTFileInput obvTReader = new DssatTFileInput();
+    private DssatCulFileInput culReader = new DssatCulFileInput();
 
     /**
      * All DSSAT Data input method
@@ -28,7 +29,7 @@ public class DssatControllerInput {
      */
     public ArrayList<LinkedHashMap> readFiles(String arg0) throws FileNotFoundException, IOException {
 
-        HashMap brMap = new HashMap();
+        HashMap brMap;
         LinkedHashMap metaData = new LinkedHashMap();
         ArrayList<LinkedHashMap> expArr = new ArrayList<LinkedHashMap>();
         LinkedHashMap expData;
@@ -40,6 +41,8 @@ public class DssatControllerInput {
         ArrayList<LinkedHashMap> obvAArr;
         LinkedHashMap obvTFile;
         ArrayList<LinkedHashMap> obvTArr;
+        ArrayList<LinkedHashMap> culArr;
+        LinkedHashMap culData;
 
         // Get buffered input file holder
         try {
@@ -68,6 +71,9 @@ public class DssatControllerInput {
         // Try to read Observed AFile (time-series data)
         obvTFile = obvTReader.readObvData(brMap);
         obvTArr = getObjectOr(obvTFile, obvTReader.obvDataKey, new ArrayList<LinkedHashMap>());
+
+        // Try to read cultivar File
+        culArr = culReader.readCultivarData(brMap, metaData);
 
         // Combine the each part of data
         for (int i = 0; i < mgnArr.size(); i++) {
@@ -140,6 +146,27 @@ public class DssatControllerInput {
 
             // Set experiment data include management, Initial Condition and DSSAT specific data blocks for this treatment
             mgnReader.setupTrnData(expData, mgnArr.get(i), obvAFile, obvTFile);
+            
+            // Set dssat cultivar info block
+            if (!culArr.isEmpty()) {
+                LinkedHashMap mgnData = getObjectOr(expData, mgnReader.jsonKey, new LinkedHashMap());
+                ArrayList<LinkedHashMap> eventArr = getObjectOr(mgnData, "events", new ArrayList());
+                ArrayList<LinkedHashMap> culTmpArr = new ArrayList<LinkedHashMap>();
+                for (int j = 0; j < eventArr.size(); j++) {
+                    if (getObjectOr(eventArr.get(j), "event", "").equals("planting")) {
+                        culData = getSectionData(culArr, "cul_id", (String) eventArr.get(j).get("cul_id"));
+                        if (culData != null) {
+                            culTmpArr.add(culData);
+                        }
+                    }
+                }
+                
+                if (!culTmpArr.isEmpty()) {
+                    LinkedHashMap tmp = new LinkedHashMap();
+                    tmp.put(culReader.dataKey, culTmpArr);
+                    expData.put(culReader.jsonKey, tmp);
+                }
+            }
 
             // Add to output array
             expArr.add(expData);
