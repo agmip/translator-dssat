@@ -8,31 +8,21 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import static org.agmip.translators.dssat.DssatCommonInput.copyItem;
-
 import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Experiment Data I/O API Class
- * 
+ *
  * @author Meng Zhang
  * @version 1.0
  */
 public class DssatXFileOutput extends DssatCommonOutput {
 
-    private File outputFile;
-
-    /**
-     * Get output file object
-     */
-    public File getOutputFile() {
-        return outputFile;
-    }
-
     /**
      * DSSAT Experiment Data Output method
-     * 
-     * @param arg0  file output path
-     * @param result  data holder object
+     *
+     * @param arg0 file output path
+     * @param result data holder object
      */
     @Override
     public void writeFile(String arg0, Map result) {
@@ -42,7 +32,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
         LinkedHashMap soilData = getObjectOr(result, "soil", new LinkedHashMap());
         LinkedHashMap wthData = getObjectOr(result, "weather", new LinkedHashMap());
         BufferedWriter bwX;                          // output object
-        StringBuilder sbData = new StringBuilder();     // construct the data info in the output
+        StringBuilder sbGenData = new StringBuilder();      // construct the data info in the output
+        StringBuilder sbNotesData = new StringBuilder();      // construct the data info in the output
+        StringBuilder sbData = new StringBuilder();         // construct the data info in the output
         StringBuilder eventPart2 = new StringBuilder();                   // output string for second part of event data
         LinkedHashMap secData;
         ArrayList subDataArr;                       // Arraylist for event data holder
@@ -76,15 +68,14 @@ public class DssatXFileOutput extends DssatCommonOutput {
         ArrayList mrArr = new ArrayList();   // array for residues record
         ArrayList mcArr = new ArrayList();   // array for chemical record
         ArrayList mtArr = new ArrayList();   // array for tillage record
-        ArrayList meArr = new ArrayList();   // array for enveronment modification record
+        ArrayList<LinkedHashMap> meArr;     // array for enveronment modification record
         ArrayList mhArr = new ArrayList();   // array for harvest record
-        ArrayList smArr = new ArrayList();   // array for simulation control record
+        ArrayList<LinkedHashMap> smArr;     // array for simulation control record
         String exName;
 
         try {
 
             // Set default value for missing data
-//            result = (LinkedHashMap) getObjectOr(result, "experiment", result);
             if (expData == null || expData.isEmpty()) {
                 return;
             }
@@ -95,48 +86,51 @@ public class DssatXFileOutput extends DssatCommonOutput {
             exName = getExName(expData);
             String fileName = exName;
             if (fileName.equals("")) {
-                fileName = "a.tmp";
+                fileName = "TEMP.XXX";
             } else {
-                fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "X";
+                try {
+                    fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "X";
+                } catch (Exception e) {
+                    fileName = "TEMP.XXX";
+                }
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
             bwX = new BufferedWriter(new FileWriter(outputFile));
 
-
             // Output XFile
             // EXP.DETAILS Section
-            sbData.append(String.format("*EXP.DETAILS: %1$-10s %2$s\r\n\r\n", exName, getObjectOr(expData, "local_name", defValBlank).toString()));
+            sbGenData.append(String.format("*EXP.DETAILS: %1$-10s %2$s\r\n\r\n", exName, getObjectOr(expData, "local_name", defValBlank).toString()));
 
             // GENERAL Section
-            sbData.append("*GENERAL\r\n");
+            sbGenData.append("*GENERAL\r\n");
             // People
             if (!getObjectOr(expData, "people", "").equals("")) {
-                sbData.append(String.format("@PEOPLE\r\n %1$s\r\n", getObjectOr(expData, "people", defValBlank).toString()));
+                sbGenData.append(String.format("@PEOPLE\r\n %1$s\r\n", getObjectOr(expData, "people", defValBlank).toString()));
             }
             // Address
             if (getObjectOr(expData, "institution", "").equals("")) {
                 if (!getObjectOr(expData, "fl_loc_1", "").equals("")
                         && getObjectOr(expData, "fl_loc_2", "").equals("")
                         && getObjectOr(expData, "fl_loc_3", "").equals("")) {
-                    sbData.append(String.format("@ADDRESS\r\n %3$s, %2$s, %1$s\r\n",
+                    sbGenData.append(String.format("@ADDRESS\r\n %3$s, %2$s, %1$s\r\n",
                             getObjectOr(expData, "fl_loc_1", defValBlank).toString(),
                             getObjectOr(expData, "fl_loc_2", defValBlank).toString(),
                             getObjectOr(expData, "fl_loc_3", defValBlank).toString()));
                 }
             } else {
-                sbData.append(String.format("@ADDRESS\r\n %1$s\r\n", getObjectOr(expData, "institution", defValBlank).toString()));
+                sbGenData.append(String.format("@ADDRESS\r\n %1$s\r\n", getObjectOr(expData, "institution", defValBlank).toString()));
             }
 
             // Site
             if (!getObjectOr(expData, "site", "").equals("")) {
-                sbData.append(String.format("@SITE\r\n %1$s\r\n", getObjectOr(expData, "site", defValBlank).toString()));
+                sbGenData.append(String.format("@SITE\r\n %1$s\r\n", getObjectOr(expData, "site", defValBlank).toString()));
             }
             // Plot Info
             if (isPlotInfoExist(expData)) {
 
-                sbData.append("@ PAREA  PRNO  PLEN  PLDR  PLSP  PLAY HAREA  HRNO  HLEN  HARM.........\r\n");
-                sbData.append(String.format(" %1$6s %2$5s %3$5s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$5s %10$-15s\r\n",
+                sbGenData.append("@ PAREA  PRNO  PLEN  PLDR  PLSP  PLAY HAREA  HRNO  HLEN  HARM.........\r\n");
+                sbGenData.append(String.format(" %1$6s %2$5s %3$5s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$5s %10$-15s\r\n",
                         formatNumStr(6, expData, "plta", defValR),
                         formatNumStr(5, expData, "pltrno", defValI),
                         formatNumStr(5, expData, "pltln", defValR),
@@ -150,21 +144,21 @@ public class DssatXFileOutput extends DssatCommonOutput {
             }
             // Notes
             if (!getObjectOr(expData, "tr_notes", "").equals("")) {
-                sbData.append("@NOTES\r\n");
+                sbNotesData.append("@NOTES\r\n");
                 String notes = getObjectOr(expData, "tr_notes", defValC).toString();
                 notes = notes.replaceAll("\\\\r\\\\n", "\r\n");
 
                 // If notes contain newline code, then write directly
                 if (notes.indexOf("\r\n") >= 0) {
 //                    sbData.append(String.format(" %1$s\r\n", notes));
-                    sbData.append(notes);
+                    sbNotesData.append(notes);
                 } // Otherwise, add newline for every 75-bits charactors
                 else {
                     while (notes.length() > 75) {
-                        sbData.append(" ").append(notes.substring(0, 75)).append("\r\n");
+                        sbNotesData.append(" ").append(notes.substring(0, 75)).append("\r\n");
                         notes = notes.substring(75);
                     }
-                    sbData.append(" ").append(notes).append("\r\n");
+                    sbNotesData.append(" ").append(notes).append("\r\n");
                 }
             }
             sbData.append("\r\n");
@@ -172,7 +166,12 @@ public class DssatXFileOutput extends DssatCommonOutput {
             // TREATMENT Section
             sqArr = getDataList(expData, "dssat_sequence", "data");
             evtArr = getDataList(expData, "management", "events");
+            meArr = getDataList(expData, "dssat_environment_modification", "data");
+            smArr = getDataList(expData, "dssat_simulation_control", "data");
+            boolean isSmExist = !smArr.isEmpty();
             String seqId;
+            String em;
+            String sm;
             sbData.append("*TREATMENTS                        -------------FACTOR LEVELS------------\r\n");
             sbData.append("@N R O C TNAME.................... CU FL SA IC MP MI MF MR MC MT ME MH SM\r\n");
 
@@ -226,7 +225,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 for (int i = 0; i < icSubArr.size(); i++) {
                     saSubData = new LinkedHashMap();
                     copyItem(saSubData, icSubArr.get(i), "sabl", "icbl", false);
-                    copyItem(saSubData, icSubArr.get(i), "sasc");
+                    copyItem(saSubData, icSubArr.get(i), "sasc", "slsc", false);
                     saSubArr.add(saSubData);
                 }
                 copyItem(saData, soilData, "sadat");
@@ -240,6 +239,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
             for (int i = 0; i < sqArr.size(); i++) {
                 sqData = sqArr.get(i);
                 seqId = getValueOr(sqData, "seqid", defValBlank);
+                em = getValueOr(sqData, "em", defValBlank);
+                sm = getValueOr(sqData, "sm", defValBlank);
                 LinkedHashMap cuData = new LinkedHashMap();
                 LinkedHashMap mpData = new LinkedHashMap();
                 ArrayList<LinkedHashMap> miSubArr = new ArrayList<LinkedHashMap>();
@@ -247,30 +248,57 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 ArrayList<LinkedHashMap> mrSubArr = new ArrayList<LinkedHashMap>();
                 ArrayList<LinkedHashMap> mcSubArr = new ArrayList<LinkedHashMap>();
                 ArrayList<LinkedHashMap> mtSubArr = new ArrayList<LinkedHashMap>();
-                ArrayList<LinkedHashMap> meSubArr = new ArrayList<LinkedHashMap>();
+//                ArrayList<LinkedHashMap> meSubArr = new ArrayList<LinkedHashMap>();
                 ArrayList<LinkedHashMap> mhSubArr = new ArrayList<LinkedHashMap>();
                 LinkedHashMap smData = new LinkedHashMap();
 
                 // Set environment modification info
-                meSubArr = getObjectOr(sqData, "em_data", meSubArr);
+//                meSubArr = getObjectOr(sqData, "em_data", meSubArr);
+                String meNumStr = "";
+                meNum = 0;
+                for (int j = 0, cnt = 0; j < meArr.size(); j++) {
+                    if (!meNumStr.equals(meArr.get(j).get("em"))) {
+                        meNumStr = (String) meArr.get(j).get("em");
+                        cnt++;
+                        if (em.equals(meNumStr)) {
+                            meNum = cnt;
+                            break;
+                        }
+                    }
+                }
 
                 // Set simulation control info
-                if (!getValueOr(sqData, "sm_general", "").equals("")) {
-                    smData.put("sm_general", getValueOr(sqData, "sm_general", defValBlank));
-                    smData.put("sm_options", getValueOr(sqData, "sm_options", defValBlank));
-                    smData.put("sm_methods", getValueOr(sqData, "sm_methods", defValBlank));
-                    smData.put("sm_management", getValueOr(sqData, "sm_management", defValBlank));
-                    smData.put("sm_outputs", getValueOr(sqData, "sm_outputs", defValBlank));
-                    smData.put("sm_planting", getValueOr(sqData, "sm_planting", defValBlank));
-                    smData.put("sm_irrigation", getValueOr(sqData, "sm_irrigation", defValBlank));
-                    smData.put("sm_nitrogen", getValueOr(sqData, "sm_nitrogen", defValBlank));
-                    smData.put("sm_residues", getValueOr(sqData, "sm_residues", defValBlank));
-                    smData.put("sm_harvests", getValueOr(sqData, "sm_harvests", defValBlank));
-                } else {
+                smNum = 0;
+                if (isSmExist) {
+                    for (int j = 0; j < smArr.size(); j++) {
+                        if (sm.equals(smArr.get(j).get("sm"))) {
+                            smNum = j + 1;
+                            break;
+                        }
+                    }
+                }
+                if (smNum == 0) {
                     smData.put("fertilizer", mfSubArr);
                     smData.put("irrigation", miSubArr);
                     smData.put("planting", mpData);
+                    smNum = setSecDataArr(smData, smArr);
                 }
+//                if (!getValueOr(sqData, "sm_general", "").equals("")) {
+//                    smData.put("sm_general", getValueOr(sqData, "sm_general", defValBlank));
+//                    smData.put("sm_options", getValueOr(sqData, "sm_options", defValBlank));
+//                    smData.put("sm_methods", getValueOr(sqData, "sm_methods", defValBlank));
+//                    smData.put("sm_management", getValueOr(sqData, "sm_management", defValBlank));
+//                    smData.put("sm_outputs", getValueOr(sqData, "sm_outputs", defValBlank));
+//                    smData.put("sm_planting", getValueOr(sqData, "sm_planting", defValBlank));
+//                    smData.put("sm_irrigation", getValueOr(sqData, "sm_irrigation", defValBlank));
+//                    smData.put("sm_nitrogen", getValueOr(sqData, "sm_nitrogen", defValBlank));
+//                    smData.put("sm_residues", getValueOr(sqData, "sm_residues", defValBlank));
+//                    smData.put("sm_harvests", getValueOr(sqData, "sm_harvests", defValBlank));
+//                } else {
+//                    smData.put("fertilizer", mfSubArr);
+//                    smData.put("irrigation", miSubArr);
+//                    smData.put("planting", mpData);
+//                }
 
                 // Loop all event data
                 for (int j = 0; j < evtArr.size(); j++) {
@@ -284,8 +312,10 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         if (getValueOr(evtData, "event", defValBlank).equals("planting")) {
                             // Set cultivals info
                             copyItem(cuData, evtData, "cul_name");
-                            copyItem(cuData, sqData, "crid");
-                            copyItem(cuData, sqData, "cul_id");
+                            copyItem(cuData, evtData, "crid");
+                            copyItem(cuData, evtData, "cul_id");
+                            copyItem(cuData, evtData, "rm");
+                            copyItem(cuData, evtData, "cul_notes");
                             // Set planting info
                             mpData.putAll(evtData);
                             mpData.remove("cul_name");
@@ -317,6 +347,15 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 }
 
+                // If alternative fields are avaiable for fertilizer data
+                if (mfSubArr.isEmpty()) {
+                    if (!getObjectOr(result, "fen_tot", "").equals("")
+                            || !getObjectOr(result, "fep_tot", "").equals("")
+                            || !getObjectOr(result, "fek_tot", "").equals("")) {
+                        mfSubArr.add(new LinkedHashMap());
+                    }
+                }
+
                 cuNum = setSecDataArr(cuData, cuArr);
                 mpNum = setSecDataArr(mpData, mpArr);
                 miNum = setSecDataArr(miSubArr, miArr);
@@ -324,12 +363,12 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 mrNum = setSecDataArr(mrSubArr, mrArr);
                 mcNum = setSecDataArr(mcSubArr, mcArr);
                 mtNum = setSecDataArr(mtSubArr, mtArr);
-                meNum = setSecDataArr(meSubArr, meArr);
+//                meNum = setSecDataArr(meSubArr, meArr);
                 mhNum = setSecDataArr(mhSubArr, mhArr);
-                smNum = setSecDataArr(smData, smArr);
-                if (smNum == 0) {
-                    smNum = 1;
-                }
+//                smNum = setSecDataArr(smData, smArr);
+//                if (smArr.isEmpty()) {
+//                    smNum = 1;
+//                }
 
                 sbData.append(String.format("%1$2s %2$1s %3$1s %4$1s %5$-25s %6$2s %7$2s %8$2s %9$2s %10$2s %11$2s %12$2s %13$2s %14$2s %15$2s %16$2s %17$2s %18$2s\r\n",
                         getValueOr(sqData, "trno", "1").toString(),
@@ -358,20 +397,43 @@ public class DssatXFileOutput extends DssatCommonOutput {
             if (!cuArr.isEmpty()) {
                 sbData.append("*CULTIVARS\r\n");
                 sbData.append("@C CR INGENO CNAME\r\n");
+                if (sbNotesData.toString().equals("")) {
+                    sbNotesData.append("@NOTES\r\n");
+                }
+                sbNotesData.append(" Cultivar Additional Info\r\n");
+                sbNotesData.append(" C CRID  CUL_ID   RM CNAME            CUL_NOTES\r\n");
 
                 for (int idx = 0; idx < cuArr.size(); idx++) {
                     secData = (LinkedHashMap) cuArr.get(idx);
+                    String cul_id = defValC;
+                    String crid = getObjectOr(secData, "crid", "");
                     // Checl if necessary data is missing
-                    if (getObjectOr(secData, "crid", "").equals("")) {
+                    if (crid.equals("")) {
                         sbError.append("! Warning: Incompleted record because missing data : [crid]\r\n");
-                    } else if (getObjectOr(secData, "cul_id", "").equals("")) {
-                        sbError.append("! Warning: Incompleted record because missing data : [cul_id]\r\n");
+                    } else {
+                        // Set cultivar id a default value deponds on the crop id
+                        if (crid.equals("MZ")) {
+                            cul_id = "990002";
+                        } else {
+                            cul_id = "999999";
+                        }
+                    }
+                    if (getObjectOr(secData, "cul_id", "").equals("")) {
+                        sbError.append("! Warning: Incompleted record because missing data : [cul_id], and will use default value '").append(cul_id).append("'\r\n");
                     }
                     sbData.append(String.format("%1$2s %2$-2s %3$-6s %4$s\r\n",
                             idx + 1, //getObjectOr(secData, "ge", defValI).toString(),
-                            getObjectOr(secData, "crid", defValBlank).toString(), // P.S. if missing, default value use blank string
-                            getObjectOr(secData, "cul_id", defValC).toString(),
+                            getObjectOr(secData, "crid", defValBlank).toString(),   // P.S. if missing, default value use blank string
+                            getObjectOr(secData, "cul_id", cul_id).toString(),      // P.S. Set default value which is deponds on crid
                             getObjectOr(secData, "cul_name", defValC).toString()));
+                    sbNotesData.append(String.format("%1$2s %2$-4s %3$7s %4$4s %5$-16s %6$s\r\n",
+                            idx + 1, //getObjectOr(secData, "ge", defValI).toString(),
+                            getObjectOr(secData, "crid", defValC).toString(),   // P.S. if missing, default value use blank string
+                            getObjectOr(secData, "cul_id", defValC).toString(),      // P.S. Set default value which is deponds on crid
+                            getObjectOr(secData, "rm", defValC).toString(),
+                            getObjectOr(secData, "cul_name", defValC).toString(),
+                            getObjectOr(secData, "cul_notes", defValC).toString()));
+                    
                 }
                 sbData.append("\r\n");
             } else {
@@ -392,7 +454,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 // Check if the necessary is missing
                 if (getObjectOr(secData, "wst_id", "").equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [wst_id]\r\n");
-                } else if (getObjectOr(secData, "soil_id", "").equals("")) {
+                }
+                if (getObjectOr(secData, "soil_id", "").equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [soil_id]\r\n");
                 }
                 sbData.append(String.format("%1$2s %2$-8s %3$-8s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$-5s %10$-5s%11$5s  %12$-10s %13$s\r\n", // P.S. change length definition to match current way
@@ -518,11 +581,21 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     // Check if necessary data is missing
                     if (getObjectOr(secData, "date", "").equals("")) {
                         sbError.append("! Warning: Incompleted record because missing data : [pdate]\r\n");
-                    } else if (getObjectOr(secData, "plpop", getObjectOr(secData, "plpoe", "")).equals("")) {
+                    }
+                    if (getObjectOr(secData, "plpop", getObjectOr(secData, "plpoe", "")).equals("")) {
                         sbError.append("! Warning: Incompleted record because missing data : [plpop] and [plpoe]\r\n");
                     }
                     if (getObjectOr(secData, "plrs", "").equals("")) {
                         sbError.append("! Warning: Incompleted record because missing data : [plrs]\r\n");
+                    }
+                    if (getObjectOr(secData, "plma", "").equals("")) {
+                        sbError.append("! Warning: missing data : [plma], and will automatically use default value 'S'\r\n");
+                    }
+                    if (getObjectOr(secData, "plds", "").equals("")) {
+                        sbError.append("! Warning: missing data : [plds], and will automatically use default value 'R'\r\n");
+                    }
+                    if (getObjectOr(secData, "pldp", "").equals("")) {
+                        sbError.append("! Warning: missing data : [pldp], and will automatically use default value '7'\r\n");
                     }
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s                        %16$s\r\n",
                             idx + 1, //getObjectOr(data, "pl", defValI).toString(),
@@ -530,11 +603,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             formatDateStr(getObjectOr(secData, "pldae", defValD).toString()),
                             formatNumStr(5, secData, "plpop", getObjectOr(secData, "plpoe", defValR)),
                             formatNumStr(5, secData, "plpoe", getObjectOr(secData, "plpop", defValR)),
-                            getObjectOr(secData, "plma", defValC).toString(),
-                            getObjectOr(secData, "plds", defValC).toString(),
+                            getObjectOr(secData, "plma", "S").toString(), // P.S. Set default value as "S"
+                            getObjectOr(secData, "plds", "R").toString(), // P.S. Set default value as "R"
                             formatNumStr(5, secData, "plrs", defValR),
                             formatNumStr(5, secData, "plrd", defValR),
-                            formatNumStr(5, secData, "pldp", defValR),
+                            formatNumStr(5, secData, "pldp", "7"), // P.S. Set default value as "7"
                             formatNumStr(5, secData, "plmwt", defValR),
                             formatNumStr(5, secData, "page", defValR),
                             formatNumStr(5, secData, "penv", defValR),
@@ -592,21 +665,39 @@ public class DssatXFileOutput extends DssatCommonOutput {
             if (!mfArr.isEmpty()) {
                 sbData.append("*FERTILIZERS (INORGANIC)\r\n");
                 sbData.append("@F FDATE  FMCD  FACD  FDEP  FAMN  FAMP  FAMK  FAMC  FAMO  FOCD FERNAME\r\n");
+                String fen_tot = getObjectOr(result, "fen_tot", defValR);
+                String fep_tot = getObjectOr(result, "fep_tot", defValR);
+                String fek_tot = getObjectOr(result, "fek_tot", defValR);
 
                 for (int idx = 0; idx < mfArr.size(); idx++) {
                     secDataArr = (ArrayList) mfArr.get(idx);
 
                     for (int i = 0; i < secDataArr.size(); i++) {
                         secData = (LinkedHashMap) secDataArr.get(i);
+                        if (getObjectOr(secData, "fecd", "").equals("")) {
+                            sbError.append("! Warning: missing data : [fecd], and will automatically use default value 'FE005'\r\n");
+                        }
+                        if (getObjectOr(secData, "fedep", "").equals("")) {
+                            sbError.append("! Warning: missing data : [fedep], and will automatically use default value '5'\r\n");
+                        }
+                        if (getObjectOr(secData, "feamn", "").equals("")) {
+                            sbError.append("! Warning: missing data : [feamn], and will automatically use the value of FEN_TOT, '").append(fen_tot).append("'\r\n");
+                        }
+                        if (getObjectOr(secData, "feamp", "").equals("")) {
+                            sbError.append("! Warning: missing data : [feamp], and will automatically use the value of FEP_TOT, '").append(fep_tot).append("'\r\n");
+                        }
+                        if (getObjectOr(secData, "feamk", "").equals("")) {
+                            sbError.append("! Warning: missing data : [feamk], and will automatically use the value of FEK_TOT, '").append(fek_tot).append("'\r\n");
+                        }
                         sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$s\r\n",
                                 idx + 1, //getObjectOr(data, "fe", defValI).toString(),
                                 formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. fdate -> date
-                                getObjectOr(secData, "fecd", defValC).toString(),
+                                getObjectOr(secData, "fecd", "FE005").toString(), // P.S. Set default value as "FE005"
                                 getObjectOr(secData, "feacd", defValC).toString(),
-                                formatNumStr(5, secData, "fedep", defValR),
-                                formatNumStr(5, secData, "feamn", defValR),
-                                formatNumStr(5, secData, "feamp", defValR),
-                                formatNumStr(5, secData, "feamk", defValR),
+                                formatNumStr(5, secData, "fedep", "5"), // P.S. Set default value as "5"
+                                formatNumStr(5, secData, "feamn", fen_tot), // P.S. Set default value to use the value of FEN_TOT in meta data
+                                formatNumStr(5, secData, "feamp", fep_tot), // P.S. Set default value to use the value of FEP_TOT in meta data
+                                formatNumStr(5, secData, "feamk", fek_tot), // P.S. Set default value to use the value of FEK_TOT in meta data
                                 formatNumStr(5, secData, "feamc", defValR),
                                 formatNumStr(5, secData, "feamo", defValR),
                                 getObjectOr(secData, "feocd", defValC).toString(),
@@ -695,13 +786,21 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 sbData.append("*ENVIRONMENT MODIFICATIONS\r\n");
                 sbData.append("@E ODATE EDAY  ERAD  EMAX  EMIN  ERAIN ECO2  EDEW  EWIND ENVNAME\r\n");
 
-                for (int idx = 0; idx < meArr.size(); idx++) {
-                    secDataArr = (ArrayList) meArr.get(idx);
-
-                    for (int i = 0; i < secDataArr.size(); i++) {
-                        sbData.append(String.format("%1$2s%2$s\r\n",
-                                idx + 1,
-                                (String) secDataArr.get(i)));
+                String emNumStr = "";
+                for (int idx = 0, cnt = 1; idx < meArr.size(); idx++) {
+//                    secDataArr = (ArrayList) meArr.get(idx);
+                    secData = meArr.get(idx);
+                    if (!emNumStr.equals(secData.get("em"))) {
+                        cnt++;
+                        emNumStr = (String) secData.get("em");
+                    }
+                    sbData.append(String.format("%1$2s%2$s\r\n",
+                            cnt,
+                            secData.get("em_data")));
+//                    for (int i = 0; i < secDataArr.size(); i++) {
+//                        sbData.append(String.format("%1$2s%2$s\r\n",
+//                                idx + 1,
+//                                (String) secDataArr.get(i)));
 //                        sbData.append(String.format("%1$2s %2$5s %3$-1s%4$4s %5$-1s%6$4s %7$-1s%8$4s %9$-1s%10$4s %11$-1s%12$4s %13$-1s%14$4s %15$-1s%16$4s %17$-1s%18$4s %19$s\r\n",
 //                                idx + 1, //getObjectOr(secData, "em", defValI).toString(),
 //                                formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. emday -> date
@@ -722,8 +821,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                                getObjectOr(secData, "ecwnd", defValBlank).toString(),
 //                                formatNumStr(4, getObjectOr(secData, "emwnd", defValR),
 //                                getObjectOr(secData, "em_name", defValC).toString()));
-
-                    }
+//                    }
                 }
                 sbData.append("\r\n");
             }
@@ -775,6 +873,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                     if (secData.containsKey("sm_general")) {
                         sbData.append("*SIMULATION CONTROLS\r\n");
+                        secData.remove("sm");
                         Object[] keys = secData.keySet().toArray();
                         for (int i = 0; i < keys.length; i++) {
 
@@ -795,6 +894,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
             // Output finish
             bwX.write(sbError.toString());
+            bwX.write(sbGenData.toString());
+            bwX.write(sbNotesData.toString());
             bwX.write(sbData.toString());
             bwX.close();
         } catch (IOException e) {
@@ -805,11 +906,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     /**
      * Create string of Simulation Control and Automatic Management Section
-     * 
-     * @param smid      simulation index number
-     * @param expData   date holder for experiment data
-     * @param trData    date holder for one treatment data
-     * @return      date string with format of "yyddd" 
+     *
+     * @param smid simulation index number
+     * @param expData date holder for experiment data
+     * @param trData date holder for one treatment data
+     * @return date string with format of "yyddd"
      */
     private String createSMMAStr(int smid, LinkedHashMap expData, LinkedHashMap trData) {
 
@@ -860,9 +961,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
         }
         sdate = formatDateStr(sdate);
 
-
         sb.append("*SIMULATION CONTROLS\r\n");
-        sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME.................... SMODEL\r\n");
+        sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
         sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
         sb.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
         sb.append(sm).append(" OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     Y     M\r\n");
@@ -871,7 +971,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         sb.append("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
         sb.append(sm).append(" MA              R     R     R     R     M\r\n");
         sb.append("@N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT\r\n");
-        sb.append(sm).append(" OU              N     Y     Y     1     Y     Y     Y     Y     Y     N     Y     N     Y\r\n\r\n");
+        sb.append(sm).append(" OU              N     Y     Y     1     Y     Y     N     N     N     N     N     N     N\r\n\r\n");
         sb.append("@  AUTOMATIC MANAGEMENT\r\n");
         sb.append("@N PLANTING    PFRST PLAST PH2OL PH2OU PH2OD PSTMX PSTMN\r\n");
         sb.append(sm).append(" PL          82050 82064    40   100    30    40    10\r\n");
@@ -888,22 +988,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
     }
 
     /**
-     * Set default value for missing data
-     * 
-     */
-    private void setDefVal() {
-
-        defValR = "-99";
-        defValC = "-99";
-        defValI = "-99";
-    }
-
-    /**
      * Get index value of the record and set new id value in the array
-     * 
-     * @param m     sub data
-     * @param arr   array of sub data
-     * @return       current index value of the sub data
+     *
+     * @param m sub data
+     * @param arr array of sub data
+     * @return current index value of the sub data
      */
     private int setSecDataArr(LinkedHashMap m, ArrayList arr) {
 
@@ -922,10 +1011,10 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     /**
      * Get index value of the record and set new id value in the array
-     * 
-     * @param inArr     sub array of data
-     * @param outArr    array of sub data
-     * @return          current index value of the sub data
+     *
+     * @param inArr sub array of data
+     * @param outArr array of sub data
+     * @return current index value of the sub data
      */
     private int setSecDataArr(ArrayList inArr, ArrayList outArr) {
 
@@ -944,9 +1033,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     /**
      * To check if there is plot info data existed in the experiment
-     * 
-     * @param expData   experiment data holder
-     * @return          the boolean value for if plot info exists
+     *
+     * @param expData experiment data holder
+     * @return the boolean value for if plot info exists
      */
     private boolean isPlotInfoExist(Map expData) {
 
@@ -961,14 +1050,14 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     /**
      * To check if there is soil analysis info data existed in the experiment
-     * 
-     * @param expData   initial condition layer data array
-     * @return          the boolean value for if soil analysis info exists
+     *
+     * @param expData initial condition layer data array
+     * @return the boolean value for if soil analysis info exists
      */
     private boolean isSoilAnalysisExist(ArrayList<LinkedHashMap> icSubArr) {
 
         for (int i = 0; i < icSubArr.size(); i++) {
-            if (!getValueOr(icSubArr.get(i), "sasc", "").equals("")) {
+            if (!getValueOr(icSubArr.get(i), "slsc", "").equals("")) {
                 return true;
             }
 
@@ -978,11 +1067,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
     /**
      * Get sub data array from experiment data object
-     * 
-     * @param expData       experiment data holder
-     * @param blockName     top level block name
-     * @param dataListName  sub array name
-     * @return              sub data array
+     *
+     * @param expData experiment data holder
+     * @param blockName top level block name
+     * @param dataListName sub array name
+     * @return sub data array
      */
     private ArrayList<LinkedHashMap> getDataList(Map expData, String blockName, String dataListName) {
         LinkedHashMap dataBlock = getObjectOr(expData, blockName, new LinkedHashMap());

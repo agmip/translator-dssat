@@ -5,30 +5,20 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-
 import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Observation Data I/O API Class
- * 
+ *
  * @author Meng Zhang
  * @version 1.0
  */
 public class DssatTFileOutput extends DssatCommonOutput {
 
-    private File outputFile;
-
-    /**
-     * Get output file object
-     */
-    public File getOutputFile() {
-        return outputFile;
-    }
-
     /**
      * DSSAT Observation Data Output method
      *
-     * @param arg0  file output path
+     * @param arg0 file output path
      * @param result data holder object
      */
     @Override
@@ -51,8 +41,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
             // Get Data from input holder
             LinkedHashMap tmp = (LinkedHashMap) getObjectOr(result, "observed", new LinkedHashMap());
-            tmp = (LinkedHashMap) getObjectOr(tmp, "time_series", new LinkedHashMap());
-            observeRecords = (ArrayList<LinkedHashMap>) getObjectOr(tmp, "data", new ArrayList<LinkedHashMap>());
+            observeRecords = (ArrayList<LinkedHashMap>) getObjectOr(tmp, "time_series", new ArrayList<LinkedHashMap>());
             if (observeRecords.isEmpty()) {
                 return;
             } else {
@@ -64,9 +53,13 @@ public class DssatTFileOutput extends DssatCommonOutput {
             String exName = getExName(result);
             String fileName = exName;
             if (fileName.equals("")) {
-                fileName = "a.tmp";
+                fileName = "TEMP.XXT";
             } else {
-                fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "T";
+                try {
+                    fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "T";
+                } catch (Exception e) {
+                    fileName = "TEMP.XXT";
+                }
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
@@ -162,18 +155,5 @@ public class DssatTFileOutput extends DssatCommonOutput {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Set default value for missing data
-     *
-     * @version 1.0
-     */
-    private void setDefVal() {
-
-        // defValD = ""; No need to set default value for Date type in Observation file
-        defValR = "-99";
-        defValC = "-99";
-        defValI = "-99";
     }
 }

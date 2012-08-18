@@ -39,50 +39,57 @@ public class DssatControllerTest {
             //            "UFGA9602.TMX",
             //            "UFGA7801_SBX.ZIP",
             //            "UFGA7802_SBX.ZIP",
-                        "UFGA8201_MZX.ZIP",
-            //            "UFGA8202_MZX.ZIP",
-//            "Anantapur-peanut-data\\APAN8601_PNX.zip",
-//            "Anantapur-peanut-data\\APAN8701_PNX.zip",
-//            "Anantapur-peanut-data\\APAN8803_PNX.zip",
-//            "Anantapur-peanut-data\\APAN8904_PNX.zip",
-//            "Anantapur-peanut-data\\APAN9001_PNX.zip",
-//            "Anantapur-peanut-data\\APAN9304_PNX.zip",
-//            "ksas8101_whx.zip",
-//            "MACH0001.zip",
-//            "MACH0002.zip",
-//            "MACH0003.zip",
-//            "MACH0004.zip",
+            //            "UFGA8201MZX.ZIP",
+//            "UFGA8201_MZX_2.ZIP",
+                        "UFGA8202_MZX.ZIP",
+        //            "APAN8601PNX.zip",
+        //                        "APAN8701_PNX.zip",
+        //                        "APAN8803_PNX.zip",
+        //                        "APAN8904_PNX.zip",
+        //                        "APAN9001_PNX.zip",
+        //                        "APAN9304_PNX.zip",
+        //            "KSAS8101WHX.zip",
+        //            "MACH0001MZX.zip",
+        //            "MACH0002MZX.zip",
+        //            "MACH0003MZX.zip",
+        //            "MACH0004MZX.zip",
         };
 
-        File f = new File("output.txt");
+        File f;
         BufferedOutputStream bo;
         for (int i = 0; i < fileNames.length; i++) {
             result = obDssatControllerInput.readFiles(filePath + fileNames[i]);
             System.out.println(fileNames[i] + ":\r\n" + JSONAdapter.toJSON(result));
-//            if (fileNames[i].equals(fileNames[0])) {
-//                resultForWrite = result;
-//            }
+            f = new File(fileNames[i].replaceAll("[Xx]*\\.\\w+$", ".json"));
+            bo = new BufferedOutputStream(new FileOutputStream(f));
 
             // Output json for reading
-            if (i != 0) {
-                bo = new BufferedOutputStream(new FileOutputStream(f, true));
-            } else {
-                bo = new BufferedOutputStream(new FileOutputStream(f));
-            }
-            bo.write((fileNames[i] + ":\r\n").getBytes());
             bo.write(JSONAdapter.toJSON(result).getBytes());
-            bo.write("\r\n\r\n=================================================================\r\n\r\n".getBytes());
             bo.close();
-            
+
             obDssatControllerOutput = new DssatControllerOutput();
-            obDssatControllerOutput.writeFiles("", result.get(0));
+            if (i == 0) {
+                obDssatControllerOutput.writeFiles("", result.get(0));
+            } else {
+                obDssatControllerOutput.writeFiles("", result.get(0));
+            }
             File file = obDssatControllerOutput.getOutputZipFile();
             if (file != null) {
                 assertTrue(file.exists());
                 assertTrue(file.delete());
             }
+
+            obDssatControllerOutput = new DssatControllerOutput();
+            if (i == 0) {
+                obDssatControllerOutput.writeFiles("", result);
+            }
+            file = obDssatControllerOutput.getOutputZipFile();
+            if (file != null) {
+                assertTrue(file.exists());
+                assertTrue(file.delete());
+            }
+            f.delete();
         }
-        f.delete();
 
     }
 }
