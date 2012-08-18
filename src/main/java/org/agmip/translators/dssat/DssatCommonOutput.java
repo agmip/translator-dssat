@@ -23,7 +23,8 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     protected String defValD = "-99";
     protected String defValBlank = "";
     // construct the error message in the output
-    protected StringBuilder sbError = new StringBuilder();
+    protected StringBuilder sbError;
+    protected File outputFile;
 
     /**
      * Translate data str from "yyyymmdd" to "yyddd"
@@ -166,11 +167,18 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @param path the output path
      * @return revised path
      */
-    protected String revisePath(String path) {
+    public static String revisePath(String path) {
         if (!path.trim().equals("")) {
-            path = path.replaceAll("/", "\\");
-            if (path.endsWith("\\")) {
-                path += "\\";
+            path = path.replaceAll("/", File.separator);
+            if (!path.endsWith(File.separator)) {
+                path += File.separator;
+            }
+            File f = new File(path);
+            if (f.isFile()) {
+                f = f.getParentFile();
+            }
+            if (f != null && !f.exists()) {
+                f.mkdirs();
             }
         }
         return path;
@@ -179,7 +187,9 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     /**
      * Get output file object
      */
-    public abstract File getOutputFile();
+    public File getOutputFile() {
+        return outputFile;
+    }
 
     /**
      * decompress the data in a map object
@@ -242,8 +252,8 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 
     /**
      * Get plating date from experiment management event
-     * 
-     * @param result    the experiment data object
+     *
+     * @param result the experiment data object
      * @return plating date
      */
     protected String getPdate(Map result) {
@@ -258,42 +268,56 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 
         return "";
     }
-    
+
     /**
      * Get the weather file name for auto-generating (extend name not included)
-     * 
-     * @param wthFile   weather data holder
-     * @return 
+     *
+     * @param wthFile weather data holder
+     * @return
      */
     protected String getWthFileName(LinkedHashMap wthFile) {
         ArrayList wthRecords = (ArrayList) getObjectOr(wthFile, "dailyWeather", new ArrayList());
         String ret = getObjectOr(wthFile, "wst_id", "").toString();
-            if (ret.equals("")) {
-                ret = "AGMP";
-            } else {
-                if (!wthRecords.isEmpty()) {
-                    // Get the year of starting date and end date
-                    String startYear = getValueOr(((LinkedHashMap) wthRecords.get(0)), "w_date", "    ").substring(2, 4).trim();
-                    String endYear = getValueOr(((LinkedHashMap) wthRecords.get(wthRecords.size() - 1)), "w_date", "    ").substring(2, 4).trim();
-                    // If not available, do not show year and duration in the file name
-                    if (!startYear.equals("") && !endYear.equals("")) {
-                        ret += startYear;
-                        try {
-                            int iStartYear = Integer.parseInt(startYear);
-                            int iEndYear = Integer.parseInt(endYear);
-                            iStartYear += iStartYear <= 15 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version
-                            iEndYear += iEndYear <= 15 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version
-                            int duration = iEndYear - iStartYear + 1;
-                            // P.S. Currently the system only support the maximum of 99 years for duration
-                            duration = duration > 99 ? 99 : duration;
-                            ret += String.format("%02d", duration);
-                        } catch (Exception e) {
-                            ret += "01";    // Default duration uses 01 (minimum value)
-                        }
+        if (ret.equals("")) {
+            ret = "AGMP";
+        } else {
+            if (!wthRecords.isEmpty()) {
+                // Get the year of starting date and end date
+                String startYear = getValueOr(((LinkedHashMap) wthRecords.get(0)), "w_date", "    ").substring(2, 4).trim();
+                String endYear = getValueOr(((LinkedHashMap) wthRecords.get(wthRecords.size() - 1)), "w_date", "    ").substring(2, 4).trim();
+                // If not available, do not show year and duration in the file name
+                if (!startYear.equals("") && !endYear.equals("")) {
+                    ret += startYear;
+                    try {
+                        int iStartYear = Integer.parseInt(startYear);
+                        int iEndYear = Integer.parseInt(endYear);
+                        iStartYear += iStartYear <= 15 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version
+                        iEndYear += iEndYear <= 15 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version
+                        int duration = iEndYear - iStartYear + 1;
+                        // P.S. Currently the system only support the maximum of 99 years for duration
+                        duration = duration > 99 ? 99 : duration;
+                        ret += String.format("%02d", duration);
+                    } catch (Exception e) {
+                        ret += "01";    // Default duration uses 01 (minimum value)
                     }
                 }
             }
-        
+        }
+
         return ret;
+    }
+
+    /**
+     * Set default value for missing data
+     *
+     */
+    protected void setDefVal() {
+
+        // defValD = ""; No need to set default value for Date type in weather file
+        defValR = "-99";
+        defValC = "-99";
+        defValI = "-99";
+        sbError = new StringBuilder();
+        outputFile = null;
     }
 }

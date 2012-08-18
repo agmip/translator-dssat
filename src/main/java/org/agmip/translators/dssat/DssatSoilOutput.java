@@ -12,26 +12,17 @@ import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Soil Data I/O API Class
- * 
+ *
  * @author Meng Zhang
  * @version 1.0
  */
 public class DssatSoilOutput extends DssatCommonOutput {
 
-    private File outputFile;
-
-    /**
-     * Get output file object
-     */
-    public File getOutputFile() {
-        return outputFile;
-    }
-
     /**
      * DSSAT Soil Data Output method
-     * 
-     * @param arg0   file output path
-     * @param result  data holder object
+     *
+     * @param arg0 file output path
+     * @param result data holder object
      */
     @Override
     public void writeFile(String arg0, Map result) {
@@ -101,14 +92,20 @@ public class DssatSoilOutput extends DssatCommonOutput {
                     formatNumStr(8, soilSite, "soil_long", defValR), // P.S. Definition changed 9 -> 8  (06/24)
                     getObjectOr(soilSite, "classification", defValC).toString()));
             sbData.append("@ SCOM  SALB  SLU1  SLDR  SLRO  SLNF  SLPF  SMHB  SMPX  SMKE\r\n");
+            if (getObjectOr(soilSite, "slnf", "").equals("")) {
+                sbError.append("! Warning: missing data : [slnf], and will automatically use default value '1'\r\n");
+            }
+            if (getObjectOr(soilSite, "slpf", "").equals("")) {
+                sbError.append("! Warning: missing data : [slpf], and will automatically use default value '0.92'\r\n");
+            }
             sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$-5s %9$-5s %10$-5s\r\n",
                     getObjectOr(soilSite, "scom", defValC).toString(),
                     formatNumStr(5, soilSite, "salb", defValR),
                     formatNumStr(5, soilSite, "slu1", defValR),
                     formatNumStr(5, soilSite, "sldr", defValR),
                     formatNumStr(5, soilSite, "slro", defValR),
-                    formatNumStr(5, soilSite, "slnf", defValR),
-                    formatNumStr(5, soilSite, "slpf", defValR),
+                    formatNumStr(5, soilSite, "slnf", "1"),     // P.S. Set default value as '1'
+                    formatNumStr(5, soilSite, "slpf", "0.92"),  // P.S. Set default value as '0.92'
                     getObjectOr(soilSite, "smhb", defValC).toString(),
                     getObjectOr(soilSite, "smpx", defValC).toString(),
                     getObjectOr(soilSite, "smke", defValC).toString()));
@@ -168,7 +165,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
                             formatNumStr(5, soilRecord, "slpx", defValR),
                             formatNumStr(5, soilRecord, "slpt", defValR),
                             formatNumStr(5, soilRecord, "slpo", defValR),
-                            formatNumStr(5, soilRecord, "caco3", defValR),  // P.S. Different with document (DSSAT vol2.pdf)
+                            formatNumStr(5, soilRecord, "caco3", defValR), // P.S. Different with document (DSSAT vol2.pdf)
                             formatNumStr(5, soilRecord, "slal", defValR),
                             formatNumStr(5, soilRecord, "slfe", defValR),
                             formatNumStr(5, soilRecord, "slmn", defValR),
@@ -201,17 +198,5 @@ public class DssatSoilOutput extends DssatCommonOutput {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Set default value for missing data
-     *
-     */
-    private void setDefVal() {
-
-        // defValD = ""; No need to set default value for Date type in soil file
-        defValR = "-99";
-        defValC = "-99";
-        defValI = "-99";
     }
 }

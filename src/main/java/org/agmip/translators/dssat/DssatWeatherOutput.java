@@ -11,26 +11,17 @@ import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Weather Data I/O API Class
- * 
+ *
  * @author Meng Zhang
  * @version 1.0
  */
 public class DssatWeatherOutput extends DssatCommonOutput {
 
-    private File outputFile;
-
-    /**
-     * Get output file object
-     */
-    public File getOutputFile() {
-        return outputFile;
-    }
-
     /**
      * DSSAT Weather Data Output method
-     * 
-     * @param arg0   file output path
-     * @param result  data holder object
+     *
+     * @param arg0 file output path
+     * @param result data holder object
      */
     @Override
     public void writeFile(String arg0, Map result) {
@@ -171,17 +162,5 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Set default value for missing data
-     * 
-     */
-    private void setDefVal() {
-
-        // defValD = ""; No need to set default value for Date type in weather file
-        defValR = "-99";
-        defValC = "-99";
-        defValI = "-99";
     }
 }

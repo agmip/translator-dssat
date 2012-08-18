@@ -7,29 +7,21 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import static org.agmip.translators.dssat.DssatCommonInput.CopyList;
 import static org.agmip.util.MapUtil.*;
 
 /**
  * DSSAT Observation Data I/O API Class
- * 
+ *
  * @author Meng Zhang
  * @version 1.0
  */
 public class DssatAFileOutput extends DssatCommonOutput {
 
-    private File outputFile;
-
-    /**
-     * Get output file object
-     */
-    public File getOutputFile() {
-        return outputFile;
-    }
-
     /**
      * DSSAT Observation Data Output method
      *
-     * @param arg0  file output path
+     * @param arg0 file output path
      * @param result data holder object
      */
     @Override
@@ -53,8 +45,13 @@ public class DssatAFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            LinkedHashMap tmp = (LinkedHashMap) getObjectOr(result, "observed", new LinkedHashMap());
-            record = (LinkedHashMap) getObjectOr(tmp, "summary", new LinkedHashMap());
+            record = CopyList((LinkedHashMap) getObjectOr(result, "observed", new LinkedHashMap()));
+            Object[] keys = record.keySet().toArray();
+            for (Object key : keys) {
+                if (!(record.get(key) instanceof String)) {
+                    record.remove(key);
+                }
+            }
             if (record.isEmpty()) {
                 return;
             }
@@ -63,9 +60,13 @@ public class DssatAFileOutput extends DssatCommonOutput {
             String exName = getExName(result);
             String fileName = exName;
             if (fileName.equals("")) {
-                fileName = "a.tmp";
+                fileName = "TEMP.XXA";
             } else {
-                fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "A";
+                try {
+                    fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "A";
+                } catch (Exception e) {
+                    fileName = "TEMP.XXA";
+                }
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
@@ -148,23 +149,10 @@ public class DssatAFileOutput extends DssatCommonOutput {
     }
 
     /**
-     * Set default value for missing data
-     *
-     * @version 1.0
-     */
-    private void setDefVal() {
-
-        // defValD = ""; No need to set default value for Date type in Observation file
-        defValR = "-99";
-        defValC = "-99";
-        defValI = "-99";
-    }
-
-    /**
      * Remove the 2-bit year number from input date string
-     * 
-     * @param str   input date string
-     * @return 
+     *
+     * @param str input date string
+     * @return
      */
     private String cutYear(String str) {
         if (str.length() > 3) {

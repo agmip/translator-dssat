@@ -1,0 +1,94 @@
+package org.agmip.translators.dssat;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import static org.agmip.util.MapUtil.*;
+
+/**
+ * DSSAT Cultivar Data I/O API Class
+ *
+ * @author Meng Zhang
+ * @version 1.0
+ */
+public class DssatCulFileOutput extends DssatCommonOutput {
+
+    /**
+     * DSSAT Cultivar Data Output method
+     *
+     * @param arg0 file output path
+     * @param result data holder object
+     */
+    @Override
+    public void writeFile(String arg0, Map result) {
+
+        // Initial variables
+        LinkedHashMap culData;              // Data holder for one site of cultivar data
+        ArrayList<LinkedHashMap> culArr;    // Data holder for one site of cultivar data
+        BufferedWriter bwC;                             // output object
+        StringBuilder sbData = new StringBuilder();     // construct the data info in the output
+
+        try {
+
+            // Set default value for missing data
+            setDefVal();
+
+            culData = getObjectOr(result, "dssat_cultivar_info", new LinkedHashMap());
+            culArr = getObjectOr(culData, "data", new ArrayList());
+            if (culArr.isEmpty()) {
+                return;
+            }
+//            decompressData(culArr);
+
+            // Initial BufferedWriter
+            // Get File name
+            String fileName = getExName(result);
+            if (fileName.equals("")) {
+                fileName = "Cultivar.CUL";
+            } else {
+                try {
+                    fileName = fileName.substring(0, fileName.length() - 2) + "_" + fileName.substring(fileName.length() - 2) + "X.CUL";
+                } catch (Exception e) {
+                    fileName = "Cultivar.CUL";
+                }
+            }
+            arg0 = revisePath(arg0);
+            outputFile = new File(arg0 + fileName);
+            bwC = new BufferedWriter(new FileWriter(outputFile));
+
+            // Output Cultivar File
+            String lastHeaderInfo = "";
+            String lastTitles = "";
+            for (int i = 0; i < culArr.size(); i++) {
+                // If come to new header, add header line and title line
+                if (!getObjectOr(culArr.get(i), "header_info", "").equals(lastHeaderInfo)) {
+                    lastHeaderInfo = getObjectOr(culArr.get(i), "header_info", "");
+                    sbData.append(lastHeaderInfo).append("\r\n");
+                    lastTitles = getObjectOr(culArr.get(i), "cul_titles", "");
+                    sbData.append(lastTitles).append("\r\n");
+                }
+                // If come to new title line, add title line
+                if (!getObjectOr(culArr.get(i), "cul_titles", "").equals(lastTitles)) {
+                    lastTitles = getObjectOr(culArr.get(i), "cul_titles", "");
+                    sbData.append(lastTitles).append("\r\n");
+                }
+                // Write data line
+                sbData.append(getObjectOr(culArr.get(i), "cul_info", "")).append("\r\n");
+                
+            }
+
+            // Output finish
+            bwC.write(sbError.toString());
+            bwC.write(sbData.toString());
+            bwC.close();
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+}

@@ -41,16 +41,16 @@ public class DssatAFileInput extends DssatCommonInput {
         LinkedHashMap file = readObvData(brMap);
 //        compressData(file);
         ArrayList<LinkedHashMap> obvData = (ArrayList) file.get(obvDataKey);
-        LinkedHashMap obv;
+//        LinkedHashMap obv;
         LinkedHashMap expData;
 
         for (int i = 0; i < obvData.size(); i++) {
             expData = new LinkedHashMap();
-            obv = new LinkedHashMap();
+//            obv = new LinkedHashMap();
             copyItem(expData, file, "exname");
             copyItem(expData, file, "local_name");
-            expData.put(jsonKey, obv);
-            obv.put(obvFileKey, obvData.get(i));
+            expData.put(jsonKey, obvData.get(i));
+//            obv.put(obvFileKey, obvData.get(i));
 
             ret.add(expData);
         }
