@@ -579,8 +579,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                     secData = (LinkedHashMap) mpArr.get(idx);
                     // Check if necessary data is missing
-                    if (getObjectOr(secData, "date", "").equals("")) {
+                    String pdate = getObjectOr(secData, "date", "");
+                    if (pdate.equals("")) {
                         sbError.append("! Warning: Incompleted record because missing data : [pdate]\r\n");
+                    } else if (formatDateStr(pdate).equals(defValD)) {
+                        sbError.append("! Warning: Incompleted record because variable [pdate] with invalid value [").append(pdate).append("]\r\n");
                     }
                     if (getObjectOr(secData, "plpop", getObjectOr(secData, "plpoe", "")).equals("")) {
                         sbError.append("! Warning: Incompleted record because missing data : [plpop] and [plpoe]\r\n");
