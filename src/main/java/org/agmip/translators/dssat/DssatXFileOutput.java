@@ -433,7 +433,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             getObjectOr(secData, "rm", defValC).toString(),
                             getObjectOr(secData, "cul_name", defValC).toString(),
                             getObjectOr(secData, "cul_notes", defValC).toString()));
-                    
+
                 }
                 sbData.append("\r\n");
             } else {
