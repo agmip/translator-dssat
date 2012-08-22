@@ -437,7 +437,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 }
                 sbData.append("\r\n");
             } else {
-                sbError.append("! Warning: Trhee is no cultivar data in the experiment.\r\n");
+                sbError.append("! Warning: There is no cultivar data in the experiment.\r\n");
             }
 
             // FIELDS Section
@@ -447,7 +447,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 eventPart2 = new StringBuilder();
                 eventPart2.append("@L ...........XCRD ...........YCRD .....ELEV .............AREA .SLEN .FLWR .SLAS FLHST FHDUR\r\n");
             } else {
-                sbError.append("! Warning: Trhee is no field data in the experiment.\r\n");
+                sbError.append("! Warning: There is no field data in the experiment.\r\n");
             }
             for (int idx = 0; idx < flArr.size(); idx++) {
                 secData = (LinkedHashMap) flArr.get(idx);
@@ -618,7 +618,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 }
                 sbData.append("\r\n");
             } else {
-                sbError.append("! Warning: Trhee is no plainting data in the experiment.\r\n");
+                sbError.append("! Warning: There is no plainting data in the experiment.\r\n");
             }
 
             // IRRIGATION AND WATER MANAGEMENT Section
