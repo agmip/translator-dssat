@@ -156,26 +156,64 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         // TODO need to be updated with a translate rule for other models' exname
         if (ret.length() > 10 && ret.matches("\\w+_\\d+")) {
             ret = ret.replaceAll("_\\d+$", "");
-        } // If exname do not contain crop id, try to read it from planting event
-        else if (ret.length() < 10) {
-            LinkedHashMap mgnData = getObjectOr(result, "management", new LinkedHashMap());
-            ArrayList<LinkedHashMap> events = getObjectOr(mgnData, "events", new ArrayList());
-            String crid = null;
-            for (int i = 0; i < events.size(); i++) {
-                if (events.get(i).get("event").equals("planting")) {
-                    if (crid == null) {
-                        crid = (String) events.get(i).get("crid");
-                    } else if (!crid.equals(events.get(i).get("crid"))) {
-                        crid = "SQ";
-                        break;
-                    }
-                }
-            }
-            DssatCRIDHelper crids = new DssatCRIDHelper();
-            crid = crids.get2BitCrid(crid);
-            ret += crid;
         }
 
+        return ret;
+    }
+
+    /**
+     * Get crop id with 2-bit format
+     *
+     * @param result date holder for experiment data
+     * @return crop id
+     */
+    protected String getCrid(Map result) {
+
+        LinkedHashMap mgnData = getObjectOr(result, "management", new LinkedHashMap());
+        ArrayList<LinkedHashMap> events = getObjectOr(mgnData, "events", new ArrayList());
+        String crid = null;
+        for (int i = 0; i < events.size(); i++) {
+            if (events.get(i).get("event").equals("planting")) {
+                if (crid == null) {
+                    crid = (String) events.get(i).get("crid");
+                } else if (!crid.equals(events.get(i).get("crid"))) {
+                    crid = "SQ";
+                    break;
+                }
+            }
+        }
+        DssatCRIDHelper crids = new DssatCRIDHelper();
+        return crids.get2BitCrid(crid);
+    }
+
+    /**
+     * Generate output file name
+     *
+     * @param result date holder for experiment data
+     * @param fileType the last letter from file extend name
+     * @return file name
+     */
+    protected String getFileName(Map result, String fileType) {
+        String ret = getExName(result);
+        String crid = getCrid(result);
+        if (ret == null || ret.equals("")) {
+            ret = "TEMP.XX" + fileType;
+        } else {
+            try {
+                if (ret.endsWith(crid)) {
+                    ret = ret.substring(0, ret.length() - crid.length());
+                } else {
+                    if (crid.equals("XX")) {
+                        crid = ret.substring(ret.length() - 2, ret.length());
+                        ret = ret.substring(0, ret.length() - 2);
+                    }
+                }
+
+                ret += "." + crid + fileType;
+            } catch (Exception e) {
+                ret = "TEMP.XX" + fileType;
+            }
+        }
         return ret;
     }
 

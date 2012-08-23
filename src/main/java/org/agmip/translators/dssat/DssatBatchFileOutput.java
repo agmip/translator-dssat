@@ -51,15 +51,9 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
             // Titel Section
             String crop = getCropName(result);
             String dssatPath = "C:\\DSSAT45\\";
-            String exFileName = getExName(result);
+            String exFileName = getFileName(result, "X");
             int dssatVersion;
             int expNo = results.size();
-            // Get file name
-            try {
-                exFileName = exFileName.substring(0, exFileName.length() - 2) + "." + exFileName.substring(exFileName.length() - 2) + "X";
-            } catch (Exception e) {
-                exFileName = "TEMP.XXX";
-            }
             // Get version number
             try {
                 String cropVersion = getObjectOr(result, "crop_model_version", "").replaceAll("\\D", "");
@@ -144,15 +138,9 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
             // Titel Section
             String crop = getCropName(result);
             String dssatPath = "C:\\DSSAT45\\";
-            String exFileName = getExName(result);
+            String exFileName = getFileName(result, "X");
             int dssatVersion;
             int expNo = 1;
-            // Get file name
-            try {
-                exFileName = exFileName.substring(0, exFileName.length() - 2) + "." + exFileName.substring(exFileName.length() - 2) + "X";
-            } catch (Exception e) {
-                exFileName = "TEMP.XXX";
-            }
             // Get version number
             try {
                 String cropVersion = getObjectOr(result, "crop_model_version", "").replaceAll("\\D", "");
@@ -214,27 +202,10 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
         String crid = null;
 
         // Get crop id
-        LinkedHashMap mgnData = getObjectOr(result, "management", new LinkedHashMap());
-        ArrayList<LinkedHashMap> events = getObjectOr(mgnData, "events", new ArrayList<LinkedHashMap>());
-        for (int i = 0; i < events.size(); i++) {
-            if ("planting".equals(events.get(i).get("event"))) {
-                crid = (String) events.get(i).get("crid");
-                break;
-            }
-        }
-        if (crid == null) {
-            String exname = getExName(result);
-            if (exname.length() > 2) {
-                crid = exname.substring(exname.length() - 2, exname.length());
-            }
-        }
-        DssatCRIDHelper crids = new DssatCRIDHelper();
-        crid = crids.get2BitCrid(crid);
+        crid = getCrid(result);
 
         // Get crop name string
-        if (crid == null || "".equals(crid)) {
-            ret = "";
-        } else if ("BH".equals(crid)) {
+        if ("BH".equals(crid)) {
             ret = "Bahia";
         } else if ("BA".equals(crid)) {
             ret = "Barley";
@@ -292,8 +263,10 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
             ret = "Velvetbean";
         } else if ("WH".equals(crid)) {
             ret = "Wheat";
+        } else if ("SQ".equals(crid)) {
+            ret = "Sequence";
         } else {
-            ret = crid;
+            ret = "Unkown";
             sbError.append("! Warning: Undefined crop id: [").append(crid).append("]\r\n");
         }
         return ret;

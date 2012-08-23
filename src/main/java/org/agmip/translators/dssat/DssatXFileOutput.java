@@ -83,24 +83,16 @@ public class DssatXFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Initial BufferedWriter
-            exName = getExName(expData);
-            String fileName = exName;
-            if (fileName.equals("")) {
-                fileName = "TEMP.XXX";
-            } else {
-                try {
-                    fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "X";
-                } catch (Exception e) {
-                    fileName = "TEMP.XXX";
-                }
-            }
+            String fileName = getFileName(result, "X");
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
             bwX = new BufferedWriter(new FileWriter(outputFile));
 
             // Output XFile
             // EXP.DETAILS Section
-            sbGenData.append(String.format("*EXP.DETAILS: %1$-10s %2$s\r\n\r\n", exName, getObjectOr(expData, "local_name", defValBlank).toString()));
+            sbGenData.append(String.format("*EXP.DETAILS: %1$-10s %2$s\r\n\r\n",
+                    getObjectOr(expData, "exname", defValBlank),
+                    getObjectOr(expData, "local_name", defValBlank).toString()));
 
             // GENERAL Section
             sbGenData.append("*GENERAL\r\n");
