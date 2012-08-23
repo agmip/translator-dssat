@@ -57,24 +57,16 @@ public class DssatAFileOutput extends DssatCommonOutput {
             }
 
             // Initial BufferedWriter
-            String exName = getExName(result);
-            String fileName = exName;
-            if (fileName.equals("")) {
-                fileName = "TEMP.XXA";
-            } else {
-                try {
-                    fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "A";
-                } catch (Exception e) {
-                    fileName = "TEMP.XXA";
-                }
-            }
+            String fileName = getFileName(result, "A");
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
             bwA = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Observation File
             // Titel Section
-            sbData.append(String.format("*EXP.DATA (A): %1$-10s %2$s\r\n\r\n", exName, getObjectOr(result, "local_name", defValBlank).toString()));
+            sbData.append(String.format("*EXP.DATA (A): %1$-10s %2$s\r\n\r\n",
+                    getObjectOr(result, "exname", defValBlank),
+                    getObjectOr(result, "local_name", defValBlank)));
 
             // Check if which field is available
             for (Object key : record.keySet()) {

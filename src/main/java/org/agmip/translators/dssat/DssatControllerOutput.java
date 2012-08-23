@@ -27,7 +27,8 @@ public class DssatControllerOutput {
         new DssatTFileOutput(),
         new DssatCulFileOutput(),
         new DssatBatchFileOutput(),
-        new DssatRunFileOutput()
+        new DssatRunFileOutput(),
+        new DssatACMOJsonOutput()
     };
     private File zipFile;
     private ArrayList<File> files = new ArrayList();

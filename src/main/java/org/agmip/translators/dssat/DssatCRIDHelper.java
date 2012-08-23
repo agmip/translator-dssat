@@ -108,8 +108,8 @@ public class DssatCRIDHelper {
             return str;
         }
         String ret = crids.get(str);
-        if (ret == null) {
-            return def2BitVal;
+        if (ret == null || ret.equals("")) {
+            return str;
         } else {
             return ret;
         }
@@ -131,6 +131,6 @@ public class DssatCRIDHelper {
                 return key;
             }
         }
-        return def3BitVal;
+        return str;
     }
 }

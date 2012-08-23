@@ -50,24 +50,16 @@ public class DssatTFileOutput extends DssatCommonOutput {
             }
 
             // Initial BufferedWriter
-            String exName = getExName(result);
-            String fileName = exName;
-            if (fileName.equals("")) {
-                fileName = "TEMP.XXT";
-            } else {
-                try {
-                    fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "T";
-                } catch (Exception e) {
-                    fileName = "TEMP.XXT";
-                }
-            }
+            String fileName = getFileName(result, "T");
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
             bwT = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Observation File
             // Titel Section
-            sbData.append(String.format("*EXP.DATA (T): %1$-10s %2$s\r\n\r\n", exName, getObjectOr(result, "local_name", defValBlank).toString()));
+            sbData.append(String.format("*EXP.DATA (T): %1$-10s %2$s\r\n\r\n",
+                    getObjectOr(result, "exname", defValBlank),
+                    getObjectOr(result, "local_name", defValBlank)));
 
             titleOutput = new LinkedHashMap();
             // TODO get title for output

@@ -83,24 +83,16 @@ public class DssatXFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Initial BufferedWriter
-            exName = getExName(expData);
-            String fileName = exName;
-            if (fileName.equals("")) {
-                fileName = "TEMP.XXX";
-            } else {
-                try {
-                    fileName = fileName.substring(0, fileName.length() - 2) + "." + fileName.substring(fileName.length() - 2) + "X";
-                } catch (Exception e) {
-                    fileName = "TEMP.XXX";
-                }
-            }
+            String fileName = getFileName(result, "X");
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
             bwX = new BufferedWriter(new FileWriter(outputFile));
 
             // Output XFile
             // EXP.DETAILS Section
-            sbGenData.append(String.format("*EXP.DETAILS: %1$-10s %2$s\r\n\r\n", exName, getObjectOr(expData, "local_name", defValBlank).toString()));
+            sbGenData.append(String.format("*EXP.DETAILS: %1$-10s %2$s\r\n\r\n",
+                    getObjectOr(expData, "exname", defValBlank),
+                    getObjectOr(expData, "local_name", defValBlank).toString()));
 
             // GENERAL Section
             sbGenData.append("*GENERAL\r\n");
@@ -686,7 +678,10 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             sbError.append("! Warning: missing data : [fdate], and will automatically use planting value '").append(pdate).append("'\r\n");
                         }
                         if (getObjectOr(secData, "fecd", "").equals("")) {
-                            sbError.append("! Warning: missing data : [fecd], and will automatically use default value 'FE005'\r\n");
+                            sbError.append("! Warning: missing data : [fecd], and will automatically use default value 'FE001'\r\n");
+                        }
+                        if (getObjectOr(secData, "feacd", "").equals("")) {
+                            sbError.append("! Warning: missing data : [feacd], and will automatically use default value 'AP002'\r\n");
                         }
                         if (getObjectOr(secData, "fedep", "").equals("")) {
                             sbError.append("! Warning: missing data : [fedep], and will automatically use default value '5'\r\n");
@@ -703,9 +698,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$s\r\n",
                                 idx + 1, //getObjectOr(data, "fe", defValI).toString(),
                                 formatDateStr(getObjectOr(secData, "date", pdate).toString()), // P.S. fdate -> date
-                                getObjectOr(secData, "fecd", "FE005").toString(), // P.S. Set default value as "FE005"
-                                getObjectOr(secData, "feacd", defValC).toString(),
-                                formatNumStr(5, secData, "fedep", "5"), // P.S. Set default value as "5"
+                                getObjectOr(secData, "fecd", "FE001").toString(), // P.S. Set default value as "FE005"
+                                getObjectOr(secData, "feacd", "AP002").toString(),
+                                formatNumStr(5, secData, "fedep", "10"), // P.S. Set default value as "5"
                                 formatNumStr(5, secData, "feamn", fen_tot), // P.S. Set default value to use the value of FEN_TOT in meta data
                                 formatNumStr(5, secData, "feamp", fep_tot), // P.S. Set default value to use the value of FEP_TOT in meta data
                                 formatNumStr(5, secData, "feamk", fek_tot), // P.S. Set default value to use the value of FEK_TOT in meta data
@@ -937,17 +932,21 @@ public class DssatXFileOutput extends DssatCommonOutput {
         if (!getValueOr(expData, "fertilizer", "").equals("N")) {
 
             // Check if necessary data is missing in all the event records
+            // P.S. rule changed since all the necessary data has a default value for it
             dataArr = (ArrayList) getObjectOr(trData, "fertilizer", new ArrayList());
-            for (int i = 0; i < dataArr.size(); i++) {
-                subData = dataArr.get(i);
-                if (getValueOr(subData, "date", "").equals("")
-                        || getValueOr(subData, "fecd", "").equals("")
-                        || getValueOr(subData, "feacd", "").equals("")
-                        || getValueOr(subData, "feamn", "").equals("")) {
-                    nitro = "N";
-                    break;
-                }
+            if (dataArr.isEmpty()) {
+                nitro = "N";
             }
+//            for (int i = 0; i < dataArr.size(); i++) {
+//                subData = dataArr.get(i);
+//                if (getValueOr(subData, "date", "").equals("")
+//                        || getValueOr(subData, "fecd", "").equals("")
+//                        || getValueOr(subData, "feacd", "").equals("")
+//                        || getValueOr(subData, "feamn", "").equals("")) {
+//                    nitro = "N";
+//                    break;
+//                }
+//            }
         }
 
         // Check if the meta data of irrigation is not "N" ("Y" or null)
