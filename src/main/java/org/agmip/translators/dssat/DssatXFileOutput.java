@@ -932,10 +932,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
             dataArr = (ArrayList) getObjectOr(trData, "fertilizer", new ArrayList());
             for (int i = 0; i < dataArr.size(); i++) {
                 subData = dataArr.get(i);
-                if (getValueOr(subData, "date", "").equals("")
-                        || getValueOr(subData, "fecd", "").equals("")
-                        || getValueOr(subData, "feacd", "").equals("")
-                        || getValueOr(subData, "feamn", "").equals("")) {
+//                if (getValueOr(subData, "date", "").equals("")
+//                        || getValueOr(subData, "fecd", "").equals("")
+//                        || getValueOr(subData, "feacd", "").equals("")
+//                        || getValueOr(subData, "feamn", "").equals("")) {
+                if (getValueOr(subData, "feacd", "").equals("")) {
                     nitro = "N";
                     break;
                 }
