@@ -171,9 +171,8 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                     }
                 }
             }
-            if (crid == null) {
-                crid = "XX";
-            }
+            DssatCRIDHelper crids = new DssatCRIDHelper();
+            crid = crids.get2BitCrid(crid);
             ret += crid;
         }
 
