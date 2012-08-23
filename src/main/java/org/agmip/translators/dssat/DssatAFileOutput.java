@@ -119,7 +119,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
                 sbData.append("@TRNO ");
                 int limit = Math.min(titleOutputId.length, (i + 1) * 40);
                 for (int j = i * 40; j < limit; j++) {
-                    sbData.append(String.format("%1$6s", titleOutput.get(titleOutputId[j]).toString().toUpperCase()));
+                    sbData.append(String.format("%1$6s", titleOutputId[j].toString().toUpperCase()));
                 }
                 sbData.append("\r\n");
 

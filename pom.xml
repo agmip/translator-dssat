@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.agmip.translators</groupId>
         <artifactId>translator-dist</artifactId>
-        <version>0.3</version>
+        <version>0.7</version>
     </parent>
 
     <properties>
