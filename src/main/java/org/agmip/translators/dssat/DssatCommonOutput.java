@@ -156,6 +156,24 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         // TODO need to be updated with a translate rule for other models' exname
         if (ret.length() > 10 && ret.matches("\\w+_\\d+")) {
             ret = ret.replaceAll("_\\d+$", "");
+        } // If exname do not contain crop id, try to read it from planting event
+        else if (ret.length() < 10) {
+            LinkedHashMap mgnData = getObjectOr(result, "management", new LinkedHashMap());
+            ArrayList<LinkedHashMap> events = getObjectOr(mgnData, "events", new ArrayList());
+            String crid = null;
+            for (int i = 0; i < events.size(); i++) {
+                if (events.get(i).get("event").equals("planting")) {
+                    if (crid == null) {
+                        crid = (String) events.get(i).get("crid");
+                    } else if (!crid.equals(events.get(i).get("crid"))) {
+                        crid = "SQ";
+                        break;
+                    }
+                }
+            }
+            DssatCRIDHelper crids = new DssatCRIDHelper();
+            crid = crids.get2BitCrid(crid);
+            ret += crid;
         }
 
         return ret;

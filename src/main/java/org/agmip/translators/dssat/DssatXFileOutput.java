@@ -316,13 +316,14 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             copyItem(cuData, evtData, "cul_id");
                             copyItem(cuData, evtData, "rm");
                             copyItem(cuData, evtData, "cul_notes");
+                            translateTo2BitCrid(cuData);
                             // Set planting info
                             mpData.putAll(evtData);
                             mpData.remove("cul_name");
                         } // irrigation event
                         else if (getValueOr(evtData, "event", "").equals("irrigation")) {
                             miSubArr.add(evtData);
-                        } // irrigation event
+                        } // fertilizer event
                         else if (getValueOr(evtData, "event", "").equals("fertilizer")) {
                             mfSubArr.add(evtData);
                         } // organic_matter event
@@ -397,11 +398,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
             if (!cuArr.isEmpty()) {
                 sbData.append("*CULTIVARS\r\n");
                 sbData.append("@C CR INGENO CNAME\r\n");
-                if (sbNotesData.toString().equals("")) {
-                    sbNotesData.append("@NOTES\r\n");
-                }
-                sbNotesData.append(" Cultivar Additional Info\r\n");
-                sbNotesData.append(" C CRID  CUL_ID   RM CNAME            CUL_NOTES\r\n");
 
                 for (int idx = 0; idx < cuArr.size(); idx++) {
                     secData = (LinkedHashMap) cuArr.get(idx);
@@ -423,21 +419,26 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     }
                     sbData.append(String.format("%1$2s %2$-2s %3$-6s %4$s\r\n",
                             idx + 1, //getObjectOr(secData, "ge", defValI).toString(),
-                            getObjectOr(secData, "crid", defValBlank).toString(),   // P.S. if missing, default value use blank string
-                            getObjectOr(secData, "cul_id", cul_id).toString(),      // P.S. Set default value which is deponds on crid
+                            getObjectOr(secData, "crid", defValBlank).toString(), // P.S. if missing, default value use blank string
+                            getObjectOr(secData, "cul_id", cul_id).toString(), // P.S. Set default value which is deponds on crid
                             getObjectOr(secData, "cul_name", defValC).toString()));
-                    sbNotesData.append(String.format("%1$2s %2$-4s %3$7s %4$4s %5$-16s %6$s\r\n",
-                            idx + 1, //getObjectOr(secData, "ge", defValI).toString(),
-                            getObjectOr(secData, "crid", defValC).toString(),   // P.S. if missing, default value use blank string
-                            getObjectOr(secData, "cul_id", defValC).toString(),      // P.S. Set default value which is deponds on crid
-                            getObjectOr(secData, "rm", defValC).toString(),
-                            getObjectOr(secData, "cul_name", defValC).toString(),
-                            getObjectOr(secData, "cul_notes", defValC).toString()));
-                    
+
+                    if (!getObjectOr(secData, "rm", "").equals("") || !getObjectOr(secData, "cul_notes", "").equals("")) {
+                        if (sbNotesData.toString().equals("")) {
+                            sbNotesData.append("@NOTES\r\n");
+                        }
+                        sbNotesData.append(" Cultivar Additional Info\r\n");
+                        sbNotesData.append(" C   RM CNAME            CUL_NOTES\r\n");
+                        sbNotesData.append(String.format("%1$2s %2$4s %3$s\r\n",
+                                idx + 1, //getObjectOr(secData, "ge", defValI).toString(),
+                                getObjectOr(secData, "rm", defValC).toString(),
+                                getObjectOr(secData, "cul_notes", defValC).toString()));
+                    }
+
                 }
                 sbData.append("\r\n");
             } else {
-                sbError.append("! Warning: Trhee is no cultivar data in the experiment.\r\n");
+                sbError.append("! Warning: There is no cultivar data in the experiment.\r\n");
             }
 
             // FIELDS Section
@@ -447,7 +448,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 eventPart2 = new StringBuilder();
                 eventPart2.append("@L ...........XCRD ...........YCRD .....ELEV .............AREA .SLEN .FLWR .SLAS FLHST FHDUR\r\n");
             } else {
-                sbError.append("! Warning: Trhee is no field data in the experiment.\r\n");
+                sbError.append("! Warning: There is no field data in the experiment.\r\n");
             }
             for (int idx = 0; idx < flArr.size(); idx++) {
                 secData = (LinkedHashMap) flArr.get(idx);
@@ -579,8 +580,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                     secData = (LinkedHashMap) mpArr.get(idx);
                     // Check if necessary data is missing
-                    if (getObjectOr(secData, "date", "").equals("")) {
+                    String pdate = getObjectOr(secData, "date", "");
+                    if (pdate.equals("")) {
                         sbError.append("! Warning: Incompleted record because missing data : [pdate]\r\n");
+                    } else if (formatDateStr(pdate).equals(defValD)) {
+                        sbError.append("! Warning: Incompleted record because variable [pdate] with invalid value [").append(pdate).append("]\r\n");
                     }
                     if (getObjectOr(secData, "plpop", getObjectOr(secData, "plpoe", "")).equals("")) {
                         sbError.append("! Warning: Incompleted record because missing data : [plpop] and [plpoe]\r\n");
@@ -618,7 +622,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 }
                 sbData.append("\r\n");
             } else {
-                sbError.append("! Warning: Trhee is no plainting data in the experiment.\r\n");
+                sbError.append("! Warning: There is no plainting data in the experiment.\r\n");
             }
 
             // IRRIGATION AND WATER MANAGEMENT Section
@@ -668,12 +672,19 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 String fen_tot = getObjectOr(result, "fen_tot", defValR);
                 String fep_tot = getObjectOr(result, "fep_tot", defValR);
                 String fek_tot = getObjectOr(result, "fek_tot", defValR);
+                String pdate = getPdate(result);
+                if (pdate.equals("")) {
+                    pdate = defValD;
+                }
 
                 for (int idx = 0; idx < mfArr.size(); idx++) {
                     secDataArr = (ArrayList) mfArr.get(idx);
 
                     for (int i = 0; i < secDataArr.size(); i++) {
                         secData = (LinkedHashMap) secDataArr.get(i);
+                        if (getObjectOr(secData, "fdate", "").equals("")) {
+                            sbError.append("! Warning: missing data : [fdate], and will automatically use planting value '").append(pdate).append("'\r\n");
+                        }
                         if (getObjectOr(secData, "fecd", "").equals("")) {
                             sbError.append("! Warning: missing data : [fecd], and will automatically use default value 'FE005'\r\n");
                         }
@@ -691,7 +702,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         }
                         sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$s\r\n",
                                 idx + 1, //getObjectOr(data, "fe", defValI).toString(),
-                                formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. fdate -> date
+                                formatDateStr(getObjectOr(secData, "date", pdate).toString()), // P.S. fdate -> date
                                 getObjectOr(secData, "fecd", "FE005").toString(), // P.S. Set default value as "FE005"
                                 getObjectOr(secData, "feacd", defValC).toString(),
                                 formatNumStr(5, secData, "fedep", "5"), // P.S. Set default value as "5"
@@ -1076,5 +1087,18 @@ public class DssatXFileOutput extends DssatCommonOutput {
     private ArrayList<LinkedHashMap> getDataList(Map expData, String blockName, String dataListName) {
         LinkedHashMap dataBlock = getObjectOr(expData, blockName, new LinkedHashMap());
         return getObjectOr(dataBlock, dataListName, new ArrayList<LinkedHashMap>());
+    }
+
+    /**
+     * Try to translate 3-bit crid to 2-bit version stored in the map
+     *
+     * @param cuData the cultivar data record
+     */
+    private void translateTo2BitCrid(LinkedHashMap cuData) {
+        String crid = getObjectOr(cuData, "crid", "");
+        if (!crid.equals("")) {
+            DssatCRIDHelper crids = new DssatCRIDHelper();
+            cuData.put("crid", crids.get2BitCrid(crid));
+        }
     }
 }

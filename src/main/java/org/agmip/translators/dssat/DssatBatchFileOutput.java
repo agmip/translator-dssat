@@ -228,6 +228,8 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
                 crid = exname.substring(exname.length() - 2, exname.length());
             }
         }
+        DssatCRIDHelper crids = new DssatCRIDHelper();
+        crid = crids.get2BitCrid(crid);
 
         // Get crop name string
         if (crid == null || "".equals(crid)) {
@@ -292,7 +294,7 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
             ret = "Wheat";
         } else {
             ret = crid;
-            sbError.append("! Warning: Undefined crop id: [").append(crid).append("]");
+            sbError.append("! Warning: Undefined crop id: [").append(crid).append("]\r\n");
         }
         return ret;
     }
