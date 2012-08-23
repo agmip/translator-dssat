@@ -379,6 +379,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
                         result.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".CUL")) {
                         mapC.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
+                    } else if (entry.getName().toUpperCase().endsWith(".JSON")) {
+                        result.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
                     }
                 }
             }
@@ -400,6 +402,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 result.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
             } else if (filePath.toUpperCase().endsWith(".CUL")) {
                 mapC.put(filePath, new BufferedReader(new InputStreamReader(in)));
+            } else if (filePath.toUpperCase().endsWith(".JSON")) {
+                File f = new File(filePath);
+                result.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
             }
         }
 

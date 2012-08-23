@@ -203,7 +203,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                 if (ret.endsWith(crid)) {
                     ret = ret.substring(0, ret.length() - crid.length());
                 } else {
-                    if (crid.equals("XX")) {
+                    if (crid.equals("XX") && ret.length() == 10) {
                         crid = ret.substring(ret.length() - 2, ret.length());
                         ret = ret.substring(0, ret.length() - 2);
                     }

@@ -30,12 +30,13 @@ public class DssatAcmoCsvTranslator {
      * Generate ACMO CSV file
      *
      * @param outputCsvPath The path for output csv file
-     * @param inputFilePath The path for input zip file which contains *.OUT
-     * @param metaDataArr The array of mini json objects
+     * @param inputFilePath The path for input zip file which contains *.OUT and acmo.json
      */
-    public void writeCsvFile(String outputCsvPath, String inputFilePath, ArrayList<LinkedHashMap> metaDataArr) throws IOException {
+    public void writeCsvFile(String outputCsvPath, String inputFilePath) throws IOException {
 
         DssatOutputFileInput dssatReader = new DssatOutputFileInput();
+        DssatACMOJsonInput dssatReader2 = new DssatACMOJsonInput();
+        ArrayList<LinkedHashMap> metaDataArr = dssatReader2.readFileAll(inputFilePath);
         StringBuilder sbData = new StringBuilder();
         ArrayList<LinkedHashMap> inArr = dssatReader.readFileAll(inputFilePath);
         LinkedHashMap sumData = new LinkedHashMap();
