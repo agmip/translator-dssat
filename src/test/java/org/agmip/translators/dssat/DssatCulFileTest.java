@@ -37,7 +37,7 @@ public class DssatCulFileTest {
         String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\APAN9304_PNX.zip";
         result = obInput.readFileAll(filePath);
 //        System.out.println(JSONAdapter.toJSON(result));
-        File f = new File("outputS.txt");
+        File f = new File("outputCul.txt");
         BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
         bo.write(JSONAdapter.toJSON(result).getBytes());
         bo.close();

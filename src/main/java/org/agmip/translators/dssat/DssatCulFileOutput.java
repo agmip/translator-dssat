@@ -46,12 +46,12 @@ public class DssatCulFileOutput extends DssatCommonOutput {
 
             // Initial BufferedWriter
             // Get File name
-            String fileName = getExName(result);
-            if (fileName.equals("")) {
+            String fileName = getFileName(result, "X");
+            if (fileName.equals("TEMP.XXX")) {
                 fileName = "Cultivar.CUL";
             } else {
                 try {
-                    fileName = fileName.substring(0, fileName.length() - 2) + "_" + fileName.substring(fileName.length() - 2) + "X.CUL";
+                    fileName = fileName.replaceAll("\\.", "_") + ".CUL";
                 } catch (Exception e) {
                     fileName = "Cultivar.CUL";
                 }
