@@ -129,7 +129,6 @@ public class DssatWeatherInput extends DssatCommonInput {
                         LinkedHashMap tmp = readLine(line, formats, "");
                         // translate date from yyddd format to yyyymmdd format
                         translateDateStr(tmp, "w_date");
-                        t2.setW_date(tmp.get("w_date"));
 
                         daily.add(tmp);
 
@@ -184,35 +183,5 @@ public class DssatWeatherInput extends DssatCommonInput {
         flg[0] = "weather";
         flg[1] = "";
         flg[2] = "data";
-    }
-
-    protected static void setDailyVars(Map m, DailyWeather w) {
-        Class noparams[] = {};
-        Class[] paramString = new Class[1];	
-        paramString[0] = String.class;
- 
-        Class[] paramInt = new Class[1];	
-        paramInt[0] = Integer.TYPE;
-
-        Class[] paramDbl = new Class[1];
-        paramDbl[0] = Double.TYPE;
-
-        Class cls = w.getClass();
-        for(Map.Entry entry : m.entrySet()) {
-            String key = entry.getKey();
-            String method = key.substring(0,1).toUpperCase()+method.substring(1);
-            Method getter = cls.getDeclaredMethod("get"+method, noparams);
-            String type = getter.getReturnType().getName();
-            if ( type.equals("Integer") ) {
-                Method setter = cls.getDeclaredMethod("set"+method, paramInt);
-                setter.invoke(w, Integer.parseInt(entry.getValue()));
-            } else if ( type.equals("Double") ) {
-                Method setter = cls.getDeclaredMethod("set"+method, paramDbl);
-                setter.invoke(w, Double.parseDouble(entry.getValue()));
-            } else {
-                Method setter = cls.getDeclaredMethod("set"+method, paramString);
-                setter.invoke(w, entry.getValue());
-            }
-        }
     }
 }

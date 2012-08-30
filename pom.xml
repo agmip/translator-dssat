@@ -1,71 +1,86 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.agmip.translators</groupId>
-    <artifactId>translator-dssat</artifactId>
-    <version>1.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
-    <name>translator-dssat</name>
-    <description>
+	<groupId>org.agmip.translators</groupId>
+	<artifactId>translator-dssat</artifactId>
+	<version>1.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>translator-dssat</name>
+	<description>
         AgMIP DSSAT Translator
     </description>
-    <url>http://www.agmip.org/</url>
+	<url>http://www.agmip.org/</url>
 
-    <parent>
-        <groupId>org.agmip.translators</groupId>
-        <artifactId>translator-dist</artifactId>
-        <version>0.7</version>
-    </parent>
+	<parent>
+		<groupId>org.agmip.translators</groupId>
+		<artifactId>translator-dist</artifactId>
+		<version>0.7</version>
+	</parent>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
-    <organization>
-        <name>AgMIP - Agricultural Model Intercomparison and Improvement Project</name>
-        <url>http://www.agmip.org/</url>
-    </organization>
+	<organization>
+		<name>AgMIP - Agricultural Model Intercomparison and Improvement Project</name>
+		<url>http://www.agmip.org/</url>
+	</organization>
 
-    <licenses>
-        <license>
-            <url>http://raw.github.com/agmip/translator-dssat/LICENSE</url>
-        </license>
-    </licenses>
+	<licenses>
+		<license>
+			<url>http://raw.github.com/agmip/translator-dssat/LICENSE</url>
+		</license>
+	</licenses>
 
-    <developers>
-        <developer>
-            <name>Meng Zhang</name>
-            <email>meng.zhang15@ufl.edu</email>
-            <roles>
-                <role>Contributor</role>
-                <role>Module Lead</role>
-            </roles>
-        </developer>
-        <developer>
-            <name>Christopher Villalobos</name>
-            <email>cvillalobos@ufl.edu</email>
-            <roles>
-                <role>Contributor</role>
-                <role>Maintainer</role>
-            </roles>
-        </developer>
-    </developers>
+	<developers>
+		<developer>
+			<name>Meng Zhang</name>
+			<email>meng.zhang15@ufl.edu</email>
+			<roles>
+				<role>Contributor</role>
+				<role>Module Lead</role>
+			</roles>
+		</developer>
+		<developer>
+			<name>Christopher Villalobos</name>
+			<email>cvillalobos@ufl.edu</email>
+			<roles>
+				<role>Contributor</role>
+				<role>Maintainer</role>
+			</roles>
+		</developer>
+	</developers>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.agmip</groupId>
-            <artifactId>agmip-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-    </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.agmip</groupId>
+			<artifactId>agmip-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+	</dependencies>
 
-    <scm>
-        <connection>scm:git:git://github.com/agmip/translator-dssat.git</connection>
-        <developerConnection>scm:git:git@github.com:agmip/translator-dssat.git</developerConnection>
-        <url>https://github.com/agmip/translator-dssat</url>
-      <tag>HEAD</tag>
-  </scm>
+	<scm>
+		<connection>scm:git:git://github.com/agmip/translator-dssat.git</connection>
+		<developerConnection>scm:git:git@github.com:agmip/translator-dssat.git</developerConnection>
+		<url>https://github.com/agmip/translator-dssat</url>
+		<tag>HEAD</tag>
+	</scm>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

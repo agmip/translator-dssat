@@ -8,8 +8,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import org.agmip.core.types.TranslatorOutput;
+
 import static org.agmip.translators.dssat.DssatCommonOutput.revisePath;
 import static org.agmip.util.MapUtil.getObjectOr;
 
@@ -17,7 +21,7 @@ import static org.agmip.util.MapUtil.getObjectOr;
  *
  * @author Meng Zhang
  */
-public class DssatControllerOutput {
+public class DssatControllerOutput implements TranslatorOutput {
 
     private DssatCommonOutput[] outputs = {
         new DssatXFileOutput(),
@@ -52,7 +56,7 @@ public class DssatControllerOutput {
         for (int i = 0; i < results.size(); i++) {
             result = results.get(i);
             exname = getObjectOr(result, "exname", "Experiment_" + i);
-            writeFile(arg0 + exname, result);
+            writeSingleFile(arg0 + exname, result);
             exnames.add(exname);
         }
 
@@ -89,14 +93,11 @@ public class DssatControllerOutput {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public void writeFiles(String arg0, LinkedHashMap result) throws FileNotFoundException, IOException {
+    public void writeFile(String arg0, Map result) {
 
         // Write files
-        writeFile(arg0, result);
-
-        // compress all output files into one zip file
-        zipFile = new File(revisePath(arg0) + getZipFileName());
-        createZip(files);
+    	String exname = getObjectOr(result, "exname", "er");
+        writeSingleFile(arg0 + File.separator + exname, result);
     }
 
     /**
@@ -105,7 +106,7 @@ public class DssatControllerOutput {
      * @param arg0 file output path
      * @param result data holder object
      */
-    private void writeFile(String arg0, LinkedHashMap result) {
+    private void writeSingleFile(String arg0, Map result) {
         for (int i = 0; i < outputs.length; i++) {
             outputs[i].writeFile(arg0, result);
             if (outputs[i].getOutputFile() != null) {
