@@ -57,9 +57,9 @@ public class DssatWeatherInput extends DssatCommonInput {
     protected ArrayList<LinkedHashMap> readDailyData(HashMap brMap, LinkedHashMap ret) throws IOException {
 
         ArrayList<LinkedHashMap> files = new ArrayList();
-        ArrayList<LinkedHashMap> daily = new ArrayList();
-        ArrayList titles = new ArrayList();
-        LinkedHashMap fileTmp = null;
+        ArrayList<LinkedHashMap> daily;
+        ArrayList titles;
+        LinkedHashMap fileTmp;
         LinkedHashMap file = null;
         String line;
         BufferedReader brW = null;

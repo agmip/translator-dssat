@@ -27,16 +27,22 @@ public class DssatControllerInput {
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    public ArrayList<LinkedHashMap> readFiles(String arg0) throws FileNotFoundException, IOException {
+    public LinkedHashMap readFiles(String arg0) throws FileNotFoundException, IOException {
 
         HashMap brMap;
+        LinkedHashMap ret = new LinkedHashMap();
         LinkedHashMap metaData = new LinkedHashMap();
         ArrayList<LinkedHashMap> expArr = new ArrayList<LinkedHashMap>();
         LinkedHashMap expData;
         ArrayList<LinkedHashMap> mgnArr;
         ArrayList<LinkedHashMap> soilArr;
         LinkedHashMap soilData;
+        LinkedHashMap soilTmpMap = new LinkedHashMap();
+        String soilId;
         ArrayList<LinkedHashMap> wthArr;
+        LinkedHashMap wthData;
+        LinkedHashMap wthTmpMap = new LinkedHashMap();
+        String wthId;
         LinkedHashMap obvAFile;
         ArrayList<LinkedHashMap> obvAArr;
         LinkedHashMap obvTFile;
@@ -49,7 +55,7 @@ public class DssatControllerInput {
             brMap = getBufferReader(arg0);
         } catch (FileNotFoundException fe) {
             System.out.println("File not found under following path : [" + arg0 + "]!");
-            return expArr;
+            return ret;
         }
 
         // Set Data source and version info
@@ -82,16 +88,19 @@ public class DssatControllerInput {
             expData = mgnReader.setupMetaData(metaData, i);
 
             // Set soil data for this treatment
-            if (!getValueOr(expData, "wst_id", "0").equals("0")) {
-                LinkedHashMap tmp = getSectionData(wthArr, "wst_id", expData.get("wst_id").toString());
-                if (tmp != null && tmp.size() != 0) {
-                    expData.put(wthReader.jsonKey, tmp);
+            wthId = getValueOr(expData, "wst_id", "0");
+            if (!wthId.equals("0")) {
+                wthData = getSectionData(wthArr, "wst_id", wthId);
+                if (wthData != null && wthData.size() != 0) {
+//                    expData.put(wthReader.jsonKey, wthData);
+                    wthTmpMap.put(wthId, wthData);
                 }
             }
 
             // Set weather data for this treatment
-            if (!getValueOr(expData, "soil_id", "0").equals("0")) {
-                soilData = getSectionData(soilArr, "soil_id", expData.get("soil_id").toString());
+            soilId = getValueOr(expData, "soil_id", "0");
+            if (!soilId.equals("0") && !soilTmpMap.containsKey(soilId)) {
+                soilData = getSectionData(soilArr, "soil_id", soilId);
                 // if there is soil analysis data, create new soil block by using soil analysis info
                 if (expData.get("soil_analysis") != null) {
                     if (soilData == null) {
@@ -106,8 +115,9 @@ public class DssatControllerInput {
                     copyItem(soilData, saTmp, "smhb");
                     copyItem(soilData, saTmp, "smpx");
                     copyItem(soilData, saTmp, "smke");
-                    soilData.put("soil_id", soilData.get("soil_id") + "_" + (i + 1));
-                    expData.put("soil_id", expData.get("soil_id") + "_" + (i + 1));
+                    soilId += "_" + (i + 1);
+                    soilData.put("soil_id", soilId);
+                    expData.put("soil_id", soilId);
 
                     // Update soil layer data
                     ArrayList<LinkedHashMap> soilLyrs = getObjectOr(soilData, soilReader.layerKey, new ArrayList());
@@ -117,7 +127,8 @@ public class DssatControllerInput {
                 }
 
                 if (soilData != null && soilData.size() != 0) {
-                    expData.put(soilReader.jsonKey, soilData);
+//                    expData.put(soilReader.jsonKey, soilData);
+                    soilTmpMap.put(soilId, soilData);
                 }
             }
 
@@ -146,7 +157,7 @@ public class DssatControllerInput {
 
             // Set experiment data include management, Initial Condition and DSSAT specific data blocks for this treatment
             mgnReader.setupTrnData(expData, mgnArr.get(i), obvAFile, obvTFile);
-            
+
             // Set dssat cultivar info block
             if (!culArr.isEmpty()) {
                 LinkedHashMap mgnData = getObjectOr(expData, mgnReader.jsonKey, new LinkedHashMap());
@@ -160,7 +171,7 @@ public class DssatControllerInput {
                         }
                     }
                 }
-                
+
                 if (!culTmpArr.isEmpty()) {
                     LinkedHashMap tmp = new LinkedHashMap();
                     tmp.put(culReader.dataKey, culTmpArr);
@@ -172,6 +183,15 @@ public class DssatControllerInput {
             expArr.add(expData);
         }
 
-        return expArr;
+        ret.put("experiment", expArr);
+        if (!soilTmpMap.isEmpty()) {
+            ret.put("soil", new ArrayList(soilTmpMap.values()));
+        }
+        if (!wthTmpMap.isEmpty()) {
+            ret.put("weather", new ArrayList(wthTmpMap.values()));
+        }
+
+//        return expArr;
+        return ret;
     }
 }

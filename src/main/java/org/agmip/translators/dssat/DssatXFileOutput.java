@@ -928,41 +928,41 @@ public class DssatXFileOutput extends DssatCommonOutput {
         ArrayList<LinkedHashMap> dataArr;
         LinkedHashMap subData;
 
-        // Check if the meta data of fertilizer is not "N" ("Y" or null)
-        if (!getValueOr(expData, "fertilizer", "").equals("N")) {
+//        // Check if the meta data of fertilizer is not "N" ("Y" or null)
+//        if (!getValueOr(expData, "fertilizer", "").equals("N")) {
+//
+//            // Check if necessary data is missing in all the event records
+//            // P.S. rule changed since all the necessary data has a default value for it
+//            dataArr = (ArrayList) getObjectOr(trData, "fertilizer", new ArrayList());
+//            if (dataArr.isEmpty()) {
+//                nitro = "N";
+//            }
+////            for (int i = 0; i < dataArr.size(); i++) {
+////                subData = dataArr.get(i);
+////                if (getValueOr(subData, "date", "").equals("")
+////                        || getValueOr(subData, "fecd", "").equals("")
+////                        || getValueOr(subData, "feacd", "").equals("")
+////                        || getValueOr(subData, "feamn", "").equals("")) {
+////                    nitro = "N";
+////                    break;
+////                }
+////            }
+//        }
 
-            // Check if necessary data is missing in all the event records
-            // P.S. rule changed since all the necessary data has a default value for it
-            dataArr = (ArrayList) getObjectOr(trData, "fertilizer", new ArrayList());
-            if (dataArr.isEmpty()) {
-                nitro = "N";
-            }
+//        // Check if the meta data of irrigation is not "N" ("Y" or null)
+//        if (!getValueOr(expData, "irrigation", "").equals("N")) {
+//
+//            // Check if necessary data is missing in all the event records
+//            dataArr = (ArrayList) getObjectOr(trData, "irrigation", new ArrayList());
 //            for (int i = 0; i < dataArr.size(); i++) {
 //                subData = dataArr.get(i);
 //                if (getValueOr(subData, "date", "").equals("")
-//                        || getValueOr(subData, "fecd", "").equals("")
-//                        || getValueOr(subData, "feacd", "").equals("")
-//                        || getValueOr(subData, "feamn", "").equals("")) {
-//                    nitro = "N";
+//                        || getValueOr(subData, "irval", "").equals("")) {
+//                    water = "N";
 //                    break;
 //                }
 //            }
-        }
-
-        // Check if the meta data of irrigation is not "N" ("Y" or null)
-        if (!getValueOr(expData, "irrigation", "").equals("N")) {
-
-            // Check if necessary data is missing in all the event records
-            dataArr = (ArrayList) getObjectOr(trData, "irrigation", new ArrayList());
-            for (int i = 0; i < dataArr.size(); i++) {
-                subData = dataArr.get(i);
-                if (getValueOr(subData, "date", "").equals("")
-                        || getValueOr(subData, "irval", "").equals("")) {
-                    water = "N";
-                    break;
-                }
-            }
-        }
+//        }
 
         sdate = getObjectOr(expData, "sdat", "").toString();
         if (sdate.equals("")) {
