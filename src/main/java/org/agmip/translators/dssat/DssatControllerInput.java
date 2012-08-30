@@ -183,12 +183,12 @@ public class DssatControllerInput {
             expArr.add(expData);
         }
 
-        ret.put("experiment", expArr);
+        ret.put("experiments", expArr);
         if (!soilTmpMap.isEmpty()) {
-            ret.put("soil", new ArrayList(soilTmpMap.values()));
+            ret.put("soils", new ArrayList(soilTmpMap.values()));
         }
         if (!wthTmpMap.isEmpty()) {
-            ret.put("weather", new ArrayList(wthTmpMap.values()));
+            ret.put("weathers", new ArrayList(wthTmpMap.values()));
         }
 
 //        return expArr;
