@@ -210,6 +210,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
             // Set soil analysis info
             ArrayList<LinkedHashMap> icSubArr = getDataList(expData, "initial_condition", "soilLayer");
+            ArrayList<LinkedHashMap> soilLarys = getDataList(expData, "soil", "soilLayer");
+            // If it is stored in the initial condition block
             if (isSoilAnalysisExist(icSubArr)) {
                 LinkedHashMap saData = new LinkedHashMap();
                 ArrayList<LinkedHashMap> saSubArr = new ArrayList<LinkedHashMap>();
@@ -218,6 +220,20 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     saSubData = new LinkedHashMap();
                     copyItem(saSubData, icSubArr.get(i), "sabl", "icbl", false);
                     copyItem(saSubData, icSubArr.get(i), "sasc", "slsc", false);
+                    saSubArr.add(saSubData);
+                }
+                copyItem(saData, soilData, "sadat");
+                saData.put("soilLayer", saSubArr);
+                saNum = setSecDataArr(saData, saArr);
+            } // If it is stored in the soil block
+            else if (isSoilAnalysisExist(soilLarys)) {
+                LinkedHashMap saData = new LinkedHashMap();
+                ArrayList<LinkedHashMap> saSubArr = new ArrayList<LinkedHashMap>();
+                LinkedHashMap saSubData;
+                for (int i = 0; i < soilLarys.size(); i++) {
+                    saSubData = new LinkedHashMap();
+                    copyItem(saSubData, soilLarys.get(i), "sabl", "slbl", false);
+                    copyItem(saSubData, soilLarys.get(i), "sasc", "slsc", false);
                     saSubArr.add(saSubData);
                 }
                 copyItem(saData, soilData, "sadat");
