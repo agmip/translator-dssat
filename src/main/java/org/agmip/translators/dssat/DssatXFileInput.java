@@ -392,7 +392,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     // Set variables' formats
                     formats.clear();
                     formats.put("", 2);         // P.S. ignore the data index "sa"
-                    formats.put("slbl", 6);     // P.S. changed from sabl  to sllb to match the soil variable name
+                    formats.put("sllb", 6);     // P.S. changed from sabl  to sllb to match the soil variable name
                     formats.put("slbdm", 6);    // P.S. changed from sabdm to slbdm to match the soil variable name
                     formats.put("sloc", 6);     // P.S. changed from saoc  to sloc to match the soil variable name
                     formats.put("slni", 6);     // P.S. changed from sani  to slni to match the soil variable name
@@ -1080,27 +1080,27 @@ public class DssatXFileInput extends DssatCommonInput {
             // soil_analysis
             if (!getObjectOr(sqData, "sa", "0").equals("0")) {
                 LinkedHashMap saTmp = (LinkedHashMap) getSectionDataObj(saArr, "sa", sqData.get("sa").toString());
-                ArrayList<LinkedHashMap> saSubArr = getObjectOr(saTmp, icEventKey, new ArrayList());
+//                ArrayList<LinkedHashMap> saSubArr = getObjectOr(saTmp, icEventKey, new ArrayList());
 
                 // temporally put soil_analysis block into treatment meta data
                 trMetaData.put("soil_analysis", saTmp);
 
-                // Add SASC into initial condition block
-                ArrayList<LinkedHashMap> icSubArrNew;
-                LinkedHashMap icTmp;
-                String[] copyKeys = {"slsc"};
-                if (!trData.containsKey("initial_condition")) {
-                    // Add a dummy ic block to hold SASC
-                    icTmp = new LinkedHashMap();
-                    trData.put("initial_condition", icTmp);
-                    icSubArrNew = combinLayers(new ArrayList<LinkedHashMap>(), saSubArr, "icbl", "slbl", copyKeys);
-                } else {
-                    // Add SASC into initial condition block
-                    icTmp = (LinkedHashMap) trData.get("initial_condition");
-                    ArrayList<LinkedHashMap> icSubArr = getObjectOr(icTmp, icEventKey, new ArrayList());
-                    icSubArrNew = combinLayers(icSubArr, saSubArr, "icbl", "slbl", copyKeys);
-                }
-                icTmp.put(icEventKey, icSubArrNew);
+//                // Add SASC into initial condition block
+//                ArrayList<LinkedHashMap> icSubArrNew;
+//                LinkedHashMap icTmp;
+//                String[] copyKeys = {"slsc"};
+//                if (!trData.containsKey("initial_condition")) {
+//                    // Add a dummy ic block to hold SASC
+//                    icTmp = new LinkedHashMap();
+//                    trData.put("initial_condition", icTmp);
+//                    icSubArrNew = combinLayers(new ArrayList<LinkedHashMap>(), saSubArr, "icbl", "sllb", copyKeys);
+//                } else {
+//                    // Add SASC into initial condition block
+//                    icTmp = (LinkedHashMap) trData.get("initial_condition");
+//                    ArrayList<LinkedHashMap> icSubArr = getObjectOr(icTmp, icEventKey, new ArrayList());
+//                    icSubArrNew = combinLayers(icSubArr, saSubArr, "icbl", "sllb", copyKeys);
+//                }
+//                icTmp.put(icEventKey, icSubArrNew);
             }
 
         }

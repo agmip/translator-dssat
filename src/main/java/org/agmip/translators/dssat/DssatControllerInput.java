@@ -122,8 +122,8 @@ public class DssatControllerInput {
                     // Update soil layer data
                     ArrayList<LinkedHashMap> soilLyrs = getObjectOr(soilData, soilReader.layerKey, new ArrayList());
                     ArrayList<LinkedHashMap> saLyrs = getObjectOr(saTmp, mgnReader.icEventKey, new ArrayList());
-                    String[] copyKeys = {"slbdm", "sloc", "slni", "slphw", "slphb", "slpx", "slke"};
-                    soilData.put(soilReader.layerKey, combinLayers(soilLyrs, saLyrs, "sllb", "slbl", copyKeys));
+                    String[] copyKeys = {"sllb", "slbdm", "sloc", "slni", "slphw", "slphb", "slpx", "slke", "slsc"};
+                    soilData.put(soilReader.layerKey, combinLayers(soilLyrs, saLyrs, "sllb", "sllb", copyKeys));
                 }
 
                 if (soilData != null && soilData.size() != 0) {
