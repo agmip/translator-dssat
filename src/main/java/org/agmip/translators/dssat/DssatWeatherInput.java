@@ -34,16 +34,11 @@ public class DssatWeatherInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected ArrayList<LinkedHashMap> readFile(HashMap brMap) throws IOException {
-        LinkedHashMap metaData = new LinkedHashMap();
-        ArrayList<LinkedHashMap> files = readDailyData(brMap, metaData);
+    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
+        LinkedHashMap ret = new LinkedHashMap();
+        ArrayList<LinkedHashMap> files = readDailyData(brMap, new LinkedHashMap());
 //        compressData(files);
-        ArrayList<LinkedHashMap> ret = new ArrayList();
-        for (int i = 0; i < files.size(); i++) {
-            LinkedHashMap tmp = new LinkedHashMap();
-            tmp.put(jsonKey, files.get(i));
-            ret.add(tmp);
-        }
+        ret.put("weathers", files);
 
         return ret;
     }

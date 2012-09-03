@@ -4,7 +4,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import org.agmip.util.JSONAdapter;
 import static org.junit.Assert.*;
@@ -31,10 +30,10 @@ public class DssatAcmoCsvTranslatorTest {
 
     @Test
     public void test() throws IOException, Exception {
-        ArrayList<LinkedHashMap> result;
+        LinkedHashMap result;
 
         String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\testCsv.ZIP";
-        result = obDssatOutputFileInput.readFileAll(filePath);
+        result = obDssatOutputFileInput.readFile(filePath);
 //        System.out.println(JSONAdapter.toJSON(result));
         File f = new File("outputOut.txt");
         BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));

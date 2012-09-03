@@ -36,30 +36,18 @@ public class DssatAcmoCsvTranslator {
 
         DssatOutputFileInput dssatReader = new DssatOutputFileInput();
         DssatACMOJsonInput dssatReader2 = new DssatACMOJsonInput();
-        ArrayList<LinkedHashMap> metaDataArr = dssatReader2.readFileAll(inputFilePath);
+        LinkedHashMap miniJson = dssatReader2.readFile(inputFilePath);
+        ArrayList<LinkedHashMap> metaDataArr = getObjectOr(miniJson, "data", new ArrayList());
         StringBuilder sbData = new StringBuilder();
-        ArrayList<LinkedHashMap> inArr = dssatReader.readFileAll(inputFilePath);
-        LinkedHashMap sumData = new LinkedHashMap();
-        ArrayList<LinkedHashMap> sumSubArr = new ArrayList();
+        LinkedHashMap outputData = dssatReader.readFile(inputFilePath);
+        LinkedHashMap sumData = getObjectOr(outputData, "summary", new LinkedHashMap());
+        ArrayList<LinkedHashMap> sumSubArr = getObjectOr(sumData, "data", new ArrayList<LinkedHashMap>());
         LinkedHashMap sumSubData;
-        ArrayList<LinkedHashMap> ovwSubArr = new ArrayList();
+        ArrayList<LinkedHashMap> ovwSubArr = getObjectOr(outputData, "overview", new ArrayList());
         LinkedHashMap ovwSubData;
-        ArrayList<LinkedHashMap> soilOrgArr = new ArrayList();
+        ArrayList<LinkedHashMap> soilOrgArr = getObjectOr(outputData, "soilorg", new ArrayList());
         LinkedHashMap soilOrgData;
         LinkedHashMap metaData;
-        if (!inArr.isEmpty()) {
-            // Set Summary data
-            sumData = inArr.get(0);
-            sumSubArr = getObjectOr(sumData, "data", new ArrayList<LinkedHashMap>());
-            // Set Overview data
-            for (int i = 1; i < sumSubArr.size() + 1 && i < inArr.size(); i++) {
-                ovwSubArr.add(inArr.get(i));
-            }
-            // Set soil organic matter data
-            for (int i = 1 + sumSubArr.size(); i < inArr.size(); i++) {
-                soilOrgArr.add(inArr.get(i));
-            }
-        }
 
         outputCsvPath = revisePath(outputCsvPath);
         outputFile = new File(outputCsvPath + "ACMO.csv");

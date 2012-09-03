@@ -3,11 +3,9 @@ package org.agmip.translators.dssat;
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import org.agmip.util.JSONAdapter;
-import static org.agmip.util.MapUtil.getObjectOr;
 
 /**
  * DSSAT ACMO mini json Data I/O API Class
@@ -33,11 +31,12 @@ public class DssatACMOJsonInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected ArrayList<LinkedHashMap> readFile(HashMap brMap) throws IOException {
+    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
 
         LinkedHashMap file = readACMOJsonData(brMap);
 //        decompressData(file);
-        return getObjectOr(file, "data", new ArrayList<LinkedHashMap>());
+//        return getObjectOr(file, "data", new ArrayList<LinkedHashMap>());
+        return file;
     }
 
     /**

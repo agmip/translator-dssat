@@ -7,11 +7,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import static org.agmip.translators.dssat.DssatCommonInput.getSectionData;
 import org.agmip.util.JSONAdapter;
-import static org.agmip.util.MapUtil.*;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,12 +55,13 @@ public class DssatControllerTest {
         //            "MACH0002MZX.zip",
         //            "MACH0003MZX.zip",
         //            "MACH0004MZX.zip",
+//            "GHWA0401_MZX.zip"
         };
 
         File f;
         BufferedOutputStream bo;
         for (int i = 0; i < fileNames.length; i++) {
-            result = obDssatControllerInput.readFiles(filePath + fileNames[i]);
+            result = obDssatControllerInput.readFile(filePath + fileNames[i]);
             System.out.println(fileNames[i] + ":\r\n" + JSONAdapter.toJSON(result));
             f = new File(fileNames[i].replaceAll("[Xx]*\\.\\w+$", ".json"));
             bo = new BufferedOutputStream(new FileOutputStream(f));
@@ -78,12 +76,13 @@ public class DssatControllerTest {
             File file = obDssatControllerOutput.getOutputZipFile();
             if (file != null) {
                 assertTrue(file.exists());
-//                assertTrue(file.delete());
+                assertTrue(file.getName().toUpperCase().matches("^AGMIP_DSSAT_\\d+\\.ZIP$"));
+                assertTrue(file.delete());
             }
         }
 
         String jsonStr;
-        File input = new File("src\\main\\resources\\machakos.json");
+        File input = new File("src\\main\\resources\\Machakos_1Exp-1Yr.json");
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(input)));
         jsonStr = br.readLine();
         obDssatControllerOutput = new DssatControllerOutput();
@@ -91,16 +90,7 @@ public class DssatControllerTest {
         File file = obDssatControllerOutput.getOutputZipFile();
         if (file != null) {
             assertTrue(file.exists());
-            assertTrue(file.delete());
-        }
-
-        jsonStr = "{\"exname\":\"MACH0001\",\"farea\":\"3035\",\"fl_lat\":\"-1.9527\",\"fl_long\":\"37.3876\",\"wst_id\":\"MK10\",\"soil_id\":\"TOA0235063\",\"fen_tot\":\"110\",\"fep_tot\":\"39\",\"fek_tot\":\"119\",\"management\":{\"events\":[{\"event\":\"planting\",\"date\":\"19990415\",\"plpop\":\"7.5\",\"plrs\":\"80\",\"pldp\":\"7\"},{\"event\":\"harvest\",\"date\":\"19990912\"}]},\"observed\":{\"hwah\":\"1601\",\"bwah\":\"264\"}}";
-        LinkedHashMap m = JSONAdapter.fromJSON(jsonStr);
-        obDssatControllerOutput = new DssatControllerOutput();
-        obDssatControllerOutput.writeFile("", m);
-        file = obDssatControllerOutput.getOutputZipFile();
-        if (file != null) {
-            assertTrue(file.exists());
+            assertTrue(file.getName().toUpperCase().matches("^AGMIP_DSSAT_\\d+\\.ZIP$"));
             assertTrue(file.delete());
         }
     }

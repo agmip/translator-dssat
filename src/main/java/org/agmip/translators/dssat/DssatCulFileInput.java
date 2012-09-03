@@ -33,16 +33,18 @@ public class DssatCulFileInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected ArrayList<LinkedHashMap> readFile(HashMap brMap) throws IOException {
+    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
+        LinkedHashMap ret = new LinkedHashMap();
         LinkedHashMap metaData = new LinkedHashMap();
         ArrayList<LinkedHashMap> culArr = readCultivarData(brMap, metaData);
 //        compressData(sites);
-        ArrayList<LinkedHashMap> ret = new ArrayList();
+        ArrayList<LinkedHashMap> expArr = new ArrayList();
         LinkedHashMap tmp = new LinkedHashMap();
         LinkedHashMap tmp2 = new LinkedHashMap();
         tmp.put(jsonKey, tmp2);
         tmp2.put(dataKey, culArr);
-        ret.add(tmp);
+        expArr.add(tmp);
+        ret.put("experiments", expArr);
 
         return ret;
     }

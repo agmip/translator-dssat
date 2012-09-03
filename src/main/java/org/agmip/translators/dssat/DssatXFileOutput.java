@@ -994,7 +994,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         sb.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
         sb.append(sm).append(" OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     Y     M\r\n");
         sb.append("@N METHODS     WTHER INCON LIGHT EVAPO INFIL PHOTO HYDRO NSWIT MESOM MESEV MESOL\r\n");
-        sb.append(sm).append(" ME              M     M     E     R     S     L     R     1     G     S     2\r\n");
+        sb.append(sm).append(" ME              M     M     E     R     S     L     R     1     P     S     2\r\n"); // P.S. 2012/09/02 MESOM "G" -> "P"
         sb.append("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
         sb.append(sm).append(" MA              R     R     R     R     M\r\n");
         sb.append("@N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT\r\n");

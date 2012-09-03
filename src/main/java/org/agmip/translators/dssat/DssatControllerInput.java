@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import org.agmip.core.types.TranslatorInput;
 import static org.agmip.translators.dssat.DssatCommonInput.*;
 import static org.agmip.util.MapUtil.*;
 
@@ -12,7 +13,7 @@ import static org.agmip.util.MapUtil.*;
  *
  * @author Meng Zhang
  */
-public class DssatControllerInput {
+public class DssatControllerInput implements TranslatorInput {
 
     private DssatXFileInput mgnReader = new DssatXFileInput();
     private DssatSoilInput soilReader = new DssatSoilInput();
@@ -27,7 +28,7 @@ public class DssatControllerInput {
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    public LinkedHashMap readFiles(String arg0) throws FileNotFoundException, IOException {
+    public LinkedHashMap readFile(String arg0) {
 
         HashMap brMap;
         LinkedHashMap ret = new LinkedHashMap();
@@ -43,43 +44,47 @@ public class DssatControllerInput {
         LinkedHashMap wthData;
         LinkedHashMap wthTmpMap = new LinkedHashMap();
         String wthId;
+        LinkedHashMap obvAFiles;
         LinkedHashMap obvAFile;
         ArrayList<LinkedHashMap> obvAArr;
+        LinkedHashMap obvTFiles;
         LinkedHashMap obvTFile;
         ArrayList<LinkedHashMap> obvTArr;
         ArrayList<LinkedHashMap> culArr;
         LinkedHashMap culData;
 
-        // Get buffered input file holder
         try {
+            // Get buffered input file holder
             brMap = getBufferReader(arg0);
+
+            // Set Data source and version info
+            setDataVersionInfo(metaData);
+
+            // Try to read XFile (treatment; management)
+            mgnArr = mgnReader.readTreatments(brMap, metaData);
+
+            // Try to read soil File
+            soilArr = soilReader.readSoilSites(brMap, metaData);
+
+            // Try to read weather File
+            wthArr = wthReader.readDailyData(brMap, metaData);
+
+            // Try to read Observed AFile (summary data)
+            obvAFiles = obvAReader.readObvData(brMap);
+
+            // Try to read Observed AFile (time-series data)
+            obvTFiles = obvTReader.readObvData(brMap);
+
+            // Try to read cultivar File
+            culArr = culReader.readCultivarData(brMap, metaData);
+
         } catch (FileNotFoundException fe) {
             System.out.println("File not found under following path : [" + arg0 + "]!");
             return ret;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ret;
         }
-
-        // Set Data source and version info
-        setDataVersionInfo(metaData);
-
-        // Try to read XFile (treatment; management)
-        mgnArr = mgnReader.readTreatments(brMap, metaData);
-
-        // Try to read soil File
-        soilArr = soilReader.readSoilSites(brMap, metaData);
-
-        // Try to read weather File
-        wthArr = wthReader.readDailyData(brMap, metaData);
-
-        // Try to read Observed AFile (summary data)
-        obvAFile = obvAReader.readObvData(brMap);
-        obvAArr = getObjectOr(obvAFile, obvAReader.obvDataKey, new ArrayList<LinkedHashMap>());
-
-        // Try to read Observed AFile (time-series data)
-        obvTFile = obvTReader.readObvData(brMap);
-        obvTArr = getObjectOr(obvTFile, obvTReader.obvDataKey, new ArrayList<LinkedHashMap>());
-
-        // Try to read cultivar File
-        culArr = culReader.readCultivarData(brMap, metaData);
 
         // Combine the each part of data
         for (int i = 0; i < mgnArr.size(); i++) {
@@ -133,6 +138,8 @@ public class DssatControllerInput {
             }
 
             // observed data (summary)
+            obvAFile = getObjectOr(obvAFiles, getValueOr(metaData, "exname", ""), new LinkedHashMap());
+            obvAArr = getObjectOr(obvAFile, obvAReader.obvDataKey, new ArrayList<LinkedHashMap>());
             LinkedHashMap obv = new LinkedHashMap();
             expData.put(obvAReader.jsonKey, obv);
             if (!getValueOr(expData, "trno", "0").equals("0")) {
@@ -143,6 +150,8 @@ public class DssatControllerInput {
             }
 
             // observed data (time-series)
+            obvTFile = getObjectOr(obvTFiles, getValueOr(metaData, "exname", ""), new LinkedHashMap());
+            obvTArr = getObjectOr(obvTFile, obvTReader.obvDataKey, new ArrayList<LinkedHashMap>());
             if (!getValueOr(expData, "trno", "0").equals("0")) {
                 LinkedHashMap tmp = getSectionData(obvTArr, "trno_t", expData.get("trno").toString());
                 if (tmp != null) {
@@ -156,7 +165,7 @@ public class DssatControllerInput {
             }
 
             // Set experiment data include management, Initial Condition and DSSAT specific data blocks for this treatment
-            mgnReader.setupTrnData(expData, mgnArr.get(i), obvAFile, obvTFile);
+            mgnReader.setupTrnData(expData, mgnArr.get(i), obvAFiles, obvTFiles);
 
             // Set dssat cultivar info block
             if (!culArr.isEmpty()) {
@@ -191,7 +200,6 @@ public class DssatControllerInput {
             ret.put("weathers", new ArrayList(wthTmpMap.values()));
         }
 
-//        return expArr;
         return ret;
     }
 }
