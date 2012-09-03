@@ -359,13 +359,15 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
             // Get experiment name
             ZipEntry entry;
+            ArrayList<String> exnames = new ArrayList();
             String exname = "";
             in = new ZipInputStream(new FileInputStream(filePath));
             while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
                     if (entry.getName().matches(".+\\.\\w{2}[Xx]")) {
                         exname = entry.getName().replaceAll("[Xx]$", "");
-                        break;
+                        exnames.add(exname);
+//                        break;
                     }
                 }
             }
@@ -375,17 +377,18 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
             while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
-                    if (entry.getName().equalsIgnoreCase(exname + "X")) {
+                    
+                    if (exnames.contains(entry.getName().replaceAll("[Xx]$", ""))) {
 //                        result.put("X", getBuf(in, (int) entry.getSize()));
                         mapX.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".WTH")) {
                         mapW.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".SOL")) {
                         mapS.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
-                    } else if (entry.getName().equalsIgnoreCase(exname + "A")) {
+                    } else if (exnames.contains(entry.getName().replaceAll("[Aa]$", ""))) {
 //                        result.put("A", getBuf(in, (int) entry.getSize()));
                         mapA.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
-                    } else if (entry.getName().equalsIgnoreCase(exname + "T")) {
+                    } else if (exnames.contains(entry.getName().replaceAll("[Tt]$", ""))) {
 //                        result.put("T", getBuf(in, (int) entry.getSize()));
                         mapT.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".OUT")) {

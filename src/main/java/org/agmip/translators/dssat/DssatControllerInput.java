@@ -137,8 +137,13 @@ public class DssatControllerInput implements TranslatorInput {
                 }
             }
 
+            // Get exname
+            String exname = (String) expData.remove("exname_o");
+            if (exname == null) {
+                exname = "";
+            }
             // observed data (summary)
-            obvAFile = getObjectOr(obvAFiles, getValueOr(metaData, "exname", ""), new LinkedHashMap());
+            obvAFile = getObjectOr(obvAFiles, exname, new LinkedHashMap());
             obvAArr = getObjectOr(obvAFile, obvAReader.obvDataKey, new ArrayList<LinkedHashMap>());
             LinkedHashMap obv = new LinkedHashMap();
             expData.put(obvAReader.jsonKey, obv);
@@ -150,7 +155,7 @@ public class DssatControllerInput implements TranslatorInput {
             }
 
             // observed data (time-series)
-            obvTFile = getObjectOr(obvTFiles, getValueOr(metaData, "exname", ""), new LinkedHashMap());
+            obvTFile = getObjectOr(obvTFiles, exname, new LinkedHashMap());
             obvTArr = getObjectOr(obvTFile, obvTReader.obvDataKey, new ArrayList<LinkedHashMap>());
             if (!getValueOr(expData, "trno", "0").equals("0")) {
                 LinkedHashMap tmp = getSectionData(obvTArr, "trno_t", expData.get("trno").toString());

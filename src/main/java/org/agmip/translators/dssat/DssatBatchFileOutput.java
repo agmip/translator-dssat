@@ -74,6 +74,7 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
             sbData.append("@FILEX                                                                                        TRTNO     RP     SQ     OP     CO\r\n");
             for (int i = 0; i < results.size(); i++) {
                 result = results.get(i);
+                exFileName = getFileName(result, "X");
                 String folderPath = getObjectOr(result, "exname", "Experiment_" + i);
                 folderPath += File.separator;
 

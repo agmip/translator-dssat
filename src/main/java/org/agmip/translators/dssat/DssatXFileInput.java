@@ -78,12 +78,13 @@ public class DssatXFileInput extends DssatCommonInput {
      * DSSAT XFile Data input method for Controller using (no compressing data)
      *
      * @param brMap The holder for BufferReader objects for all files
+     * @param metaData
      * @return trArr The array of treatment data
      */
     protected ArrayList<LinkedHashMap> readTreatments(HashMap brMap, LinkedHashMap metaData) throws IOException {
 
         String line;
-        BufferedReader br = null;
+        BufferedReader br;
         Object buf;
         BufferedReader brw = null;
         char[] bufW = null;
@@ -95,25 +96,12 @@ public class DssatXFileInput extends DssatCommonInput {
         ArrayList<LinkedHashMap> trArr = new ArrayList<LinkedHashMap>();
         LinkedHashMap trData = new LinkedHashMap();
         ArrayList<LinkedHashMap> evtArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> sqArr = new ArrayList<LinkedHashMap>();
-        LinkedHashMap sqData;
-        ArrayList<LinkedHashMap> cuArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> flArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> saArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> sadArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> icArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> icdArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> plArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> irArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> irdArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> feArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> omArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> chArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> tiArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> emArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> haArr = new ArrayList<LinkedHashMap>();
-        ArrayList<LinkedHashMap> smArr = new ArrayList<LinkedHashMap>();
         String ireff = "";    // P.S. special handling for EFIR in irrigation section
+
+        // Set meta data info for each treatment
+        ArrayList<LinkedHashMap> trMetaArr = new ArrayList<LinkedHashMap>();
+        LinkedHashMap trMetaData;
+        metaData.put("tr_meta", trMetaArr);
 
         mapX = (HashMap) brMap.get("X");
         mapW = (HashMap) brMap.get("W");
@@ -124,7 +112,6 @@ public class DssatXFileInput extends DssatCommonInput {
         }
 
         for (Object keyX : mapX.keySet()) {
-
             buf = mapX.get(keyX);
             if (buf instanceof char[]) {
                 br = new BufferedReader(new CharArrayReader((char[]) buf));
@@ -135,6 +122,28 @@ public class DssatXFileInput extends DssatCommonInput {
 //        fileName = (String) brMap.get("Z");
             fileName = (String) keyX;
             wid = fileName.length() > 4 ? fileName.substring(0, 4) : fileName;
+            String exname = fileName.replaceAll("\\.", "").replaceAll("X$", "");
+            LinkedHashMap meta = new LinkedHashMap();
+            metaData.put(exname, meta);
+            
+            ArrayList<LinkedHashMap> sqArr = new ArrayList<LinkedHashMap>();
+            LinkedHashMap sqData;
+            ArrayList<LinkedHashMap> cuArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> flArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> saArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> sadArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> icArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> icdArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> plArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> irArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> irdArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> feArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> omArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> chArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> tiArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> emArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> haArr = new ArrayList<LinkedHashMap>();
+            ArrayList<LinkedHashMap> smArr = new ArrayList<LinkedHashMap>();
 
             while ((line = br.readLine()) != null) {
 
@@ -150,17 +159,16 @@ public class DssatXFileInput extends DssatCommonInput {
                     formats.put("null_2", 11);  // P.S. Since exname in top line is not reliable, read from file name
                     formats.put("local_name", 61);
                     // Read line and save into return holder
-                    metaData.putAll(readLine(line, formats));
-                    String exname = fileName.replaceAll("\\.", "").replaceAll("X$", "");
-                    metaData.put("exname", exname);
-                    metaData.put("in", getObjectOr(metaData, "exname", "  ").substring(0, 2).trim());
+                    meta.putAll(readLine(line, formats));
+                    meta.put("exname", exname);
+                    meta.put("in", getObjectOr(meta, "exname", "  ").substring(0, 2).trim());
                 } // Read General Section
                 else if (flg[0].startsWith("general")) {
 
                     // People info
                     if (flg[1].equals("people") && flg[2].equals("data")) {
                         if (checkValidValue(line.trim())) {
-                            metaData.put("people", line.trim());
+                            meta.put("people", line.trim());
                         }
 
                     } // Address info
@@ -168,7 +176,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         String[] addr;
                         if (checkValidValue(line.trim())) {
                             addr = line.split(",[ ]*");
-                            metaData.put("institution", line.trim());
+                            meta.put("institution", line.trim());
                         } else {
                             addr = new String[0];
                         }
@@ -178,32 +186,32 @@ public class DssatXFileInput extends DssatCommonInput {
                             case 0:
                                 break;
                             case 1:
-                                metaData.put("fl_loc_1", addr[0]);
+                                meta.put("fl_loc_1", addr[0]);
                                 break;
                             case 2:
-                                metaData.put("fl_loc_1", addr[1]);
-                                metaData.put("fl_loc_2", addr[0]);
+                                meta.put("fl_loc_1", addr[1]);
+                                meta.put("fl_loc_2", addr[0]);
                                 break;
                             case 3:
-                                metaData.put("fl_loc_1", addr[2]);
-                                metaData.put("fl_loc_2", addr[1]);
-                                metaData.put("fl_loc_3", addr[0]);
+                                meta.put("fl_loc_1", addr[2]);
+                                meta.put("fl_loc_2", addr[1]);
+                                meta.put("fl_loc_3", addr[0]);
                                 break;
                             default:
-                                metaData.put("fl_loc_1", addr[addr.length - 1]);
-                                metaData.put("fl_loc_2", addr[addr.length - 2]);
+                                meta.put("fl_loc_1", addr[addr.length - 1]);
+                                meta.put("fl_loc_2", addr[addr.length - 2]);
                                 String loc3 = "";
                                 for (int i = 0; i < addr.length - 2; i++) {
                                     loc3 += addr[i] + ", ";
                                 }
-                                metaData.put("fl_loc_3", loc3.substring(0, loc3.length() - 2));
+                                meta.put("fl_loc_3", loc3.substring(0, loc3.length() - 2));
                         }
 
                     } // Site info
                     else if ((flg[1].equals("site") || flg[1].equals("sites")) && flg[2].equals("data")) {
                         // P.S. site is missing in the master variables list
                         if (checkValidValue(line.trim())) {
-                            metaData.put("site", line.trim());
+                            meta.put("site", line.trim());
                         }
 
                     } // Plot Info
@@ -222,16 +230,16 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("plthl", 6);
                         formats.put("plthm", 16);
                         // Read line and save into return holder
-                        metaData.putAll(readLine(line, formats));
+                        meta.putAll(readLine(line, formats));
 
                     } // Notes field
                     else if (flg[1].equals("notes") && flg[2].equals("data")) {
-                        if (!metaData.containsKey("tr_notes")) {
-                            metaData.put("tr_notes", line + "\r\n");
+                        if (!meta.containsKey("tr_notes")) {
+                            meta.put("tr_notes", line + "\r\n");
                         } else {
-                            String notes = (String) metaData.get("tr_notes");
+                            String notes = (String) meta.get("tr_notes");
                             notes += line + "\r\n";
-                            metaData.put("tr_notes", notes);
+                            meta.put("tr_notes", notes);
                         }
                     } else {
                     }
@@ -896,11 +904,6 @@ public class DssatXFileInput extends DssatCommonInput {
                 brw.close();
             }
 
-            // Set meta data info for each treatment
-            ArrayList<LinkedHashMap> trMetaArr = new ArrayList<LinkedHashMap>();
-            LinkedHashMap trMetaData;
-            metaData.put("tr_meta", trMetaArr);
-
             // Combine all the sections data into the related treatment block
             String trno = null;
             LinkedHashMap dssatSq;
@@ -927,6 +930,7 @@ public class DssatXFileInput extends DssatCommonInput {
 //                trData.put("dssat_info", dssatInfo);
                     trMetaData.put("tr_name", sqData.get("tr_name"));
                     trMetaData.put("trno", trno);
+                    trMetaData.put("exname", exname);
                     seqid = 1;
                 } else {
                     trMetaData.remove("tr_name");
@@ -1254,13 +1258,16 @@ public class DssatXFileInput extends DssatCommonInput {
     public LinkedHashMap setupMetaData(LinkedHashMap metaData, int trId) {
 
         // Set meta data for all treatment
-        LinkedHashMap expData = CopyList(metaData);
+        LinkedHashMap expData = new LinkedHashMap();
         // Set meta data per treatment
-        ArrayList<LinkedHashMap> trMetaArr = (ArrayList<LinkedHashMap>) expData.remove("tr_meta");
+        ArrayList<LinkedHashMap> trMetaArr = (ArrayList<LinkedHashMap>) metaData.get("tr_meta");
+        String exname = getValueOr(trMetaArr.get(trId), "exname", "");
+        expData.putAll(getObjectOr(metaData, exname, new LinkedHashMap()));
         expData.putAll(trMetaArr.get(trId));
-        if (!getValueOr(expData, "exname", "").equals("")) {
-            expData.put("exname", expData.get("exname") + "_" + (trId + 1));
+        if (!exname.equals("")) {
+            expData.put("exname", exname + "_" + expData.get("trno"));
         }
+        expData.put("exname_o", exname);
 
         return expData;
     }
