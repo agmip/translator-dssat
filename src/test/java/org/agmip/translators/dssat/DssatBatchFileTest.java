@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import static org.agmip.util.MapUtil.*;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,12 +29,13 @@ public class DssatBatchFileTest {
 
     @Test
     public void test() throws IOException, Exception {
-        ArrayList<LinkedHashMap> result;
+        LinkedHashMap result;
 
-        String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\UFGA8202_MZX.ZIP";
-        result = obDssatControllerInput.readFiles(filePath);
+        String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\UFGA8201_MZX_2.ZIP";
+        result = obDssatControllerInput.readFile(filePath);
+        ArrayList<LinkedHashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
 
-        obDssatBatchFileOutput.writeFile("", result);
+        obDssatBatchFileOutput.writeFile("", expArr);
         File file = obDssatBatchFileOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());

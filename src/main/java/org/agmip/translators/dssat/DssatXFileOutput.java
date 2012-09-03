@@ -91,7 +91,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             // Output XFile
             // EXP.DETAILS Section
             sbGenData.append(String.format("*EXP.DETAILS: %1$-10s %2$s\r\n\r\n",
-                    getObjectOr(expData, "exname", defValBlank),
+                    getExName(result),
                     getObjectOr(expData, "local_name", defValBlank).toString()));
 
             // GENERAL Section
@@ -209,15 +209,32 @@ public class DssatXFileOutput extends DssatCommonOutput {
             icNum = setSecDataArr(getObjectOr(expData, "initial_condition", new LinkedHashMap()), icArr);
 
             // Set soil analysis info
-            ArrayList<LinkedHashMap> icSubArr = getDataList(expData, "initial_condition", "soilLayer");
-            if (isSoilAnalysisExist(icSubArr)) {
+//            ArrayList<LinkedHashMap> icSubArr = getDataList(expData, "initial_condition", "soilLayer");
+            ArrayList<LinkedHashMap> soilLarys = getDataList(expData, "soil", "soilLayer");
+//            // If it is stored in the initial condition block
+//            if (isSoilAnalysisExist(icSubArr)) {
+//                LinkedHashMap saData = new LinkedHashMap();
+//                ArrayList<LinkedHashMap> saSubArr = new ArrayList<LinkedHashMap>();
+//                LinkedHashMap saSubData;
+//                for (int i = 0; i < icSubArr.size(); i++) {
+//                    saSubData = new LinkedHashMap();
+//                    copyItem(saSubData, icSubArr.get(i), "sabl", "icbl", false);
+//                    copyItem(saSubData, icSubArr.get(i), "sasc", "slsc", false);
+//                    saSubArr.add(saSubData);
+//                }
+//                copyItem(saData, soilData, "sadat");
+//                saData.put("soilLayer", saSubArr);
+//                saNum = setSecDataArr(saData, saArr);
+//            } else
+            // If it is stored in the soil block
+            if (isSoilAnalysisExist(soilLarys)) {
                 LinkedHashMap saData = new LinkedHashMap();
                 ArrayList<LinkedHashMap> saSubArr = new ArrayList<LinkedHashMap>();
                 LinkedHashMap saSubData;
-                for (int i = 0; i < icSubArr.size(); i++) {
+                for (int i = 0; i < soilLarys.size(); i++) {
                     saSubData = new LinkedHashMap();
-                    copyItem(saSubData, icSubArr.get(i), "sabl", "icbl", false);
-                    copyItem(saSubData, icSubArr.get(i), "sasc", "slsc", false);
+                    copyItem(saSubData, soilLarys.get(i), "sabl", "sllb", false);
+                    copyItem(saSubData, soilLarys.get(i), "sasc", "slsc", false);
                     saSubArr.add(saSubData);
                 }
                 copyItem(saData, soilData, "sadat");
@@ -928,41 +945,41 @@ public class DssatXFileOutput extends DssatCommonOutput {
         ArrayList<LinkedHashMap> dataArr;
         LinkedHashMap subData;
 
-        // Check if the meta data of fertilizer is not "N" ("Y" or null)
-        if (!getValueOr(expData, "fertilizer", "").equals("N")) {
+//        // Check if the meta data of fertilizer is not "N" ("Y" or null)
+//        if (!getValueOr(expData, "fertilizer", "").equals("N")) {
+//
+//            // Check if necessary data is missing in all the event records
+//            // P.S. rule changed since all the necessary data has a default value for it
+//            dataArr = (ArrayList) getObjectOr(trData, "fertilizer", new ArrayList());
+//            if (dataArr.isEmpty()) {
+//                nitro = "N";
+//            }
+////            for (int i = 0; i < dataArr.size(); i++) {
+////                subData = dataArr.get(i);
+////                if (getValueOr(subData, "date", "").equals("")
+////                        || getValueOr(subData, "fecd", "").equals("")
+////                        || getValueOr(subData, "feacd", "").equals("")
+////                        || getValueOr(subData, "feamn", "").equals("")) {
+////                    nitro = "N";
+////                    break;
+////                }
+////            }
+//        }
 
-            // Check if necessary data is missing in all the event records
-            // P.S. rule changed since all the necessary data has a default value for it
-            dataArr = (ArrayList) getObjectOr(trData, "fertilizer", new ArrayList());
-            if (dataArr.isEmpty()) {
-                nitro = "N";
-            }
+//        // Check if the meta data of irrigation is not "N" ("Y" or null)
+//        if (!getValueOr(expData, "irrigation", "").equals("N")) {
+//
+//            // Check if necessary data is missing in all the event records
+//            dataArr = (ArrayList) getObjectOr(trData, "irrigation", new ArrayList());
 //            for (int i = 0; i < dataArr.size(); i++) {
 //                subData = dataArr.get(i);
 //                if (getValueOr(subData, "date", "").equals("")
-//                        || getValueOr(subData, "fecd", "").equals("")
-//                        || getValueOr(subData, "feacd", "").equals("")
-//                        || getValueOr(subData, "feamn", "").equals("")) {
-//                    nitro = "N";
+//                        || getValueOr(subData, "irval", "").equals("")) {
+//                    water = "N";
 //                    break;
 //                }
 //            }
-        }
-
-        // Check if the meta data of irrigation is not "N" ("Y" or null)
-        if (!getValueOr(expData, "irrigation", "").equals("N")) {
-
-            // Check if necessary data is missing in all the event records
-            dataArr = (ArrayList) getObjectOr(trData, "irrigation", new ArrayList());
-            for (int i = 0; i < dataArr.size(); i++) {
-                subData = dataArr.get(i);
-                if (getValueOr(subData, "date", "").equals("")
-                        || getValueOr(subData, "irval", "").equals("")) {
-                    water = "N";
-                    break;
-                }
-            }
-        }
+//        }
 
         sdate = getObjectOr(expData, "sdat", "").toString();
         if (sdate.equals("")) {
@@ -977,7 +994,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         sb.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
         sb.append(sm).append(" OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     Y     M\r\n");
         sb.append("@N METHODS     WTHER INCON LIGHT EVAPO INFIL PHOTO HYDRO NSWIT MESOM MESEV MESOL\r\n");
-        sb.append(sm).append(" ME              M     M     E     R     S     L     R     1     G     S     2\r\n");
+        sb.append(sm).append(" ME              M     M     E     R     S     L     R     1     P     S     2\r\n"); // P.S. 2012/09/02 MESOM "G" -> "P"
         sb.append("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
         sb.append(sm).append(" MA              R     R     R     R     M\r\n");
         sb.append("@N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT\r\n");

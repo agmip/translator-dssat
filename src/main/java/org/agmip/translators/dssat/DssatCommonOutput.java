@@ -225,7 +225,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      */
     public static String revisePath(String path) {
         if (!path.trim().equals("")) {
-            path = path.replaceAll("/", File.separator);
+//            path = path.replaceAll("/", File.separator);
             if (!path.endsWith(File.separator)) {
                 path += File.separator;
             }

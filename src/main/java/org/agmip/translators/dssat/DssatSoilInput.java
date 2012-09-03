@@ -34,16 +34,11 @@ public class DssatSoilInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected ArrayList<LinkedHashMap> readFile(HashMap brMap) throws IOException {
-        LinkedHashMap metaData = new LinkedHashMap();
-        ArrayList<LinkedHashMap> sites = readSoilSites(brMap, metaData);
+    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
+        LinkedHashMap ret = new LinkedHashMap();
+        ArrayList<LinkedHashMap> sites = readSoilSites(brMap, new LinkedHashMap());
 //        compressData(sites);
-        ArrayList<LinkedHashMap> ret = new ArrayList();
-        for (int i = 0; i < sites.size(); i++) {
-            LinkedHashMap tmp = new LinkedHashMap();
-            tmp.put(jsonKey, sites.get(i));
-            ret.add(tmp);
-        }
+        ret.put("soils", sites);
 
         return ret;
     }

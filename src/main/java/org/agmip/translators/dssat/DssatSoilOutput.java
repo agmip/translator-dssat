@@ -72,7 +72,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
             // Description info for output by translator
             bwS.write("!This soil file is created by DSSAT translator tool on " + Calendar.getInstance().getTime() + ".\r\n");
             bwS.write("!The ACE ID is " + getValueOr(result, "id", "N/A") + ".\r\n");
-            bwS.write("!This soil data is used for the experiment of " + getExName(result) + ".\r\n\r\n");
+            bwS.write("!This soil data is used for the experiment of " + getValueOr(result, "exname", "N/A") + ".\r\n\r\n");
 
             // Titel Section
             sbData.append("*SOILS: ").append(getObjectOr((LinkedHashMap) soilSite, "sl_notes", defValBlank)).append("\r\n\r\n");
