@@ -29,19 +29,11 @@ public class DssatBatchFileTest {
 
     @Test
     public void test() throws IOException, Exception {
-        ArrayList<LinkedHashMap> result;
+        LinkedHashMap result;
 
         String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\UFGA8201_MZX_2.ZIP";
-        LinkedHashMap tmp = obDssatControllerInput.readFile(filePath);
-        result = getObjectOr(tmp, "experiments", new ArrayList());
-        ArrayList<LinkedHashMap> expArr = getObjectOr(tmp, "experiment", new ArrayList());
-//        LinkedHashMap expData;
-//        for (int j = 0; j < expArr.size(); j++) {
-//            expData = expArr.get(j);
-//            expData.put("soil", getSectionData(getObjectOr(tmp, "soil", new ArrayList()), "soil_id", getObjectOr(expData, "soil_id", "")));
-//            expData.put("weather", getSectionData(getObjectOr(tmp, "weather", new ArrayList()), "wst_id", getObjectOr(expData, "wst_id", "")));
-//            result.add(expData);
-//        }
+        result = obDssatControllerInput.readFile(filePath);
+        ArrayList<LinkedHashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
 
         obDssatBatchFileOutput.writeFile("", expArr);
         File file = obDssatBatchFileOutput.getOutputFile();
