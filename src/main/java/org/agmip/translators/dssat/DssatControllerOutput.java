@@ -7,9 +7,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import static org.agmip.translators.dssat.DssatCommonInput.getSectionData;
 import static org.agmip.translators.dssat.DssatCommonOutput.revisePath;
 import static org.agmip.util.MapUtil.getObjectOr;
 
@@ -17,7 +21,7 @@ import static org.agmip.util.MapUtil.getObjectOr;
  *
  * @author Meng Zhang
  */
-public class DssatControllerOutput {
+public class DssatControllerOutput extends DssatCommonOutput {
 
     private DssatCommonOutput[] outputs = {
         new DssatXFileOutput(),
@@ -37,39 +41,61 @@ public class DssatControllerOutput {
      * ALL DSSAT Data Output method
      *
      * @param arg0 file output path
-     * @param results data holder object
+     * @param result data holder object
      *
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public void writeFiles(String arg0, ArrayList<LinkedHashMap> results) throws FileNotFoundException, IOException {
-        LinkedHashMap result;
+    private void writeMultipleExp(String arg0, Map result) throws FileNotFoundException, IOException {
+
         arg0 = revisePath(arg0);
         String exname;
         ArrayList<String> exnames = new ArrayList();
+        ArrayList<LinkedHashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
+        LinkedHashMap expData;
+        ArrayList<LinkedHashMap> soilArr = getObjectOr(result, "soils", new ArrayList());
+        ArrayList<LinkedHashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
 
         // Write files
-        for (int i = 0; i < results.size(); i++) {
-            result = results.get(i);
-            exname = getObjectOr(result, "exname", "Experiment_" + i);
-            writeFile(arg0 + exname, result);
+        for (int i = 0; i < expArr.size(); i++) {
+            expData = expArr.get(i);
+            expData.put("soil", getSectionData(soilArr, "soil_id", getObjectOr(expData, "soil_id", "")));
+            expData.put("weather", getSectionData(wthArr, "wst_id", getObjectOr(expData, "wst_id", "")));
+            exname = getObjectOr(expData, "exname", "Experiment_" + i);
+            writeSingleExp(arg0 + exname, expData);
             exnames.add(exname);
         }
 
-        // Write all batch files
-        DssatBatchFileOutput batchTran = new DssatBatchFileOutput();
-        batchTran.writeFile(arg0, results);
-        if (batchTran.getOutputFile() != null) {
-            files.add(batchTran.getOutputFile());
-        }
-        DssatRunFileOutput runTran = new DssatRunFileOutput();
-        runTran.writeFile(arg0, results);
-        if (runTran.getOutputFile() != null) {
-            files.add(runTran.getOutputFile());
+        // If experiment data is included
+        if (!expArr.isEmpty()) {
+            // Write all batch files
+            DssatBatchFileOutput batchTran = new DssatBatchFileOutput();
+            batchTran.writeFile(arg0, expArr);
+            if (batchTran.getOutputFile() != null) {
+                files.add(batchTran.getOutputFile());
+            }
+            DssatRunFileOutput runTran = new DssatRunFileOutput();
+            runTran.writeFile(arg0, expArr);
+            if (runTran.getOutputFile() != null) {
+                files.add(runTran.getOutputFile());
+            }
+        } // If only weather or soil data is included
+        else {
+            for (int i = 0; i < soilArr.size(); i++) {
+                LinkedHashMap tmp = new LinkedHashMap();
+                tmp.put("soil", soilArr.get(i));
+                writeSingleExp(arg0, tmp);
+            }
+            for (int i = 0; i < wthArr.size(); i++) {
+                LinkedHashMap tmp = new LinkedHashMap();
+                tmp.put("weather", wthArr.get(i));
+                writeSingleExp(arg0, tmp);
+            }
         }
 
         // compress all output files into one zip file
-        zipFile = new File(arg0 + "AGMIP_DSSAT.zip");
+        Calendar cal = Calendar.getInstance();
+        zipFile = new File(arg0 + "AGMIP_DSSAT_" + cal.getTimeInMillis() + ".zip");
         createZip(files);
 
         // Delete the remained folders
@@ -86,17 +112,28 @@ public class DssatControllerOutput {
      * @param arg0 file output path
      * @param result data holder object
      *
-     * @throws FileNotFoundException
-     * @throws IOException
      */
-    public void writeFiles(String arg0, LinkedHashMap result) throws FileNotFoundException, IOException {
+    public void writeFile(String arg0, Map result) {
 
-        // Write files
-        writeFile(arg0, result);
+        try {
+            if (getObjectOr(result, "experiments", new ArrayList()).isEmpty()
+                    && getObjectOr(result, "soils", new ArrayList()).isEmpty()
+                    && getObjectOr(result, "weathers", new ArrayList()).isEmpty()) {
+                // Write files
+                writeSingleExp(arg0, result);
 
-        // compress all output files into one zip file
-        zipFile = new File(revisePath(arg0) + getZipFileName());
-        createZip(files);
+                // compress all output files into one zip file
+                zipFile = new File(revisePath(arg0) + getZipFileName());
+
+                createZip(files);
+
+            } else {
+                writeMultipleExp(arg0, result);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -105,7 +142,7 @@ public class DssatControllerOutput {
      * @param arg0 file output path
      * @param result data holder object
      */
-    private void writeFile(String arg0, LinkedHashMap result) {
+    private void writeSingleExp(String arg0, Map result) {
         for (int i = 0; i < outputs.length; i++) {
             outputs[i].writeFile(arg0, result);
             if (outputs[i].getOutputFile() != null) {
@@ -114,9 +151,13 @@ public class DssatControllerOutput {
         }
     }
 
-    private void createZip(ArrayList<File> files, ArrayList<String> paths) throws FileNotFoundException, IOException {
-    }
-
+    /**
+     * Compress the files in one zip
+     *
+     * @param files The array for files which need to be zipped
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
     private void createZip(ArrayList<File> files) throws FileNotFoundException, IOException {
 
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile));

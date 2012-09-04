@@ -34,12 +34,12 @@ public class DssatOutputFileInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected ArrayList<LinkedHashMap> readFile(HashMap brMap) throws IOException {
+    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
 
-        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
-        ret.add(readSummary(brMap));
-        ret.addAll(readOverview(brMap));
-        ret.addAll(readSoilOrg(brMap));
+        LinkedHashMap ret = new LinkedHashMap();
+        ret.put("summary", readSummary(brMap));
+        ret.put("overview", readOverview(brMap));
+        ret.put("soilorg", readSoilOrg(brMap));
         return ret;
     }
 

@@ -34,74 +34,22 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
     /**
      * DSSAT Data Output method for Controller using
-     * 
-     * @param m  The holder for BufferReader objects for all files
+     *
+     * @param m The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected abstract ArrayList<LinkedHashMap> readFile(HashMap m) throws IOException;
+    protected abstract LinkedHashMap readFile(HashMap m) throws IOException;
 
     /**
      * DSSAT XFile Data input method, always return the first data object
-     * 
-     * @param arg0  file name
+     *
+     * @param arg0 file name
      * @return result data holder object
      */
     @Override
     public LinkedHashMap readFile(String arg0) {
 
-//        LinkedHashMap ret = new LinkedHashMap();
-//        String filePath = arg0;
-//
-//        try {
-//            // read file by file
-//            ret = readFile2(getBufferReader(filePath));
-//
-//        } catch (Exception e) {
-//            //System.out.println(e.getMessage());
-//            e.printStackTrace();
-//        }
-//
-//        return ret;
-        return readFileById(arg0, 0);  // TODO
-    }
-
-    /**
-     * DSSAT XFile Data input method, get the data object by array index
-     * 
-     * @param arg0  file name
-     * @return result data holder object
-     */
-    public LinkedHashMap readFileById(String arg0, int id) {
-
-        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
-        String filePath = arg0;
-
-        try {
-            // read file by file
-            ret = readFileAll(filePath);
-
-        } catch (Exception e) {
-            //System.out.println(e.getMessage());
-            e.printStackTrace();
-        }
-
-        // If read failed, return blank map
-        if (ret.isEmpty() || id >= ret.size() || id < 0) {
-            return new LinkedHashMap();
-        } else {
-            return ret.get(id);
-        }
-    }
-
-    /**
-     * DSSAT XFile Data input method, return whole array
-     * 
-     * @param arg0  file name
-     * @return result data holder object
-     */
-    public ArrayList<LinkedHashMap> readFileAll(String arg0) {
-
-        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
+        LinkedHashMap ret = new LinkedHashMap();
         String filePath = arg0;
 
         try {
@@ -117,12 +65,66 @@ public abstract class DssatCommonInput implements TranslatorInput {
         }
 
         return ret;
+//        return readFileById(arg0, 0);
     }
 
+//    /**
+//     * DSSAT XFile Data input method, get the data object by array index
+//     * 
+//     * @param arg0  file name
+//     * @return result data holder object
+//     */
+//    public LinkedHashMap readFileById(String arg0, int id) {
+//
+//        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
+//        String filePath = arg0;
+//
+//        try {
+//            // read file by file
+//            ret = readFileAll(filePath);
+//
+//        } catch (Exception e) {
+//            //System.out.println(e.getMessage());
+//            e.printStackTrace();
+//        }
+//
+//        // If read failed, return blank map
+//        if (ret.isEmpty() || id >= ret.size() || id < 0) {
+//            return new LinkedHashMap();
+//        } else {
+//            return ret.get(id);
+//        }
+//    }
+//
+//    /**
+//     * DSSAT XFile Data input method, return whole array
+//     * 
+//     * @param arg0  file name
+//     * @return result data holder object
+//     */
+//    public ArrayList<LinkedHashMap> readFileAll(String arg0) {
+//
+//        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
+//        String filePath = arg0;
+//
+//        try {
+//            // read file by file
+//            ret = readFile(getBufferReader(filePath));
+//
+//        } catch (FileNotFoundException fe) {
+//            System.out.println("File not found under following path : [" + filePath + "]!");
+//            return ret;
+//        } catch (Exception e) {
+//            //System.out.println(e.getMessage());
+//            e.printStackTrace();
+//        }
+//
+//        return ret;
+//    }
     /**
      * Set reading flgs for reading lines
-     * 
-     * @param line  the string of reading line
+     *
+     * @param line the string of reading line
      */
     protected void judgeContentType(String line) {
         // Section Title line
@@ -166,13 +168,14 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
     /**
      * Set reading flgs for title lines (the line marked with *)
-     * 
-     * @param line  the string of reading line
+     *
+     * @param line the string of reading line
      */
     protected abstract void setTitleFlgs(String line);
 
     /**
-     * Take the data str from input map and translate it from "yyddd" to "yyyymmdd"
+     * Take the data str from input map and translate it from "yyddd" to
+     * "yyyymmdd"
      *
      * @param m input map which might contain date value in it
      * @param id date string with format of "yyddd"
@@ -269,10 +272,12 @@ public abstract class DssatCommonInput implements TranslatorInput {
     }
 
     /**
-     * Divide the data in the line into a map (Default invalid value is null, which means not to be sore in the json)
+     * Divide the data in the line into a map (Default invalid value is null,
+     * which means not to be sore in the json)
      *
      * @param line The string of line read from data file
-     * @param formats The definition of length for each data field (String itemName : Integer length)
+     * @param formats The definition of length for each data field (String
+     * itemName : Integer length)
      * @return the map contains divided data with keys from original string
      */
     protected LinkedHashMap readLine(String line, LinkedHashMap<String, Integer> formats) {
@@ -284,8 +289,10 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * Divide the data in the line into a map
      *
      * @param line The string of line read from data file
-     * @param formats The definition of length for each data field (String itemName : Integer length)
-     * @param invalidValue  The text will replace the original reading when its value is invalid 
+     * @param formats The definition of length for each data field (String
+     * itemName : Integer length)
+     * @param invalidValue The text will replace the original reading when its
+     * value is invalid
      * @return the map contains divided data with keys from original string
      */
     protected LinkedHashMap readLine(String line, LinkedHashMap<String, Integer> formats, String invalidValue) {
@@ -342,6 +349,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
         LinkedHashMap mapW = new LinkedHashMap();
         LinkedHashMap mapS = new LinkedHashMap();
         LinkedHashMap mapC = new LinkedHashMap();
+        LinkedHashMap mapX = new LinkedHashMap();
+        LinkedHashMap mapA = new LinkedHashMap();
+        LinkedHashMap mapT = new LinkedHashMap();
         String[] tmp = filePath.split("[\\/]");
 
         // If input File is ZIP file
@@ -349,32 +359,38 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
             // Get experiment name
             ZipEntry entry;
+            ArrayList<String> exnames = new ArrayList();
             String exname = "";
             in = new ZipInputStream(new FileInputStream(filePath));
             while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
                     if (entry.getName().matches(".+\\.\\w{2}[Xx]")) {
                         exname = entry.getName().replaceAll("[Xx]$", "");
-                        break;
+                        exnames.add(exname);
+//                        break;
                     }
                 }
             }
-            
+
             // Read Files
             in = new ZipInputStream(new FileInputStream(filePath));
-            
+
             while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
-                    if (entry.getName().equalsIgnoreCase(exname + "X")) {
-                        result.put("X", getBuf(in, (int) entry.getSize()));
+                    
+                    if (exnames.contains(entry.getName().replaceAll("[Xx]$", ""))) {
+//                        result.put("X", getBuf(in, (int) entry.getSize()));
+                        mapX.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".WTH")) {
                         mapW.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".SOL")) {
                         mapS.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
-                    } else if (entry.getName().equalsIgnoreCase(exname + "A")) {
-                        result.put("A", getBuf(in, (int) entry.getSize()));
-                    } else if (entry.getName().equalsIgnoreCase(exname + "T")) {
-                        result.put("T", getBuf(in, (int) entry.getSize()));
+                    } else if (exnames.contains(entry.getName().replaceAll("[Aa]$", ""))) {
+//                        result.put("A", getBuf(in, (int) entry.getSize()));
+                        mapA.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
+                    } else if (exnames.contains(entry.getName().replaceAll("[Tt]$", ""))) {
+//                        result.put("T", getBuf(in, (int) entry.getSize()));
+                        mapT.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".OUT")) {
                         result.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
                     } else if (entry.getName().toUpperCase().endsWith(".CUL")) {
@@ -387,29 +403,34 @@ public abstract class DssatCommonInput implements TranslatorInput {
         } // If input File is not ZIP file
         else {
             in = new FileInputStream(filePath);
+            File f = new File(filePath);
             if (filePath.matches(".+\\.\\w{2}[Xx]")) {
-                result.put("X", new BufferedReader(new InputStreamReader(in)));
+                mapX.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
+//                result.put("X", new BufferedReader(new InputStreamReader(in)));
             } else if (filePath.toUpperCase().endsWith(".WTH")) {
-                mapW.put(filePath, new BufferedReader(new InputStreamReader(in)));
+                mapW.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
             } else if (filePath.toUpperCase().endsWith(".SOL")) {
-                mapS.put(filePath, new BufferedReader(new InputStreamReader(in)));
+                mapS.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
             } else if (filePath.matches(".+\\.\\w{2}[Aa]")) {
-                result.put("A", new BufferedReader(new InputStreamReader(in)));
+                mapA.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
+//                result.put("A", new BufferedReader(new InputStreamReader(in)));
             } else if (filePath.matches(".+\\.\\w{2}[Tt]")) {
-                result.put("T", new BufferedReader(new InputStreamReader(in)));
-            } else if (filePath.toUpperCase().endsWith(".OUT")) {
-                File f = new File(filePath);
+                mapT.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
+//                result.put("T", new BufferedReader(new InputStreamReader(in)));
+            } else if (f.getName().toUpperCase().endsWith(".OUT")) {
                 result.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
-            } else if (filePath.toUpperCase().endsWith(".CUL")) {
-                mapC.put(filePath, new BufferedReader(new InputStreamReader(in)));
+            } else if (f.getName().toUpperCase().endsWith(".CUL")) {
+                mapC.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
             } else if (filePath.toUpperCase().endsWith(".JSON")) {
-                File f = new File(filePath);
                 result.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
             }
         }
 
         result.put("W", mapW);
         result.put("S", mapS);
+        result.put("X", mapX);
+        result.put("A", mapA);
+        result.put("T", mapT);
         result.put("C", mapC);
         result.put("Z", tmp[tmp.length - 1]);
 
@@ -564,10 +585,10 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
     /**
      * Add the new item into array by having same key value
-     * 
-     * @param arr   the target array
-     * @param item  the input item which will be added into array
-     * @param key   the primary key item's name
+     *
+     * @param arr the target array
+     * @param item the input item which will be added into array
+     * @param key the primary key item's name
      */
     protected void addToArray(ArrayList arr, LinkedHashMap item, Object key) {
         LinkedHashMap elem;
@@ -603,26 +624,36 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
     /**
      * Get planting date value from XFile with related treatment number
-     * 
-     * @param m   the files content holder
+     *
+     * @param m the files content holder
      */
-    protected String getPdate(HashMap m, String trno) {
+    protected String getPdate(HashMap m, String trno, String fileName) {
 
         BufferedReader br;
-        char[] buf = null;
+        Object buf = null;
         String line;
         LinkedHashMap formats = new LinkedHashMap();
         String pl = null;
         String[] flgP = new String[3];
         DssatXFileInput xfile = new DssatXFileInput();
 
-        buf = (char[]) m.get("X");
+//        buf = (char[]) m.get("X");
+        HashMap mapX = (HashMap) m.get("X");
 
+        buf = mapX.get(fileName);
         if (buf == null) {
             return "";
+        } else if (buf instanceof char[]) {
+            br = new BufferedReader(new CharArrayReader((char[]) buf));
         } else {
-            br = new BufferedReader(new CharArrayReader(buf));
+            br = (BufferedReader) buf;
         }
+
+//        if (buf == null) {
+//            return "";
+//        } else {
+//            br = new BufferedReader(new CharArrayReader(buf));
+//        }
 
         try {
             while ((line = br.readLine()) != null) {
@@ -682,7 +713,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
             br.close();
         } catch (IOException ex) {
-//            Logger.getLogger(DssatCommonInput.class.getName()).log(Level.SEVERE, null, ex);
+            //            Logger.getLogger(DssatCommonInput.class.getName()).log(Level.SEVERE, null, ex);
             ex.printStackTrace();
         }
 
@@ -696,10 +727,10 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
     /**
      * Get the section data by given index value and key
-     * 
-     * @param secArr    Section data array
-     * @param key       index variable name
-     * @param value     index variable value
+     *
+     * @param secArr Section data array
+     * @param key index variable name
+     * @param value index variable value
      */
     public static LinkedHashMap getSectionData(ArrayList secArr, Object key, String value) {
 
@@ -718,14 +749,15 @@ public abstract class DssatCommonInput implements TranslatorInput {
     }
 
     /**
-     * Combine two layer data array into a new array by matching the pointed id, and only combine the pointed variables
-     * 
-     * @param toArr     the array which the data will be combined to
-     * @param fromArr   the array which the data will be combined from
-     * @param toKey     the index variable name of to array
-     * @param fromKey   the index variable name of from array
-     * @param copyKeys  the array of variable names which will be handled
-     * 
+     * Combine two layer data array into a new array by matching the pointed id,
+     * and only combine the pointed variables
+     *
+     * @param toArr the array which the data will be combined to
+     * @param fromArr the array which the data will be combined from
+     * @param toKey the index variable name of to array
+     * @param fromKey the index variable name of from array
+     * @param copyKeys the array of variable names which will be handled
+     *
      * @return the combined new array
      */
     public static ArrayList<LinkedHashMap> combinLayers(ArrayList<LinkedHashMap> toArr, ArrayList<LinkedHashMap> fromArr, String toKey, String fromKey, String[] copyKeys) {
@@ -805,10 +837,10 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
     /**
      * Get the array of key variables from original array
-     * 
-     * @param arr     the input array
-     * @param key     the key name
-     * 
+     *
+     * @param arr the input array
+     * @param key the key name
+     *
      * @return the array of key variable value
      */
     private static ArrayList<String> getLayerNumArray(ArrayList<LinkedHashMap> arr, String key) {
@@ -822,11 +854,11 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
     /**
      * copy items from one map to another map
-     * 
-     * @param to     the map which data will be copied to
-     * @param from   the map which data will be copied from
-     * @param copyKeys     the array of key name which will be copied
-     * 
+     *
+     * @param to the map which data will be copied to
+     * @param from the map which data will be copied from
+     * @param copyKeys the array of key name which will be copied
+     *
      */
     private static void copyItems(LinkedHashMap to, LinkedHashMap from, String[] copyKeys) {
         for (int i = 0; i < copyKeys.length; i++) {
@@ -836,8 +868,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
     /**
      * remove all the relation index for the input array
-     * 
-     * @param arr    The array of treatment data 
+     *
+     * @param arr The array of treatment data
      * @param idNames The array of id want be removed
      */
     public static void removeIndex(ArrayList arr, ArrayList idNames) {
@@ -856,8 +888,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
     /**
      * remove all the relation index for the input map
-     * 
-     * @param m    the array of treatment data 
+     *
+     * @param m the array of treatment data
      */
     public static void removeIndex(LinkedHashMap m, ArrayList idNames) {
 
@@ -876,40 +908,40 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
     /**
      * copy item from one map to another map
-     * 
-     * @param to     the map which data will be copied to
-     * @param from   the map which data will be copied from
-     * @param key    the key name which will be copied
-     * 
+     *
+     * @param to the map which data will be copied to
+     * @param from the map which data will be copied from
+     * @param key the key name which will be copied
+     *
      */
     public static void copyItem(LinkedHashMap to, LinkedHashMap from, String key) {
         copyItem(to, from, key, key, false);
     }
 
     /**
-     * copy item from one map to another map
-     * original data might be delete based on last boolean value
-     * 
-     * @param to     the map which data will be copied to
-     * @param from   the map which data will be copied from
-     * @param key    the key name which will be copied
-     * @param deleteFlg     decide if delete the original data(true for delete)
-     * 
+     * copy item from one map to another map original data might be delete based
+     * on last boolean value
+     *
+     * @param to the map which data will be copied to
+     * @param from the map which data will be copied from
+     * @param key the key name which will be copied
+     * @param deleteFlg decide if delete the original data(true for delete)
+     *
      */
     public static void copyItem(LinkedHashMap to, LinkedHashMap from, String key, boolean deleteFlg) {
         copyItem(to, from, key, key, deleteFlg);
     }
 
     /**
-     * copy item from one map to another map by using different key
-     * original data might be delete based on last boolean value
-     * 
-     * @param to     the map which data will be copied to
-     * @param from   the map which data will be copied from
-     * @param toKey      the key name used in target holder
-     * @param fromKey    the key name used in original holder
-     * @param deleteFlg     decide if delete the original data(true for delete)
-     * 
+     * copy item from one map to another map by using different key original
+     * data might be delete based on last boolean value
+     *
+     * @param to the map which data will be copied to
+     * @param from the map which data will be copied from
+     * @param toKey the key name used in target holder
+     * @param fromKey the key name used in original holder
+     * @param deleteFlg decide if delete the original data(true for delete)
+     *
      */
     public static void copyItem(LinkedHashMap to, LinkedHashMap from, String toKey, String fromKey, boolean deleteFlg) {
         if (from.get(fromKey) != null) {

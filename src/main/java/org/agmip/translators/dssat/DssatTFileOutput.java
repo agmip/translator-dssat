@@ -58,7 +58,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
             // Output Observation File
             // Titel Section
             sbData.append(String.format("*EXP.DATA (T): %1$-10s %2$s\r\n\r\n",
-                    getObjectOr(result, "exname", defValBlank),
+                    getExName(result),
                     getObjectOr(result, "local_name", defValBlank)));
 
             titleOutput = new LinkedHashMap();

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import org.agmip.util.JSONAdapter;
+import static org.agmip.util.MapUtil.getObjectOr;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,10 +33,10 @@ public class DssatCulFileTest {
     @Test
     public void test() throws IOException, Exception {
 
-        ArrayList<LinkedHashMap> result;
+        LinkedHashMap result;
 
         String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\APAN9304_PNX.zip";
-        result = obInput.readFileAll(filePath);
+        result = obInput.readFile(filePath);
 //        System.out.println(JSONAdapter.toJSON(result));
         File f = new File("outputCul.txt");
         BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
@@ -43,8 +44,9 @@ public class DssatCulFileTest {
         bo.close();
         f.delete();
 
-        result.get(0).put("exname", "APAN9304PN");
-        obOutput.writeFile("", result.get(0));
+        ArrayList<LinkedHashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
+        expArr.get(0).put("exname", "APAN9304PN");
+        obOutput.writeFile("", expArr.get(0));
         File file = obOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());

@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 
 /**
  * DSSAT AFile Data I/O API Class
- * 
+ *
  * @author Meng Zhang
  * @version 1.0
  */
@@ -19,9 +19,8 @@ public class DssatAFileInput extends DssatCommonInput {
     public String obvDataKey = "data";     // P.S. the key name might change
 
     /**
-     * Constructor with no parameters
-     * Set jsonKey as "observed"
-     * 
+     * Constructor with no parameters Set jsonKey as "observed"
+     *
      */
     public DssatAFileInput() {
         super();
@@ -30,50 +29,54 @@ public class DssatAFileInput extends DssatCommonInput {
 
     /**
      * DSSAT AFile Data input method for Controller using
-     * 
-     * @param brMap  The holder for BufferReader objects for all files
+     *
+     * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
     @Override
-    protected ArrayList<LinkedHashMap> readFile(HashMap brMap) throws IOException {
+    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
 
-        ArrayList<LinkedHashMap> ret = new ArrayList<LinkedHashMap>();
-        LinkedHashMap file = readObvData(brMap);
+        LinkedHashMap ret = new LinkedHashMap();
+        ArrayList<LinkedHashMap> expArr = new ArrayList<LinkedHashMap>();
+        LinkedHashMap<String, LinkedHashMap> files = readObvData(brMap);
 //        compressData(file);
-        ArrayList<LinkedHashMap> obvData = (ArrayList) file.get(obvDataKey);
-//        LinkedHashMap obv;
+        ArrayList<LinkedHashMap> obvData;
         LinkedHashMap expData;
 
-        for (int i = 0; i < obvData.size(); i++) {
-            expData = new LinkedHashMap();
-//            obv = new LinkedHashMap();
-            copyItem(expData, file, "exname");
-            copyItem(expData, file, "local_name");
-            expData.put(jsonKey, obvData.get(i));
-//            obv.put(obvFileKey, obvData.get(i));
-
-            ret.add(expData);
+        for (String exname : files.keySet()) {
+            obvData = (ArrayList) files.get(exname).get(obvDataKey);
+            for (int i = 0; i < obvData.size(); i++) {
+                expData = new LinkedHashMap();
+                copyItem(expData, files.get(exname), "exname");
+                copyItem(expData, files.get(exname), "local_name");
+                expData.put(jsonKey, obvData.get(i));
+                expArr.add(expData);
+            }
         }
 
         // remove index variables
         ArrayList idNames = new ArrayList();
         idNames.add("trno_a");
-        removeIndex(ret, idNames);
+        removeIndex(expArr, idNames);
+        ret.put("experiments", expArr);
 
         return ret;
     }
 
     /**
-     * DSSAT AFile Data input method for Controller using (return map will not be compressed)
-     * 
-     * @param brMap  The holder for BufferReader objects for all files
+     * DSSAT AFile Data input method for Controller using (return map will not
+     * be compressed)
+     *
+     * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
     protected LinkedHashMap readObvData(HashMap brMap) throws IOException {
 
+        LinkedHashMap files = new LinkedHashMap();
         LinkedHashMap file = new LinkedHashMap();
         String line;
-        BufferedReader brA;
+        HashMap mapA;
+        BufferedReader brA = null;
         Object buf;
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
@@ -81,93 +84,101 @@ public class DssatAFileInput extends DssatCommonInput {
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
         String pdate;
 
-        buf = brMap.get("A");
+        mapA = (HashMap) brMap.get("A");
 
         // If AFile File is no been found
-        if (buf == null) {
+        if (mapA.isEmpty()) {
             return file;
-        } else {
+        }
+
+        for (Object keyA : mapA.keySet()) {
+
+            buf = mapA.get(keyA);
+            String fileName = (String) keyA;
+            String exname = fileName.replaceAll("\\.", "").replaceAll("A$", "");
             if (buf instanceof char[]) {
                 brA = new BufferedReader(new CharArrayReader((char[]) buf));
             } else {
                 brA = (BufferedReader) buf;
             }
-        }
 
-//        ret.put(obvFileKey, file);
-//        file.put(obvDataKey, obvData);
-        while ((line = brA.readLine()) != null) {
+            file = new LinkedHashMap();
 
-            // Get content type of line
-            judgeContentType(line);
+            while ((line = brA.readLine()) != null) {
 
-            // Read Observed data
-            if (flg[2].equals("data")) {
+                // Get content type of line
+                judgeContentType(line);
 
-                // Read meta info
-                if (flg[0].equals("meta") && flg[1].equals("")) {
+                // Read Observed data
+                if (flg[2].equals("data")) {
 
-                    // Set variables' formats
-                    line = line.replaceAll(".*:", "").trim();
-                    formats.clear();
-                    formats.put("exname", 10);
-                    formats.put("local_name", line.length());
-                    // Read line and save into return holder
-                    file.putAll(readLine(line, formats));
+                    // Read meta info
+                    if (flg[0].equals("meta") && flg[1].equals("")) {
 
-                } // Read data info 
-                else {
-                    // Set variables' formats
-                    formats.clear();
-                    for (int i = 0; i < titles.size(); i++) {
-                        formats.put(titles.get(i), 6);
-                    }
-                    // Read line and save into return holder
-                    LinkedHashMap tmp = readLine(line, formats, "");
-                    pdate = getPdate(brMap, (String) tmp.get("trno_a"));
-                    for (int i = 0; i < titles.size(); i++) {
-                        String title = (String) titles.get(i);
-                        if (obvDataList.isDateType(title)) {
-                            translateDateStrForDOY(tmp, (String) title, pdate);
+                        // Set variables' formats
+                        line = line.replaceAll(".*:", "").trim();
+                        formats.clear();
+                        formats.put("null", 10);  // P.S. Since exname in top line is not reliable, read from file name
+                        formats.put("local_name", line.length());
+                        // Read line and save into return holder
+                        file.putAll(readLine(line, formats));
+                        file.put("exname", exname);
+
+                    } // Read data info 
+                    else {
+                        // Set variables' formats
+                        formats.clear();
+                        for (int i = 0; i < titles.size(); i++) {
+                            formats.put(titles.get(i), 6);
+                        }
+                        // Read line and save into return holder
+                        LinkedHashMap tmp = readLine(line, formats, "");
+                        pdate = getPdate(brMap, (String) tmp.get("trno_a"), fileName.replaceAll("A$", "X"));
+                        for (int i = 0; i < titles.size(); i++) {
+                            String title = (String) titles.get(i);
+                            if (obvDataList.isDateType(title)) {
+                                translateDateStrForDOY(tmp, (String) title, pdate);
 //                            String val = (String) tmp.get(title);
 //                            if (val != null && val.length() > 3) {
 //                                tmp.put(title, val.substring(val.length() - 3, val.length()));
 //                            }
+                            }
+                        }
+                        addToArray(obvData, tmp, "trno_a");
+                    }
+
+                } // Read Observed title
+                else if (flg[2].equals("title")) {
+
+                    titles = new ArrayList();
+                    line = line.replaceFirst("@", " ");
+                    for (int i = 0; i < line.length(); i += 6) {
+                        String titleStr = line.substring(i, Math.min(i + 6, line.length())).trim().toLowerCase();
+                        if (titleStr.equals("")) {
+                            titles.add("null" + i);
+                        } else if (titleStr.equals("trno")) {
+                            titles.add(titleStr + "_a");
+                        } else {
+                            titles.add(titleStr);
                         }
                     }
-                    addToArray(obvData, tmp, "trno_a");
+
+                } else {
                 }
-
-            } // Read Observed title
-            else if (flg[2].equals("title")) {
-
-                titles = new ArrayList();
-                line = line.replaceFirst("@", " ");
-                for (int i = 0; i < line.length(); i += 6) {
-                    String titleStr = line.substring(i, Math.min(i + 6, line.length())).trim().toLowerCase();
-                    if (titleStr.equals("")) {
-                        titles.add("null" + i);
-                    } else if (titleStr.equals("trno")) {
-                        titles.add(titleStr + "_a");
-                    } else {
-                        titles.add(titleStr);
-                    }
-                }
-
-            } else {
             }
+            file.put(obvDataKey, obvData);
+            files.put(exname, file);
         }
 
-        file.put(obvDataKey, obvData);
         brA.close();
 
-        return file;
+        return files;
     }
 
     /**
      * Set reading flags for title lines (marked with *)
-     * 
-     * @param line  the string of reading line
+     *
+     * @param line the string of reading line
      */
     @Override
     protected void setTitleFlgs(String line) {

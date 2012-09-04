@@ -65,7 +65,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
             // Output Observation File
             // Titel Section
             sbData.append(String.format("*EXP.DATA (A): %1$-10s %2$s\r\n\r\n",
-                    getObjectOr(result, "exname", defValBlank),
+                    getExName(result),
                     getObjectOr(result, "local_name", defValBlank)));
 
             // Check if which field is available
