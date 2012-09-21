@@ -546,6 +546,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 for (int idx = 0; idx < icArr.size(); idx++) {
 
                     secData = (LinkedHashMap) icArr.get(idx);
+                    translateTo2BitCrid(secData, "icpcr");
                     sbData.append("@C   PCR ICDAT  ICRT  ICND  ICRN  ICRE  ICWD ICRES ICREN ICREP ICRIP ICRID ICNAME\r\n");
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$s\r\n",
                             idx + 1, //getObjectOr(secData, "ic", defValI).toString(),
@@ -1109,12 +1110,22 @@ public class DssatXFileOutput extends DssatCommonOutput {
      * Try to translate 3-bit crid to 2-bit version stored in the map
      *
      * @param cuData the cultivar data record
+     * @param id    the field id for contain crop id info
      */
-    private void translateTo2BitCrid(LinkedHashMap cuData) {
-        String crid = getObjectOr(cuData, "crid", "");
+    private void translateTo2BitCrid(LinkedHashMap cuData, String id) {
+        String crid = getObjectOr(cuData, id, "");
         if (!crid.equals("")) {
             DssatCRIDHelper crids = new DssatCRIDHelper();
-            cuData.put("crid", crids.get2BitCrid(crid));
+            cuData.put(id, crids.get2BitCrid(crid));
         }
+    }
+
+    /**
+     * Try to translate 3-bit crid to 2-bit version stored in the map
+     *
+     * @param cuData the cultivar data record
+     */
+    private void translateTo2BitCrid(LinkedHashMap cuData) {
+        translateTo2BitCrid(cuData, "crid");
     }
 }
