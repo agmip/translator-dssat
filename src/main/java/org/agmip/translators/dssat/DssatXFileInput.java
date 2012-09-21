@@ -220,13 +220,13 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Set variables' formats
                         formats.clear();
                         formats.put("plta", 7);
-                        formats.put("pltrno", 6);
+                        formats.put("pltr#", 6);
                         formats.put("pltln", 6);
                         formats.put("pldr", 6);
                         formats.put("pltsp", 6);
                         formats.put("plot_layout", 6);
                         formats.put("pltha", 6);
-                        formats.put("plthno", 6);
+                        formats.put("plth#", 6);
                         formats.put("plthl", 6);
                         formats.put("plthm", 16);
                         // Read line and save into return holder
@@ -436,7 +436,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("icdat", 6);
                         formats.put("icrt", 6);
                         formats.put("icnd", 6);
-                        formats.put("icrzno", 6);
+                        formats.put("icrz#", 6);
                         formats.put("icrze", 6);
                         formats.put("icwt", 6);
                         formats.put("icrag", 6);
@@ -578,9 +578,9 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("omdat", 6);    // P.S. id do not match with the master list "omday"
                         formats.put("omcd", 6);
                         formats.put("omamt", 6);
-                        formats.put("omnpct", 6);
-                        formats.put("omppct", 6);
-                        formats.put("omkpct", 6);
+                        formats.put("omn%", 6);
+                        formats.put("omp%", 6);
+                        formats.put("omk%", 6);
                         formats.put("ominp", 6);
                         formats.put("omdep", 6);
                         formats.put("omacd", 6);
@@ -1015,7 +1015,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Date adjust based on realted treatment info (handling for DOY type value)
                         translateDateStrForDOY(omTmp, "omdat", pdate);
                         // add event data into array
-                        addEvent(evtArr, omTmp, "omdat", "organic_matter", seqid);
+                        addEvent(evtArr, omTmp, "omdat", "organic-materials", seqid); // P.S. change event name to organic-materials
                     }
                 }
 
