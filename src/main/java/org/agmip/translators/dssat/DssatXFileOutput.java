@@ -17,6 +17,7 @@ import static org.agmip.util.MapUtil.*;
  * @version 1.0
  */
 public class DssatXFileOutput extends DssatCommonOutput {
+    public static final DssatCRIDHelper crHelper = new DssatCRIDHelper();
 
     /**
      * DSSAT Experiment Data Output method
@@ -206,7 +207,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             flNum = setSecDataArr(flData, flArr);
 
             // Set initial condition info
-            icNum = setSecDataArr(getObjectOr(expData, "initial_condition", new LinkedHashMap()), icArr);
+            icNum = setSecDataArr(getObjectOr(expData, "initial_conditions", new LinkedHashMap()), icArr);
 
             // Set soil analysis info
 //            ArrayList<LinkedHashMap> icSubArr = getDataList(expData, "initial_condition", "soilLayer");

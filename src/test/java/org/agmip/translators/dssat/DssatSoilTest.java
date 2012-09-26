@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import org.agmip.util.JSONAdapter;
@@ -23,12 +24,15 @@ public class DssatSoilTest {
 
     DssatSoilOutput obDssatSoilOutput;
     DssatSoilInput obDssatSoilInput;
-
+    URL resource;
+    
     @Before
     public void setUp() throws Exception {
         obDssatSoilOutput = new DssatSoilOutput();
         obDssatSoilInput = new DssatSoilInput();
+        resource = this.getClass().getResource("/UFGA8202_MZX.zip");
     }
+    
 
     @Test
     public void test() throws IOException, Exception {
@@ -36,7 +40,7 @@ public class DssatSoilTest {
         LinkedHashMap result;
 
         String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\UFGA8202_MZX.zip";
-        result = obDssatSoilInput.readFile(filePath);
+        result = obDssatSoilInput.readFile(resource.getPath());
 //        System.out.println(JSONAdapter.toJSON(result));
         File f = new File("outputS.txt");
         BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));

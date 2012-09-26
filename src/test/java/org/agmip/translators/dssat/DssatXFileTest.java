@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import org.agmip.util.JSONAdapter;
@@ -23,11 +24,13 @@ public class DssatXFileTest {
 
     DssatXFileOutput obDssatXFileOutput;
     DssatXFileInput obDssatXFileInput;
+    URL resource;
 
     @Before
     public void setUp() throws Exception {
         obDssatXFileOutput = new DssatXFileOutput();
         obDssatXFileInput = new DssatXFileInput();
+        resource = this.getClass().getResource("/UFGA8202_MZX.ZIP");
     }
 
     @Test
@@ -36,7 +39,7 @@ public class DssatXFileTest {
         LinkedHashMap result;
 
         String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\UFGA8202_MZX.ZIP"; //UFGA9602.TMX";
-        result = obDssatXFileInput.readFile(filePath);
+        result = obDssatXFileInput.readFile(resource.getPath());
 //        System.out.println(JSONAdapter.toJSON(result));
         File f = new File("outputX.txt");
         BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));

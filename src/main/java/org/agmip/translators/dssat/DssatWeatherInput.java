@@ -33,14 +33,22 @@ public class DssatWeatherInput extends DssatCommonInput {
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
-        LinkedHashMap ret = new LinkedHashMap();
-        ArrayList<LinkedHashMap> files = readDailyData(brMap, new LinkedHashMap());
+    protected ArrayList<LinkedHashMap> readFiles(HashMap brMap) throws IOException {
+        LinkedHashMap metaData = new LinkedHashMap();
+        ArrayList<LinkedHashMap> files = readDailyData(brMap, metaData);
 //        compressData(files);
-        ret.put("weathers", files);
+        ArrayList<LinkedHashMap> ret = new ArrayList();
+        for (int i = 0; i < files.size(); i++) {
+            LinkedHashMap tmp = new LinkedHashMap();
+            tmp.put(jsonKey, files.get(i));
+            ret.add(tmp);
+        }
 
         return ret;
+    }
+    
+    protected LinkedHashMap readFile(HashMap unused) throws IOException {
+        return new LinkedHashMap();
     }
 
     /**
@@ -52,9 +60,9 @@ public class DssatWeatherInput extends DssatCommonInput {
     protected ArrayList<LinkedHashMap> readDailyData(HashMap brMap, LinkedHashMap ret) throws IOException {
 
         ArrayList<LinkedHashMap> files = new ArrayList();
-        ArrayList<LinkedHashMap> daily;
-        ArrayList titles;
-        LinkedHashMap fileTmp;
+        ArrayList<LinkedHashMap> daily = new ArrayList();
+        ArrayList titles = new ArrayList();
+        LinkedHashMap fileTmp = null;
         LinkedHashMap file = null;
         String line;
         BufferedReader brW = null;
@@ -124,7 +132,6 @@ public class DssatWeatherInput extends DssatCommonInput {
                         LinkedHashMap tmp = readLine(line, formats, "");
                         // translate date from yyddd format to yyyymmdd format
                         translateDateStr(tmp, "w_date");
-                        t2.setW_date(tmp.get("w_date"));
 
                         daily.add(tmp);
 
@@ -179,35 +186,5 @@ public class DssatWeatherInput extends DssatCommonInput {
         flg[0] = "weather";
         flg[1] = "";
         flg[2] = "data";
-    }
-
-    protected static void setDailyVars(Map m, DailyWeather w) {
-        Class noparams[] = {};
-        Class[] paramString = new Class[1];	
-        paramString[0] = String.class;
- 
-        Class[] paramInt = new Class[1];	
-        paramInt[0] = Integer.TYPE;
-
-        Class[] paramDbl = new Class[1];
-        paramDbl[0] = Double.TYPE;
-
-        Class cls = w.getClass();
-        for(Map.Entry entry : m.entrySet()) {
-            String key = entry.getKey();
-            String method = key.substring(0,1).toUpperCase()+method.substring(1);
-            Method getter = cls.getDeclaredMethod("get"+method, noparams);
-            String type = getter.getReturnType().getName();
-            if ( type.equals("Integer") ) {
-                Method setter = cls.getDeclaredMethod("set"+method, paramInt);
-                setter.invoke(w, Integer.parseInt(entry.getValue()));
-            } else if ( type.equals("Double") ) {
-                Method setter = cls.getDeclaredMethod("set"+method, paramDbl);
-                setter.invoke(w, Double.parseDouble(entry.getValue()));
-            } else {
-                Method setter = cls.getDeclaredMethod("set"+method, paramString);
-                setter.invoke(w, entry.getValue());
-            }
-        }
     }
 }
