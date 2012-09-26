@@ -124,13 +124,13 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 sbGenData.append("@ PAREA  PRNO  PLEN  PLDR  PLSP  PLAY HAREA  HRNO  HLEN  HARM.........\r\n");
                 sbGenData.append(String.format(" %1$6s %2$5s %3$5s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$5s %10$-15s\r\n",
                         formatNumStr(6, expData, "plta", defValR),
-                        formatNumStr(5, expData, "pltrno", defValI),
+                        formatNumStr(5, expData, "pltr#", defValI),
                         formatNumStr(5, expData, "pltln", defValR),
                         formatNumStr(5, expData, "pldr", defValI),
                         formatNumStr(5, expData, "pltsp", defValI),
                         getObjectOr(expData, "plot_layout", defValC).toString(),
                         formatNumStr(5, expData, "pltha", defValR),
-                        formatNumStr(5, expData, "plthno", defValI),
+                        formatNumStr(5, expData, "plth#", defValI),
                         formatNumStr(5, expData, "plthl", defValR),
                         getObjectOr(expData, "plthm", defValC).toString()));
             }
@@ -336,7 +336,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         else if (getValueOr(evtData, "event", "").equals("fertilizer")) {
                             mfSubArr.add(evtData);
                         } // organic_matter event
-                        else if (getValueOr(evtData, "event", "").equals("organic_matter")) {
+                        else if (getValueOr(evtData, "event", "").equals("organic-materials")) {   // P.S. change event name to organic-materials
                             mrSubArr.add(evtData);
                         } // chemical event
                         else if (getValueOr(evtData, "event", "").equals("chemical")) {
@@ -410,26 +410,26 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 for (int idx = 0; idx < cuArr.size(); idx++) {
                     secData = (LinkedHashMap) cuArr.get(idx);
-                    String cul_id = defValC;
+//                    String cul_id = defValC;
                     String crid = getObjectOr(secData, "crid", "");
                     // Checl if necessary data is missing
                     if (crid.equals("")) {
                         sbError.append("! Warning: Incompleted record because missing data : [crid]\r\n");
-                    } else {
-                        // Set cultivar id a default value deponds on the crop id
-                        if (crid.equals("MZ")) {
-                            cul_id = "990002";
-                        } else {
-                            cul_id = "999999";
-                        }
-                    }
-                    if (getObjectOr(secData, "cul_id", "").equals("")) {
-                        sbError.append("! Warning: Incompleted record because missing data : [cul_id], and will use default value '").append(cul_id).append("'\r\n");
+//                    } else {
+//                        // Set cultivar id a default value deponds on the crop id
+//                        if (crid.equals("MZ")) {
+//                            cul_id = "990002";
+//                        } else {
+//                            cul_id = "999999";
+//                        }
+//                    }
+//                    if (getObjectOr(secData, "cul_id", "").equals("")) {
+//                        sbError.append("! Warning: Incompleted record because missing data : [cul_id], and will use default value '").append(cul_id).append("'\r\n");
                     }
                     sbData.append(String.format("%1$2s %2$-2s %3$-6s %4$s\r\n",
                             idx + 1, //getObjectOr(secData, "ge", defValI).toString(),
                             getObjectOr(secData, "crid", defValBlank).toString(), // P.S. if missing, default value use blank string
-                            getObjectOr(secData, "cul_id", cul_id).toString(), // P.S. Set default value which is deponds on crid
+                            getObjectOr(secData, "cul_id", defValC).toString(), // P.S. Set default value which is deponds on crid(Cancelled)
                             getObjectOr(secData, "cul_name", defValC).toString()));
 
                     if (!getObjectOr(secData, "rm", "").equals("") || !getObjectOr(secData, "cul_notes", "").equals("")) {
@@ -546,6 +546,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 for (int idx = 0; idx < icArr.size(); idx++) {
 
                     secData = (LinkedHashMap) icArr.get(idx);
+                    translateTo2BitCrid(secData, "icpcr");
                     sbData.append("@C   PCR ICDAT  ICRT  ICND  ICRN  ICRE  ICWD ICRES ICREN ICREP ICRIP ICRID ICNAME\r\n");
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$s\r\n",
                             idx + 1, //getObjectOr(secData, "ic", defValI).toString(),
@@ -553,7 +554,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             formatDateStr(getObjectOr(secData, "icdat", getPdate(result)).toString()),
                             formatNumStr(5, secData, "icrt", defValR),
                             formatNumStr(5, secData, "icnd", defValR),
-                            formatNumStr(5, secData, "icrzno", defValR),
+                            formatNumStr(5, secData, "icrz#", defValR),
                             formatNumStr(5, secData, "icrze", defValR),
                             formatNumStr(5, secData, "icwt", defValR),
                             formatNumStr(5, secData, "icrag", defValR),
@@ -601,26 +602,26 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     if (getObjectOr(secData, "plrs", "").equals("")) {
                         sbError.append("! Warning: Incompleted record because missing data : [plrs]\r\n");
                     }
-                    if (getObjectOr(secData, "plma", "").equals("")) {
-                        sbError.append("! Warning: missing data : [plma], and will automatically use default value 'S'\r\n");
-                    }
-                    if (getObjectOr(secData, "plds", "").equals("")) {
-                        sbError.append("! Warning: missing data : [plds], and will automatically use default value 'R'\r\n");
-                    }
-                    if (getObjectOr(secData, "pldp", "").equals("")) {
-                        sbError.append("! Warning: missing data : [pldp], and will automatically use default value '7'\r\n");
-                    }
+//                    if (getObjectOr(secData, "plma", "").equals("")) {
+//                        sbError.append("! Warning: missing data : [plma], and will automatically use default value 'S'\r\n");
+//                    }
+//                    if (getObjectOr(secData, "plds", "").equals("")) {
+//                        sbError.append("! Warning: missing data : [plds], and will automatically use default value 'R'\r\n");
+//                    }
+//                    if (getObjectOr(secData, "pldp", "").equals("")) {
+//                        sbError.append("! Warning: missing data : [pldp], and will automatically use default value '7'\r\n");
+//                    }
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s                        %16$s\r\n",
                             idx + 1, //getObjectOr(data, "pl", defValI).toString(),
                             formatDateStr(getObjectOr(secData, "date", defValD).toString()),
                             formatDateStr(getObjectOr(secData, "pldae", defValD).toString()),
                             formatNumStr(5, secData, "plpop", getObjectOr(secData, "plpoe", defValR)),
                             formatNumStr(5, secData, "plpoe", getObjectOr(secData, "plpop", defValR)),
-                            getObjectOr(secData, "plma", "S").toString(), // P.S. Set default value as "S"
-                            getObjectOr(secData, "plds", "R").toString(), // P.S. Set default value as "R"
+                            getObjectOr(secData, "plma", defValC).toString(), // P.S. Set default value as "S"(Cancelled)
+                            getObjectOr(secData, "plds", defValC).toString(), // P.S. Set default value as "R"(Cancelled)
                             formatNumStr(5, secData, "plrs", defValR),
                             formatNumStr(5, secData, "plrd", defValR),
-                            formatNumStr(5, secData, "pldp", "7"), // P.S. Set default value as "7"
+                            formatNumStr(5, secData, "pldp", defValR), // P.S. Set default value as "7"(Cancelled)
                             formatNumStr(5, secData, "plmwt", defValR),
                             formatNumStr(5, secData, "page", defValR),
                             formatNumStr(5, secData, "penv", defValR),
@@ -678,49 +679,49 @@ public class DssatXFileOutput extends DssatCommonOutput {
             if (!mfArr.isEmpty()) {
                 sbData.append("*FERTILIZERS (INORGANIC)\r\n");
                 sbData.append("@F FDATE  FMCD  FACD  FDEP  FAMN  FAMP  FAMK  FAMC  FAMO  FOCD FERNAME\r\n");
-                String fen_tot = getObjectOr(result, "fen_tot", defValR);
-                String fep_tot = getObjectOr(result, "fep_tot", defValR);
-                String fek_tot = getObjectOr(result, "fek_tot", defValR);
-                String pdate = getPdate(result);
-                if (pdate.equals("")) {
-                    pdate = defValD;
-                }
+//                String fen_tot = getObjectOr(result, "fen_tot", defValR);
+//                String fep_tot = getObjectOr(result, "fep_tot", defValR);
+//                String fek_tot = getObjectOr(result, "fek_tot", defValR);
+//                String pdate = getPdate(result);
+//                if (pdate.equals("")) {
+//                    pdate = defValD;
+//                }
 
                 for (int idx = 0; idx < mfArr.size(); idx++) {
                     secDataArr = (ArrayList) mfArr.get(idx);
 
                     for (int i = 0; i < secDataArr.size(); i++) {
                         secData = (LinkedHashMap) secDataArr.get(i);
-                        if (getObjectOr(secData, "fdate", "").equals("")) {
-                            sbError.append("! Warning: missing data : [fdate], and will automatically use planting value '").append(pdate).append("'\r\n");
-                        }
-                        if (getObjectOr(secData, "fecd", "").equals("")) {
-                            sbError.append("! Warning: missing data : [fecd], and will automatically use default value 'FE001'\r\n");
-                        }
-                        if (getObjectOr(secData, "feacd", "").equals("")) {
-                            sbError.append("! Warning: missing data : [feacd], and will automatically use default value 'AP002'\r\n");
-                        }
-                        if (getObjectOr(secData, "fedep", "").equals("")) {
-                            sbError.append("! Warning: missing data : [fedep], and will automatically use default value '5'\r\n");
-                        }
-                        if (getObjectOr(secData, "feamn", "").equals("")) {
-                            sbError.append("! Warning: missing data : [feamn], and will automatically use the value of FEN_TOT, '").append(fen_tot).append("'\r\n");
-                        }
-                        if (getObjectOr(secData, "feamp", "").equals("")) {
-                            sbError.append("! Warning: missing data : [feamp], and will automatically use the value of FEP_TOT, '").append(fep_tot).append("'\r\n");
-                        }
-                        if (getObjectOr(secData, "feamk", "").equals("")) {
-                            sbError.append("! Warning: missing data : [feamk], and will automatically use the value of FEK_TOT, '").append(fek_tot).append("'\r\n");
-                        }
+//                        if (getObjectOr(secData, "fdate", "").equals("")) {
+//                            sbError.append("! Warning: missing data : [fdate], and will automatically use planting value '").append(pdate).append("'\r\n");
+//                        }
+//                        if (getObjectOr(secData, "fecd", "").equals("")) {
+//                            sbError.append("! Warning: missing data : [fecd], and will automatically use default value 'FE001'\r\n");
+//                        }
+//                        if (getObjectOr(secData, "feacd", "").equals("")) {
+//                            sbError.append("! Warning: missing data : [feacd], and will automatically use default value 'AP002'\r\n");
+//                        }
+//                        if (getObjectOr(secData, "fedep", "").equals("")) {
+//                            sbError.append("! Warning: missing data : [fedep], and will automatically use default value '10'\r\n");
+//                        }
+//                        if (getObjectOr(secData, "feamn", "").equals("")) {
+//                            sbError.append("! Warning: missing data : [feamn], and will automatically use the value of FEN_TOT, '").append(fen_tot).append("'\r\n");
+//                        }
+//                        if (getObjectOr(secData, "feamp", "").equals("")) {
+//                            sbError.append("! Warning: missing data : [feamp], and will automatically use the value of FEP_TOT, '").append(fep_tot).append("'\r\n");
+//                        }
+//                        if (getObjectOr(secData, "feamk", "").equals("")) {
+//                            sbError.append("! Warning: missing data : [feamk], and will automatically use the value of FEK_TOT, '").append(fek_tot).append("'\r\n");
+//                        }
                         sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$s\r\n",
                                 idx + 1, //getObjectOr(data, "fe", defValI).toString(),
-                                formatDateStr(getObjectOr(secData, "date", pdate).toString()), // P.S. fdate -> date
-                                getObjectOr(secData, "fecd", "FE001").toString(), // P.S. Set default value as "FE005"
-                                getObjectOr(secData, "feacd", "AP002").toString(),
-                                formatNumStr(5, secData, "fedep", "10"), // P.S. Set default value as "5"
-                                formatNumStr(5, secData, "feamn", fen_tot), // P.S. Set default value to use the value of FEN_TOT in meta data
-                                formatNumStr(5, secData, "feamp", fep_tot), // P.S. Set default value to use the value of FEP_TOT in meta data
-                                formatNumStr(5, secData, "feamk", fek_tot), // P.S. Set default value to use the value of FEK_TOT in meta data
+                                formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. fdate -> date
+                                getObjectOr(secData, "fecd", defValC).toString(), // P.S. Set default value as "FE005"(Cancelled)
+                                getObjectOr(secData, "feacd", defValC).toString(), // P.S. Set default value as "AP002"(Cancelled)
+                                formatNumStr(5, secData, "fedep", defValR), // P.S. Set default value as "10"(Cancelled)
+                                formatNumStr(5, secData, "feamn", defValR), // P.S. Set default value to use the value of FEN_TOT in meta data(Cancelled)
+                                formatNumStr(5, secData, "feamp", defValR), // P.S. Set default value to use the value of FEP_TOT in meta data(Cancelled)
+                                formatNumStr(5, secData, "feamk", defValR), // P.S. Set default value to use the value of FEK_TOT in meta data(Cancelled)
                                 formatNumStr(5, secData, "feamc", defValR),
                                 formatNumStr(5, secData, "feamo", defValR),
                                 getObjectOr(secData, "feocd", defValC).toString(),
@@ -746,9 +747,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                 formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. omdat -> date
                                 getObjectOr(secData, "omcd", defValC).toString(),
                                 formatNumStr(5, secData, "omamt", defValR),
-                                formatNumStr(5, secData, "omnpct", defValR),
-                                formatNumStr(5, secData, "omppct", defValR),
-                                formatNumStr(5, secData, "omkpct", defValR),
+                                formatNumStr(5, secData, "omn%", defValR),
+                                formatNumStr(5, secData, "omp%", defValR),
+                                formatNumStr(5, secData, "omk%", defValR),
                                 formatNumStr(5, secData, "ominp", defValR),
                                 formatNumStr(5, secData, "omdep", defValR),
                                 formatNumStr(5, secData, "omacd", defValR),
@@ -1066,7 +1067,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
      */
     private boolean isPlotInfoExist(Map expData) {
 
-        String[] plotIds = {"plta", "pltrno", "pltln", "pldr", "pltsp", "plot_layout", "pltha", "plthno", "plthl", "plthm"};
+        String[] plotIds = {"plta", "pltr#", "pltln", "pldr", "pltsp", "plot_layout", "pltha", "plth#", "plthl", "plthm"};
         for (int i = 0; i < plotIds.length; i++) {
             if (!getValueOr(expData, plotIds[i], "").equals("")) {
                 return true;
@@ -1109,12 +1110,22 @@ public class DssatXFileOutput extends DssatCommonOutput {
      * Try to translate 3-bit crid to 2-bit version stored in the map
      *
      * @param cuData the cultivar data record
+     * @param id    the field id for contain crop id info
      */
-    private void translateTo2BitCrid(LinkedHashMap cuData) {
-        String crid = getObjectOr(cuData, "crid", "");
+    private void translateTo2BitCrid(LinkedHashMap cuData, String id) {
+        String crid = getObjectOr(cuData, id, "");
         if (!crid.equals("")) {
             DssatCRIDHelper crids = new DssatCRIDHelper();
-            cuData.put("crid", crids.get2BitCrid(crid));
+            cuData.put(id, crids.get2BitCrid(crid));
         }
+    }
+
+    /**
+     * Try to translate 3-bit crid to 2-bit version stored in the map
+     *
+     * @param cuData the cultivar data record
+     */
+    private void translateTo2BitCrid(LinkedHashMap cuData) {
+        translateTo2BitCrid(cuData, "crid");
     }
 }
