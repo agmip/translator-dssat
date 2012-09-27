@@ -160,7 +160,7 @@ public class DssatControllerInput implements TranslatorInput {
             if (!getValueOr(expData, "trno", "0").equals("0")) {
                 LinkedHashMap tmp = getSectionData(obvTArr, "trno_t", expData.get("trno").toString());
                 if (tmp != null) {
-                    obv.put("time_series", tmp.get(obvTReader.obvDataKey));
+                    obv.put("timeSeries", tmp.get(obvTReader.obvDataKey));
                 }
             }
 

@@ -2,6 +2,7 @@ package org.agmip.translators.dssat;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import static org.agmip.util.MapUtil.*;
@@ -20,19 +21,20 @@ public class DssatBatchFileTest {
 
     DssatControllerInput obDssatControllerInput;
     DssatBatchFileOutput obDssatBatchFileOutput;
+    URL resource;
 
     @Before
     public void setUp() throws Exception {
         obDssatControllerInput = new DssatControllerInput();
         obDssatBatchFileOutput = new DssatBatchFileOutput();
+        resource = this.getClass().getResource("/UFGA8201_MZX.zip");
     }
 
     @Test
     public void test() throws IOException, Exception {
         LinkedHashMap result;
 
-        String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\UFGA8201_MZX_2.ZIP";
-        result = obDssatControllerInput.readFile(filePath);
+        result = obDssatControllerInput.readFile(resource.getPath());
         ArrayList<LinkedHashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
 
         obDssatBatchFileOutput.writeFile("", expArr);

@@ -33,14 +33,22 @@ public class DssatWeatherInput extends DssatCommonInput {
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
-        LinkedHashMap ret = new LinkedHashMap();
-        ArrayList<LinkedHashMap> files = readDailyData(brMap, new LinkedHashMap());
+    protected ArrayList<LinkedHashMap> readFiles(HashMap brMap) throws IOException {
+        LinkedHashMap metaData = new LinkedHashMap();
+        ArrayList<LinkedHashMap> files = readDailyData(brMap, metaData);
 //        compressData(files);
-        ret.put("weathers", files);
+        ArrayList<LinkedHashMap> ret = new ArrayList();
+        for (int i = 0; i < files.size(); i++) {
+            LinkedHashMap tmp = new LinkedHashMap();
+            tmp.put(jsonKey, files.get(i));
+            ret.add(tmp);
+        }
 
         return ret;
+    }
+    
+    protected LinkedHashMap readFile(HashMap unused) throws IOException {
+        return new LinkedHashMap();
     }
 
     /**
@@ -52,9 +60,9 @@ public class DssatWeatherInput extends DssatCommonInput {
     protected ArrayList<LinkedHashMap> readDailyData(HashMap brMap, LinkedHashMap ret) throws IOException {
 
         ArrayList<LinkedHashMap> files = new ArrayList();
-        ArrayList<LinkedHashMap> daily;
-        ArrayList titles;
-        LinkedHashMap fileTmp;
+        ArrayList<LinkedHashMap> daily = new ArrayList();
+        ArrayList titles = new ArrayList();
+        LinkedHashMap fileTmp = null;
         LinkedHashMap file = null;
         String line;
         BufferedReader brW = null;
@@ -124,6 +132,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                         LinkedHashMap tmp = readLine(line, formats, "");
                         // translate date from yyddd format to yyyymmdd format
                         translateDateStr(tmp, "w_date");
+
                         daily.add(tmp);
 
                     } else {

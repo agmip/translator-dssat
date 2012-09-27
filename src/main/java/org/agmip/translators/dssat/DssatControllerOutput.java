@@ -15,7 +15,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import static org.agmip.translators.dssat.DssatCommonInput.getSectionData;
 import static org.agmip.translators.dssat.DssatCommonOutput.revisePath;
-import static org.agmip.util.MapUtil.getObjectOr;
+import static org.agmip.util.MapUtil.*;
 
 /**
  *
@@ -66,7 +66,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
             wth_id = getObjectOr(expData, "wst_id", "");
             expData.put("soil", getSectionData(soilArr, "soil_id", soil_id));
             expData.put("weather", getSectionData(wthArr, "wst_id", wth_id));
-            exname = getObjectOr(expData, "exname", "Experiment_" + i);
+            exname = getValueOr(expData, "exname", "Experiment_" + i);
             writeSingleExp(arg0 + exname, expData, outputs);
             swFiles.put(exname + "_S", writeSWFile(arg0 + "SOIL", expData, new DssatSoilOutput()));
             swFiles.put(exname + "_W", writeSWFile(arg0 + "WEATHER", expData, new DssatWeatherOutput()));

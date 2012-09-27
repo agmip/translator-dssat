@@ -16,7 +16,7 @@ import static org.agmip.util.MapUtil.*;
  */
 public class DssatTFileInput extends DssatCommonInput {
 
-    public String obvFileKey = "time_series";  // P.S. the key name might change
+    public String obvFileKey = "timeSeries";  // P.S. the key name might change
     public String obvDataKey = "data";  // P.S. the key name might change
 
     /**

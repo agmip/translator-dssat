@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import org.agmip.util.JSONAdapter;
@@ -23,11 +24,14 @@ public class DssatCulFileTest {
 
     DssatCulFileOutput obOutput;
     DssatCulFileInput obInput;
+    URL resource;
 
     @Before
     public void setUp() throws Exception {
         obOutput = new DssatCulFileOutput();
         obInput = new DssatCulFileInput();
+        resource = this.getClass().getResource("/APAN9304_PNX.zip");
+        
     }
 
     @Test
@@ -36,7 +40,7 @@ public class DssatCulFileTest {
         LinkedHashMap result;
 
         String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\APAN9304_PNX.zip";
-        result = obInput.readFile(filePath);
+        result = obInput.readFile(resource.getPath());
 //        System.out.println(JSONAdapter.toJSON(result));
         File f = new File("outputCul.txt");
         BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));

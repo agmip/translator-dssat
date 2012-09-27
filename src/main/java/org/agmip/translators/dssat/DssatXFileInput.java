@@ -956,7 +956,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (!getObjectOr(sqData, "ic", "0").equals("0")) {
                     LinkedHashMap icTmpArr = (LinkedHashMap) getSectionDataObj(icArr, "ic", sqData.get("ic").toString());
                     if (!icTmpArr.isEmpty()) {
-                        trData.put("initial_condition", icTmpArr);
+                        trData.put("initial_conditions", icTmpArr);
                     }
                 }
 
@@ -1301,7 +1301,7 @@ public class DssatXFileInput extends DssatCommonInput {
         expData.put(jsonKey, mgnData);
 
         // Set Initial Condition data block for this treatment
-        copyItem(expData, mgnData, "initial_condition", true);
+        copyItem(expData, mgnData, "initial_conditions", true);
 
         // Set DSSAT specific data blocks
         // dssat_sequence

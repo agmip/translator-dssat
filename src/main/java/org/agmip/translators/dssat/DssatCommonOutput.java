@@ -333,6 +333,10 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      */
     protected String getWthFileName(LinkedHashMap wthFile) {
         ArrayList wthRecords = (ArrayList) getObjectOr(wthFile, "dailyWeather", new ArrayList());
+        String agmipFileHack = getValueOr(wthFile, "wst_name", "");
+        if (agmipFileHack.length() == 8) {
+            return agmipFileHack;
+        }
         String ret = getObjectOr(wthFile, "wst_id", "").toString();
         if (ret.equals("")) {
             ret = "AGMP";
