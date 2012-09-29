@@ -21,7 +21,7 @@ import org.junit.Test;
  * @author Meng Zhang
  */
 
-/*public class DssatWeatherTest {
+public class DssatWeatherTest {
 
     DssatWeatherOutput obDssatWeatherOutput;
     DssatWeatherInput obDssatWeatherInput;
@@ -60,4 +60,3 @@ import org.junit.Test;
         }
     }
 }
-*/

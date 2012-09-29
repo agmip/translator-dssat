@@ -50,7 +50,7 @@ public class DssatAcmoCsvTranslatorTest {
 //        result.add(JSONAdapter.fromJSON("{\"eid\":\"56f94b40d0\", \"clim_id\":\"0XXX\", \"clim_rep\":\"1\", \"rap_id\":\"1\", \"region\":\"NA\", \"institution\":\"UF\", \"wsta_id\":\"UFGA8201\", \"soil_id\":\"IBMZ910014\", \"fl_lat\":\"29.630\", \"fl_long\":\"-82.370\", \"crid\":\"MAZ\", \"cul_id\":\"IB0035\", \"irop\":\"IR001\", \"ti_#\":\"0\", \"tiimp\":\"\", \"exname\":\"UFGA8201MZ_1\"}"));
 //        result.add(JSONAdapter.fromJSON("{\"eid\":\"873488b13f\", \"clim_id\":\"0XXX\", \"clim_rep\":\"1\", \"rap_id\":\"1\", \"region\":\"NA\", \"institution\":\"UF\", \"wsta_id\":\"UFGA8201\", \"soil_id\":\"IBMZ910014\", \"fl_lat\":\"29.630\", \"fl_long\":\"-82.370\", \"crid\":\"MAZ\", \"cul_id\":\"IB0035\", \"irop\":\"\", \"ti_#\":\"0\", \"tiimp\":\"\", \"exname\":\"UFGA8202MZ_1\"}"));
 //        result.add(JSONAdapter.fromJSON("{\"eid\":\"11f2d3cc43\", \"clim_id\":\"0XXX\", \"clim_rep\":\"1\", \"rap_id\":\"1\", \"region\":\"NA\", \"institution\":\"SW\", \"wsta_id\":\"SWSW7501\", \"soil_id\":\"IBWH980019\", \"fl_lat\":\"\", \"fl_long\":\"\", \"crid\":\"WHT\", \"cul_id\":\"IB1500\", \"irop\":\"\", \"ti_#\":\"0\", \"tiimp\":\"\", \"exname\":\"SWSW7501WH_1\"}"));
-        obDssatAcmoCsvTanslator.writeCsvFile("", "");
+        obDssatAcmoCsvTanslator.writeCsvFile("", resource.getPath());
         File file = obDssatAcmoCsvTanslator.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
