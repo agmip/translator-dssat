@@ -27,6 +27,10 @@ public class DssatControllerTest {
     DssatControllerInput obDssatControllerInput;
     URL resource;
     String fileName = "UFGA8202_MZX.ZIP";
+            // "UFGA8201_MZX_experiment.ZIP";
+            // "UFGA8201_MZX_soil.ZIP";
+            // "UFGA8201_MZX_weather.ZIP";
+            // "UFGA8201_MZX.ZIP";
 
     @Before
     public void setUp() throws Exception {
@@ -74,7 +78,7 @@ public class DssatControllerTest {
             // Output json for reading
             bo.write(JSONAdapter.toJSON(result).getBytes());
             bo.close();
-            f.delete();
+//            f.delete();
 
             obDssatControllerOutput = new DssatControllerOutput();
             obDssatControllerOutput.writeFile("", result);
@@ -82,7 +86,7 @@ public class DssatControllerTest {
             if (file != null) {
                 assertTrue(file.exists());
                 assertTrue(file.getName().toUpperCase().matches("^AGMIP_DSSAT_\\d+\\.ZIP$"));
-                assertTrue(file.delete());
+//                assertTrue(file.delete());
             }
 //        }
 
