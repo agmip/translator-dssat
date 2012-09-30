@@ -33,10 +33,7 @@ public class DssatAcmoCsvTranslatorTest {
 
     @Test
     public void test() throws IOException, Exception {
-        LinkedHashMap result;
-
-        
-        result = obDssatOutputFileInput.readFile(resource.getPath());
+        LinkedHashMap result = obDssatOutputFileInput.readFile(resource.getPath());
 //        System.out.println(JSONAdapter.toJSON(result));
         File f = new File("outputOut.txt");
         BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
