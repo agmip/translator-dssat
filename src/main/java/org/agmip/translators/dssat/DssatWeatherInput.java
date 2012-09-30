@@ -33,22 +33,14 @@ public class DssatWeatherInput extends DssatCommonInput {
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected ArrayList<LinkedHashMap> readFiles(HashMap brMap) throws IOException {
-        LinkedHashMap metaData = new LinkedHashMap();
-        ArrayList<LinkedHashMap> files = readDailyData(brMap, metaData);
+    @Override
+    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
+        LinkedHashMap ret = new LinkedHashMap();
+        ArrayList<LinkedHashMap> files = readDailyData(brMap, new LinkedHashMap());
 //        compressData(files);
-        ArrayList<LinkedHashMap> ret = new ArrayList();
-        for (int i = 0; i < files.size(); i++) {
-            LinkedHashMap tmp = new LinkedHashMap();
-            tmp.put(jsonKey, files.get(i));
-            ret.add(tmp);
-        }
+        ret.put("weathers", files);
 
         return ret;
-    }
-    
-    protected LinkedHashMap readFile(HashMap unused) throws IOException {
-        return new LinkedHashMap();
     }
 
     /**
@@ -60,9 +52,9 @@ public class DssatWeatherInput extends DssatCommonInput {
     protected ArrayList<LinkedHashMap> readDailyData(HashMap brMap, LinkedHashMap ret) throws IOException {
 
         ArrayList<LinkedHashMap> files = new ArrayList();
-        ArrayList<LinkedHashMap> daily = new ArrayList();
-        ArrayList titles = new ArrayList();
-        LinkedHashMap fileTmp = null;
+        ArrayList<LinkedHashMap> daily;
+        ArrayList titles;
+        LinkedHashMap fileTmp;
         LinkedHashMap file = null;
         String line;
         BufferedReader brW = null;
@@ -98,7 +90,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                 if (flg[0].equals("weather") && flg[1].equals("") && flg[2].equals("data")) {
 
                     // header info
-                    fileTmp.put("wst_name", line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*([Dd][Aa][Tt][Aa]\\s*)*:?", "").trim());
+                    fileTmp.put("wst_source", line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*([Dd][Aa][Tt][Aa]\\s*)*:?", "").trim());
 
                 } // Read Weather Data
                 else if (flg[2].equals("data")) {
@@ -132,7 +124,6 @@ public class DssatWeatherInput extends DssatCommonInput {
                         LinkedHashMap tmp = readLine(line, formats, "");
                         // translate date from yyddd format to yyyymmdd format
                         translateDateStr(tmp, "w_date");
-
                         daily.add(tmp);
 
                     } else {

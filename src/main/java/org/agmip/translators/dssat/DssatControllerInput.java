@@ -197,12 +197,23 @@ public class DssatControllerInput implements TranslatorInput {
             expArr.add(expData);
         }
 
-        ret.put("experiments", expArr);
-        if (!soilTmpMap.isEmpty()) {
-            ret.put("soils", new ArrayList(soilTmpMap.values()));
-        }
-        if (!wthTmpMap.isEmpty()) {
-            ret.put("weathers", new ArrayList(wthTmpMap.values()));
+        if (!expArr.isEmpty()) {
+            ret.put("experiments", expArr);
+        
+            if (!soilTmpMap.isEmpty()) {
+                ret.put("soils", new ArrayList(soilTmpMap.values()));
+            }
+            if (!wthTmpMap.isEmpty()) {
+                ret.put("weathers", new ArrayList(wthTmpMap.values()));
+            }
+        } else {
+            // If only weather data or soil data
+            if (!soilArr.isEmpty()) {
+                ret.put("soils", soilArr);
+            }
+            if (!wthArr.isEmpty()) {
+                ret.put("weathers", wthArr);
+            }
         }
 
         return ret;
