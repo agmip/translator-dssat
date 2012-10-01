@@ -174,11 +174,11 @@ public class DssatControllerOutput extends DssatCommonOutput {
 
     /**
      * write soil/weather files
-     * 
-     * @param arg0      The output path
-     * @param expData   The holder for experiment data include soil/weather data
-     * @param output    The DSSAT Writer object
-     * @return      The created soil/weather file object
+     *
+     * @param arg0 The output path
+     * @param expData The holder for experiment data include soil/weather data
+     * @param output The DSSAT Writer object
+     * @return The created soil/weather file object
      */
     private File writeSWFile(String arg0, Map expData, DssatCommonOutput output) {
         String id;
@@ -241,7 +241,8 @@ public class DssatControllerOutput extends DssatCommonOutput {
     /**
      * Compress the files in one zip
      *
-     * @param swFiles The map contain the relationship between experiments and soil/weather files
+     * @param swFiles The map contain the relationship between experiments and
+     * soil/weather files
      * @throws FileNotFoundException
      * @throws IOException
      */
@@ -275,13 +276,17 @@ public class DssatControllerOutput extends DssatCommonOutput {
 
         // Delete Soil files
         for (String id : soilFiles.keySet()) {
-            soilFiles.get(id).delete();
+            if (soilFiles.get(id) != null) {
+                soilFiles.get(id).delete();
+            }
         }
         soilFiles.clear();
 
         // Delete Weather files
         for (String id : wthFiles.keySet()) {
-            wthFiles.get(id).delete();
+            if (wthFiles.get(id) != null) {
+                wthFiles.get(id).delete();
+            }
         }
         wthFiles.clear();
 
@@ -290,10 +295,10 @@ public class DssatControllerOutput extends DssatCommonOutput {
 
     /**
      * Add current file into zip package
-     * 
-     * @param out   The ZipOutputStream object
-     * @param zipPath   The inside file path of zip package
-     * @param file  The file which will be zipped
+     *
+     * @param out The ZipOutputStream object
+     * @param zipPath The inside file path of zip package
+     * @param file The file which will be zipped
      * @throws FileNotFoundException
      * @throws IOException
      */

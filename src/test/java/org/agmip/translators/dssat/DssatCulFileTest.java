@@ -39,7 +39,6 @@ public class DssatCulFileTest {
 
         LinkedHashMap result;
 
-        String filePath = "src\\test\\java\\org\\agmip\\translators\\dssat\\APAN9304_PNX.zip";
         result = obInput.readFile(resource.getPath());
 //        System.out.println(JSONAdapter.toJSON(result));
         File f = new File("outputCul.txt");
