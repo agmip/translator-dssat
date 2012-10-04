@@ -78,7 +78,7 @@ public class DssatControllerTest {
             // Output json for reading
             bo.write(JSONAdapter.toJSON(result).getBytes());
             bo.close();
-//            f.delete();
+            f.delete();
 
             obDssatControllerOutput = new DssatControllerOutput();
             obDssatControllerOutput.writeFile("", result);
@@ -86,7 +86,7 @@ public class DssatControllerTest {
             if (file != null) {
                 assertTrue(file.exists());
                 assertTrue(file.getName().toUpperCase().matches("^AGMIP_DSSAT_\\d+\\.ZIP$"));
-//                assertTrue(file.delete());
+                assertTrue(file.delete());
             }
 //        }
 
