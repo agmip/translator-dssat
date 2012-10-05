@@ -24,7 +24,7 @@ import static org.agmip.util.MapUtil.*;
 public class DssatControllerOutput extends DssatCommonOutput {
 
     private File zipFile;
-    private ArrayList<File> files = new ArrayList();
+    private HashMap<String, File> files = new HashMap();
     private HashMap<String, File> soilFiles = new HashMap();
     private HashMap<String, File> wthFiles = new HashMap();
 
@@ -51,15 +51,17 @@ public class DssatControllerOutput extends DssatCommonOutput {
             new DssatAFileOutput(),
             new DssatTFileOutput(),
             new DssatCulFileOutput(),
-            new DssatBatchFileOutput(),
-            new DssatRunFileOutput(),
-            new DssatACMOJsonOutput()
+            //            new DssatBatchFileOutput(),
+            //            new DssatRunFileOutput(),
+            new DssatACMOJsonOutput() // TODO ACMO data also need to be combined?
         };
 
         // Write files
         String soil_id;
         String wth_id;
         HashMap<String, File> swFiles = new HashMap();
+        boolean wsSubDirFlg = false;
+        HashMap<String, String> expNameMap = checkMultiTrn(expArr);
         for (int i = 0; i < expArr.size(); i++) {
             expData = expArr.get(i);
             soil_id = getObjectOr(expData, "soil_id", "");
@@ -67,13 +69,20 @@ public class DssatControllerOutput extends DssatCommonOutput {
             expData.put("soil", getSectionData(soilArr, "soil_id", soil_id));
             expData.put("weather", getSectionData(wthArr, "wst_id", wth_id));
             exname = getValueOr(expData, "exname", "Experiment_" + i);
-            writeSingleExp(arg0 + exname, expData, outputs);
-            swFiles.put(exname + "_S", writeSWFile(arg0 + "SOIL", expData, new DssatSoilOutput()));
-            swFiles.put(exname + "_W", writeSWFile(arg0 + "WEATHER", expData, new DssatWeatherOutput()));
-            subDirs.add(exname);
+            writeSingleExp(arg0 + expNameMap.get(exname), expData, outputs);
+            File soilFile = writeSWFile(arg0, expData, new DssatSoilOutput());
+            File wthFile = writeSWFile(arg0, expData, new DssatWeatherOutput());
+            if (!expNameMap.get(exname).equals("")) {
+                subDirs.add(expNameMap.get(exname));
+                swFiles.put(exname + "_S", soilFile);
+                swFiles.put(exname + "_W", wthFile);
+                wsSubDirFlg = true;
+            }
         }
-        subDirs.add("SOIL");
-        subDirs.add("WEATHER");
+        if (wsSubDirFlg) {
+            subDirs.add("SOIL");
+            subDirs.add("WEATHER");
+        }
 
         // If experiment data is included
         if (!expArr.isEmpty()) {
@@ -81,12 +90,14 @@ public class DssatControllerOutput extends DssatCommonOutput {
             DssatBatchFileOutput batchTran = new DssatBatchFileOutput();
             batchTran.writeFile(arg0, expArr);
             if (batchTran.getOutputFile() != null) {
-                files.add(batchTran.getOutputFile());
+//                files.add(batchTran.getOutputFile());
+                files.put(batchTran.getOutputFile().getPath(), batchTran.getOutputFile());
             }
             DssatRunFileOutput runTran = new DssatRunFileOutput();
             runTran.writeFile(arg0, expArr);
             if (runTran.getOutputFile() != null) {
-                files.add(runTran.getOutputFile());
+//                files.add(runTran.getOutputFile());
+                files.put(runTran.getOutputFile().getPath(), runTran.getOutputFile());
             }
         } // If only weather or soil data is included
         else {
@@ -167,7 +178,8 @@ public class DssatControllerOutput extends DssatCommonOutput {
         for (int i = 0; i < outputs.length; i++) {
             outputs[i].writeFile(arg0, result);
             if (outputs[i].getOutputFile() != null) {
-                files.add(outputs[i].getOutputFile());
+//                files.add(outputs[i].getOutputFile());
+                files.put(outputs[i].getOutputFile().getPath(), outputs[i].getOutputFile());
             }
         }
     }
@@ -182,18 +194,25 @@ public class DssatControllerOutput extends DssatCommonOutput {
      */
     private File writeSWFile(String arg0, Map expData, DssatCommonOutput output) {
         String id;
+//        String fileName;
         HashMap<String, File> swfiles;
 
         if (output instanceof DssatSoilOutput) {
             id = getObjectOr(expData, "soil_id", "");
+            id = id.substring(0, 2);
             swfiles = soilFiles;
         } else {
-            id = getObjectOr(expData, "wst_id", "");
+//            id = getObjectOr(expData, "wst_id", "");
+            id = getWthFileName(getObjectOr(expData, "weather", new LinkedHashMap()));
             swfiles = wthFiles;
         }
         if (!id.equals("") && !swfiles.containsKey(id)) {
             output.writeFile(arg0, expData);
-            swfiles.put(id, output.getOutputFile());
+            if (output.getOutputFile() != null) {
+                swfiles.put(id, output.getOutputFile());
+//            files.add(output.getOutputFile());
+                files.put(output.getOutputFile().getPath(), output.getOutputFile());
+            }
         }
 
         return swfiles.get(id);
@@ -211,10 +230,10 @@ public class DssatControllerOutput extends DssatCommonOutput {
         ZipEntry entry;
         BufferedInputStream bis;
         byte[] data = new byte[1024];
-        File file;
+//        File file;
 
-        for (int i = 0; i < files.size(); i++) {
-            file = files.get(i);
+        for (File file : files.values()) {
+//            file = files.get(i);
             if (file == null) {
                 continue;
             }
@@ -249,11 +268,11 @@ public class DssatControllerOutput extends DssatCommonOutput {
     private void createZip(HashMap<String, File> swFiles) throws FileNotFoundException, IOException {
 
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile));
-        File file;
+//        File file;
         String zipPath;
 
-        for (int i = 0; i < files.size(); i++) {
-            file = files.get(i);
+        for (File file : files.values()) {
+//            file = files.get(i);
             if (file == null) {
                 continue;
             }
@@ -267,28 +286,40 @@ public class DssatControllerOutput extends DssatCommonOutput {
 
             if (file.getName().matches(".+\\.\\w{2}[Xx]")) {
                 zipPath = zipPath.substring(0, zipPath.length() - file.getName().length());
-                String exname = zipPath.substring(0, zipPath.length() - 1);
-                addToZip(out, zipPath, swFiles.get(exname + "_S"));
-                addToZip(out, zipPath, swFiles.get(exname + "_W"));
+                if (!zipPath.equals("")) {
+                    String exname = zipPath.substring(0, zipPath.length() - 1);
+                    addToZip(out, zipPath, swFiles.get(exname + "_S"));
+                    addToZip(out, zipPath, swFiles.get(exname + "_W"));
+                }
             }
-            file.delete();
+//            file.delete();
         }
+
+        // Delete files
+        for (File file : files.values()) {
+            if (file != null) {
+                file.delete();
+            }
+        }
+        files.clear();
+        soilFiles.clear();
+        wthFiles.clear();
 
         // Delete Soil files
-        for (String id : soilFiles.keySet()) {
-            if (soilFiles.get(id) != null) {
-                soilFiles.get(id).delete();
-            }
-        }
-        soilFiles.clear();
-
-        // Delete Weather files
-        for (String id : wthFiles.keySet()) {
-            if (wthFiles.get(id) != null) {
-                wthFiles.get(id).delete();
-            }
-        }
-        wthFiles.clear();
+//        for (String id : soilFiles.keySet()) {
+//            if (soilFiles.get(id) != null) {
+//                soilFiles.get(id).delete();
+//            }
+//        }
+//        soilFiles.clear();
+//
+//        // Delete Weather files
+//        for (String id : wthFiles.keySet()) {
+//            if (wthFiles.get(id) != null) {
+//                wthFiles.get(id).delete();
+//            }
+//        }
+//        wthFiles.clear();
 
         out.close();
     }
@@ -326,7 +357,8 @@ public class DssatControllerOutput extends DssatCommonOutput {
      * Get all output files
      */
     public ArrayList<File> getOutputFiles() {
-        return files;
+//        return files;
+        return new ArrayList(files.values());
     }
 
     /**
@@ -354,5 +386,40 @@ public class DssatControllerOutput extends DssatCommonOutput {
      */
     public File getOutputZipFile() {
         return zipFile;
+    }
+
+    private HashMap<String, String> checkMultiTrn(ArrayList<LinkedHashMap> expArr) {
+        HashMap<String, String> ret = new HashMap();
+        HashMap<String, Boolean> multiTrnFlgs = new HashMap();
+        String exname;
+        String subDir;
+
+        for (int i = 0; i < expArr.size(); i++) {
+            exname = getValueOr(expArr.get(i), "exname", "");
+            if (!exname.equals("")) {
+                subDir = getExName(expArr.get(i));
+                if (multiTrnFlgs.containsKey(subDir)) {
+                    multiTrnFlgs.put(subDir, true);
+                } else {
+                    multiTrnFlgs.put(subDir, false);
+                }
+            }
+        }
+
+        for (int i = 0; i < expArr.size(); i++) {
+            exname = getValueOr(expArr.get(i), "exname", "");
+            if (exname.equals("")) {
+                ret.put("Experiment_" + i, "Experiment_" + i);
+            } else {
+                subDir = getExName(expArr.get(i));
+                if (multiTrnFlgs.get(subDir)) {
+                    ret.put(exname, exname);
+                } else {
+                    ret.put(exname, "");
+                }
+            }
+        }
+
+        return ret;
     }
 }
