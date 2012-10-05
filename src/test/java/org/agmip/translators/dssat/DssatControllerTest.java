@@ -26,11 +26,13 @@ public class DssatControllerTest {
     DssatControllerOutput obDssatControllerOutput;
     DssatControllerInput obDssatControllerInput;
     URL resource;
-    String fileName = "UFGA8202_MZX.ZIP";
-            // "UFGA8201_MZX_experiment.ZIP";
-            // "UFGA8201_MZX_soil.ZIP";
-            // "UFGA8201_MZX_weather.ZIP";
-            // "UFGA8201_MZX.ZIP";
+    String fileName = 
+             "UFGA8201_MZX.ZIP";
+//             "UFGA8202_MZX.ZIP";
+//             "UFGA8201_MZX_experiment.ZIP";
+//             "UFGA8201_MZX_soil.ZIP";
+//             "UFGA8201_MZX_weather.ZIP";
+//             "UFGA8201_MZX.ZIP";
 
     @Before
     public void setUp() throws Exception {
