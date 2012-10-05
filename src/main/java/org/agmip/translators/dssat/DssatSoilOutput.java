@@ -1,11 +1,11 @@
 package org.agmip.translators.dssat;
 
-import java.util.Calendar;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import static org.agmip.util.MapUtil.*;
@@ -66,16 +66,21 @@ public class DssatSoilOutput extends DssatCommonOutput {
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
-            bwS = new BufferedWriter(new FileWriter(outputFile));
+            boolean existFlg = outputFile.exists();
+            bwS = new BufferedWriter(new FileWriter(outputFile, existFlg));
 
             // Output Soil File
             // Description info for output by translator
-            bwS.write("!This soil file is created by DSSAT translator tool on " + Calendar.getInstance().getTime() + ".\r\n");
-            bwS.write("!The ACE ID is " + getValueOr(result, "id", "N/A") + ".\r\n");
-            bwS.write("!This soil data is used for the experiment of " + getValueOr(result, "exname", "N/A") + ".\r\n\r\n");
+            if (!existFlg) {
+                bwS.write("!This soil file is created by DSSAT translator tool on " + Calendar.getInstance().getTime() + ".\r\n");
+            }
 
             // Titel Section
-            sbData.append("*SOILS: ").append(getObjectOr((LinkedHashMap) soilSite, "sl_notes", defValBlank)).append("\r\n\r\n");
+            if (!existFlg) {
+                sbData.append("*SOILS: ").append(getObjectOr((LinkedHashMap) soilSite, "sl_notes", defValBlank)).append("\r\n\r\n");
+            }
+            sbData.append("!The ACE ID is ").append(getValueOr(result, "id", "N/A")).append(".\r\n");
+            sbData.append("!This soil data is used for the experiment of ").append(getValueOr(result, "exname", "N/A")).append(".\r\n\r\n");
 
             // Site Info Section
             sbData.append(String.format("*%1$-10s  %2$-11s %3$-5s %4$5s %5$s\r\n",
@@ -104,8 +109,8 @@ public class DssatSoilOutput extends DssatCommonOutput {
                     formatNumStr(5, soilSite, "slu1", defValR),
                     formatNumStr(5, soilSite, "sldr", defValR),
                     formatNumStr(5, soilSite, "slro", defValR),
-                    formatNumStr(5, soilSite, "slnf", "1"),     // P.S. Set default value as '1'
-                    formatNumStr(5, soilSite, "slpf", "0.92"),  // P.S. Set default value as '0.92'
+                    formatNumStr(5, soilSite, "slnf", "1"), // P.S. Set default value as '1'
+                    formatNumStr(5, soilSite, "slpf", "0.92"), // P.S. Set default value as '0.92'
                     getObjectOr(soilSite, "smhb", defValC).toString(),
                     getObjectOr(soilSite, "smpx", defValC).toString(),
                     getObjectOr(soilSite, "smke", defValC).toString()));
@@ -184,7 +189,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
             // Add part two
             if (p2Flg) {
                 sbData.append(sbLyrP2.toString()).append("\r\n");
-                sbLyrP2 = new StringBuilder();
+//                sbLyrP2 = new StringBuilder();
             } else {
                 sbData.append("\r\n");
             }
