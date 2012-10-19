@@ -27,6 +27,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
     private HashMap<String, File> files = new HashMap();
     private HashMap<String, File> soilFiles = new HashMap();
     private HashMap<String, File> wthFiles = new HashMap();
+    private DssatWthFileHelper wthHelper = new DssatWthFileHelper();
 
     /**
      * ALL DSSAT Data Output method
@@ -69,9 +70,9 @@ public class DssatControllerOutput extends DssatCommonOutput {
             expData.put("soil", getSectionData(soilArr, "soil_id", soil_id));
             expData.put("weather", getSectionData(wthArr, "wst_id", wth_id));
             exname = getValueOr(expData, "exname", "Experiment_" + i);
-            writeSingleExp(arg0 + expNameMap.get(exname), expData, outputs);
             File soilFile = writeSWFile(arg0, expData, new DssatSoilOutput());
             File wthFile = writeSWFile(arg0, expData, new DssatWeatherOutput());
+            writeSingleExp(arg0 + expNameMap.get(exname), expData, outputs);
             if (!expNameMap.get(exname).equals("")) {
                 subDirs.add(expNameMap.get(exname));
                 swFiles.put(exname + "_S", soilFile);
@@ -203,8 +204,11 @@ public class DssatControllerOutput extends DssatCommonOutput {
             swfiles = soilFiles;
         } else {
 //            id = getObjectOr(expData, "wst_id", "");
-            id = getWthFileName(getObjectOr(expData, "weather", new LinkedHashMap()));
+//            id = getWthFileName(getObjectOr(expData, "weather", new LinkedHashMap()));
+            id = wthHelper.createWthFileName(getObjectOr(expData, "weather", new LinkedHashMap()));
             swfiles = wthFiles;
+            expData.put("wst_id", id);
+            getObjectOr(expData, "weather", new HashMap()).put("wst_id", id);
         }
         if (!id.equals("") && !swfiles.containsKey(id)) {
             output.writeFile(arg0, expData);

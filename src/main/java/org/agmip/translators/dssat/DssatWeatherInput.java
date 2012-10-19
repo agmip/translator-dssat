@@ -90,7 +90,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                 if (flg[0].equals("weather") && flg[1].equals("") && flg[2].equals("data")) {
 
                     // header info
-                    fileTmp.put("wst_source", line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*([Dd][Aa][Tt][Aa]\\s*)*:?", "").trim());
+                    fileTmp.put("wst_name", line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*([Dd][Aa][Tt][Aa]\\s*)*:?", "").trim());
 
                 } // Read Weather Data
                 else if (flg[2].equals("data")) {
@@ -110,6 +110,15 @@ public class DssatWeatherInput extends DssatCommonInput {
                         formats.put("wndht", 6);
                         // Read line and save into return holder
                         fileTmp.putAll(readLine(line, formats));
+                        String wst_id = (String) fileTmp.get("wst_id");
+                        String wst_name = (String) fileTmp.get("wst_name");
+                        if (wst_id != null) {
+                            if (wst_name != null) {
+                                fileTmp.put("wst_name", wst_id + " " + wst_name);
+                            } else {
+                                fileTmp.put("wst_name", wst_id);
+                            }
+                        }
 
                     } // Weather daily data
                     else if (flg[1].startsWith("date ")) {
@@ -152,6 +161,7 @@ public class DssatWeatherInput extends DssatCommonInput {
 
             if (file == null || !file.get("wst_id").equals(fileTmp.get("wst_id"))) {
                 file = fileTmp;
+                file.put("wst_source", "DSSAT");
                 fileTmp.put(dailyKey, daily);
                 files.add(file);
             } else {
