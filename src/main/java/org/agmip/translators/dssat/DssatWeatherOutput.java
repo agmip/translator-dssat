@@ -69,7 +69,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // Output Weather File
             // Titel Section
-            sbData.append(String.format("*WEATHER DATA : %1$s\r\n\r\n", getObjectOr(wthFile, "wst_source", defValBlank).toString()));
+            sbData.append(String.format("*WEATHER DATA : %1$s\r\n\r\n", getObjectOr(wthFile, "wst_name", defValBlank).toString()));
 
             // Weather Station Section
             sbData.append("@ INSI      LAT     LONG  ELEV   TAV   AMP REFHT WNDHT\r\n");
@@ -155,8 +155,8 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             bwW.write(sbData.toString());
             bwW.close();
             sbError = new StringBuilder();
-            sbData = new StringBuilder();
-            adtDaily = new ArrayList();
+//            sbData = new StringBuilder();
+//            adtDaily = new ArrayList();
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
