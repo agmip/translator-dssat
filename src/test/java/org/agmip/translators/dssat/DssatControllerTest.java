@@ -3,8 +3,8 @@ package org.agmip.translators.dssat;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -93,8 +93,8 @@ public class DssatControllerTest {
 //        }
 
         String jsonStr;
-        File input = new File("src\\main\\resources\\Machakos_1Exp-1Yr.json");
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(input)));
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream("Machakos_1Exp-1Yr.json");
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
         jsonStr = br.readLine();
         obDssatControllerOutput = new DssatControllerOutput();
         obDssatControllerOutput.writeFile("", JSONAdapter.fromJSON(jsonStr));
