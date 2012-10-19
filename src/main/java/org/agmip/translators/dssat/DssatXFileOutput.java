@@ -177,7 +177,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
             LinkedHashMap flData = new LinkedHashMap();
             copyItem(flData, expData, "id_field");
             if (wthData.isEmpty()) {
-                copyItem(flData, expData, "wst_id");
+//                copyItem(flData, expData, "wst_id");
+                flData.put("wst_id", getWthFileName(expData));
             } else {
                 flData.put("wst_id", getWthFileName(wthData));
             }

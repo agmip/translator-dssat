@@ -50,6 +50,7 @@ public class DssatWeatherTest {
         ArrayList<LinkedHashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
         LinkedHashMap expData = new LinkedHashMap();
         expData.put("weather", wthArr.get(0));
+        wthArr.get(0).put("wst_id", "123456789");
         obDssatWeatherOutput.writeFile("", expData);
         File file = obDssatWeatherOutput.getOutputFile();
         if (file != null) {
