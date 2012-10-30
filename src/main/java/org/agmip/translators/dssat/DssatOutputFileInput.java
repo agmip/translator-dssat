@@ -5,7 +5,7 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import static org.agmip.util.MapUtil.*;
 
 /**
@@ -34,9 +34,9 @@ public class DssatOutputFileInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
+    protected HashMap readFile(HashMap brMap) throws IOException {
 
-        LinkedHashMap ret = new LinkedHashMap();
+        HashMap ret = new HashMap();
         ret.put("summary", readSummary(brMap));
         ret.put("overview", readOverview(brMap));
         ret.put("soilorg", readSoilOrg(brMap));
@@ -49,15 +49,15 @@ public class DssatOutputFileInput extends DssatCommonInput {
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected LinkedHashMap readSummary(HashMap brMap) throws IOException {
+    protected HashMap readSummary(HashMap brMap) throws IOException {
 
-        LinkedHashMap file = new LinkedHashMap();
+        HashMap file = new HashMap();
         String line;
         BufferedReader brOut;
         Object buf;
-        LinkedHashMap formats = new LinkedHashMap();
+        HashMap formats = new HashMap();
 //        String[] titles = new String[0];
-        ArrayList<LinkedHashMap> sumArr = new ArrayList();
+        ArrayList<HashMap> sumArr = new ArrayList();
 
         buf = brMap.get("SUMMARY.OUT");
 
@@ -92,7 +92,7 @@ public class DssatOutputFileInput extends DssatCommonInput {
                     formats.put("vevsion", 19);
                     formats.put("date", line.length());
                     // Read line and save into return holder
-                    LinkedHashMap tmp = readLine(line, formats);
+                    HashMap tmp = readLine(line, formats);
                     String date = getObjectOr(tmp, "date", "");
                     String version = getObjectOr(tmp, "version", "");
                     if (date.length() > 22) {
@@ -203,15 +203,15 @@ public class DssatOutputFileInput extends DssatCommonInput {
      * @param brMap The holder for BufferReader objects for all files
      * @return the array of result data holder object
      */
-    protected ArrayList<LinkedHashMap> readSoilOrg(HashMap brMap) throws IOException {
+    protected ArrayList<HashMap> readSoilOrg(HashMap brMap) throws IOException {
 
-        ArrayList<LinkedHashMap> file = new ArrayList<LinkedHashMap>();
-        LinkedHashMap data = new LinkedHashMap();
-        ArrayList<LinkedHashMap> subArr = new ArrayList<LinkedHashMap>();
+        ArrayList<HashMap> file = new ArrayList<HashMap>();
+        HashMap data = new HashMap();
+        ArrayList<HashMap> subArr = new ArrayList<HashMap>();
         String line;
         BufferedReader brOut;
         Object buf;
-        LinkedHashMap formats = new LinkedHashMap();
+        HashMap formats = new HashMap();
 
         buf = brMap.get("SOILORG.OUT");
 
@@ -237,8 +237,8 @@ public class DssatOutputFileInput extends DssatCommonInput {
                 if (flg[1].equals("meta info")) {
                     if (line.trim().toUpperCase().startsWith("*RUN")) {
                         // Set new data object
-                        data = new LinkedHashMap();
-                        subArr = new ArrayList<LinkedHashMap>();
+                        data = new HashMap();
+                        subArr = new ArrayList<HashMap>();
                         data.put(outDataKey, subArr);
                         file.add(data);
                         // Set variables' formats
@@ -312,15 +312,15 @@ public class DssatOutputFileInput extends DssatCommonInput {
      * @param brMap The holder for BufferReader objects for all files
      * @return the array of result data holder object
      */
-    protected ArrayList<LinkedHashMap> readOverview(HashMap brMap) throws IOException {
+    protected ArrayList<HashMap> readOverview(HashMap brMap) throws IOException {
 
-        ArrayList<LinkedHashMap> file = new ArrayList<LinkedHashMap>();
-        LinkedHashMap data = new LinkedHashMap();
-        ArrayList<LinkedHashMap> subArr;
+        ArrayList<HashMap> file = new ArrayList<HashMap>();
+        HashMap data = new HashMap();
+        ArrayList<HashMap> subArr;
         String line;
         BufferedReader brOut;
         Object buf;
-        LinkedHashMap formats = new LinkedHashMap();
+        HashMap formats = new HashMap();
 
         buf = brMap.get("OVERVIEW.OUT");
 
@@ -346,8 +346,8 @@ public class DssatOutputFileInput extends DssatCommonInput {
                 if (flg[1].equals("meta info")) {
                     if (line.trim().toUpperCase().startsWith("*RUN")) {
                         // Set new data object
-                        data = new LinkedHashMap();
-                        subArr = new ArrayList<LinkedHashMap>();
+                        data = new HashMap();
+                        subArr = new ArrayList<HashMap>();
                         data.put(outDataKey, subArr);
                         file.add(data);
                         // Set variables' formats

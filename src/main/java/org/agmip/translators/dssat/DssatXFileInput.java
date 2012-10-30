@@ -5,7 +5,7 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import static org.agmip.util.MapUtil.*;
 
 /**
@@ -35,13 +35,13 @@ public class DssatXFileInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
+    protected HashMap readFile(HashMap brMap) throws IOException {
 
-        LinkedHashMap ret = new LinkedHashMap();
-        LinkedHashMap metaData = new LinkedHashMap();
-        ArrayList<LinkedHashMap> expArr = new ArrayList<LinkedHashMap>();
-        LinkedHashMap expData;
-        ArrayList<LinkedHashMap> mgnArr = readTreatments(brMap, metaData);
+        HashMap ret = new HashMap();
+        HashMap metaData = new HashMap();
+        ArrayList<HashMap> expArr = new ArrayList<HashMap>();
+        HashMap expData;
+        ArrayList<HashMap> mgnArr = readTreatments(brMap, metaData);
 
         for (int i = 0; i < mgnArr.size(); i++) {
 
@@ -50,12 +50,12 @@ public class DssatXFileInput extends DssatCommonInput {
 
             // Set soil_analysis block to soil block
             copyItem(expData, expData, "soil", "soil_analysis", true);
-            LinkedHashMap soilTmp = getObjectOr(expData, "soil", new LinkedHashMap());
+            HashMap soilTmp = getObjectOr(expData, "soil", new HashMap());
             expData.put("soil_id", expData.get("soil_id") + "_" + (i + 1));
             copyItem(soilTmp, expData, "soil_id");
             copyItem(soilTmp, expData, "sltx");
             copyItem(soilTmp, expData, "sldp");
-            ArrayList<LinkedHashMap> soilSubArr = getObjectOr(soilTmp, icEventKey, new ArrayList());
+            ArrayList<HashMap> soilSubArr = getObjectOr(soilTmp, icEventKey, new ArrayList());
             for (int j = 0; j < soilSubArr.size(); j++) {
                 soilSubArr.get(j).remove("slsc");
             }
@@ -81,7 +81,7 @@ public class DssatXFileInput extends DssatCommonInput {
      * @param metaData
      * @return trArr The array of treatment data
      */
-    protected ArrayList<LinkedHashMap> readTreatments(HashMap brMap, LinkedHashMap metaData) throws IOException {
+    protected ArrayList<HashMap> readTreatments(HashMap brMap, HashMap metaData) throws IOException {
 
         String line;
         BufferedReader br;
@@ -92,15 +92,15 @@ public class DssatXFileInput extends DssatCommonInput {
         HashMap mapW;
         String wid;
         String fileName;
-        LinkedHashMap formats = new LinkedHashMap();
-        ArrayList<LinkedHashMap> trArr = new ArrayList<LinkedHashMap>();
-        LinkedHashMap trData = new LinkedHashMap();
-        ArrayList<LinkedHashMap> evtArr = new ArrayList<LinkedHashMap>();
+        HashMap formats = new HashMap();
+        ArrayList<HashMap> trArr = new ArrayList<HashMap>();
+        HashMap trData = new HashMap();
+        ArrayList<HashMap> evtArr = new ArrayList<HashMap>();
         String ireff = "";    // P.S. special handling for EFIR in irrigation section
 
         // Set meta data info for each treatment
-        ArrayList<LinkedHashMap> trMetaArr = new ArrayList<LinkedHashMap>();
-        LinkedHashMap trMetaData;
+        ArrayList<HashMap> trMetaArr = new ArrayList<HashMap>();
+        HashMap trMetaData;
         metaData.put("tr_meta", trMetaArr);
 
         mapX = (HashMap) brMap.get("X");
@@ -123,27 +123,27 @@ public class DssatXFileInput extends DssatCommonInput {
             fileName = (String) keyX;
             wid = fileName.length() > 4 ? fileName.substring(0, 4) : fileName;
             String exname = fileName.replaceAll("\\.", "").replaceAll("X$", "");
-            LinkedHashMap meta = new LinkedHashMap();
+            HashMap meta = new HashMap();
             metaData.put(exname, meta);
             
-            ArrayList<LinkedHashMap> sqArr = new ArrayList<LinkedHashMap>();
-            LinkedHashMap sqData;
-            ArrayList<LinkedHashMap> cuArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> flArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> saArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> sadArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> icArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> icdArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> plArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> irArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> irdArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> feArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> omArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> chArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> tiArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> emArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> haArr = new ArrayList<LinkedHashMap>();
-            ArrayList<LinkedHashMap> smArr = new ArrayList<LinkedHashMap>();
+            ArrayList<HashMap> sqArr = new ArrayList<HashMap>();
+            HashMap sqData;
+            ArrayList<HashMap> cuArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> flArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> saArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> sadArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> icArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> icdArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> plArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> irArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> irdArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> feArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> omArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> chArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> tiArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> emArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> haArr = new ArrayList<HashMap>();
+            ArrayList<HashMap> smArr = new ArrayList<HashMap>();
 
             while ((line = br.readLine()) != null) {
 
@@ -312,7 +312,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("soil_id", 11);
                         formats.put("fl_name", line.length());
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         addToArray(flArr, tmp, "fl");
                         // Read weather station id
                         wid = (String) tmp.get("wst_id");
@@ -337,7 +337,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("flhst", 6);        // P.S. id do not find in the master list (field histoy code)
                         formats.put("fhdur", 6);        // P.S. id do not find in the master list (duration associated with field history code in years)
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
 
                         // Read lat and long
                         String strLat = (String) tmp.get("fl_lat");
@@ -399,10 +399,10 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("smpx", 6);     // P.S. changed from sampx to smpx to match the soil variable name
                         formats.put("smke", 6);     // P.S. changed from samke to smke to match the soil variable name
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         translateDateStr(tmp, "sadat");
                         saArr.add(tmp);
-                        sadArr = new ArrayList<LinkedHashMap>();
+                        sadArr = new ArrayList<HashMap>();
                         tmp.put(icEventKey, sadArr);
 
                     } // Read SOIL ANALYSIS layer data
@@ -446,10 +446,10 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("icrdp", 6);
                         formats.put("ic_name", line.length());
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         translateDateStr(tmp, "icdat");
                         icArr.add(tmp);
-                        icdArr = new ArrayList<LinkedHashMap>();
+                        icdArr = new ArrayList<HashMap>();
                         tmp.put(icEventKey, icdArr);
 
                     } else // INITIAL CONDITIONS layer data
@@ -491,7 +491,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("plspl", 6);
                         formats.put("pl_name", line.length());
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         translateDateStr(tmp, "pdate");
                         translateDateStr(tmp, "pldae");
                         plArr.add(tmp);
@@ -515,13 +515,13 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("iamt", 6);
                         formats.put("ir_name", line.length());
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         ireff = (String) tmp.get("ireff");
                         if (ireff != null) {
                             tmp.remove("ireff");
                         }
                         irArr.add(tmp);
-                        irdArr = new ArrayList<LinkedHashMap>();
+                        irdArr = new ArrayList<HashMap>();
                         tmp.put(eventKey, irdArr);
 
                     } // Read IRRIGATION appliction data
@@ -533,7 +533,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("irop", 6);
                         formats.put("irval", 6);
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         //                    tmp.put("idate", translateDateStr((String) tmp.getOr("idate"))); // P.S. DOY handling
                         tmp.put("ireff", ireff);
                         irdArr.add(tmp);
@@ -561,7 +561,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("feocd", 6);
                         formats.put("fe_name", line.length());
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         //                    translateDateStr(tmp, "fdate"); // P.S. DOY handling
                         feArr.add(tmp);
                     } else {
@@ -586,7 +586,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("omacd", 6);
                         formats.put("om_name", line.length());
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         //                    translateDateStr(tmp, "omdat"); // P.S. DOY handling
                         omArr.add(tmp);
                     } else {
@@ -608,7 +608,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("ch_targets", 6);
                         formats.put("ch_name", line.length());
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         translateDateStr(tmp, "cdate");
                         chArr.add(tmp);
                     } else {
@@ -627,7 +627,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("tidep", 6);
                         formats.put("ti_name", line.length());
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         translateDateStr(tmp, "tdate");
                         tiArr.add(tmp);
                     } else {
@@ -660,7 +660,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("emwnd", 4);
                         //                    formats.put("em_name", line.length());
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         //                    translateDateStr(tmp, "emday");
                         tmp.put("em_data", line.substring(2));
                         emArr.add(tmp);
@@ -683,7 +683,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("habpc", 6);
                         formats.put("ha_name", line.length());
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         translateDateStr(tmp, "hdate");
                         haArr.add(tmp);
                     } else {
@@ -708,7 +708,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("sname", 26);
                         //                    formats.put("model", line.length());
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         //                    translateDateStr(tmp, "sdate");
                         //                    smSubArr = new ArrayList();
                         //                    smArr.add(tmp);
@@ -734,7 +734,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("till", 6);
                         //                    formats.put("co2", 6);
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         addToArray(smArr, tmp, "sm");
                         //                    smSubArr.add(line);
 
@@ -757,7 +757,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("mesev", 6);
                         //                    formats.put("mesol", 6);
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         addToArray(smArr, tmp, "sm");
                         //                    smSubArr.add(line);
 
@@ -774,7 +774,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("resid", 6);
                         //                    formats.put("harvs", 6);
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         addToArray(smArr, tmp, "sm");
                         //                    smSubArr.add(line);
 
@@ -799,7 +799,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("chout", 6);
                         //                    formats.put("opout", 6);
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         addToArray(smArr, tmp, "sm");
                         //                    smSubArr.add(line);
 
@@ -818,7 +818,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("pstmx", 6);
                         //                    formats.put("pstmn", 6);
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         //                    translateDateStr(tmp, "pfrst");
                         //                    translateDateStr(tmp, "plast");
                         addToArray(smArr, tmp, "sm");
@@ -839,7 +839,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("iramt", 6);
                         //                    formats.put("ireff", 6);
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         addToArray(smArr, tmp, "sm");
                         //                    smSubArr.add(line);
 
@@ -856,7 +856,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("ncode", 6);
                         //                    formats.put("naoff", 6);
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         addToArray(smArr, tmp, "sm");
                         //                    smSubArr.add(line);
 
@@ -871,7 +871,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("rtime", 6);
                         //                    formats.put("ridep", 6);
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         addToArray(smArr, tmp, "sm");
                         //                    smSubArr.add(line);
 
@@ -887,7 +887,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("hpcnp", 6);
                         //                    formats.put("hrcnr", 6);
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);
+                        HashMap tmp = readLine(line, formats);
                         //                    translateDateStr(tmp, "hlast");
                         addToArray(smArr, tmp, "sm");
                         //                    smSubArr.add(line);
@@ -906,25 +906,25 @@ public class DssatXFileInput extends DssatCommonInput {
 
             // Combine all the sections data into the related treatment block
             String trno = null;
-            LinkedHashMap dssatSq;
-//        LinkedHashMap dssatInfo = new LinkedHashMap();
-            ArrayList<LinkedHashMap> sqArrNew = new ArrayList<LinkedHashMap>();
+            HashMap dssatSq;
+//        HashMap dssatInfo = new HashMap();
+            ArrayList<HashMap> sqArrNew = new ArrayList<HashMap>();
             for (int i = 0, seqid = 1; i < sqArr.size(); i++, seqid++) {
-                sqData = (LinkedHashMap) sqArr.get(i);
+                sqData = (HashMap) sqArr.get(i);
 
-                trMetaData = new LinkedHashMap();
+                trMetaData = new HashMap();
                 trMetaArr.add(trMetaData);
 
                 if (!sqData.get("trno").equals(trno)) {
                     trno = sqData.get("trno").toString();
-                    trData = new LinkedHashMap();
-                    evtArr = new ArrayList<LinkedHashMap>();
+                    trData = new HashMap();
+                    evtArr = new ArrayList<HashMap>();
                     trArr.add(trData);
                     trData.put("events", evtArr);
 
-                    dssatSq = new LinkedHashMap();
-                    sqArrNew = new ArrayList<LinkedHashMap>();
-//                dssatInfo = new LinkedHashMap();
+                    dssatSq = new HashMap();
+                    sqArrNew = new ArrayList<HashMap>();
+//                dssatInfo = new HashMap();
                     dssatSq.put(eventKey, sqArrNew);
                     trData.put("dssat_sequence", dssatSq);
 //                trData.put("dssat_info", dssatInfo);
@@ -939,22 +939,22 @@ public class DssatXFileInput extends DssatCommonInput {
                 sqArrNew.add(sqData);
 
                 // cultivar
-                LinkedHashMap crData = new LinkedHashMap();
+                HashMap crData = new HashMap();
                 if (!getObjectOr(sqData, "ge", "0").equals("0")) {
                     // Get related cultivar data
-                    crData = (LinkedHashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString());
+                    crData = (HashMap) getSectionDataObj(cuArr, "ge", sqData.get("ge").toString());
                 }
 
                 // field
                 if (!getObjectOr(sqData, "fl", "0").equals("0")) {
                     // Move field info into meta data block
-                    trMetaData.putAll((LinkedHashMap) getSectionDataObj(flArr, "fl", sqData.get("fl").toString()));
+                    trMetaData.putAll((HashMap) getSectionDataObj(flArr, "fl", sqData.get("fl").toString()));
                     trMetaData.remove("fl");
                 }
 
                 // initial_condition
                 if (!getObjectOr(sqData, "ic", "0").equals("0")) {
-                    LinkedHashMap icTmpArr = (LinkedHashMap) getSectionDataObj(icArr, "ic", sqData.get("ic").toString());
+                    HashMap icTmpArr = (HashMap) getSectionDataObj(icArr, "ic", sqData.get("ic").toString());
                     if (!icTmpArr.isEmpty()) {
                         trData.put("initial_conditions", icTmpArr);
                     }
@@ -964,7 +964,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 String pdate = "";
                 if (!getObjectOr(sqData, "pl", "0").equals("0")) {
                     // add event data into array
-                    addEvent(evtArr, (LinkedHashMap) getSectionDataObj(plArr, "pl", sqData.get("pl").toString()), "pdate", "planting", seqid);
+                    addEvent(evtArr, (HashMap) getSectionDataObj(plArr, "pl", sqData.get("pl").toString()), "pdate", "planting", seqid);
 
                     // add cultivar data into planting event
                     if (crData != null) {
@@ -980,10 +980,10 @@ public class DssatXFileInput extends DssatCommonInput {
                 // irrigation
                 if (!getObjectOr(sqData, "ir", "0").equals("0")) {
                     // Date adjust based on realted treatment info (handling for DOY type value)
-                    LinkedHashMap irTmp = (LinkedHashMap) getSectionDataObj(irArr, "ir", sqData.get("ir").toString());
-                    ArrayList<LinkedHashMap> irTmpSubs = getObjectOr(irTmp, "data", new ArrayList());
+                    HashMap irTmp = (HashMap) getSectionDataObj(irArr, "ir", sqData.get("ir").toString());
+                    ArrayList<HashMap> irTmpSubs = getObjectOr(irTmp, "data", new ArrayList());
                     for (int j = 0; j < irTmpSubs.size(); j++) {
-                        LinkedHashMap irTmpSub = irTmpSubs.get(j);
+                        HashMap irTmpSub = irTmpSubs.get(j);
                         translateDateStrForDOY(irTmpSub, "idate", pdate);
                     }
 
@@ -994,8 +994,8 @@ public class DssatXFileInput extends DssatCommonInput {
                 // fertilizer
                 if (!getObjectOr(sqData, "fe", "0").equals("0")) {
 
-                    ArrayList<LinkedHashMap> feTmps = (ArrayList) getSectionDataObj(feArr, "fe", sqData.get("fe").toString());
-                    LinkedHashMap feTmp;
+                    ArrayList<HashMap> feTmps = (ArrayList) getSectionDataObj(feArr, "fe", sqData.get("fe").toString());
+                    HashMap feTmp;
                     for (int j = 0; j < feTmps.size(); j++) {
                         feTmp = feTmps.get(j);
                         // Date adjust based on realted treatment info (handling for DOY type value)
@@ -1008,8 +1008,8 @@ public class DssatXFileInput extends DssatCommonInput {
 
                 // organic_matter
                 if (!getObjectOr(sqData, "om", "0").equals("0")) {
-                    ArrayList<LinkedHashMap> omTmps = (ArrayList) getSectionDataObj(omArr, "om", sqData.get("om").toString());
-                    LinkedHashMap omTmp;
+                    ArrayList<HashMap> omTmps = (ArrayList) getSectionDataObj(omArr, "om", sqData.get("om").toString());
+                    HashMap omTmp;
                     for (int j = 0; j < omTmps.size(); j++) {
                         omTmp = omTmps.get(j);
                         // Date adjust based on realted treatment info (handling for DOY type value)
@@ -1021,7 +1021,7 @@ public class DssatXFileInput extends DssatCommonInput {
 
                 // chemical
                 if (!getObjectOr(sqData, "ch", "0").equals("0")) {
-                    ArrayList<LinkedHashMap> chTmps = (ArrayList) getSectionDataObj(chArr, "ch", sqData.get("ch").toString());
+                    ArrayList<HashMap> chTmps = (ArrayList) getSectionDataObj(chArr, "ch", sqData.get("ch").toString());
                     for (int j = 0; j < chTmps.size(); j++) {
                         // add event data into array
                         addEvent(evtArr, chTmps.get(j), "cdate", "chemical", seqid);
@@ -1030,7 +1030,7 @@ public class DssatXFileInput extends DssatCommonInput {
 
                 // tillage
                 if (!getObjectOr(sqData, "ti", "0").equals("0")) {
-                    ArrayList<LinkedHashMap> tiTmps = (ArrayList) getSectionDataObj(tiArr, "ti", sqData.get("ti").toString());
+                    ArrayList<HashMap> tiTmps = (ArrayList) getSectionDataObj(tiArr, "ti", sqData.get("ti").toString());
                     for (int j = 0; j < tiTmps.size(); j++) {
                         // add event data into array
                         addEvent(evtArr, tiTmps.get(j), "tdate", "tillage", seqid);
@@ -1040,15 +1040,15 @@ public class DssatXFileInput extends DssatCommonInput {
                 // emvironment  // P.S. keep for furture using
                 if (!getObjectOr(sqData, "em", "0").equals("0")) {
                     String em = (String) sqData.get("em");
-                    ArrayList<LinkedHashMap> emDataArr = (ArrayList) getSectionDataObj(emArr, "em", em);
+                    ArrayList<HashMap> emDataArr = (ArrayList) getSectionDataObj(emArr, "em", em);
 //                ArrayList arr = new ArrayList();
 //                for (int j = 0; j < emDataArr.size(); j++) {
 //                    arr.add(emDataArr.get(j).get("em_data"));
 //                }
 //                sqData.put("em_data", arr);
 
-                    LinkedHashMap tmp = getObjectOr(trData, "dssat_environment_modification", new LinkedHashMap());
-                    ArrayList<LinkedHashMap> arr = getObjectOr(tmp, eventKey, new ArrayList());
+                    HashMap tmp = getObjectOr(trData, "dssat_environment_modification", new HashMap());
+                    ArrayList<HashMap> arr = getObjectOr(tmp, eventKey, new ArrayList());
                     boolean isExistFlg = false;
                     for (int j = 0; j < arr.size(); j++) {
                         if (em.equals(arr.get(j).get("em"))) {
@@ -1066,17 +1066,17 @@ public class DssatXFileInput extends DssatCommonInput {
                 // harvest
                 if (!getObjectOr(sqData, "ha", "0").equals("0")) {
                     // add event data into array
-                    addEvent(evtArr, (LinkedHashMap) getSectionDataObj(haArr, "ha", sqData.get("ha").toString()), "hdate", "harvest", seqid);
+                    addEvent(evtArr, (HashMap) getSectionDataObj(haArr, "ha", sqData.get("ha").toString()), "hdate", "harvest", seqid);
                 }
 
                 // simulation
                 if (!getObjectOr(sqData, "sm", "0").equals("0")) {
                     String sm = (String) sqData.get("sm");
-                    LinkedHashMap smData = (LinkedHashMap) getSectionDataObj(smArr, "sm", sm);
-//                sqData.putAll((LinkedHashMap) getSectionDataObj(smArr, "sm", sm));
+                    HashMap smData = (HashMap) getSectionDataObj(smArr, "sm", sm);
+//                sqData.putAll((HashMap) getSectionDataObj(smArr, "sm", sm));
 
-                    LinkedHashMap tmp = getObjectOr(trData, "dssat_simulation_control", new LinkedHashMap());
-                    ArrayList<LinkedHashMap> arr = getObjectOr(tmp, eventKey, new ArrayList());
+                    HashMap tmp = getObjectOr(trData, "dssat_simulation_control", new HashMap());
+                    ArrayList<HashMap> arr = getObjectOr(tmp, eventKey, new ArrayList());
                     boolean isExistFlg = false;
                     for (int j = 0; j < arr.size(); j++) {
                         if (sm.equals(arr.get(j).get("sm"))) {
@@ -1093,25 +1093,25 @@ public class DssatXFileInput extends DssatCommonInput {
 
                 // soil_analysis
                 if (!getObjectOr(sqData, "sa", "0").equals("0")) {
-                    LinkedHashMap saTmp = (LinkedHashMap) getSectionDataObj(saArr, "sa", sqData.get("sa").toString());
-//                ArrayList<LinkedHashMap> saSubArr = getObjectOr(saTmp, icEventKey, new ArrayList());
+                    HashMap saTmp = (HashMap) getSectionDataObj(saArr, "sa", sqData.get("sa").toString());
+//                ArrayList<HashMap> saSubArr = getObjectOr(saTmp, icEventKey, new ArrayList());
 
                     // temporally put soil_analysis block into treatment meta data
                     trMetaData.put("soil_analysis", saTmp);
 
 //                // Add SASC into initial condition block
-//                ArrayList<LinkedHashMap> icSubArrNew;
-//                LinkedHashMap icTmp;
+//                ArrayList<HashMap> icSubArrNew;
+//                HashMap icTmp;
 //                String[] copyKeys = {"slsc"};
 //                if (!trData.containsKey("initial_condition")) {
 //                    // Add a dummy ic block to hold SASC
-//                    icTmp = new LinkedHashMap();
+//                    icTmp = new HashMap();
 //                    trData.put("initial_condition", icTmp);
-//                    icSubArrNew = combinLayers(new ArrayList<LinkedHashMap>(), saSubArr, "icbl", "sllb", copyKeys);
+//                    icSubArrNew = combinLayers(new ArrayList<HashMap>(), saSubArr, "icbl", "sllb", copyKeys);
 //                } else {
 //                    // Add SASC into initial condition block
-//                    icTmp = (LinkedHashMap) trData.get("initial_condition");
-//                    ArrayList<LinkedHashMap> icSubArr = getObjectOr(icTmp, icEventKey, new ArrayList());
+//                    icTmp = (HashMap) trData.get("initial_condition");
+//                    ArrayList<HashMap> icSubArr = getObjectOr(icTmp, icEventKey, new ArrayList());
 //                    icSubArrNew = combinLayers(icSubArr, saSubArr, "icbl", "sllb", copyKeys);
 //                }
 //                icTmp.put(icEventKey, icSubArrNew);
@@ -1173,7 +1173,7 @@ public class DssatXFileInput extends DssatCommonInput {
         // Get First data node
         if (secArr.isEmpty() || value == null) {
             if (key.equals("icbl") || key.equals("ir") || key.equals("ic") || key.equals("sa") || singleSubRecSecList.contains(key)) {
-                return new LinkedHashMap();
+                return new HashMap();
             } else {
                 return ret;
             }
@@ -1182,20 +1182,20 @@ public class DssatXFileInput extends DssatCommonInput {
         if (key.equals("icbl")) {
             return getSectionData(secArr, key, value);
         } else {
-            LinkedHashMap fstNode = (LinkedHashMap) secArr.get(0);
+            HashMap fstNode = (HashMap) secArr.get(0);
             // If it contains multiple sub array of data, or it does not have multiple sub records
             if (fstNode.containsKey(eventKey) || fstNode.containsKey(icEventKey) || singleSubRecSecList.contains(key)) {
                 for (int i = 0; i < secArr.size(); i++) {
-                    if (value.equals(((LinkedHashMap) secArr.get(i)).get(key))) {
-                        return CopyList((LinkedHashMap) secArr.get(i));
+                    if (value.equals(((HashMap) secArr.get(i)).get(key))) {
+                        return CopyList((HashMap) secArr.get(i));
                     }
                 }
 
             } // If it is simple array
             else {
-                LinkedHashMap node;
+                HashMap node;
                 for (int i = 0; i < secArr.size(); i++) {
-                    node = (LinkedHashMap) secArr.get(i);
+                    node = (HashMap) secArr.get(i);
                     if (value.equals(node.get(key))) {
                         ret.add(CopyList(node));
                     }
@@ -1215,16 +1215,16 @@ public class DssatXFileInput extends DssatCommonInput {
      * @param eventName the event name
      * @param seqId the sequence id for DSSAT
      */
-    private void addEvent(ArrayList events, LinkedHashMap m, String dateId, String eventName, int seqId) {
+    private void addEvent(ArrayList events, HashMap m, String dateId, String eventName, int seqId) {
 
-        LinkedHashMap<String, String> ret = new LinkedHashMap<String, String>();
-        LinkedHashMap mCopy = CopyList(m);
+        HashMap<String, String> ret = new HashMap<String, String>();
+        HashMap mCopy = CopyList(m);
         if (mCopy.containsKey(dateId)) {
             ret.put("date", mCopy.remove(dateId).toString());
         }
         ret.put("event", eventName);
         if (mCopy.containsKey(eventKey)) {
-            ArrayList<LinkedHashMap> subArr = (ArrayList) mCopy.remove(eventKey);
+            ArrayList<HashMap> subArr = (ArrayList) mCopy.remove(eventKey);
 
             if (subArr == null || subArr.isEmpty()) {
                 ret.putAll(mCopy);
@@ -1233,7 +1233,7 @@ public class DssatXFileInput extends DssatCommonInput {
 
             for (int i = 0; i < subArr.size(); i++) {
 
-                LinkedHashMap tmp = subArr.get(i);
+                HashMap tmp = subArr.get(i);
                 ret.put("date", tmp.remove(dateId).toString());
                 ret.putAll(mCopy);
                 ret.putAll(tmp);
@@ -1255,14 +1255,14 @@ public class DssatXFileInput extends DssatCommonInput {
      *
      * @return expData experiment data holder (contain all blocks)
      */
-    public LinkedHashMap setupMetaData(LinkedHashMap metaData, int trId) {
+    public HashMap setupMetaData(HashMap metaData, int trId) {
 
         // Set meta data for all treatment
-        LinkedHashMap expData = new LinkedHashMap();
+        HashMap expData = new HashMap();
         // Set meta data per treatment
-        ArrayList<LinkedHashMap> trMetaArr = (ArrayList<LinkedHashMap>) metaData.get("tr_meta");
+        ArrayList<HashMap> trMetaArr = (ArrayList<HashMap>) metaData.get("tr_meta");
         String exname = getValueOr(trMetaArr.get(trId), "exname", "");
-        expData.putAll(getObjectOr(metaData, exname, new LinkedHashMap()));
+        expData.putAll(getObjectOr(metaData, exname, new HashMap()));
         expData.putAll(trMetaArr.get(trId));
         if (!exname.equals("")) {
             expData.put("exname", exname + "_" + expData.get("trno"));
@@ -1279,8 +1279,8 @@ public class DssatXFileInput extends DssatCommonInput {
      * @param expData experiment data holder (contain all blocks)
      * @param mgnData management data holder (contain events array)
      */
-    private void setupTrnData(LinkedHashMap expData, LinkedHashMap mgnData) {
-        setupTrnData(expData, mgnData, new LinkedHashMap(), new LinkedHashMap());
+    private void setupTrnData(HashMap expData, HashMap mgnData) {
+        setupTrnData(expData, mgnData, new HashMap(), new HashMap());
     }
 
     /**
@@ -1292,7 +1292,7 @@ public class DssatXFileInput extends DssatCommonInput {
      * @param obvAFile summary observed data holder
      * @param obvTFile time series observed data holder
      */
-    public void setupTrnData(LinkedHashMap expData, LinkedHashMap mgnData, LinkedHashMap obvAFile, LinkedHashMap obvTFile) {
+    public void setupTrnData(HashMap expData, HashMap mgnData, HashMap obvAFile, HashMap obvTFile) {
 
         // remove unused variable
         expData.remove("sltx");
@@ -1313,7 +1313,7 @@ public class DssatXFileInput extends DssatCommonInput {
         // dssat_info
 //        cutDataBlock(mgnData, expData, "dssat_info");
         // Create dssat info holder
-        LinkedHashMap dssatInfo = new LinkedHashMap();
+        HashMap dssatInfo = new HashMap();
         // Move field history code into dssat_info block
         copyItem(dssatInfo, expData, "flhst", true);
         copyItem(dssatInfo, expData, "fhdur", true);

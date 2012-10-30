@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import org.agmip.core.types.TranslatorInput;
 import static org.agmip.translators.dssat.DssatCommonInput.*;
 import static org.agmip.util.MapUtil.*;
@@ -28,30 +28,30 @@ public class DssatControllerInput implements TranslatorInput {
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    public LinkedHashMap readFile(String arg0) {
+    public HashMap readFile(String arg0) {
 
         HashMap brMap;
-        LinkedHashMap ret = new LinkedHashMap();
-        LinkedHashMap metaData = new LinkedHashMap();
-        ArrayList<LinkedHashMap> expArr = new ArrayList<LinkedHashMap>();
-        LinkedHashMap expData;
-        ArrayList<LinkedHashMap> mgnArr;
-        ArrayList<LinkedHashMap> soilArr;
-        LinkedHashMap soilData;
-        LinkedHashMap soilTmpMap = new LinkedHashMap();
+        HashMap ret = new HashMap();
+        HashMap metaData = new HashMap();
+        ArrayList<HashMap> expArr = new ArrayList<HashMap>();
+        HashMap expData;
+        ArrayList<HashMap> mgnArr;
+        ArrayList<HashMap> soilArr;
+        HashMap soilData;
+        HashMap soilTmpMap = new HashMap();
         String soilId;
-        ArrayList<LinkedHashMap> wthArr;
-        LinkedHashMap wthData;
-        LinkedHashMap wthTmpMap = new LinkedHashMap();
+        ArrayList<HashMap> wthArr;
+        HashMap wthData;
+        HashMap wthTmpMap = new HashMap();
         String wthId;
-        LinkedHashMap obvAFiles;
-        LinkedHashMap obvAFile;
-        ArrayList<LinkedHashMap> obvAArr;
-        LinkedHashMap obvTFiles;
-        LinkedHashMap obvTFile;
-        ArrayList<LinkedHashMap> obvTArr;
-        ArrayList<LinkedHashMap> culArr;
-        LinkedHashMap culData;
+        HashMap obvAFiles;
+        HashMap obvAFile;
+        ArrayList<HashMap> obvAArr;
+        HashMap obvTFiles;
+        HashMap obvTFile;
+        ArrayList<HashMap> obvTArr;
+        ArrayList<HashMap> culArr;
+        HashMap culData;
 
         try {
             // Get buffered input file holder
@@ -109,11 +109,11 @@ public class DssatControllerInput implements TranslatorInput {
                 // if there is soil analysis data, create new soil block by using soil analysis info
                 if (expData.get("soil_analysis") != null) {
                     if (soilData == null) {
-                        soilData = new LinkedHashMap();
+                        soilData = new HashMap();
                     } else {
                         soilData = CopyList(soilData);
                     }
-                    LinkedHashMap saTmp = (LinkedHashMap) expData.remove("soil_analysis");
+                    HashMap saTmp = (HashMap) expData.remove("soil_analysis");
 
                     // Update soil site data
                     copyItem(soilData, saTmp, "sadat");
@@ -125,8 +125,8 @@ public class DssatControllerInput implements TranslatorInput {
                     expData.put("soil_id", soilId);
 
                     // Update soil layer data
-                    ArrayList<LinkedHashMap> soilLyrs = getObjectOr(soilData, soilReader.layerKey, new ArrayList());
-                    ArrayList<LinkedHashMap> saLyrs = getObjectOr(saTmp, mgnReader.icEventKey, new ArrayList());
+                    ArrayList<HashMap> soilLyrs = getObjectOr(soilData, soilReader.layerKey, new ArrayList());
+                    ArrayList<HashMap> saLyrs = getObjectOr(saTmp, mgnReader.icEventKey, new ArrayList());
                     String[] copyKeys = {"sllb", "slbdm", "sloc", "slni", "slphw", "slphb", "slpx", "slke", "slsc"};
                     soilData.put(soilReader.layerKey, combinLayers(soilLyrs, saLyrs, "sllb", "sllb", copyKeys));
                 }
@@ -143,22 +143,22 @@ public class DssatControllerInput implements TranslatorInput {
                 exname = "";
             }
             // observed data (summary)
-            obvAFile = getObjectOr(obvAFiles, exname, new LinkedHashMap());
-            obvAArr = getObjectOr(obvAFile, obvAReader.obvDataKey, new ArrayList<LinkedHashMap>());
-            LinkedHashMap obv = new LinkedHashMap();
+            obvAFile = getObjectOr(obvAFiles, exname, new HashMap());
+            obvAArr = getObjectOr(obvAFile, obvAReader.obvDataKey, new ArrayList<HashMap>());
+            HashMap obv = new HashMap();
             expData.put(obvAReader.jsonKey, obv);
             if (!getValueOr(expData, "trno", "0").equals("0")) {
-                LinkedHashMap tmp = getSectionData(obvAArr, "trno_a", expData.get("trno").toString());
+                HashMap tmp = getSectionData(obvAArr, "trno_a", expData.get("trno").toString());
                 if (tmp != null) {
                     obv.putAll(tmp);
                 }
             }
 
             // observed data (time-series)
-            obvTFile = getObjectOr(obvTFiles, exname, new LinkedHashMap());
-            obvTArr = getObjectOr(obvTFile, obvTReader.obvDataKey, new ArrayList<LinkedHashMap>());
+            obvTFile = getObjectOr(obvTFiles, exname, new HashMap());
+            obvTArr = getObjectOr(obvTFile, obvTReader.obvDataKey, new ArrayList<HashMap>());
             if (!getValueOr(expData, "trno", "0").equals("0")) {
-                LinkedHashMap tmp = getSectionData(obvTArr, "trno_t", expData.get("trno").toString());
+                HashMap tmp = getSectionData(obvTArr, "trno_t", expData.get("trno").toString());
                 if (tmp != null) {
                     obv.put("timeSeries", tmp.get(obvTReader.obvDataKey));
                 }
@@ -174,9 +174,9 @@ public class DssatControllerInput implements TranslatorInput {
 
             // Set dssat cultivar info block
             if (!culArr.isEmpty()) {
-                LinkedHashMap mgnData = getObjectOr(expData, mgnReader.jsonKey, new LinkedHashMap());
-                ArrayList<LinkedHashMap> eventArr = getObjectOr(mgnData, "events", new ArrayList());
-                ArrayList<LinkedHashMap> culTmpArr = new ArrayList<LinkedHashMap>();
+                HashMap mgnData = getObjectOr(expData, mgnReader.jsonKey, new HashMap());
+                ArrayList<HashMap> eventArr = getObjectOr(mgnData, "events", new ArrayList());
+                ArrayList<HashMap> culTmpArr = new ArrayList<HashMap>();
                 for (int j = 0; j < eventArr.size(); j++) {
                     if (getObjectOr(eventArr.get(j), "event", "").equals("planting")) {
                         culData = getSectionData(culArr, "cul_id", (String) eventArr.get(j).get("cul_id"));
@@ -187,7 +187,7 @@ public class DssatControllerInput implements TranslatorInput {
                 }
 
                 if (!culTmpArr.isEmpty()) {
-                    LinkedHashMap tmp = new LinkedHashMap();
+                    HashMap tmp = new HashMap();
                     tmp.put(culReader.dataKey, culTmpArr);
                     expData.put(culReader.jsonKey, tmp);
                 }

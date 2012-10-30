@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import org.agmip.util.JSONAdapter;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -43,7 +43,7 @@ public class DssatControllerTest {
 
     @Test
     public void test() throws IOException, Exception {
-        LinkedHashMap result;
+        HashMap result;
         File f;
         BufferedOutputStream bo;
         result = obDssatControllerInput.readFile(resource.getPath());

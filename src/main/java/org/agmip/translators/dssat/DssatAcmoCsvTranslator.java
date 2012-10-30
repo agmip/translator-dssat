@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import static org.agmip.translators.dssat.DssatCommonOutput.revisePath;
 import static org.agmip.util.MapUtil.*;
 
@@ -36,18 +36,18 @@ public class DssatAcmoCsvTranslator {
 
         DssatOutputFileInput dssatReader = new DssatOutputFileInput();
         DssatACMOJsonInput dssatReader2 = new DssatACMOJsonInput();
-        LinkedHashMap miniJson = dssatReader2.readFile(inputFilePath);
-        ArrayList<LinkedHashMap> metaDataArr = getObjectOr(miniJson, "data", new ArrayList());
+        HashMap miniJson = dssatReader2.readFile(inputFilePath);
+        ArrayList<HashMap> metaDataArr = getObjectOr(miniJson, "data", new ArrayList());
         StringBuilder sbData = new StringBuilder();
-        LinkedHashMap outputData = dssatReader.readFile(inputFilePath);
-        LinkedHashMap sumData = getObjectOr(outputData, "summary", new LinkedHashMap());
-        ArrayList<LinkedHashMap> sumSubArr = getObjectOr(sumData, "data", new ArrayList<LinkedHashMap>());
-        LinkedHashMap sumSubData;
-        ArrayList<LinkedHashMap> ovwSubArr = getObjectOr(outputData, "overview", new ArrayList());
-        LinkedHashMap ovwSubData;
-        ArrayList<LinkedHashMap> soilOrgArr = getObjectOr(outputData, "soilorg", new ArrayList());
-        LinkedHashMap soilOrgData;
-        LinkedHashMap metaData;
+        HashMap outputData = dssatReader.readFile(inputFilePath);
+        HashMap sumData = getObjectOr(outputData, "summary", new HashMap());
+        ArrayList<HashMap> sumSubArr = getObjectOr(sumData, "data", new ArrayList<HashMap>());
+        HashMap sumSubData;
+        ArrayList<HashMap> ovwSubArr = getObjectOr(outputData, "overview", new ArrayList());
+        HashMap ovwSubData;
+        ArrayList<HashMap> soilOrgArr = getObjectOr(outputData, "soilorg", new ArrayList());
+        HashMap soilOrgData;
+        HashMap metaData;
 
         outputCsvPath = revisePath(outputCsvPath);
         outputFile = new File(outputCsvPath + "ACMO.csv");
@@ -142,7 +142,7 @@ public class DssatAcmoCsvTranslator {
      * @param arr The array contains data objects
      * @param runno The run number
      */
-    private LinkedHashMap getSoilOrgData(ArrayList<LinkedHashMap> arr, String runno) {
+    private HashMap getSoilOrgData(ArrayList<HashMap> arr, String runno) {
 
         for (int i = 0; i < arr.size(); i++) {
             if (getObjectOr(arr.get(i), "runno", "").equals(runno)) {
@@ -150,7 +150,7 @@ public class DssatAcmoCsvTranslator {
             }
         }
 
-        return new LinkedHashMap();
+        return new HashMap();
     }
 
     /**
@@ -161,7 +161,7 @@ public class DssatAcmoCsvTranslator {
      * @param exp_id The experiment id (8-bit)
      * @param cr The crop id (2-bit)
      */
-    private LinkedHashMap getMetaData(ArrayList<LinkedHashMap> arr, String trno, String exp_id, String cr) {
+    private HashMap getMetaData(ArrayList<HashMap> arr, String trno, String exp_id, String cr) {
 
         String exname;
         for (int i = 0; i < arr.size(); i++) {
@@ -171,6 +171,6 @@ public class DssatAcmoCsvTranslator {
             }
         }
 
-        return new LinkedHashMap();
+        return new HashMap();
     }
 }

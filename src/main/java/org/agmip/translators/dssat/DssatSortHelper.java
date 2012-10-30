@@ -1,7 +1,7 @@
 package org.agmip.translators.dssat;
 
 import java.util.Comparator;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import static org.agmip.util.MapUtil.getValueOr;
 
 /**
@@ -10,7 +10,7 @@ import static org.agmip.util.MapUtil.getValueOr;
  * @author Meng Zhang
  * @version 1.0
  */
-class DssatSortHelper implements Comparator<LinkedHashMap> {
+class DssatSortHelper implements Comparator<HashMap> {
 
     private String[] sortIds;
     private int decVal = 1;
@@ -51,7 +51,7 @@ class DssatSortHelper implements Comparator<LinkedHashMap> {
      * @param m2    Data record 2nd
      * @return 
      */
-    public int compare(LinkedHashMap m1, LinkedHashMap m2) {
+    public int compare(HashMap m1, HashMap m2) {
         double val1;
         double val2;
         for (int i = 0; i < sortIds.length; i++) {
@@ -73,7 +73,7 @@ class DssatSortHelper implements Comparator<LinkedHashMap> {
      * @param key   variable name
      * @return 
      */
-    private double getValue(LinkedHashMap m, String key) {
+    private double getValue(HashMap m, String key) {
         try {
             return Double.parseDouble(getValueOr(m, key, ""));
         } catch (Exception e) {

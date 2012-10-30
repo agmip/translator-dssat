@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import static org.agmip.util.MapUtil.*;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -32,10 +32,10 @@ public class DssatBatchFileTest {
 
     @Test
     public void test() throws IOException, Exception {
-        LinkedHashMap result;
+        HashMap result;
 
         result = obDssatControllerInput.readFile(resource.getPath());
-        ArrayList<LinkedHashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
+        ArrayList<HashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
 
         obDssatBatchFileOutput.writeFile("", expArr);
         File file = obDssatBatchFileOutput.getOutputFile();

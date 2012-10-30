@@ -5,7 +5,7 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 
 /**
  * DSSAT Cultivar Data I/O API Class
@@ -33,14 +33,14 @@ public class DssatCulFileInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
-        LinkedHashMap ret = new LinkedHashMap();
-        LinkedHashMap metaData = new LinkedHashMap();
-        ArrayList<LinkedHashMap> culArr = readCultivarData(brMap, metaData);
+    protected HashMap readFile(HashMap brMap) throws IOException {
+        HashMap ret = new HashMap();
+        HashMap metaData = new HashMap();
+        ArrayList<HashMap> culArr = readCultivarData(brMap, metaData);
 //        compressData(sites);
-        ArrayList<LinkedHashMap> expArr = new ArrayList();
-        LinkedHashMap tmp = new LinkedHashMap();
-        LinkedHashMap tmp2 = new LinkedHashMap();
+        ArrayList<HashMap> expArr = new ArrayList();
+        HashMap tmp = new HashMap();
+        HashMap tmp2 = new HashMap();
         tmp.put(jsonKey, tmp2);
         tmp2.put(dataKey, culArr);
         expArr.add(tmp);
@@ -56,18 +56,18 @@ public class DssatCulFileInput extends DssatCommonInput {
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected ArrayList<LinkedHashMap> readCultivarData(HashMap brMap, LinkedHashMap ret) throws IOException {
+    protected ArrayList<HashMap> readCultivarData(HashMap brMap, HashMap ret) throws IOException {
 
         String slNotes = null;
-        ArrayList<LinkedHashMap> culArr = new ArrayList<LinkedHashMap>();
-        LinkedHashMap culData = new LinkedHashMap();
+        ArrayList<HashMap> culArr = new ArrayList<HashMap>();
+        HashMap culData = new HashMap();
         String line;
         BufferedReader brC = null;
         Object buf;
-        LinkedHashMap mapC;
-        LinkedHashMap formats = new LinkedHashMap();
+        HashMap mapC;
+        HashMap formats = new HashMap();
 
-        mapC = (LinkedHashMap) brMap.get("C");
+        mapC = (HashMap) brMap.get("C");
 
         // If Cultivar File is no been found
         if (mapC.isEmpty()) {
@@ -92,7 +92,7 @@ public class DssatCulFileInput extends DssatCommonInput {
 
                 // Read Header Info
                 if (flg[2].equals("meta")) {
-                    culData = new LinkedHashMap();
+                    culData = new HashMap();
                     culData.put("header_info", line.trim());
                 } // Cultivar data title
                 else if (flg[2].equals("title")) {
@@ -104,7 +104,7 @@ public class DssatCulFileInput extends DssatCommonInput {
                     formats.clear();
                     formats.put("cul_id", 6);
                     // Read line and save into return holder
-                    LinkedHashMap tmp = readLine(line, formats);
+                    HashMap tmp = readLine(line, formats);
                     tmp.putAll(culData);
                     tmp.put("cul_info", line);
                     culArr.add(tmp);

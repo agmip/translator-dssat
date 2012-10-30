@@ -5,7 +5,7 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 
 /**
  * DSSAT AFile Data I/O API Class
@@ -34,19 +34,19 @@ public class DssatAFileInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
+    protected HashMap readFile(HashMap brMap) throws IOException {
 
-        LinkedHashMap ret = new LinkedHashMap();
-        ArrayList<LinkedHashMap> expArr = new ArrayList<LinkedHashMap>();
-        LinkedHashMap<String, LinkedHashMap> files = readObvData(brMap);
+        HashMap ret = new HashMap();
+        ArrayList<HashMap> expArr = new ArrayList<HashMap>();
+        HashMap<String, HashMap> files = readObvData(brMap);
 //        compressData(file);
-        ArrayList<LinkedHashMap> obvData;
-        LinkedHashMap expData;
+        ArrayList<HashMap> obvData;
+        HashMap expData;
 
         for (String exname : files.keySet()) {
             obvData = (ArrayList) files.get(exname).get(obvDataKey);
             for (int i = 0; i < obvData.size(); i++) {
-                expData = new LinkedHashMap();
+                expData = new HashMap();
                 copyItem(expData, files.get(exname), "exname");
                 copyItem(expData, files.get(exname), "local_name");
                 expData.put(jsonKey, obvData.get(i));
@@ -70,15 +70,15 @@ public class DssatAFileInput extends DssatCommonInput {
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected LinkedHashMap readObvData(HashMap brMap) throws IOException {
+    protected HashMap readObvData(HashMap brMap) throws IOException {
 
-        LinkedHashMap files = new LinkedHashMap();
-        LinkedHashMap file = new LinkedHashMap();
+        HashMap files = new HashMap();
+        HashMap file = new HashMap();
         String line;
         HashMap mapA;
         BufferedReader brA = null;
         Object buf;
-        LinkedHashMap formats = new LinkedHashMap();
+        HashMap formats = new HashMap();
         ArrayList titles = new ArrayList();
         ArrayList obvData = new ArrayList();
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
@@ -102,7 +102,7 @@ public class DssatAFileInput extends DssatCommonInput {
                 brA = (BufferedReader) buf;
             }
 
-            file = new LinkedHashMap();
+            file = new HashMap();
 
             while ((line = brA.readLine()) != null) {
 
@@ -132,7 +132,7 @@ public class DssatAFileInput extends DssatCommonInput {
                             formats.put(titles.get(i), 6);
                         }
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats, "");
+                        HashMap tmp = readLine(line, formats, "");
                         pdate = getPdate(brMap, (String) tmp.get("trno_a"), fileName.replaceAll("A$", "X"));
                         for (int i = 0; i < titles.size(); i++) {
                             String title = (String) titles.get(i);

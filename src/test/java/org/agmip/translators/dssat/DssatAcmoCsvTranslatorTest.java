@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import org.agmip.util.JSONAdapter;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -33,7 +33,7 @@ public class DssatAcmoCsvTranslatorTest {
 
     @Test
     public void test() throws IOException, Exception {
-        LinkedHashMap result = obDssatOutputFileInput.readFile(resource.getPath());
+        HashMap result = obDssatOutputFileInput.readFile(resource.getPath());
 //        System.out.println(JSONAdapter.toJSON(result));
         File f = new File("outputOut.txt");
         BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
