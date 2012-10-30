@@ -50,12 +50,12 @@ public class DssatThreadOutput {
         @Override
         public void run() {
 //		LOG.debug("Starting new thread!");
-//            try {
-            translator.writeFile(outputDirectory, data);
-//            } catch (IOException e) {
+            try {
+                translator.writeFile(outputDirectory, data);
+            } catch (Exception e) {
 //                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            }
+                e.printStackTrace();
+            }
         }
     }
 }
