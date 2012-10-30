@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import org.agmip.util.JSONAdapter;
 
 /**
@@ -31,11 +31,11 @@ public class DssatACMOJsonInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
+    protected HashMap readFile(HashMap brMap) throws IOException {
 
-        LinkedHashMap file = readACMOJsonData(brMap);
+        HashMap file = readACMOJsonData(brMap);
 //        decompressData(file);
-//        return getObjectOr(file, "data", new ArrayList<LinkedHashMap>());
+//        return getObjectOr(file, "data", new ArrayList<HashMap>());
         return file;
     }
 
@@ -46,9 +46,9 @@ public class DssatACMOJsonInput extends DssatCommonInput {
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected LinkedHashMap readACMOJsonData(HashMap brMap) throws IOException {
+    protected HashMap readACMOJsonData(HashMap brMap) throws IOException {
 
-        LinkedHashMap file = new LinkedHashMap();
+        HashMap file = new HashMap();
         String line;
         StringBuilder sb = new StringBuilder();
         BufferedReader brJ;

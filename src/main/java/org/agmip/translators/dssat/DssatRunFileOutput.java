@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,8 +22,8 @@ public class DssatRunFileOutput extends DssatCommonOutput {
      * @param arg0 file output path
      * @param results array of data holder object
      */
-    public void writeFile(String arg0, ArrayList<LinkedHashMap> results) {
-        writeFile(arg0, new LinkedHashMap());
+    public void writeFile(String arg0, ArrayList<HashMap> results) {
+        writeFile(arg0, new HashMap());
     }
 
     /**
