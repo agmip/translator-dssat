@@ -6,7 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.util.MapUtil.*;
 
@@ -29,9 +29,9 @@ public class DssatSoilOutput extends DssatCommonOutput {
 
         // Initial variables
 //        ArrayList soilSites;                            // Soil site data array
-        LinkedHashMap soilSite;                       // Data holder for one site of soil data
+        HashMap soilSite;                       // Data holder for one site of soil data
         ArrayList soilRecords;                          // Soil layer data array
-        LinkedHashMap soilRecord;                     // Data holder for one layer data
+        HashMap soilRecord;                     // Data holder for one layer data
         BufferedWriter bwS;                             // output object
         StringBuilder sbData = new StringBuilder();     // construct the data info in the output
         StringBuilder sbLyrP2 = new StringBuilder();    // output string for second part of layer data
@@ -44,7 +44,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
             // Set default value for missing data
             setDefVal();
 
-            soilSite = (LinkedHashMap) getObjectOr(result, "soil", new LinkedHashMap());
+            soilSite = (HashMap) getObjectOr(result, "soil", new HashMap());
             if (soilSite.isEmpty()) {
                 return;
             }
@@ -77,7 +77,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
 
             // Titel Section
             if (!existFlg) {
-                sbData.append("*SOILS: ").append(getObjectOr((LinkedHashMap) soilSite, "sl_notes", defValBlank)).append("\r\n\r\n");
+                sbData.append("*SOILS: ").append(getObjectOr((HashMap) soilSite, "sl_notes", defValBlank)).append("\r\n\r\n");
             }
             sbData.append("!The ACE ID is ").append(getValueOr(result, "id", "N/A")).append(".\r\n");
             sbData.append("!This soil data is used for the experiment of ").append(getValueOr(result, "exname", "N/A")).append(".\r\n\r\n");
@@ -122,9 +122,9 @@ public class DssatSoilOutput extends DssatCommonOutput {
             sbData.append("@  SLB  SLMH  SLLL  SDUL  SSAT  SRGF  SSKS  SBDM  SLOC  SLCL  SLSI  SLCF  SLNI  SLHW  SLHB  SCEC  SADC\r\n");
             // part two
             // Get first site record
-            LinkedHashMap fstRecord = new LinkedHashMap();
+            HashMap fstRecord = new HashMap();
             if (!soilRecords.isEmpty()) {
-                fstRecord = (LinkedHashMap) soilRecords.get(0);
+                fstRecord = (HashMap) soilRecords.get(0);
             }
 
             // Check if there is 2nd part of layer data for output
@@ -142,7 +142,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
             // Loop for laryer data
             for (int j = 0; j < soilRecords.size(); j++) {
 
-                soilRecord = (LinkedHashMap) soilRecords.get(j);
+                soilRecord = (HashMap) soilRecords.get(j);
                 // part one
                 sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s %16$5s %17$5s\r\n",
                         formatNumStr(5, soilRecord, "sllb", defValR),

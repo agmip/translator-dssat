@@ -11,12 +11,6 @@
     </description>
     <url>http://www.agmip.org/</url>
 
-    <parent>
-        <groupId>org.agmip.translators</groupId>
-        <artifactId>translator-dist</artifactId>
-        <version>0.7</version>
-    </parent>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -55,11 +49,18 @@
         <dependency>
             <groupId>org.agmip</groupId>
             <artifactId>agmip-core</artifactId>
+			<version>0.15-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+			<version>4.10</version>
         </dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+            <version>1.0.7</version>
+		</dependency>
     </dependencies>
 
     <scm>
