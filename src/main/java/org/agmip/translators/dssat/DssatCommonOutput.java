@@ -3,7 +3,7 @@ package org.agmip.translators.dssat;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import org.agmip.core.types.TranslatorOutput;
 import static org.agmip.util.MapUtil.*;
@@ -58,7 +58,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @param str Input string of number
      * @return formated string of number
      */
-    protected String formatNumStr(int bits, LinkedHashMap m, Object key, String defVal) {
+    protected String formatNumStr(int bits, HashMap m, Object key, String defVal) {
 
         String ret = "";
         String str = getObjectOr(m, key, defVal);
@@ -169,8 +169,8 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      */
     protected String getCrid(Map result) {
 
-        LinkedHashMap mgnData = getObjectOr(result, "management", new LinkedHashMap());
-        ArrayList<LinkedHashMap> events = getObjectOr(mgnData, "events", new ArrayList());
+        HashMap mgnData = getObjectOr(result, "management", new HashMap());
+        ArrayList<HashMap> events = getObjectOr(mgnData, "events", new ArrayList());
         String crid = null;
         for (int i = 0; i < events.size(); i++) {
             if (events.get(i).get("event").equals("planting")) {
@@ -252,15 +252,15 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      *
      * @param m input map
      */
-    protected void decompressData(LinkedHashMap m) {
+    protected void decompressData(HashMap m) {
 
         for (Object key : m.keySet()) {
             if (m.get(key) instanceof ArrayList) {
                 // iterate sub array nodes
                 decompressData((ArrayList) m.get(key));
-            } else if (m.get(key) instanceof LinkedHashMap) {
+            } else if (m.get(key) instanceof HashMap) {
                 // iterate sub data nodes
-                decompressData((LinkedHashMap) m.get(key));
+                decompressData((HashMap) m.get(key));
             } else {
                 // ignore other type nodes
             }
@@ -276,24 +276,24 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      */
     protected void decompressData(ArrayList arr) {
 
-        LinkedHashMap fstData = null; // The first data record (Map type)
-        LinkedHashMap cprData = null; // The following data record which will be compressed
+        HashMap fstData = null; // The first data record (Map type)
+        HashMap cprData = null; // The following data record which will be compressed
 
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i) instanceof ArrayList) {
                 // iterate sub array nodes
                 decompressData((ArrayList) arr.get(i));
 
-            } else if (arr.get(i) instanceof LinkedHashMap) {
+            } else if (arr.get(i) instanceof HashMap) {
                 // iterate sub data nodes
-                decompressData((LinkedHashMap) arr.get(i));
+                decompressData((HashMap) arr.get(i));
 
                 // Compress data for current array
                 if (fstData == null) {
                     // Get first data node
-                    fstData = (LinkedHashMap) arr.get(i);
+                    fstData = (HashMap) arr.get(i);
                 } else {
-                    cprData = (LinkedHashMap) arr.get(i);
+                    cprData = (HashMap) arr.get(i);
                     // The omitted data will be recovered to the following map; Only data item (String type) will be processed
                     for (Object key : fstData.keySet()) {
                         if (!cprData.containsKey(key)) {
@@ -314,8 +314,8 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      */
     protected String getPdate(Map result) {
 
-        LinkedHashMap management = getObjectOr(result, "management", new LinkedHashMap());
-        ArrayList<LinkedHashMap> events = getObjectOr(management, "events", new ArrayList<LinkedHashMap>());
+        HashMap management = getObjectOr(result, "management", new HashMap());
+        ArrayList<HashMap> events = getObjectOr(management, "events", new ArrayList<HashMap>());
         for (int i = 0; i < events.size(); i++) {
             if (getValueOr(events.get(i), "event", "").equals("planting")) {
                 return getValueOr(events.get(i), "date", "");
@@ -331,7 +331,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @param data experiment data holder or weather data holder
      * @return
      */
-    protected String getWthFileName(LinkedHashMap data) {
+    protected String getWthFileName(HashMap data) {
 
 //        String agmipFileHack = getValueOr(wthFile, "wst_name", "");
 //        if (agmipFileHack.length() == 8) {

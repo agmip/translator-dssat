@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.util.MapUtil.*;
 
@@ -27,9 +27,9 @@ public class DssatWeatherOutput extends DssatCommonOutput {
     public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        LinkedHashMap wthFile;                  // Data holder for whole weather data
+        HashMap wthFile;                  // Data holder for whole weather data
         ArrayList wthRecords;                   // Daily data array
-        LinkedHashMap wthRecord;                // Data holder for daily data
+        HashMap wthRecord;                // Data holder for daily data
         BufferedWriter bwW;                     // output object
         StringBuilder sbData = new StringBuilder();     // construct the data info in the output
         ArrayList minDailyData = new ArrayList();       // Define minimum necessary daily data fields
@@ -38,7 +38,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
         minDailyData.add("tmax");
         minDailyData.add("tmin");
         minDailyData.add("rain");
-        LinkedHashMap optDailyData = new LinkedHashMap();   // Define optional daily data fields
+        HashMap optDailyData = new HashMap();   // Define optional daily data fields
         optDailyData.put("tdew", "DEWP");
         optDailyData.put("wind", "WIND");
         optDailyData.put("pard", "PAR");
@@ -51,7 +51,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get weather files
-            wthFile = (LinkedHashMap) getObjectOr(result, "weather", new LinkedHashMap());
+            wthFile = (HashMap) getObjectOr(result, "weather", new HashMap());
             if (wthFile.isEmpty()) {
                 return;
             }
@@ -89,9 +89,9 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // Unfixed Title
             // Get First day record to find how many fields there are
-            LinkedHashMap fstDayRecord = new LinkedHashMap();
+            HashMap fstDayRecord = new HashMap();
             if (!wthFile.isEmpty()) {
-                fstDayRecord = (LinkedHashMap) wthRecords.get(0);
+                fstDayRecord = (HashMap) wthRecords.get(0);
             }
 
             // check if there are optional fields
@@ -124,7 +124,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             for (int j = 0; j < wthRecords.size(); j++) {
 
-                wthRecord = (LinkedHashMap) wthRecords.get(j);
+                wthRecord = (HashMap) wthRecords.get(j);
                 // if date is missing, jump the record
                 if (!getObjectOr(wthRecord, "w_date", "").toString().equals("")) {
                     // Fixed data part

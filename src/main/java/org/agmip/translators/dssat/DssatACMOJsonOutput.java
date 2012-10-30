@@ -4,7 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import org.agmip.util.JSONAdapter;
 import static org.agmip.util.MapUtil.*;
@@ -27,7 +27,7 @@ public class DssatACMOJsonOutput extends DssatCommonOutput {
     public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        LinkedHashMap record;       // Data holder for summary data
+        HashMap record;       // Data holder for summary data
         BufferedWriter bwJ;                         // output object
 
         try {
@@ -36,7 +36,7 @@ public class DssatACMOJsonOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            record = (LinkedHashMap) getObjectOr(result, "acmo", new LinkedHashMap());
+            record = (HashMap) getObjectOr(result, "acmo", new HashMap());
             if (record.isEmpty()) {
                 return;
             }

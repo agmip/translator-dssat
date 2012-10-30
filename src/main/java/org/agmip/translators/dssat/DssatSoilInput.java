@@ -34,9 +34,9 @@ public class DssatSoilInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
-        LinkedHashMap ret = new LinkedHashMap();
-        ArrayList<LinkedHashMap> sites = readSoilSites(brMap, new LinkedHashMap());
+    protected HashMap readFile(HashMap brMap) throws IOException {
+        HashMap ret = new HashMap();
+        ArrayList<HashMap> sites = readSoilSites(brMap, new HashMap());
 //        compressData(sites);
         ret.put("soils", sites);
 
@@ -49,19 +49,19 @@ public class DssatSoilInput extends DssatCommonInput {
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected ArrayList<LinkedHashMap> readSoilSites(HashMap brMap, LinkedHashMap ret) throws IOException {
+    protected ArrayList<HashMap> readSoilSites(HashMap brMap, HashMap ret) throws IOException {
 
         String slNotes = null;
-        ArrayList<LinkedHashMap> sites = new ArrayList<LinkedHashMap>();
-        LinkedHashMap site = new LinkedHashMap();
+        ArrayList<HashMap> sites = new ArrayList<HashMap>();
+        HashMap site = new HashMap();
         ArrayList layers = new ArrayList();
         String line;
         BufferedReader brS = null;
         Object buf;
-        LinkedHashMap mapS;
+        HashMap mapS;
         LinkedHashMap formats = new LinkedHashMap();
 
-        mapS = (LinkedHashMap) brMap.get("S");
+        mapS = (HashMap) brMap.get("S");
 
         // If Soil File is no been found
         if (mapS.isEmpty()) {
@@ -110,7 +110,7 @@ public class DssatSoilInput extends DssatCommonInput {
                         }
                         sites.add(site);
                         layers = new ArrayList();
-//                        ((LinkedHashMap) sites.get(sites.size() - 1)).put(layerKey, new ArrayList());
+//                        ((HashMap) sites.get(sites.size() - 1)).put(layerKey, new ArrayList());
 
                     } // Site detail info
                     else if (flg[1].startsWith("site ") && flg[2].equals("data")) {
@@ -123,7 +123,7 @@ public class DssatSoilInput extends DssatCommonInput {
                         formats.put("soil_long", 8); // P.S. Definition changed 9 -> 8  (06/24)
                         formats.put("classification", 51);    // P.S. "fd_name" for query using, not this time
                         // Read line and save into return holder
-//                        ((LinkedHashMap) sites.get(sites.size() - 1)).putAll(readLine(line, formats));
+//                        ((HashMap) sites.get(sites.size() - 1)).putAll(readLine(line, formats));
                         site.putAll(readLine(line, formats));
 
                     } // soil info
@@ -142,7 +142,7 @@ public class DssatSoilInput extends DssatCommonInput {
                         formats.put("smpx", 6);
                         formats.put("smke", 6);
                         // Read line and save into return holder
-//                        ((LinkedHashMap) sites.get(sites.size() - 1)).putAll(readLine(line, formats));
+//                        ((HashMap) sites.get(sites.size() - 1)).putAll(readLine(line, formats));
                         site.putAll(readLine(line, formats));
 
                     } // layer part one info
@@ -168,7 +168,7 @@ public class DssatSoilInput extends DssatCommonInput {
                         formats.put("slcec", 6);
                         formats.put("sadc", 6);
                         // Read line and save into return holder
-//                        addToArray((ArrayList) ((LinkedHashMap) sites.get(sites.size() - 1)).get(layerKey),
+//                        addToArray((ArrayList) ((HashMap) sites.get(sites.size() - 1)).get(layerKey),
 //                                readLine(line, formats),
 //                                "sllb");
                         addToArray(layers, readLine(line, formats), "sllb");
@@ -203,7 +203,7 @@ public class DssatSoilInput extends DssatCommonInput {
                             formats.put("slca", 6);
                         }
                         // Read line and save into return holder
-//                        addToArray((ArrayList) ((LinkedHashMap) sites.get(sites.size() - 1)).get(layerKey),
+//                        addToArray((ArrayList) ((HashMap) sites.get(sites.size() - 1)).get(layerKey),
 //                                readLine(line, formats),
 //                                "sllb");
                         addToArray(layers, readLine(line, formats), "sllb");

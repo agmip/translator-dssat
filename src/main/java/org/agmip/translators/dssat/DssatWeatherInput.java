@@ -34,9 +34,9 @@ public class DssatWeatherInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
-        LinkedHashMap ret = new LinkedHashMap();
-        ArrayList<LinkedHashMap> files = readDailyData(brMap, new LinkedHashMap());
+    protected HashMap readFile(HashMap brMap) throws IOException {
+        HashMap ret = new HashMap();
+        ArrayList<HashMap> files = readDailyData(brMap, new HashMap());
 //        compressData(files);
         ret.put("weathers", files);
 
@@ -49,20 +49,20 @@ public class DssatWeatherInput extends DssatCommonInput {
      * @param brMap  The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected ArrayList<LinkedHashMap> readDailyData(HashMap brMap, LinkedHashMap ret) throws IOException {
+    protected ArrayList<HashMap> readDailyData(HashMap brMap, HashMap ret) throws IOException {
 
-        ArrayList<LinkedHashMap> files = new ArrayList();
-        ArrayList<LinkedHashMap> daily;
+        ArrayList<HashMap> files = new ArrayList();
+        ArrayList<HashMap> daily;
         ArrayList titles;
-        LinkedHashMap fileTmp;
-        LinkedHashMap file = null;
+        HashMap fileTmp;
+        HashMap file = null;
         String line;
         BufferedReader brW = null;
         Object buf;
-        LinkedHashMap mapW;
+        HashMap mapW;
         LinkedHashMap formats = new LinkedHashMap();
 
-        mapW = (LinkedHashMap) brMap.get("W");
+        mapW = (HashMap) brMap.get("W");
 
         // If Weather File is no been found
         if (mapW.isEmpty()) {
@@ -77,7 +77,7 @@ public class DssatWeatherInput extends DssatCommonInput {
             } else {
                 brW = (BufferedReader) buf;
             }
-            fileTmp = new LinkedHashMap();
+            fileTmp = new HashMap();
             daily = new ArrayList();
             titles = new ArrayList();
 
@@ -130,7 +130,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                             formats.put(titles.get(i), 6);
                         }
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats, "");
+                        HashMap tmp = readLine(line, formats, "");
                         // translate date from yyddd format to yyyymmdd format
                         translateDateStr(tmp, "w_date");
                         daily.add(tmp);

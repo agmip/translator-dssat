@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.translators.dssat.DssatCommonInput.CopyList;
 import static org.agmip.util.MapUtil.*;
@@ -28,7 +28,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
     public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        LinkedHashMap<String, String> record;       // Data holder for summary data
+        HashMap<String, String> record;       // Data holder for summary data
         BufferedWriter bwA;                         // output object
         StringBuilder sbData = new StringBuilder(); // construct the data info in the output
         HashMap<String, String> altTitleList = new HashMap();   // Define alternative fields for the necessary observation data fields; key is necessary field
@@ -36,7 +36,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
         altTitleList.put("mdat", "mdap");
         altTitleList.put("adat", "adap");
         altTitleList.put("cwam", "");
-        LinkedHashMap titleOutput = new LinkedHashMap();    // contain output data field id
+        HashMap titleOutput = new HashMap();    // contain output data field id
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
 
         try {
@@ -45,7 +45,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            record = CopyList((LinkedHashMap) getObjectOr(result, "observed", new LinkedHashMap()));
+            record = CopyList((HashMap) getObjectOr(result, "observed", new HashMap()));
             Object[] keys = record.keySet().toArray();
             for (Object key : keys) {
                 if (!(record.get(key) instanceof String)) {

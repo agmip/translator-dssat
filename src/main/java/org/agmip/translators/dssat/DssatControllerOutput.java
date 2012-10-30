@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -43,10 +43,10 @@ public class DssatControllerOutput extends DssatCommonOutput {
         arg0 = revisePath(arg0);
         String exname;
         ArrayList<String> subDirs = new ArrayList();
-        ArrayList<LinkedHashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
-        LinkedHashMap expData;
-        ArrayList<LinkedHashMap> soilArr = getObjectOr(result, "soils", new ArrayList());
-        ArrayList<LinkedHashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
+        ArrayList<HashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
+        HashMap expData;
+        ArrayList<HashMap> soilArr = getObjectOr(result, "soils", new ArrayList());
+        ArrayList<HashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
         DssatCommonOutput[] outputs = {
             new DssatXFileOutput(),
             new DssatAFileOutput(),
@@ -103,12 +103,12 @@ public class DssatControllerOutput extends DssatCommonOutput {
         } // If only weather or soil data is included
         else {
             for (int i = 0; i < soilArr.size(); i++) {
-                LinkedHashMap tmp = new LinkedHashMap();
+                HashMap tmp = new HashMap();
                 tmp.put("soil", soilArr.get(i));
                 writeSingleExp(arg0, tmp, new DssatSoilOutput());
             }
             for (int i = 0; i < wthArr.size(); i++) {
-                LinkedHashMap tmp = new LinkedHashMap();
+                HashMap tmp = new HashMap();
                 tmp.put("weather", wthArr.get(i));
                 writeSingleExp(arg0, tmp, new DssatWeatherOutput());
             }
@@ -177,11 +177,15 @@ public class DssatControllerOutput extends DssatCommonOutput {
      */
     private void writeSingleExp(String arg0, Map result, DssatCommonOutput... outputs) {
         for (int i = 0; i < outputs.length; i++) {
-            outputs[i].writeFile(arg0, result);
-            if (outputs[i].getOutputFile() != null) {
-//                files.add(outputs[i].getOutputFile());
-                files.put(outputs[i].getOutputFile().getPath(), outputs[i].getOutputFile());
-            }
+            try {
+                outputs[i].writeFile(arg0, result);
+                if (outputs[i].getOutputFile() != null) {
+    //                files.add(outputs[i].getOutputFile());
+                    files.put(outputs[i].getOutputFile().getPath(), outputs[i].getOutputFile());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }    
         }
     }
 
@@ -194,31 +198,34 @@ public class DssatControllerOutput extends DssatCommonOutput {
      * @return The created soil/weather file object
      */
     private File writeSWFile(String arg0, Map expData, DssatCommonOutput output) {
-        String id;
+        String id = "";
 //        String fileName;
-        HashMap<String, File> swfiles;
-
-        if (output instanceof DssatSoilOutput) {
-            id = getObjectOr(expData, "soil_id", "");
-            id = id.substring(0, 2);
-            swfiles = soilFiles;
-        } else {
-//            id = getObjectOr(expData, "wst_id", "");
-//            id = getWthFileName(getObjectOr(expData, "weather", new LinkedHashMap()));
-            id = wthHelper.createWthFileName(getObjectOr(expData, "weather", new LinkedHashMap()));
-            swfiles = wthFiles;
-            expData.put("wst_id", id);
-            getObjectOr(expData, "weather", new HashMap()).put("wst_id", id);
-        }
-        if (!id.equals("") && !swfiles.containsKey(id)) {
-            output.writeFile(arg0, expData);
-            if (output.getOutputFile() != null) {
-                swfiles.put(id, output.getOutputFile());
-//            files.add(output.getOutputFile());
-                files.put(output.getOutputFile().getPath(), output.getOutputFile());
+        HashMap<String, File> swfiles = null;
+        try {
+            if (output instanceof DssatSoilOutput) {
+                id = getObjectOr(expData, "soil_id", "");
+                id = id.substring(0, 2);
+                swfiles = soilFiles;
+            } else {
+    //            id = getObjectOr(expData, "wst_id", "");
+    //            id = getWthFileName(getObjectOr(expData, "weather", new HashMap()));
+    
+                id = wthHelper.createWthFileName(getObjectOr(expData, "weather", new HashMap()));
+                swfiles = wthFiles;
+                expData.put("wst_id", id);
+                getObjectOr(expData, "weather", new HashMap()).put("wst_id", id);
             }
+            if (!id.equals("") && !swfiles.containsKey(id)) {
+                output.writeFile(arg0, expData);
+                if (output.getOutputFile() != null) {
+                    swfiles.put(id, output.getOutputFile());
+    //            files.add(output.getOutputFile());
+                    files.put(output.getOutputFile().getPath(), output.getOutputFile());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
         return swfiles.get(id);
     }
 
@@ -392,7 +399,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         return zipFile;
     }
 
-    private HashMap<String, String> checkMultiTrn(ArrayList<LinkedHashMap> expArr) {
+    private HashMap<String, String> checkMultiTrn(ArrayList<HashMap> expArr) {
         HashMap<String, String> ret = new HashMap();
         HashMap<String, Boolean> multiTrnFlgs = new HashMap();
         String exname;
