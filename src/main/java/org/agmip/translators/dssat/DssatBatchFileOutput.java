@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.util.MapUtil.*;
 
@@ -23,10 +23,10 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
      * @param arg0 file output path
      * @param results array of data holder object
      */
-    public void writeFile(String arg0, ArrayList<LinkedHashMap> results) {
+    public void writeFile(String arg0, ArrayList<HashMap> results) {
 
         // Initial variables
-        LinkedHashMap result;                       // Data holder for summary data
+        HashMap result;                       // Data holder for summary data
         BufferedWriter bwB;                         // output object
         StringBuilder sbData = new StringBuilder(); // construct the data info in the output
 
@@ -79,11 +79,11 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
                 folderPath += File.separator;
 
                 // Get DSSAT Sequence info
-                LinkedHashMap dssatSeqData = getObjectOr(result, "dssat_sequence", new LinkedHashMap());
-                ArrayList<LinkedHashMap> dssatSeqArr = getObjectOr(dssatSeqData, "data", new ArrayList<LinkedHashMap>());
+                HashMap dssatSeqData = getObjectOr(result, "dssat_sequence", new HashMap());
+                ArrayList<HashMap> dssatSeqArr = getObjectOr(dssatSeqData, "data", new ArrayList<HashMap>());
                 // If missing, set default value
                 if (dssatSeqArr.isEmpty()) {
-                    LinkedHashMap tmp = new LinkedHashMap();
+                    HashMap tmp = new HashMap();
                     tmp.put("sq", "1");
                     tmp.put("op", "1");
                     tmp.put("co", "0");
@@ -161,11 +161,11 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
             // Body Section
             sbData.append("@FILEX                                                                                        TRTNO     RP     SQ     OP     CO\r\n");
             // Get DSSAT Sequence info
-            LinkedHashMap dssatSeqData = getObjectOr(result, "dssat_sequence", new LinkedHashMap());
-            ArrayList<LinkedHashMap> dssatSeqArr = getObjectOr(dssatSeqData, "data", new ArrayList<LinkedHashMap>());
+            HashMap dssatSeqData = getObjectOr(result, "dssat_sequence", new HashMap());
+            ArrayList<HashMap> dssatSeqArr = getObjectOr(dssatSeqData, "data", new ArrayList<HashMap>());
             // If missing, set default value
             if (dssatSeqArr.isEmpty()) {
-                LinkedHashMap tmp = new LinkedHashMap();
+                HashMap tmp = new HashMap();
                 tmp.put("sq", "1");
                 tmp.put("op", "1");
                 tmp.put("co", "0");

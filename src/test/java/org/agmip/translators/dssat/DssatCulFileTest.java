@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import org.agmip.util.JSONAdapter;
 import static org.agmip.util.MapUtil.getObjectOr;
 import static org.junit.Assert.*;
@@ -37,7 +37,7 @@ public class DssatCulFileTest {
     @Test
     public void test() throws IOException, Exception {
 
-        LinkedHashMap result;
+        HashMap result;
 
         result = obInput.readFile(resource.getPath());
 //        System.out.println(JSONAdapter.toJSON(result));
@@ -47,7 +47,7 @@ public class DssatCulFileTest {
         bo.close();
         f.delete();
 
-        ArrayList<LinkedHashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
+        ArrayList<HashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
         expArr.get(0).put("exname", "APAN9304PN");
         obOutput.writeFile("", expArr.get(0));
         File file = obOutput.getOutputFile();

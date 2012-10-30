@@ -1,7 +1,7 @@
 package org.agmip.translators.dssat;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import org.agmip.core.types.TranslatorOutput;
 import org.agmip.translators.dssat.DssatControllerOutput;
@@ -14,17 +14,17 @@ import static org.agmip.util.MapUtil.getObjectOr;
  */
 public class DssatThreadOutput {
 
-    public void execDssatTranslator(String arg0, LinkedHashMap result, ExecutorService executor) {
-        ArrayList<LinkedHashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
-        ArrayList<LinkedHashMap> soilArr = getObjectOr(result, "soils", new ArrayList());
-        ArrayList<LinkedHashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
+    public void execDssatTranslator(String arg0, HashMap result, ExecutorService executor) {
+        ArrayList<HashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
+        ArrayList<HashMap> soilArr = getObjectOr(result, "soils", new ArrayList());
+        ArrayList<HashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
         for (int i = 0; i < expArr.size(); i++) {
-            LinkedHashMap expData = expArr.get(i);
-            LinkedHashMap soilData = getSectionData(soilArr, "soil_id", getObjectOr(expData, "soil_id", ""));
+            HashMap expData = expArr.get(i);
+            HashMap soilData = getSectionData(soilArr, "soil_id", getObjectOr(expData, "soil_id", ""));
             if (soilData != null) {
                 expData.put("soil", soilData);
             }
-            LinkedHashMap wthData = getSectionData(wthArr, "wst_id", getObjectOr(expData, "wst_id", ""));
+            HashMap wthData = getSectionData(wthArr, "wst_id", getObjectOr(expData, "wst_id", ""));
             if (wthData != null) {
                 expData.put("weather", wthData);
             }
@@ -37,11 +37,11 @@ public class DssatThreadOutput {
     private class TranslateRunner implements Runnable {
 
         private TranslatorOutput translator;
-        private LinkedHashMap data;
+        private HashMap data;
         private String outputDirectory;
 //	private static Logger LOG = LoggerFactory.getLogger(TranslateRunner.class);
 
-        public TranslateRunner(TranslatorOutput translator, LinkedHashMap data, String outputDirectory) {
+        public TranslateRunner(TranslatorOutput translator, HashMap data, String outputDirectory) {
             this.translator = translator;
             this.data = data;
             this.outputDirectory = outputDirectory;
@@ -50,12 +50,12 @@ public class DssatThreadOutput {
         @Override
         public void run() {
 //		LOG.debug("Starting new thread!");
-//            try {
-            translator.writeFile(outputDirectory, data);
-//            } catch (IOException e) {
+            try {
+                translator.writeFile(outputDirectory, data);
+            } catch (Exception e) {
 //                // TODO Auto-generated catch block
-//                e.printStackTrace();
-//            }
+                e.printStackTrace();
+            }
         }
     }
 }
