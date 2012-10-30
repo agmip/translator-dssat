@@ -25,13 +25,13 @@ public class DssatTFileOutput extends DssatCommonOutput {
     public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        LinkedHashMap<String, String> record;       // Data holder for time series data
-        ArrayList<LinkedHashMap> observeRecords;    // Array of data holder for time series data
+        HashMap<String, String> record;       // Data holder for time series data
+        ArrayList<HashMap> observeRecords;    // Array of data holder for time series data
         BufferedWriter bwT;                         // output object
         StringBuilder sbData = new StringBuilder();             // construct the data info in the output
         HashMap<String, String> altTitleList = new HashMap();   // Define alternative fields for the necessary observation data fields; key is necessary field
         // P.S. Add alternative fields here
-        LinkedHashMap titleOutput;                              // contain output data field id
+        HashMap titleOutput;                              // contain output data field id
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
 
         try {
@@ -40,8 +40,8 @@ public class DssatTFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            LinkedHashMap tmp = (LinkedHashMap) getObjectOr(result, "observed", new LinkedHashMap());
-            observeRecords = (ArrayList<LinkedHashMap>) getObjectOr(tmp, "timeSeries", new ArrayList<LinkedHashMap>());
+            HashMap tmp = (HashMap) getObjectOr(result, "observed", new HashMap());
+            observeRecords = (ArrayList<HashMap>) getObjectOr(tmp, "timeSeries", new ArrayList<HashMap>());
             if (observeRecords.isEmpty()) {
                 return;
             } else {
@@ -61,7 +61,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
                     getExName(result),
                     getObjectOr(result, "local_name", defValBlank)));
 
-            titleOutput = new LinkedHashMap();
+            titleOutput = new HashMap();
             // TODO get title for output
             // Loop all records to find out all the titles
             for (int i = 0; i < observeRecords.size(); i++) {
@@ -119,7 +119,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
                 for (int j = 0; j < observeRecords.size(); j++) {
 
-                    record = (LinkedHashMap) observeRecords.get(j);
+                    record = (HashMap) observeRecords.get(j);
                     sbData.append(String.format(" %1$5s", 1));
                     sbData.append(String.format(" %1$5d", Integer.parseInt(formatDateStr(getObjectOr(record, "date", defValI).toString()))));
                     for (int k = i * 39; k < limit; k++) {

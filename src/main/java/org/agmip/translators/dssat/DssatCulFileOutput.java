@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.util.MapUtil.*;
 
@@ -27,8 +27,8 @@ public class DssatCulFileOutput extends DssatCommonOutput {
     public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        LinkedHashMap culData;              // Data holder for one site of cultivar data
-        ArrayList<LinkedHashMap> culArr;    // Data holder for one site of cultivar data
+        HashMap culData;              // Data holder for one site of cultivar data
+        ArrayList<HashMap> culArr;    // Data holder for one site of cultivar data
         BufferedWriter bwC;                             // output object
         StringBuilder sbData = new StringBuilder();     // construct the data info in the output
 
@@ -37,7 +37,7 @@ public class DssatCulFileOutput extends DssatCommonOutput {
             // Set default value for missing data
             setDefVal();
 
-            culData = getObjectOr(result, "dssat_cultivar_info", new LinkedHashMap());
+            culData = getObjectOr(result, "dssat_cultivar_info", new HashMap());
             culArr = getObjectOr(culData, "data", new ArrayList());
             if (culArr.isEmpty()) {
                 return;

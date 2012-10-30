@@ -35,21 +35,21 @@ public class DssatTFileInput extends DssatCommonInput {
      * @return result data holder object
      */
     @Override
-    protected LinkedHashMap readFile(HashMap brMap) throws IOException {
+    protected HashMap readFile(HashMap brMap) throws IOException {
 
-        LinkedHashMap ret = new LinkedHashMap();
-        ArrayList<LinkedHashMap> expArr = new ArrayList<LinkedHashMap>();
-        LinkedHashMap<String, LinkedHashMap> files = readObvData(brMap);
+        HashMap ret = new HashMap();
+        ArrayList<HashMap> expArr = new ArrayList<HashMap>();
+        HashMap<String, HashMap> files = readObvData(brMap);
 //        compressData(file);
-        ArrayList<LinkedHashMap> obvData;
-        LinkedHashMap obv;
-        LinkedHashMap expData;
+        ArrayList<HashMap> obvData;
+        HashMap obv;
+        HashMap expData;
 
         for (String exname : files.keySet()) {
             obvData = (ArrayList) files.get(exname).get(obvDataKey);
             for (int i = 0; i < obvData.size(); i++) {
-                expData = new LinkedHashMap();
-                obv = new LinkedHashMap();
+                expData = new HashMap();
+                obv = new HashMap();
                 copyItem(expData, files.get(exname), "exname");
                 copyItem(expData, files.get(exname), "local_name");
                 expData.put(jsonKey, obv);
@@ -75,19 +75,19 @@ public class DssatTFileInput extends DssatCommonInput {
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
-    protected LinkedHashMap readObvData(HashMap brMap) throws IOException {
+    protected HashMap readObvData(HashMap brMap) throws IOException {
 
-        LinkedHashMap files = new LinkedHashMap();
-        LinkedHashMap file = new LinkedHashMap();
+        HashMap files = new HashMap();
+        HashMap file = new HashMap();
         String line;
         BufferedReader brT = null;
         Object buf;
         HashMap mapT;
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
-        ArrayList<LinkedHashMap> obvData = new ArrayList();
+        ArrayList<HashMap> obvData = new ArrayList();
         ArrayList obvDataSecByTrno = new ArrayList();
-        LinkedHashMap obvDataByTrno;
+        HashMap obvDataByTrno;
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
         String pdate;
         String trno = "0";
@@ -110,7 +110,7 @@ public class DssatTFileInput extends DssatCommonInput {
                 brT = (BufferedReader) buf;
             }
 
-            file = new LinkedHashMap();
+            file = new HashMap();
 
             while ((line = brT.readLine()) != null) {
 
@@ -141,7 +141,7 @@ public class DssatTFileInput extends DssatCommonInput {
                         }
 
                         // Read line and save into return holder
-                        LinkedHashMap tmp = readLine(line, formats);    // P.S. if missing data in TFile, no longer hold title name since the combination handling
+                        HashMap tmp = readLine(line, formats);    // P.S. if missing data in TFile, no longer hold title name since the combination handling
                         // translate date from yyddd format to yyyymmdd format
                         tmp.put("date", translateDateStr((String) tmp.get("date")));
                         pdate = getPdate(brMap, (String) tmp.get("trno_t"), fileName.replaceAll("T$", "X"));
@@ -167,7 +167,7 @@ public class DssatTFileInput extends DssatCommonInput {
 
                             // If not found, create a new record and add into array
                             if (obvDataByTrno == null) {
-                                obvDataByTrno = new LinkedHashMap();
+                                obvDataByTrno = new HashMap();
                                 obvDataSecByTrno = new ArrayList();
                                 obvDataByTrno.put("trno_t", trno);
                                 obvDataByTrno.put(obvDataKey, obvDataSecByTrno);

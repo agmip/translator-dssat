@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.translators.dssat.DssatCommonInput.copyItem;
 import static org.agmip.util.MapUtil.*;
@@ -29,21 +29,21 @@ public class DssatXFileOutput extends DssatCommonOutput {
     public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        LinkedHashMap expData = (LinkedHashMap) result;
-        LinkedHashMap soilData = getObjectOr(result, "soil", new LinkedHashMap());
-        LinkedHashMap wthData = getObjectOr(result, "weather", new LinkedHashMap());
+        HashMap expData = (HashMap) result;
+        HashMap soilData = getObjectOr(result, "soil", new HashMap());
+        HashMap wthData = getObjectOr(result, "weather", new HashMap());
         BufferedWriter bwX;                          // output object
         StringBuilder sbGenData = new StringBuilder();      // construct the data info in the output
         StringBuilder sbNotesData = new StringBuilder();      // construct the data info in the output
         StringBuilder sbData = new StringBuilder();         // construct the data info in the output
         StringBuilder eventPart2 = new StringBuilder();                   // output string for second part of event data
-        LinkedHashMap secData;
+        HashMap secData;
         ArrayList subDataArr;                       // Arraylist for event data holder
-        LinkedHashMap subData;
+        HashMap subData;
         ArrayList secDataArr;                       // Arraylist for section data holder
-        LinkedHashMap sqData;
-        ArrayList<LinkedHashMap> evtArr;            // Arraylist for section data holder
-        LinkedHashMap evtData;
+        HashMap sqData;
+        ArrayList<HashMap> evtArr;            // Arraylist for section data holder
+        HashMap evtData;
 //        int trmnNum;                            // total numbers of treatment in the data holder
         int cuNum;                              // total numbers of cultivars in the data holder
         int flNum;                              // total numbers of fields in the data holder
@@ -58,7 +58,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         int meNum;                              // total numbers of enveronment modification in the data holder
         int mhNum;                              // total numbers of harvest in the data holder
         int smNum;                              // total numbers of simulation controll record
-        ArrayList<LinkedHashMap> sqArr;     // array for treatment record
+        ArrayList<HashMap> sqArr;     // array for treatment record
         ArrayList cuArr = new ArrayList();   // array for cultivars record
         ArrayList flArr = new ArrayList();   // array for fields record
         ArrayList saArr = new ArrayList();   // array for soil analysis record
@@ -69,9 +69,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
         ArrayList mrArr = new ArrayList();   // array for residues record
         ArrayList mcArr = new ArrayList();   // array for chemical record
         ArrayList mtArr = new ArrayList();   // array for tillage record
-        ArrayList<LinkedHashMap> meArr;     // array for enveronment modification record
+        ArrayList<HashMap> meArr;     // array for enveronment modification record
         ArrayList mhArr = new ArrayList();   // array for harvest record
-        ArrayList<LinkedHashMap> smArr;     // array for simulation control record
+        ArrayList<HashMap> smArr;     // array for simulation control record
         String exName;
 
         try {
@@ -80,7 +80,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             if (expData == null || expData.isEmpty()) {
                 return;
             }
-//            decompressData((LinkedHashMap) result);
+//            decompressData((HashMap) result);
             setDefVal();
 
             // Initial BufferedWriter
@@ -170,11 +170,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
             // if there is no sequence info, create dummy data
             if (sqArr.isEmpty()) {
-                sqArr.add(new LinkedHashMap());
+                sqArr.add(new HashMap());
             }
 
             // Set field info
-            LinkedHashMap flData = new LinkedHashMap();
+            HashMap flData = new HashMap();
             copyItem(flData, expData, "id_field");
             if (wthData.isEmpty()) {
 //                copyItem(flData, expData, "wst_id");
@@ -198,8 +198,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
             copyItem(flData, expData, "farea");
             copyItem(flData, expData, "fllwr");
             copyItem(flData, expData, "flsla");
-            copyItem(flData, getObjectOr(expData, "dssat_info", new LinkedHashMap()), "flhst");
-            copyItem(flData, getObjectOr(expData, "dssat_info", new LinkedHashMap()), "fhdur");
+            copyItem(flData, getObjectOr(expData, "dssat_info", new HashMap()), "flhst");
+            copyItem(flData, getObjectOr(expData, "dssat_info", new HashMap()), "fhdur");
             // remove the "_trno" in the soil_id when soil analysis is available
             String soilId = getValueOr(flData, "soil_id", "");
             if (soilId.length() > 10 && soilId.matches("\\w+_\\d+")) {
@@ -208,18 +208,18 @@ public class DssatXFileOutput extends DssatCommonOutput {
             flNum = setSecDataArr(flData, flArr);
 
             // Set initial condition info
-            icNum = setSecDataArr(getObjectOr(expData, "initial_conditions", new LinkedHashMap()), icArr);
+            icNum = setSecDataArr(getObjectOr(expData, "initial_conditions", new HashMap()), icArr);
 
             // Set soil analysis info
-//            ArrayList<LinkedHashMap> icSubArr = getDataList(expData, "initial_condition", "soilLayer");
-            ArrayList<LinkedHashMap> soilLarys = getDataList(expData, "soil", "soilLayer");
+//            ArrayList<HashMap> icSubArr = getDataList(expData, "initial_condition", "soilLayer");
+            ArrayList<HashMap> soilLarys = getDataList(expData, "soil", "soilLayer");
 //            // If it is stored in the initial condition block
 //            if (isSoilAnalysisExist(icSubArr)) {
-//                LinkedHashMap saData = new LinkedHashMap();
-//                ArrayList<LinkedHashMap> saSubArr = new ArrayList<LinkedHashMap>();
-//                LinkedHashMap saSubData;
+//                HashMap saData = new HashMap();
+//                ArrayList<HashMap> saSubArr = new ArrayList<HashMap>();
+//                HashMap saSubData;
 //                for (int i = 0; i < icSubArr.size(); i++) {
-//                    saSubData = new LinkedHashMap();
+//                    saSubData = new HashMap();
 //                    copyItem(saSubData, icSubArr.get(i), "sabl", "icbl", false);
 //                    copyItem(saSubData, icSubArr.get(i), "sasc", "slsc", false);
 //                    saSubArr.add(saSubData);
@@ -230,11 +230,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //            } else
             // If it is stored in the soil block
             if (isSoilAnalysisExist(soilLarys)) {
-                LinkedHashMap saData = new LinkedHashMap();
-                ArrayList<LinkedHashMap> saSubArr = new ArrayList<LinkedHashMap>();
-                LinkedHashMap saSubData;
+                HashMap saData = new HashMap();
+                ArrayList<HashMap> saSubArr = new ArrayList<HashMap>();
+                HashMap saSubData;
                 for (int i = 0; i < soilLarys.size(); i++) {
-                    saSubData = new LinkedHashMap();
+                    saSubData = new HashMap();
                     copyItem(saSubData, soilLarys.get(i), "sabl", "sllb", false);
                     copyItem(saSubData, soilLarys.get(i), "sasc", "slsc", false);
                     saSubArr.add(saSubData);
@@ -252,16 +252,16 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 seqId = getValueOr(sqData, "seqid", defValBlank);
                 em = getValueOr(sqData, "em", defValBlank);
                 sm = getValueOr(sqData, "sm", defValBlank);
-                LinkedHashMap cuData = new LinkedHashMap();
-                LinkedHashMap mpData = new LinkedHashMap();
-                ArrayList<LinkedHashMap> miSubArr = new ArrayList<LinkedHashMap>();
-                ArrayList<LinkedHashMap> mfSubArr = new ArrayList<LinkedHashMap>();
-                ArrayList<LinkedHashMap> mrSubArr = new ArrayList<LinkedHashMap>();
-                ArrayList<LinkedHashMap> mcSubArr = new ArrayList<LinkedHashMap>();
-                ArrayList<LinkedHashMap> mtSubArr = new ArrayList<LinkedHashMap>();
-//                ArrayList<LinkedHashMap> meSubArr = new ArrayList<LinkedHashMap>();
-                ArrayList<LinkedHashMap> mhSubArr = new ArrayList<LinkedHashMap>();
-                LinkedHashMap smData = new LinkedHashMap();
+                HashMap cuData = new HashMap();
+                HashMap mpData = new HashMap();
+                ArrayList<HashMap> miSubArr = new ArrayList<HashMap>();
+                ArrayList<HashMap> mfSubArr = new ArrayList<HashMap>();
+                ArrayList<HashMap> mrSubArr = new ArrayList<HashMap>();
+                ArrayList<HashMap> mcSubArr = new ArrayList<HashMap>();
+                ArrayList<HashMap> mtSubArr = new ArrayList<HashMap>();
+//                ArrayList<HashMap> meSubArr = new ArrayList<HashMap>();
+                ArrayList<HashMap> mhSubArr = new ArrayList<HashMap>();
+                HashMap smData = new HashMap();
 
                 // Set environment modification info
 //                meSubArr = getObjectOr(sqData, "em_data", meSubArr);
@@ -313,7 +313,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 // Loop all event data
                 for (int j = 0; j < evtArr.size(); j++) {
-                    evtData = new LinkedHashMap();
+                    evtData = new HashMap();
                     evtData.putAll(evtArr.get(j));
                     // Check if it has same sequence number
                     if (getValueOr(evtData, "seqid", defValBlank).equals(seqId)) {
@@ -364,7 +364,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     if (!getObjectOr(result, "fen_tot", "").equals("")
                             || !getObjectOr(result, "fep_tot", "").equals("")
                             || !getObjectOr(result, "fek_tot", "").equals("")) {
-                        mfSubArr.add(new LinkedHashMap());
+                        mfSubArr.add(new HashMap());
                     }
                 }
 
@@ -411,7 +411,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 sbData.append("@C CR INGENO CNAME\r\n");
 
                 for (int idx = 0; idx < cuArr.size(); idx++) {
-                    secData = (LinkedHashMap) cuArr.get(idx);
+                    secData = (HashMap) cuArr.get(idx);
 //                    String cul_id = defValC;
                     String crid = getObjectOr(secData, "crid", "");
                     // Checl if necessary data is missing
@@ -462,7 +462,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 sbError.append("! Warning: There is no field data in the experiment.\r\n");
             }
             for (int idx = 0; idx < flArr.size(); idx++) {
-                secData = (LinkedHashMap) flArr.get(idx);
+                secData = (HashMap) flArr.get(idx);
                 // Check if the necessary is missing
                 if (getObjectOr(secData, "wst_id", "").equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [wst_id]\r\n");
@@ -507,7 +507,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 for (int idx = 0; idx < saArr.size(); idx++) {
 
-                    secData = (LinkedHashMap) saArr.get(idx);
+                    secData = (HashMap) saArr.get(idx);
                     sbData.append("@A SADAT  SMHB  SMPX  SMKE  SANAME\r\n");
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s  %6$s\r\n",
                             idx + 1, //getObjectOr(secData, "sa", defValI).toString(),
@@ -522,7 +522,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         sbData.append("@A  SABL  SADM  SAOC  SANI SAPHW SAPHB  SAPX  SAKE  SASC\r\n");
                     }
                     for (int j = 0; j < subDataArr.size(); j++) {
-                        subData = (LinkedHashMap) subDataArr.get(j);
+                        subData = (HashMap) subDataArr.get(j);
                         sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
                                 idx + 1, //getObjectOr(subData, "sa", defValI).toString(),
                                 formatNumStr(5, subData, "sabl", defValR),
@@ -547,7 +547,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 for (int idx = 0; idx < icArr.size(); idx++) {
 
-                    secData = (LinkedHashMap) icArr.get(idx);
+                    secData = (HashMap) icArr.get(idx);
                     translateTo2BitCrid(secData, "icpcr");
                     sbData.append("@C   PCR ICDAT  ICRT  ICND  ICRN  ICRE  ICWD ICRES ICREN ICREP ICRIP ICRID ICNAME\r\n");
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$s\r\n",
@@ -571,7 +571,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         sbData.append("@C  ICBL  SH2O  SNH4  SNO3\r\n");
                     }
                     for (int j = 0; j < subDataArr.size(); j++) {
-                        subData = (LinkedHashMap) subDataArr.get(j);
+                        subData = (HashMap) subDataArr.get(j);
                         sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s\r\n",
                                 idx + 1, //getObjectOr(subData, "ic", defValI).toString(),
                                 formatNumStr(5, subData, "icbl", defValR),
@@ -590,7 +590,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 for (int idx = 0; idx < mpArr.size(); idx++) {
 
-                    secData = (LinkedHashMap) mpArr.get(idx);
+                    secData = (HashMap) mpArr.get(idx);
                     // Check if necessary data is missing
                     String pdate = getObjectOr(secData, "date", "");
                     if (pdate.equals("")) {
@@ -646,9 +646,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                    secData = (ArrayList) miArr.get(idx);
                     subDataArr = (ArrayList) miArr.get(idx);
                     if (!subDataArr.isEmpty()) {
-                        subData = (LinkedHashMap) subDataArr.get(0);
+                        subData = (HashMap) subDataArr.get(0);
                     } else {
-                        subData = new LinkedHashMap();
+                        subData = new HashMap();
                     }
                     sbData.append("@I  EFIR  IDEP  ITHR  IEPT  IOFF  IAME  IAMT IRNAME\r\n");
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$s\r\n",
@@ -666,7 +666,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         sbData.append("@I IDATE  IROP IRVAL\r\n");
                     }
                     for (int j = 0; j < subDataArr.size(); j++) {
-                        subData = (LinkedHashMap) subDataArr.get(j);
+                        subData = (HashMap) subDataArr.get(j);
                         sbData.append(String.format("%1$2s %2$5s %3$-5s %4$5s\r\n",
                                 idx + 1, //getObjectOr(subData, "ir", defValI).toString(),
                                 formatDateStr(getObjectOr(subData, "date", defValD).toString()), // P.S. idate -> date
@@ -693,7 +693,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     secDataArr = (ArrayList) mfArr.get(idx);
 
                     for (int i = 0; i < secDataArr.size(); i++) {
-                        secData = (LinkedHashMap) secDataArr.get(i);
+                        secData = (HashMap) secDataArr.get(i);
 //                        if (getObjectOr(secData, "fdate", "").equals("")) {
 //                            sbError.append("! Warning: missing data : [fdate], and will automatically use planting value '").append(pdate).append("'\r\n");
 //                        }
@@ -743,7 +743,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     secDataArr = (ArrayList) mrArr.get(idx);
 
                     for (int i = 0; i < secDataArr.size(); i++) {
-                        secData = (LinkedHashMap) secDataArr.get(i);
+                        secData = (HashMap) secDataArr.get(i);
                         sbData.append(String.format("%1$2s %2$5s %3$-5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$s\r\n",
                                 idx + 1, //getObjectOr(secData, "om", defValI).toString(),
                                 formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. omdat -> date
@@ -770,7 +770,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     secDataArr = (ArrayList) mcArr.get(idx);
 
                     for (int i = 0; i < secDataArr.size(); i++) {
-                        secData = (LinkedHashMap) secDataArr.get(i);
+                        secData = (HashMap) secDataArr.get(i);
                         sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s  %8$s\r\n",
                                 idx + 1, //getObjectOr(secData, "ch", defValI).toString(),
                                 formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. cdate -> date
@@ -794,7 +794,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     secDataArr = (ArrayList) mtArr.get(idx);
 
                     for (int i = 0; i < secDataArr.size(); i++) {
-                        secData = (LinkedHashMap) secDataArr.get(i);
+                        secData = (HashMap) secDataArr.get(i);
                         sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$s\r\n",
                                 idx + 1, //getObjectOr(secData, "ti", defValI).toString(),
                                 formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. tdate -> date
@@ -861,7 +861,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     secDataArr = (ArrayList) mhArr.get(idx);
 
                     for (int i = 0; i < secDataArr.size(); i++) {
-                        secData = (LinkedHashMap) secDataArr.get(i);
+                        secData = (HashMap) secDataArr.get(i);
                         sbData.append(String.format("%1$2s %2$5s %3$-5s %4$-5s %5$-5s %6$5s %7$5s %8$s\r\n",
                                 idx + 1, //getObjectOr(secData, "ha", defValI).toString(),
                                 formatDateStr(getObjectOr(secData, "date", defValD).toString()), // P.S. hdate -> date
@@ -895,7 +895,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 // Loop all the simulation control records
                 for (int idx = 0; idx < smArr.size(); idx++) {
-                    secData = (LinkedHashMap) smArr.get(idx);
+                    secData = (HashMap) smArr.get(idx);
 
                     if (secData.containsKey("sm_general")) {
                         sbData.append("*SIMULATION CONTROLS\r\n");
@@ -915,7 +915,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 }
 
             } else {
-                sbData.append(createSMMAStr(1, expData, new LinkedHashMap()));
+                sbData.append(createSMMAStr(1, expData, new HashMap()));
             }
 
             // Output finish
@@ -938,15 +938,15 @@ public class DssatXFileOutput extends DssatCommonOutput {
      * @param trData date holder for one treatment data
      * @return date string with format of "yyddd"
      */
-    private String createSMMAStr(int smid, LinkedHashMap expData, LinkedHashMap trData) {
+    private String createSMMAStr(int smid, HashMap expData, HashMap trData) {
 
         StringBuilder sb = new StringBuilder();
         String nitro = "Y";
         String water = "Y";
         String sdate;
         String sm = String.format("%2d", smid);
-        ArrayList<LinkedHashMap> dataArr;
-        LinkedHashMap subData;
+        ArrayList<HashMap> dataArr;
+        HashMap subData;
 
 //        // Check if the meta data of fertilizer is not "N" ("Y" or null)
 //        if (!getValueOr(expData, "fertilizer", "").equals("N")) {
@@ -986,7 +986,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
         sdate = getObjectOr(expData, "sdat", "").toString();
         if (sdate.equals("")) {
-            subData = (LinkedHashMap) getObjectOr(trData, "planting", new LinkedHashMap());
+            subData = (HashMap) getObjectOr(trData, "planting", new HashMap());
             sdate = getValueOr(subData, "date", defValD);
         }
         sdate = formatDateStr(sdate);
@@ -1024,7 +1024,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
      * @param arr array of sub data
      * @return current index value of the sub data
      */
-    private int setSecDataArr(LinkedHashMap m, ArrayList arr) {
+    private int setSecDataArr(HashMap m, ArrayList arr) {
 
         if (!m.isEmpty()) {
             for (int j = 0; j < arr.size(); j++) {
@@ -1084,7 +1084,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
      * @param expData initial condition layer data array
      * @return the boolean value for if soil analysis info exists
      */
-    private boolean isSoilAnalysisExist(ArrayList<LinkedHashMap> icSubArr) {
+    private boolean isSoilAnalysisExist(ArrayList<HashMap> icSubArr) {
 
         for (int i = 0; i < icSubArr.size(); i++) {
             if (!getValueOr(icSubArr.get(i), "slsc", "").equals("")) {
@@ -1103,9 +1103,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
      * @param dataListName sub array name
      * @return sub data array
      */
-    private ArrayList<LinkedHashMap> getDataList(Map expData, String blockName, String dataListName) {
-        LinkedHashMap dataBlock = getObjectOr(expData, blockName, new LinkedHashMap());
-        return getObjectOr(dataBlock, dataListName, new ArrayList<LinkedHashMap>());
+    private ArrayList<HashMap> getDataList(Map expData, String blockName, String dataListName) {
+        HashMap dataBlock = getObjectOr(expData, blockName, new HashMap());
+        return getObjectOr(dataBlock, dataListName, new ArrayList<HashMap>());
     }
 
     /**
@@ -1114,7 +1114,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
      * @param cuData the cultivar data record
      * @param id    the field id for contain crop id info
      */
-    private void translateTo2BitCrid(LinkedHashMap cuData, String id) {
+    private void translateTo2BitCrid(HashMap cuData, String id) {
         String crid = getObjectOr(cuData, id, "");
         if (!crid.equals("")) {
             DssatCRIDHelper crids = new DssatCRIDHelper();
@@ -1127,7 +1127,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
      *
      * @param cuData the cultivar data record
      */
-    private void translateTo2BitCrid(LinkedHashMap cuData) {
+    private void translateTo2BitCrid(HashMap cuData) {
         translateTo2BitCrid(cuData, "crid");
     }
 }
