@@ -177,11 +177,15 @@ public class DssatControllerOutput extends DssatCommonOutput {
      */
     private void writeSingleExp(String arg0, Map result, DssatCommonOutput... outputs) {
         for (int i = 0; i < outputs.length; i++) {
-            outputs[i].writeFile(arg0, result);
-            if (outputs[i].getOutputFile() != null) {
-//                files.add(outputs[i].getOutputFile());
-                files.put(outputs[i].getOutputFile().getPath(), outputs[i].getOutputFile());
-            }
+            try {
+                outputs[i].writeFile(arg0, result);
+                if (outputs[i].getOutputFile() != null) {
+    //                files.add(outputs[i].getOutputFile());
+                    files.put(outputs[i].getOutputFile().getPath(), outputs[i].getOutputFile());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }    
         }
     }
 
@@ -194,31 +198,34 @@ public class DssatControllerOutput extends DssatCommonOutput {
      * @return The created soil/weather file object
      */
     private File writeSWFile(String arg0, Map expData, DssatCommonOutput output) {
-        String id;
+        String id = "";
 //        String fileName;
-        HashMap<String, File> swfiles;
-
-        if (output instanceof DssatSoilOutput) {
-            id = getObjectOr(expData, "soil_id", "");
-            id = id.substring(0, 2);
-            swfiles = soilFiles;
-        } else {
-//            id = getObjectOr(expData, "wst_id", "");
-//            id = getWthFileName(getObjectOr(expData, "weather", new HashMap()));
-            id = wthHelper.createWthFileName(getObjectOr(expData, "weather", new HashMap()));
-            swfiles = wthFiles;
-            expData.put("wst_id", id);
-            getObjectOr(expData, "weather", new HashMap()).put("wst_id", id);
-        }
-        if (!id.equals("") && !swfiles.containsKey(id)) {
-            output.writeFile(arg0, expData);
-            if (output.getOutputFile() != null) {
-                swfiles.put(id, output.getOutputFile());
-//            files.add(output.getOutputFile());
-                files.put(output.getOutputFile().getPath(), output.getOutputFile());
+        HashMap<String, File> swfiles = null;
+        try {
+            if (output instanceof DssatSoilOutput) {
+                id = getObjectOr(expData, "soil_id", "");
+                id = id.substring(0, 2);
+                swfiles = soilFiles;
+            } else {
+    //            id = getObjectOr(expData, "wst_id", "");
+    //            id = getWthFileName(getObjectOr(expData, "weather", new HashMap()));
+    
+                id = wthHelper.createWthFileName(getObjectOr(expData, "weather", new HashMap()));
+                swfiles = wthFiles;
+                expData.put("wst_id", id);
+                getObjectOr(expData, "weather", new HashMap()).put("wst_id", id);
             }
+            if (!id.equals("") && !swfiles.containsKey(id)) {
+                output.writeFile(arg0, expData);
+                if (output.getOutputFile() != null) {
+                    swfiles.put(id, output.getOutputFile());
+    //            files.add(output.getOutputFile());
+                    files.put(output.getOutputFile().getPath(), output.getOutputFile());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
         return swfiles.get(id);
     }
 
