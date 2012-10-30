@@ -5,7 +5,7 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import static org.agmip.util.MapUtil.*;
 
 /**
@@ -83,7 +83,7 @@ public class DssatTFileInput extends DssatCommonInput {
         BufferedReader brT = null;
         Object buf;
         HashMap mapT;
-        HashMap formats = new HashMap();
+        LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
         ArrayList<HashMap> obvData = new ArrayList();
         ArrayList obvDataSecByTrno = new ArrayList();

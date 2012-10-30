@@ -5,7 +5,7 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * DSSAT Weather Data I/O API Class
@@ -60,7 +60,7 @@ public class DssatWeatherInput extends DssatCommonInput {
         BufferedReader brW = null;
         Object buf;
         HashMap mapW;
-        HashMap formats = new HashMap();
+        LinkedHashMap formats = new LinkedHashMap();
 
         mapW = (HashMap) brMap.get("W");
 

@@ -5,7 +5,7 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * DSSAT Soil Data I/O API Class
@@ -59,7 +59,7 @@ public class DssatSoilInput extends DssatCommonInput {
         BufferedReader brS = null;
         Object buf;
         HashMap mapS;
-        HashMap formats = new HashMap();
+        LinkedHashMap formats = new LinkedHashMap();
 
         mapS = (HashMap) brMap.get("S");
 

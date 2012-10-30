@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import static org.agmip.util.MapUtil.*;
 
 /**
@@ -92,7 +93,7 @@ public class DssatXFileInput extends DssatCommonInput {
         HashMap mapW;
         String wid;
         String fileName;
-        HashMap formats = new HashMap();
+        LinkedHashMap formats = new LinkedHashMap();
         ArrayList<HashMap> trArr = new ArrayList<HashMap>();
         HashMap trData = new HashMap();
         ArrayList<HashMap> evtArr = new ArrayList<HashMap>();
@@ -295,6 +296,7 @@ public class DssatXFileInput extends DssatCommonInput {
 
                     // Read field info 1st line
                     if (flg[1].startsWith("l id_") && flg[2].equals("data")) {
+                        System.out.println("1st: " + line);
 
                         // Set variables' formats
                         formats.clear();
@@ -320,9 +322,11 @@ public class DssatXFileInput extends DssatCommonInput {
                             wid = wid.substring(0, 4);
                             tmp.put("wst_id", wid);
                         }
+                        System.out.println(flArr.toString());
 
                     }// // Read field info 2nd line
                     else if (flg[1].startsWith("l ...") && flg[2].equals("data")) {
+                        System.out.println("2nd: " + line);
 
                         // Set variables' formats
                         formats.clear();

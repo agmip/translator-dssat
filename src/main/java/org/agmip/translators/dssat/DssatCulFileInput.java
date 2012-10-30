@@ -5,7 +5,7 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * DSSAT Cultivar Data I/O API Class
@@ -65,7 +65,7 @@ public class DssatCulFileInput extends DssatCommonInput {
         BufferedReader brC = null;
         Object buf;
         HashMap mapC;
-        HashMap formats = new HashMap();
+        LinkedHashMap formats = new LinkedHashMap();
 
         mapC = (HashMap) brMap.get("C");
 

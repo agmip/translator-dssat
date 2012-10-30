@@ -5,7 +5,7 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import static org.agmip.util.MapUtil.*;
 
 /**
@@ -55,7 +55,7 @@ public class DssatOutputFileInput extends DssatCommonInput {
         String line;
         BufferedReader brOut;
         Object buf;
-        HashMap formats = new HashMap();
+        LinkedHashMap formats = new LinkedHashMap();
 //        String[] titles = new String[0];
         ArrayList<HashMap> sumArr = new ArrayList();
 
@@ -211,7 +211,7 @@ public class DssatOutputFileInput extends DssatCommonInput {
         String line;
         BufferedReader brOut;
         Object buf;
-        HashMap formats = new HashMap();
+        LinkedHashMap formats = new LinkedHashMap();
 
         buf = brMap.get("SOILORG.OUT");
 
@@ -320,7 +320,7 @@ public class DssatOutputFileInput extends DssatCommonInput {
         String line;
         BufferedReader brOut;
         Object buf;
-        HashMap formats = new HashMap();
+        LinkedHashMap formats = new LinkedHashMap();
 
         buf = brMap.get("OVERVIEW.OUT");
 

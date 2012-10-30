@@ -30,7 +30,7 @@ public class DssatTFileTest {
     public void setUp() throws Exception {
         obDssatTFileOutput = new DssatTFileOutput();
         obDssatTFileInput = new DssatTFileInput();
-        resource = this.getClass().getResource("UFGA8202_MZX.zip");
+        resource = this.getClass().getResource("/UFGA8202_MZX.zip");
     }
 
     @Test

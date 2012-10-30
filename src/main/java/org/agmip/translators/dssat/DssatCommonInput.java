@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.agmip.core.types.TranslatorInput;
@@ -282,7 +283,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * itemName : Integer length)
      * @return the map contains divided data with keys from original string
      */
-    protected HashMap readLine(String line, HashMap<String, Integer> formats) {
+    protected HashMap readLine(String line, LinkedHashMap<String, Integer> formats) {
 
         return readLine(line, formats, null);
     }
@@ -297,7 +298,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * value is invalid
      * @return the map contains divided data with keys from original string
      */
-    protected HashMap readLine(String line, HashMap<String, Integer> formats, String invalidValue) {
+    protected HashMap readLine(String line, LinkedHashMap<String, Integer> formats, String invalidValue) {
 
         HashMap ret = new HashMap();
         int length;
@@ -641,7 +642,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
         BufferedReader br;
         Object buf = null;
         String line;
-        HashMap formats = new HashMap();
+        LinkedHashMap formats = new LinkedHashMap();
         String pl = null;
         String[] flgP = new String[3];
         DssatXFileInput xfile = new DssatXFileInput();

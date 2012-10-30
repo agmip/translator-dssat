@@ -5,7 +5,7 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * DSSAT AFile Data I/O API Class
@@ -78,7 +78,7 @@ public class DssatAFileInput extends DssatCommonInput {
         HashMap mapA;
         BufferedReader brA = null;
         Object buf;
-        HashMap formats = new HashMap();
+        LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
         ArrayList obvData = new ArrayList();
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
