@@ -92,7 +92,7 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
                 // Output all info
                 for (int j = 0; j < dssatSeqArr.size(); j++) {
                     sbData.append(String.format("%1$-92s %2$6s %3$6s %4$6s %5$6s %6$6s\r\n",
-                            folderPath + exFileName,
+                            exFileName,
                             "1",
                             "1",
                             getObjectOr(dssatSeqArr.get(j), "sq", "1"),
