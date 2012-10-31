@@ -892,6 +892,17 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 smTitles.add("@N NITROGEN    NMDEP NMTHR NAMNT NCODE NAOFF\r\n");
                 smTitles.add("@N RESIDUES    RIPCN RTIME RIDEP\r\n");
                 smTitles.add("@N HARVEST     HFRST HLAST HPCNP HPCNR\r\n");
+                String[] keys = new String[10];
+                keys[0] = "sm_general";
+                keys[1] = "sm_options";
+                keys[2] = "sm_methods";
+                keys[3] = "sm_management";
+                keys[4] = "sm_outputs";
+                keys[5] = "sm_planting";
+                keys[6] = "sm_irrigation";
+                keys[7] = "sm_nitrogen";
+                keys[8] = "sm_residues";
+                keys[9] = "sm_harvests";
 
                 // Loop all the simulation control records
                 for (int idx = 0; idx < smArr.size(); idx++) {
@@ -900,7 +911,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     if (secData.containsKey("sm_general")) {
                         sbData.append("*SIMULATION CONTROLS\r\n");
                         secData.remove("sm");
-                        Object[] keys = secData.keySet().toArray();
+//                        Object[] keys = secData.keySet().toArray();
                         for (int i = 0; i < keys.length; i++) {
 
                             sbData.append(smTitles.get(i));

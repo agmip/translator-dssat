@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -84,12 +83,15 @@ public class DssatControllerOutput extends DssatCommonOutput {
             subDirs.add("SOIL");
             subDirs.add("WEATHER");
         }
+        System.out.println("#####################################################");
+        System.out.println(expNameMap.toString());
+        System.out.println("#####################################################");
 
         // If experiment data is included
         if (!expArr.isEmpty()) {
             // Write all batch files
             DssatBatchFileOutput batchTran = new DssatBatchFileOutput();
-            batchTran.writeFile(arg0, expArr);
+            batchTran.writeFile(arg0, expArr, expNameMap);
             if (batchTran.getOutputFile() != null) {
 //                files.add(batchTran.getOutputFile());
                 files.put(batchTran.getOutputFile().getPath(), batchTran.getOutputFile());
