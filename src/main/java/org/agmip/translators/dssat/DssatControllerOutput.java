@@ -203,7 +203,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         try {
             if (output instanceof DssatSoilOutput) {
                 id = getObjectOr(expData, "soil_id", "");
-                id = id.substring(0, 2);
+//                id = id.substring(0, 2);
                 swfiles = soilFiles;
             } else {
     //            id = getObjectOr(expData, "wst_id", "");
