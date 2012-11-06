@@ -83,9 +83,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
             subDirs.add("SOIL");
             subDirs.add("WEATHER");
         }
-        System.out.println("#####################################################");
-        System.out.println(expNameMap.toString());
-        System.out.println("#####################################################");
 
         // If experiment data is included
         if (!expArr.isEmpty()) {
