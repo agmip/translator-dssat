@@ -45,13 +45,13 @@ public class DssatControllerTest {
         File f;
         BufferedOutputStream bo;
         result = obDssatControllerInput.readFile(resource.getPath());
-        f = new File(fileName.replaceAll("[Xx]*\\.\\w+$", ".json"));
-        bo = new BufferedOutputStream(new FileOutputStream(f));
-
-        // Output json for reading
-        bo.write(JSONAdapter.toJSON(result).getBytes());
-        bo.close();
-        f.delete();
+//        f = new File(fileName.replaceAll("[Xx]*\\.\\w+$", ".json"));
+//        bo = new BufferedOutputStream(new FileOutputStream(f));
+//
+//        // Output json for reading
+//        bo.write(JSONAdapter.toJSON(result).getBytes());
+//        bo.close();
+//        f.delete();
 
         obDssatControllerOutput = new DssatControllerOutput();
         obDssatControllerOutput.writeFile("", result);

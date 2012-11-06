@@ -45,7 +45,7 @@ public class DssatXFileTest {
         
         result = obDssatXFileInput.readFile(resource.getPath());
         /**
-         * What is the point of this block?
+         * What is the point of this block? Output Json text for debugging
         File f = new File("outputX.txt");
         BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
         bo.write(JSONAdapter.toJSON(result).getBytes());

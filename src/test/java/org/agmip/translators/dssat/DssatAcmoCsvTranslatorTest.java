@@ -35,11 +35,11 @@ public class DssatAcmoCsvTranslatorTest {
     public void test() throws IOException, Exception {
         HashMap result = obDssatOutputFileInput.readFile(resource.getPath());
 //        System.out.println(JSONAdapter.toJSON(result));
-        File f = new File("outputOut.txt");
-        BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
-        bo.write(JSONAdapter.toJSON(result).getBytes());
-        bo.close();
-        f.delete();
+//        File f = new File("outputOut.txt");
+//        BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
+//        bo.write(JSONAdapter.toJSON(result).getBytes());
+//        bo.close();
+//        f.delete();
 
         obDssatAcmoCsvTanslator.writeCsvFile("", resource.getPath());
         File file = obDssatAcmoCsvTanslator.getOutputFile();
