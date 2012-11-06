@@ -1016,7 +1016,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Date adjust based on realted treatment info (handling for DOY type value)
                         translateDateStrForDOY(omTmp, "omdat", pdate);
                         // add event data into array
-                        addEvent(evtArr, omTmp, "omdat", "organic-materials", seqid); // P.S. change event name to organic-materials
+                        addEvent(evtArr, omTmp, "omdat", "organic_matter", seqid); // P.S. change event name to organic-materials; Back to organic_matter again
                     }
                 }
 

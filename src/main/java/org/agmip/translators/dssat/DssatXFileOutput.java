@@ -338,7 +338,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         else if (getValueOr(evtData, "event", "").equals("fertilizer")) {
                             mfSubArr.add(evtData);
                         } // organic_matter event
-                        else if (getValueOr(evtData, "event", "").equals("organic-materials")) {   // P.S. change event name to organic-materials
+                        else if (getValueOr(evtData, "event", "").equals("organic_matter")) {   // P.S. change event name to organic-materials; Back to organic_matter again.
                             mrSubArr.add(evtData);
                         } // chemical event
                         else if (getValueOr(evtData, "event", "").equals("chemical")) {
