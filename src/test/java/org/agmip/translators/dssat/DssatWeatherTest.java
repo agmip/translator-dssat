@@ -41,11 +41,11 @@ public class DssatWeatherTest {
 
         result = obDssatWeatherInput.readFile(resource.getPath());
 //        System.out.println(JSONAdapter.toJSON(result));
-        File f = new File("outputW.txt");
-        BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
-        bo.write(JSONAdapter.toJSON(result).getBytes());
-        bo.close();
-        f.delete();
+//        File f = new File("outputW.txt");
+//        BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
+//        bo.write(JSONAdapter.toJSON(result).getBytes());
+//        bo.close();
+//        f.delete();
 
         ArrayList<HashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
         HashMap expData = new HashMap();

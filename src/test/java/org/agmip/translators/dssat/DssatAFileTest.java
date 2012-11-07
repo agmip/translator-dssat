@@ -40,11 +40,11 @@ public class DssatAFileTest {
 
         result = obDssatAFileInput.readFile(resource.getPath());
 //        System.out.println(JSONAdapter.toJSON(result));
-        File f = new File("outputA.txt");
-        BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
-        bo.write(JSONAdapter.toJSON(result).getBytes());
-        bo.close();
-        f.delete();
+//        File f = new File("outputA.txt");
+//        BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
+//        bo.write(JSONAdapter.toJSON(result).getBytes());
+//        bo.close();
+//        f.delete();
 
         ArrayList<HashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
         obDssatAFileOutput.writeFile("", expArr.get(0));
