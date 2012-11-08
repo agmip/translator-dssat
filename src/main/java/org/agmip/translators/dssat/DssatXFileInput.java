@@ -296,7 +296,6 @@ public class DssatXFileInput extends DssatCommonInput {
 
                     // Read field info 1st line
                     if (flg[1].startsWith("l id_") && flg[2].equals("data")) {
-                        System.out.println("1st: " + line);
 
                         // Set variables' formats
                         formats.clear();
@@ -322,11 +321,9 @@ public class DssatXFileInput extends DssatCommonInput {
                             wid = wid.substring(0, 4);
                             tmp.put("wst_id", wid);
                         }
-                        System.out.println(flArr.toString());
 
                     }// // Read field info 2nd line
                     else if (flg[1].startsWith("l ...") && flg[2].equals("data")) {
-                        System.out.println("2nd: " + line);
 
                         // Set variables' formats
                         formats.clear();
@@ -1019,7 +1016,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Date adjust based on realted treatment info (handling for DOY type value)
                         translateDateStrForDOY(omTmp, "omdat", pdate);
                         // add event data into array
-                        addEvent(evtArr, omTmp, "omdat", "organic-materials", seqid); // P.S. change event name to organic-materials
+                        addEvent(evtArr, omTmp, "omdat", "organic_matter", seqid); // P.S. change event name to organic-materials; Back to organic_matter again
                     }
                 }
 

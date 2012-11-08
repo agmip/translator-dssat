@@ -41,11 +41,11 @@ public class DssatCulFileTest {
 
         result = obInput.readFile(resource.getPath());
 //        System.out.println(JSONAdapter.toJSON(result));
-        File f = new File("outputCul.txt");
-        BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
-        bo.write(JSONAdapter.toJSON(result).getBytes());
-        bo.close();
-        f.delete();
+//        File f = new File("outputCul.txt");
+//        BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
+//        bo.write(JSONAdapter.toJSON(result).getBytes());
+//        bo.close();
+//        f.delete();
 
         ArrayList<HashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
         expArr.get(0).put("exname", "APAN9304PN");

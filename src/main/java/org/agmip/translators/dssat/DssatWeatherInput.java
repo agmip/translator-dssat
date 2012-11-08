@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 
 /**
  * DSSAT Weather Data I/O API Class
- * 
+ *
  * @author Meng Zhang
  * @version 1.0
  */
@@ -18,9 +18,8 @@ public class DssatWeatherInput extends DssatCommonInput {
     public String dailyKey = "dailyWeather";  // P.S. the key name might change
 
     /**
-     * Constructor with no parameters
-     * Set jsonKey as "weather"
-     * 
+     * Constructor with no parameters Set jsonKey as "weather"
+     *
      */
     public DssatWeatherInput() {
         super();
@@ -29,8 +28,8 @@ public class DssatWeatherInput extends DssatCommonInput {
 
     /**
      * DSSAT Weather Data input method for only inputing weather file
-     * 
-     * @param brMap  The holder for BufferReader objects for all files
+     *
+     * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
     @Override
@@ -44,23 +43,24 @@ public class DssatWeatherInput extends DssatCommonInput {
     }
 
     /**
-     * DSSAT Weather Data input method for Controller using (return value will not be compressed)
-     * 
-     * @param brMap  The holder for BufferReader objects for all files
+     * DSSAT Weather Data input method for Controller using (return value will
+     * not be compressed)
+     *
+     * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
     protected ArrayList<HashMap> readDailyData(HashMap brMap, HashMap ret) throws IOException {
 
         ArrayList<HashMap> files = new ArrayList();
-        ArrayList<HashMap> daily;
+        ArrayList<HashMap<String, String>> daily;
         ArrayList titles;
-        HashMap fileTmp;
-        HashMap file = null;
+        HashMap file;
         String line;
         BufferedReader brW = null;
         Object buf;
         HashMap mapW;
         LinkedHashMap formats = new LinkedHashMap();
+        HashMap<String, ArrayList<HashMap<String, String>>> dailyById = new HashMap();
 
         mapW = (HashMap) brMap.get("W");
 
@@ -77,7 +77,7 @@ public class DssatWeatherInput extends DssatCommonInput {
             } else {
                 brW = (BufferedReader) buf;
             }
-            fileTmp = new HashMap();
+            file = new HashMap();
             daily = new ArrayList();
             titles = new ArrayList();
 
@@ -90,7 +90,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                 if (flg[0].equals("weather") && flg[1].equals("") && flg[2].equals("data")) {
 
                     // header info
-                    fileTmp.put("wst_name", line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*([Dd][Aa][Tt][Aa]\\s*)*:?", "").trim());
+                    file.put("wst_name", line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*([Dd][Aa][Tt][Aa]\\s*)*:?", "").trim());
 
                 } // Read Weather Data
                 else if (flg[2].equals("data")) {
@@ -109,14 +109,14 @@ public class DssatWeatherInput extends DssatCommonInput {
                         formats.put("refht", 6);
                         formats.put("wndht", 6);
                         // Read line and save into return holder
-                        fileTmp.putAll(readLine(line, formats));
-                        String wst_id = (String) fileTmp.get("wst_id");
-                        String wst_name = (String) fileTmp.get("wst_name");
+                        file.putAll(readLine(line, formats));
+                        String wst_id = (String) file.get("wst_id");
+                        String wst_name = (String) file.get("wst_name");
                         if (wst_id != null) {
                             if (wst_name != null) {
-                                fileTmp.put("wst_name", wst_id + " " + wst_name);
+                                file.put("wst_name", wst_id + " " + wst_name);
                             } else {
-                                fileTmp.put("wst_name", wst_id);
+                                file.put("wst_name", wst_id);
                             }
                         }
 
@@ -159,16 +159,15 @@ public class DssatWeatherInput extends DssatCommonInput {
                 }
             }
 
-            if (file == null || !file.get("wst_id").equals(fileTmp.get("wst_id"))) {
-                file = fileTmp;
+            if (!dailyById.containsKey(file.get("wst_id"))) {
+                dailyById.put((String) file.get("wst_id"), daily);
                 file.put("wst_source", "DSSAT");
-                fileTmp.put(dailyKey, daily);
+                file.put(dailyKey, daily);
                 files.add(file);
             } else {
-                ArrayList tmpArr = (ArrayList) file.get(dailyKey);
-                for (int i = 0; i < daily.size(); i++) {
-                    tmpArr.add(daily.get(i));
-                }
+                ArrayList tmpArr = dailyById.get(file.get("wst_id"));
+//                tmpArr.addAll(daily);
+                addDaily(tmpArr, daily);
             }
         }
 
@@ -179,13 +178,74 @@ public class DssatWeatherInput extends DssatCommonInput {
 
     /**
      * Set reading flgs for title lines (marked with *)
-     * 
-     * @param line  the string of reading line
+     *
+     * @param line the string of reading line
      */
     @Override
     protected void setTitleFlgs(String line) {
         flg[0] = "weather";
         flg[1] = "";
         flg[2] = "data";
+    }
+
+    /**
+     * Add new daily data into array with ascending order
+     *
+     * @param arr original array
+     * @param cur new data for insert
+     */
+    private void addDaily(ArrayList<HashMap<String, String>> arr, ArrayList<HashMap<String, String>> cur) {
+        if (arr.isEmpty()) {
+            arr.addAll(cur);
+        } else if (!cur.isEmpty()) {
+            int curDay;
+            int arrDay;
+            try {
+                curDay = Integer.parseInt(cur.get(cur.size() - 1).get("w_date"));
+                arrDay = Integer.parseInt(arr.get(0).get("w_date"));
+                if (curDay <= arrDay) {
+                    ArrayList tmp = new ArrayList();
+                    tmp.addAll(arr);
+                    arr.clear();
+                    arr.addAll(cur);
+                    arr.addAll(tmp);
+                    return;
+                }
+                curDay = Integer.parseInt(cur.get(0).get("w_date"));
+                arrDay = Integer.parseInt(arr.get(arr.size() - 1).get("w_date"));
+                if (curDay >= arrDay) {
+                    ArrayList tmp = new ArrayList();
+                    arr.addAll(cur);
+                    return;
+                }
+                int yearEnd = 0;
+                ArrayList before = new ArrayList();
+                ArrayList after = new ArrayList();
+                for (int i = 0; i < arr.size();) {
+                    arrDay = Integer.parseInt(arr.get(i).get("w_date"));
+                    if (arrDay < curDay) {
+                        before.addAll(arr.subList(0, i));
+                        after.addAll(arr.subList(i + 1, arr.size() - 1));
+                        break;
+                    } else {
+                        if ((i / 1000) % 4 == 0) {
+                            i += 366;
+                        } else {
+                            i += 365;
+                        }
+                    }
+                }
+                if (after.isEmpty()) {
+                    arr.addAll(cur);
+                } else {
+                    arr.clear();
+                    arr.addAll(before);
+                    arr.addAll(cur);
+                    arr.addAll(after);
+                }
+            } catch (NumberFormatException e) {
+                arr.addAll(cur);
+            }
+        }
     }
 }
