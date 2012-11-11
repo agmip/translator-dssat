@@ -271,7 +271,11 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("ha", 3);
                         formats.put("sm", 3);
                         // Read line and save into return holder
-                        sqArr.add(readLine(line, formats));
+                        HashMap tmp = readLine(line, formats);
+                        if (tmp.get("tr_name") == null) {
+                            tmp.put("tr_name", meta.get("exname"));
+                        }
+                        sqArr.add(tmp);
                     } else {
                     }
 
