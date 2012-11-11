@@ -387,7 +387,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         getValueOr(sqData, "sq", "1").toString(), // P.S. default value here is based on document DSSAT vol2.pdf
                         getValueOr(sqData, "op", "1").toString(),
                         getValueOr(sqData, "co", "0").toString(),
-                        getValueOr(sqData, "tr_name", getValueOr(expData, "tr_name", defValC)).toString(),
+                        getValueOr(sqData, "tr_name", getValueOr(expData, "tr_name", getValueOr(expData, "exname", defValC))).toString(),
                         cuNum, //getObjectOr(data, "ge", defValI).toString(), 
                         flNum, //getObjectOr(data, "fl", defValI).toString(), 
                         saNum, //getObjectOr(data, "sa", defValI).toString(),

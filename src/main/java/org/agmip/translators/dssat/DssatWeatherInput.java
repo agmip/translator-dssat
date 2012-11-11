@@ -214,21 +214,19 @@ public class DssatWeatherInput extends DssatCommonInput {
                 curDay = Integer.parseInt(cur.get(0).get("w_date"));
                 arrDay = Integer.parseInt(arr.get(arr.size() - 1).get("w_date"));
                 if (curDay >= arrDay) {
-                    ArrayList tmp = new ArrayList();
                     arr.addAll(cur);
                     return;
                 }
-                int yearEnd = 0;
                 ArrayList before = new ArrayList();
                 ArrayList after = new ArrayList();
                 for (int i = 0; i < arr.size();) {
                     arrDay = Integer.parseInt(arr.get(i).get("w_date"));
-                    if (arrDay < curDay) {
+                    if (arrDay > curDay) {
                         before.addAll(arr.subList(0, i));
-                        after.addAll(arr.subList(i + 1, arr.size() - 1));
+                        after.addAll(arr.subList(i, arr.size()));
                         break;
                     } else {
-                        if ((i / 1000) % 4 == 0) {
+                        if ((arrDay / 10000) % 4 == 0) {
                             i += 366;
                         } else {
                             i += 365;
