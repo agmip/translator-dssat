@@ -182,7 +182,6 @@ public abstract class DssatCommonInput implements TranslatorInput {
      *
      * @param m input map which might contain date value in it
      * @param id date string with format of "yyddd"
-     * @return result date string with format of "yyyymmdd"
      */
     protected void translateDateStr(HashMap m, String id) {
 
@@ -205,9 +204,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
     /**
      * Translate data str from "yyddd" or "doy" to "yyyymmdd"
      *
-     * @param str date string with format of "yyddd"
-     * @pdate the related planting date
-     * @return result date string with format of "yyyymmdd"
+     * @param m the experiment data holder
+     * @param id the key name of date field in the map
+     * @param pdate the related planting date
      */
     protected void translateDateStrForDOY(HashMap m, String id, String pdate) {
 
@@ -220,7 +219,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * Translate data str from "yyddd" or "doy" to "yyyymmdd"
      *
      * @param str date string with format of "yyddd"
-     * @pdate the related planting date
+     * @param pdate the related planting date
      * @return result date string with format of "yyyymmdd"
      */
     protected String translateDateStrForDOY(String str, String pdate) {

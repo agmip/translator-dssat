@@ -736,7 +736,7 @@ public class DssatObservedData {
     /**
      * Get summary variable list
      * 
-     * @return 
+     * @return summary variable list
      */
     public ArrayList getSummaryList() {
         return summaryList;
@@ -745,7 +745,7 @@ public class DssatObservedData {
     /**
      * Get time-course variable list
      * 
-     * @return 
+     * @return time-course variable list
      */
     public ArrayList getTimeCourseList() {
         return timeCourseList;
@@ -754,7 +754,7 @@ public class DssatObservedData {
     /**
      * Get list of data type variable
      * 
-     * @return 
+     * @return list of data type variable
      */
     public ArrayList getDateTypeList() {
         return dateTypeList;
@@ -763,7 +763,7 @@ public class DssatObservedData {
     /**
      * Get the list of data type variables with dap variable
      * 
-     * @return 
+     * @return the list of data type variables with dap variable
      */
     public HashMap getDapDateTypeList() {
         return dapDateTypeList;
@@ -774,7 +774,7 @@ public class DssatObservedData {
      * 
      * @param variableName  the code of variable, like "hwam"
      * 
-     * @return 
+     * @return true for summary variable, false for not
      */
     public boolean isSummaryData(Object variableName) {
         return summaryList.contains(variableName);
@@ -785,7 +785,7 @@ public class DssatObservedData {
      * 
      * @param variableName  the code of variable, like "hwam"
      * 
-     * @return 
+     * @return true for time-series variable, false for not
      */
     public boolean isTimeSeriesData(Object variableName) {
         return timeCourseList.contains(variableName);
@@ -796,41 +796,41 @@ public class DssatObservedData {
      * 
      * @param variableName  the code of variable, like "adat"
      * 
-     * @return 
+     * @return true for date type, false for not
      */
     public boolean isDateType(Object variableName) {
         return dateTypeList.contains(variableName);
     }
 
     /**
-     * Check if the variable is the date type with dap variable
+     * Check if the variable is DAP (Date After Planting) variable
      * 
      * @param variableName  the code of variable, like "adat"
      * 
-     * @return 
+     * @return true for DAP variable, false for not
      */
     public boolean isDapDateType(Object variableName) {
         return dapDateTypeList.containsKey(variableName);
     }
 
     /**
-     * Check if the variable is the date type with dap variable
+     * Check if the variable is DAP (Date After Planting) variable
      * 
      * @param variableName  the code of variable, like "adat"
      * @param dapName       the code of variable, like "adap"
      * 
-     * @return 
+     * @return true for DAP variable, false for not
      */
     public boolean isDapDateType(Object variableName, Object dapName) {
         return (dapDateTypeList.containsKey(variableName) && dapDateTypeList.get(variableName).equals(dapName));
     }
 
     /**
-     * Get the dap variable name related to the input variable name
+     * Get the DAP variable name related to the input variable name
      * 
      * @param variableName  the code of variable, like "adat"
      * 
-     * @return 
+     * @return the DAP variable name
      */
     public String getDapCode(Object variableName) {
         return (String) dapDateTypeList.get(variableName);

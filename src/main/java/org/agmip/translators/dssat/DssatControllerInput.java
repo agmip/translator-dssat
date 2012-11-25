@@ -24,7 +24,7 @@ public class DssatControllerInput implements TranslatorInput {
     /**
      * All DSSAT Data input method
      *
-     * @param brMap The holder for BufferReader objects for all files
+     * @param arg0 The path of input experiment file
      * @return result data holder object
      */
     @Override
