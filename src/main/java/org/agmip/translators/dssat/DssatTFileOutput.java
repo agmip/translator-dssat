@@ -1,15 +1,10 @@
 package org.agmip.translators.dssat;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.agmip.util.JSONAdapter;
 import static org.agmip.util.MapUtil.*;
 
 /**
@@ -79,17 +74,6 @@ public class DssatTFileOutput extends DssatCommonOutput {
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
             bwT = new BufferedWriter(new FileWriter(outputFile));
-            
-            try {
-                File f = new File("test_" + fileName + ".json");
-                BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
-
-                // Output json for reading
-                bo.write(JSONAdapter.toJSON(records).getBytes());
-                bo.close();
-            } catch (IOException ex) {
-                Logger.getLogger(DssatControllerOutput.class.getName()).log(Level.SEVERE, null, ex);
-            }
 
             // Output Observation File
             // Titel Section

@@ -1,7 +1,6 @@
 package org.agmip.translators.dssat;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,13 +12,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import static org.agmip.translators.dssat.DssatCommonInput.getSectionData;
 import static org.agmip.translators.dssat.DssatCommonOutput.revisePath;
-import org.agmip.util.JSONAdapter;
 import static org.agmip.util.MapUtil.*;
 import org.agmip.util.MapUtil.BucketEntry;
 
@@ -430,17 +426,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 }
                 ret.add(tmp);
             }
-        }
-
-        try {
-            File f = new File("test.json");
-            BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
-
-            // Output json for reading
-            bo.write(JSONAdapter.toJSON(ret).getBytes());
-            bo.close();
-        } catch (IOException ex) {
-            Logger.getLogger(DssatControllerOutput.class.getName()).log(Level.SEVERE, null, ex);
         }
         return ret;
     }
