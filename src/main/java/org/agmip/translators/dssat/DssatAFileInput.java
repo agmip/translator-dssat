@@ -80,7 +80,7 @@ public class DssatAFileInput extends DssatCommonInput {
         Object buf;
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
-        ArrayList obvData = new ArrayList();
+        ArrayList obvData;
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
         String pdate;
 
@@ -103,6 +103,7 @@ public class DssatAFileInput extends DssatCommonInput {
             }
 
             file = new HashMap();
+            obvData = new ArrayList();
 
             while ((line = brA.readLine()) != null) {
 

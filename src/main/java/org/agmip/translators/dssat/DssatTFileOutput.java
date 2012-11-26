@@ -1,10 +1,15 @@
 package org.agmip.translators.dssat;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.agmip.util.JSONAdapter;
 import static org.agmip.util.MapUtil.*;
 
 /**
@@ -26,6 +31,8 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
         // Initial variables
         HashMap<String, String> record;       // Data holder for time series data
+        ArrayList<HashMap> records;
+        ArrayList<HashMap> recordT;
         ArrayList<HashMap> observeRecords;    // Array of data holder for time series data
         BufferedWriter bwT;                         // output object
         StringBuilder sbData = new StringBuilder();             // construct the data info in the output
@@ -40,13 +47,31 @@ public class DssatTFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            HashMap tmp = (HashMap) getObjectOr(result, "observed", new HashMap());
-            observeRecords = (ArrayList<HashMap>) getObjectOr(tmp, "timeSeries", new ArrayList<HashMap>());
-            if (observeRecords.isEmpty()) {
-                return;
+            Object tmpData = getObjectOr(result, "observed", new Object());
+            if (tmpData instanceof ArrayList) {
+                records = (ArrayList) tmpData;
+            } else if (tmpData instanceof HashMap) {
+                records = new ArrayList();
+                records.add((HashMap) tmpData);
             } else {
-                String[] sortIds = {"date"};
-                Collections.sort(observeRecords, new DssatSortHelper(sortIds));
+                return;
+            }
+            if (records.isEmpty()) {
+                return;
+            }
+
+            observeRecords = new ArrayList();
+            for (int i = 0; i < records.size(); i++) {
+                recordT = getObjectOr(records.get(i), "timeSeries", new ArrayList());
+                String trno = getValueOr(records.get(i), "trno", "1");
+                if (!recordT.isEmpty()) {
+                    String[] sortIds = {"date"};
+                    Collections.sort(recordT, new DssatSortHelper(sortIds));
+                    for (int j = 0; j < recordT.size(); j++) {
+                        recordT.get(j).put("trno", trno);
+                    }
+                    observeRecords.addAll(recordT);
+                }
             }
 
             // Initial BufferedWriter
@@ -54,6 +79,17 @@ public class DssatTFileOutput extends DssatCommonOutput {
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
             bwT = new BufferedWriter(new FileWriter(outputFile));
+            
+            try {
+                File f = new File("test_" + fileName + ".json");
+                BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(f));
+
+                // Output json for reading
+                bo.write(JSONAdapter.toJSON(records).getBytes());
+                bo.close();
+            } catch (IOException ex) {
+                Logger.getLogger(DssatControllerOutput.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
             // Output Observation File
             // Titel Section
@@ -75,7 +111,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
                     } // check if the additional data is too long to output
                     else if (key.toString().length() <= 5) {
-                        if (!key.equals("date")) {
+                        if (!key.equals("date") && !key.equals("trno")) {
                             titleOutput.put(key, key);
                         }
 
@@ -120,7 +156,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
                 for (int j = 0; j < observeRecords.size(); j++) {
 
                     record = (HashMap) observeRecords.get(j);
-                    sbData.append(String.format(" %1$5s", 1));
+                    sbData.append(String.format(" %1$5s", getValueOr(record, "trno", "1")));
                     sbData.append(String.format(" %1$5d", Integer.parseInt(formatDateStr(getObjectOr(record, "date", defValI).toString()))));
                     for (int k = i * 39; k < limit; k++) {
 

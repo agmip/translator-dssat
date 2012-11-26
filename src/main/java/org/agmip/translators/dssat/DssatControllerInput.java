@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashMap;
 import org.agmip.core.types.TranslatorInput;
 import static org.agmip.translators.dssat.DssatCommonInput.*;
 import static org.agmip.util.MapUtil.*;
@@ -25,9 +24,10 @@ public class DssatControllerInput implements TranslatorInput {
     /**
      * All DSSAT Data input method
      *
-     * @param brMap The holder for BufferReader objects for all files
+     * @param arg0 The path of input experiment file
      * @return result data holder object
      */
+    @Override
     public HashMap readFile(String arg0) {
 
         HashMap brMap;
@@ -96,7 +96,7 @@ public class DssatControllerInput implements TranslatorInput {
             wthId = getValueOr(expData, "wst_id", "0");
             if (!wthId.equals("0")) {
                 wthData = getSectionData(wthArr, "wst_id", wthId);
-                if (wthData != null && wthData.size() != 0) {
+                if (wthData != null && !wthData.isEmpty()) {
 //                    expData.put(wthReader.jsonKey, wthData);
                     wthTmpMap.put(wthId, wthData);
                 }
@@ -131,7 +131,7 @@ public class DssatControllerInput implements TranslatorInput {
                     soilData.put(soilReader.layerKey, combinLayers(soilLyrs, saLyrs, "sllb", "sllb", copyKeys));
                 }
 
-                if (soilData != null && soilData.size() != 0) {
+                if (soilData != null && !soilData.isEmpty()) {
 //                    expData.put(soilReader.jsonKey, soilData);
                     soilTmpMap.put(soilId, soilData);
                 }

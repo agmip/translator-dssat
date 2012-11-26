@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashMap;
 import org.agmip.util.JSONAdapter;
 
 /**
@@ -71,10 +70,10 @@ public class DssatACMOJsonInput extends DssatCommonInput {
             sb.append(line);
         }
         try {
-                file = JSONAdapter.fromJSON(sb.toString());
-            } catch (Exception e) {
-                return file;
-            }
+            file = JSONAdapter.fromJSON(sb.toString());
+        } catch (Exception e) {
+            return file;
+        }
         brJ.close();
 
         return file;
