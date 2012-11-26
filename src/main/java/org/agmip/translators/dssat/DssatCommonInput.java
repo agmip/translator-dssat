@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
  * @version 1.0
  */
 public abstract class DssatCommonInput implements TranslatorInput {
+
     private static final Logger log = LoggerFactory.getLogger(DssatCommonInput.class);
     protected String[] flg = {"", "", ""};
     protected int flg4 = 0;
@@ -379,7 +380,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
             while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
-                    
+
                     if (exnames.contains(entry.getName().replaceAll("[Xx]$", ""))) {
 //                        result.put("X", getBuf(in, (int) entry.getSize()));
                         mapX.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
@@ -600,8 +601,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
         log.debug("Array: {}", arr.toString());
         log.debug("Item: {}", item.toString());
         log.debug("Key: {}", key);
-        
-        
+
+
         for (int i = 0; i < arr.size(); i++) {
             elem = (HashMap) arr.get(i);
             if (!key.getClass().isArray()) {

@@ -17,6 +17,7 @@ import static org.agmip.util.MapUtil.*;
  * @version 1.0
  */
 public class DssatXFileOutput extends DssatCommonOutput {
+
     public static final DssatCRIDHelper crHelper = new DssatCRIDHelper();
 
     /**
@@ -69,9 +70,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
         ArrayList mrArr = new ArrayList();   // array for residues record
         ArrayList mcArr = new ArrayList();   // array for chemical record
         ArrayList mtArr = new ArrayList();   // array for tillage record
-        ArrayList<HashMap> meArr;     // array for enveronment modification record
+        ArrayList meArr = new ArrayList();     // array for enveronment modification record
         ArrayList mhArr = new ArrayList();   // array for harvest record
-        ArrayList<HashMap> smArr;     // array for simulation control record
+        ArrayList smArr = new ArrayList();     // array for simulation control record
         String exName;
 
         try {
@@ -159,9 +160,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
             // TREATMENT Section
             sqArr = getDataList(expData, "dssat_sequence", "data");
             evtArr = getDataList(expData, "management", "events");
-            meArr = getDataList(expData, "dssat_environment_modification", "data");
-            smArr = getDataList(expData, "dssat_simulation_control", "data");
-            boolean isSmExist = !smArr.isEmpty();
+            ArrayList<HashMap> meOrgArr = getDataList(expData, "dssat_environment_modification", "data");
+            ArrayList<HashMap> smOrgArr = getDataList(expData, "dssat_simulation_control", "data");
             String seqId;
             String em;
             String sm;
@@ -259,40 +259,32 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 ArrayList<HashMap> mrSubArr = new ArrayList<HashMap>();
                 ArrayList<HashMap> mcSubArr = new ArrayList<HashMap>();
                 ArrayList<HashMap> mtSubArr = new ArrayList<HashMap>();
-//                ArrayList<HashMap> meSubArr = new ArrayList<HashMap>();
+                ArrayList<HashMap> meSubArr = new ArrayList<HashMap>();
                 ArrayList<HashMap> mhSubArr = new ArrayList<HashMap>();
                 HashMap smData = new HashMap();
 
                 // Set environment modification info
-//                meSubArr = getObjectOr(sqData, "em_data", meSubArr);
-                String meNumStr = "";
-                meNum = 0;
-                for (int j = 0, cnt = 0; j < meArr.size(); j++) {
-                    if (!meNumStr.equals(meArr.get(j).get("em"))) {
-                        meNumStr = (String) meArr.get(j).get("em");
-                        cnt++;
-                        if (em.equals(meNumStr)) {
-                            meNum = cnt;
-                            break;
-                        }
+                for (int j = 0; j < meOrgArr.size(); j++) {
+                    if (em.equals(meOrgArr.get(j).get("em"))) {
+                        HashMap tmp = new HashMap();
+                        tmp.putAll(meOrgArr.get(j));
+                        tmp.remove("em");
+                        meSubArr.add(tmp);
                     }
                 }
 
                 // Set simulation control info
-                smNum = 0;
-                if (isSmExist) {
-                    for (int j = 0; j < smArr.size(); j++) {
-                        if (sm.equals(smArr.get(j).get("sm"))) {
-                            smNum = j + 1;
-                            break;
-                        }
+                for (int j = 0; j < smOrgArr.size(); j++) {
+                    if (sm.equals(smOrgArr.get(j).get("sm"))) {
+                        smData.putAll(smOrgArr.get(j));
+                        smData.remove("sm");
+                        break;
                     }
                 }
-                if (smNum == 0) {
+                if (smData.isEmpty()) {
                     smData.put("fertilizer", mfSubArr);
                     smData.put("irrigation", miSubArr);
                     smData.put("planting", mpData);
-                    smNum = setSecDataArr(smData, smArr);
                 }
 //                if (!getValueOr(sqData, "sm_general", "").equals("")) {
 //                    smData.put("sm_general", getValueOr(sqData, "sm_general", defValBlank));
@@ -324,7 +316,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             // Set cultivals info
                             copyItem(cuData, evtData, "cul_name");
                             copyItem(cuData, evtData, "crid");
-                            copyItem(cuData, evtData, "cul_id", "dssat_cul_id", false);
+                            copyItem(cuData, evtData, "cul_id", "cul_id", false);
                             copyItem(cuData, evtData, "rm");
                             copyItem(cuData, evtData, "cul_notes");
                             translateTo2BitCrid(cuData);
@@ -375,12 +367,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 mrNum = setSecDataArr(mrSubArr, mrArr);
                 mcNum = setSecDataArr(mcSubArr, mcArr);
                 mtNum = setSecDataArr(mtSubArr, mtArr);
-//                meNum = setSecDataArr(meSubArr, meArr);
+                meNum = setSecDataArr(meSubArr, meArr);
                 mhNum = setSecDataArr(mhSubArr, mhArr);
-//                smNum = setSecDataArr(smData, smArr);
-//                if (smArr.isEmpty()) {
-//                    smNum = 1;
-//                }
+                smNum = setSecDataArr(smData, smArr);
 
                 sbData.append(String.format("%1$2s %2$1s %3$1s %4$1s %5$-25s %6$2s %7$2s %8$2s %9$2s %10$2s %11$2s %12$2s %13$2s %14$2s %15$2s %16$2s %17$2s %18$2s\r\n",
                         getValueOr(sqData, "trno", "1").toString(),
@@ -812,18 +801,13 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 sbData.append("*ENVIRONMENT MODIFICATIONS\r\n");
                 sbData.append("@E ODATE EDAY  ERAD  EMAX  EMIN  ERAIN ECO2  EDEW  EWIND ENVNAME\r\n");
 
-                String emNumStr = "";
                 for (int idx = 0, cnt = 1; idx < meArr.size(); idx++) {
-//                    secDataArr = (ArrayList) meArr.get(idx);
-                    secData = meArr.get(idx);
-                    if (!emNumStr.equals(secData.get("em"))) {
-                        cnt++;
-                        emNumStr = (String) secData.get("em");
-                    }
-                    sbData.append(String.format("%1$2s%2$s\r\n",
-                            cnt,
-                            secData.get("em_data")));
-//                    for (int i = 0; i < secDataArr.size(); i++) {
+                    secDataArr = (ArrayList) meArr.get(idx);
+                    for (int i = 0; i < secDataArr.size(); i++) {
+                        secData = (HashMap) secDataArr.get(i);
+                        sbData.append(String.format("%1$2s%2$s\r\n",
+                                cnt,
+                                secData.get("em_data")));
 //                        sbData.append(String.format("%1$2s%2$s\r\n",
 //                                idx + 1,
 //                                (String) secDataArr.get(i)));
@@ -847,7 +831,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                                getObjectOr(secData, "ecwnd", defValBlank).toString(),
 //                                formatNumStr(4, getObjectOr(secData, "emwnd", defValR),
 //                                getObjectOr(secData, "em_name", defValC).toString()));
-//                    }
+                    }
                 }
                 sbData.append("\r\n");
             }
@@ -1123,7 +1107,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
      * Try to translate 3-bit crid to 2-bit version stored in the map
      *
      * @param cuData the cultivar data record
-     * @param id    the field id for contain crop id info
+     * @param id the field id for contain crop id info
      */
     private void translateTo2BitCrid(HashMap cuData, String id) {
         String crid = getObjectOr(cuData, id, "");

@@ -23,7 +23,7 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
      * @param arg0 file output path
      * @param results array of data holder object
      */
-    public void writeFile(String arg0, ArrayList<HashMap> results, HashMap<String, String> expNameMap) {
+    public void writeFile(String arg0, ArrayList<HashMap> results) {
 
         // Initial variables
         HashMap result;                       // Data holder for summary data
@@ -76,10 +76,10 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
                 result = results.get(i);
                 exFileName = getFileName(result, "X");
 //                String folderPath = getObjectOr(result, "exname", "Experiment_" + i);
-                String folderPath = getObjectOr(expNameMap, getObjectOr(result, "exname", "Experiment_" + i), "");
-                if (!folderPath.equals("")) {
-                    folderPath += File.separator;
-                }
+//                String folderPath = getObjectOr(expNameMap, getObjectOr(result, "exname", "Experiment_" + i), "");
+//                if (!folderPath.equals("")) {
+//                    folderPath += File.separator;
+//                }
 
                 // Get DSSAT Sequence info
                 HashMap dssatSeqData = getObjectOr(result, "dssat_sequence", new HashMap());
@@ -95,8 +95,9 @@ public class DssatBatchFileOutput extends DssatCommonOutput {
                 // Output all info
                 for (int j = 0; j < dssatSeqArr.size(); j++) {
                     sbData.append(String.format("%1$-92s %2$6s %3$6s %4$6s %5$6s %6$6s\r\n",
-                            folderPath + exFileName,
-                            "1",
+                            //                            folderPath + exFileName,
+                            exFileName,
+                            getObjectOr(dssatSeqArr.get(j), "trno", "1"),
                             "1",
                             getObjectOr(dssatSeqArr.get(j), "sq", "1"),
                             getObjectOr(dssatSeqArr.get(j), "op", "1"),
