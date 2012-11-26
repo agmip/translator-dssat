@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
 
         // Initial variables
         HashMap<String, String> record;       // Data holder for summary data
+        ArrayList<HashMap<String, String>> records; // Array of Data holder for summary data
         BufferedWriter bwA;                         // output object
         StringBuilder sbData = new StringBuilder(); // construct the data info in the output
         HashMap<String, String> altTitleList = new HashMap();   // Define alternative fields for the necessary observation data fields; key is necessary field
@@ -45,15 +47,24 @@ public class DssatAFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            record = CopyList((HashMap) getObjectOr(result, "observed", new HashMap()));
+            Object tmpData = getObjectOr(result, "observed", new Object());
+            if (tmpData instanceof ArrayList) {
+                records = (ArrayList) tmpData;
+            } else if (tmpData instanceof HashMap) {
+                records = new ArrayList();
+                records.add((HashMap) tmpData);
+            } else {
+                return;
+            }
+            if (records.isEmpty()) {
+                return;
+            }
+            record = CopyList(records.get(0));
             Object[] keys = record.keySet().toArray();
             for (Object key : keys) {
                 if (!(record.get(key) instanceof String)) {
                     record.remove(key);
                 }
-            }
-            if (record.isEmpty()) {
-                return;
             }
 
             // Initial BufferedWriter
@@ -75,7 +86,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
                     titleOutput.put(key, key);
 
                 } // check if the additional data is too long to output
-                else if (key.toString().length() <= 5) {
+                else if (!key.equals("trno") && key.toString().length() <= 5) {
                     titleOutput.put(key, key);
 
                 } // If it is too long for DSSAT, give a warning message
@@ -105,7 +116,8 @@ public class DssatAFileOutput extends DssatCommonOutput {
             // Observation Data Section
             Object[] titleOutputId = titleOutput.keySet().toArray();
             String pdate = getPdate(result);
-            for (int i = 0; i < (titleOutputId.length / 40 + titleOutputId.length % 40 == 0 ? 0 : 1); i++) {
+            int loops = titleOutputId.length / 40 + titleOutputId.length % 40 == 0 ? 0 : 1;
+            for (int i = 0; i < loops; i++) {
 
                 // Write title line
                 sbData.append("@TRNO ");
@@ -116,18 +128,21 @@ public class DssatAFileOutput extends DssatCommonOutput {
                 sbData.append("\r\n");
 
                 // Write data line
-                sbData.append(String.format(" %1$5s", 1));
-                for (int k = i * 40; k < limit; k++) {
+                for (int j = 0; j < records.size(); j++) {
+                    record = records.get(j);
+                    sbData.append(String.format(" %1$5s", getValueOr(record, "trno", "1")));
+                    for (int k = i * 40; k < limit; k++) {
 
-                    if (obvDataList.isDapDateType(titleOutputId[k], titleOutput.get(titleOutputId[k]))) {
-                        sbData.append(String.format("%1$6s", cutYear(formatDateStr(pdate, getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString()))));
-                    } else if (obvDataList.isDateType(titleOutputId[k])) {
-                        sbData.append(String.format("%1$6s", cutYear(formatDateStr(getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString()))));
-                    } else {
-                        sbData.append(" ").append(formatNumStr(5, record, titleOutput.get(titleOutputId[k]), defValI));
+                        if (obvDataList.isDapDateType(titleOutputId[k], titleOutput.get(titleOutputId[k]))) {
+                            sbData.append(String.format("%1$6s", cutYear(formatDateStr(pdate, getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString()))));
+                        } else if (obvDataList.isDateType(titleOutputId[k])) {
+                            sbData.append(String.format("%1$6s", cutYear(formatDateStr(getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString()))));
+                        } else {
+                            sbData.append(" ").append(formatNumStr(5, record, titleOutput.get(titleOutputId[k]), defValI));
+                        }
                     }
+                    sbData.append("\r\n");
                 }
-                sbData.append("\r\n");
             }
 
             // Output finish

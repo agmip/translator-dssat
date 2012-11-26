@@ -20,7 +20,7 @@ public class DssatWthFileHelper {
      * Generate the weather file name for auto-generating (extend name not included)
      *
      * @param wthData weather data holder
-     * @return
+     * @return the weather file name
      */
     public String createWthFileName(Map wthData) {
         
@@ -71,8 +71,8 @@ public class DssatWthFileHelper {
     /**
      * Get the 4-bit institute code for weather file nam
      *
-     * @param wthFile weather data holder
-     * @return
+     * @param wthData weather data holder
+     * @return the 4-bit institute code
      */
     public static String getWthInsiCode(Map wthData) {
         String wst_id = getValueOr(wthData, "wst_id", "");
@@ -91,8 +91,8 @@ public class DssatWthFileHelper {
     /**
      * Get the last 2-bit year number and 2-bit of the duration for weather file name
      *
-     * @param wthFile weather data holder
-     * @return
+     * @param wthData weather data holder
+     * @return the 4-bit number for year and duration
      */
     public static String getWthYearDuration(Map wthData) {
         String yearDur = "";
