@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -22,6 +21,7 @@ import static org.agmip.translators.dssat.DssatCommonInput.getSectionData;
 import static org.agmip.translators.dssat.DssatCommonOutput.revisePath;
 import org.agmip.util.JSONAdapter;
 import static org.agmip.util.MapUtil.*;
+import org.agmip.util.MapUtil.BucketEntry;
 
 /**
  *
@@ -58,8 +58,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
             new DssatAFileOutput(),
             new DssatTFileOutput(),
             new DssatCulFileOutput(),
-            //            new DssatBatchFileOutput(),
-            //            new DssatRunFileOutput(),
             new DssatACMOJsonOutput() // TODO ACMO data also need to be combined?
         };
 
@@ -67,9 +65,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         String soil_id;
         String wth_id;
         HashMap<String, File> swFiles = new HashMap();
-//        boolean wsSubDirFlg = false;
         expArr = combineExps(expArr);
-//        HashMap<String, String> expNameMap = checkMultiTrn2(expArr);
         for (int i = 0; i < expArr.size(); i++) {
             expData = expArr.get(i);
             soil_id = getObjectOr(expData, "soil_id", "");
@@ -79,36 +75,22 @@ public class DssatControllerOutput extends DssatCommonOutput {
             exname = getValueOr(expData, "exname", "Experiment_" + i);
             File soilFile = writeSWFile(arg0, expData, new DssatSoilOutput());
             File wthFile = writeSWFile(arg0, expData, new DssatWeatherOutput());
-//            writeSingleExp(arg0 + expNameMap.get(exname), expData, outputs);
             writeSingleExp(arg0, expData, outputs);
             swFiles.put(exname + "_S", soilFile);
             swFiles.put(exname + "_W", wthFile);
-//            if (!expNameMap.get(exname).equals("")) {
-//                subDirs.add(expNameMap.get(exname));
-//                wsSubDirFlg = true;
-//                swFiles.put(exname + "_S", soilFile);
-//                swFiles.put(exname + "_W", wthFile);
-//            }
         }
-//        if (wsSubDirFlg) {
-//            subDirs.add("SOIL");
-//            subDirs.add("WEATHER");
-//        }
 
         // If experiment data is included
         if (!expArr.isEmpty()) {
             // Write all batch files
             DssatBatchFileOutput batchTran = new DssatBatchFileOutput();
-//            batchTran.writeFile(arg0, expArr, expNameMap);
             batchTran.writeFile(arg0, expArr);
             if (batchTran.getOutputFile() != null) {
-//                files.add(batchTran.getOutputFile());
                 files.put(batchTran.getOutputFile().getPath(), batchTran.getOutputFile());
             }
             DssatRunFileOutput runTran = new DssatRunFileOutput();
             runTran.writeFile(arg0, expArr);
             if (runTran.getOutputFile() != null) {
-//                files.add(runTran.getOutputFile());
                 files.put(runTran.getOutputFile().getPath(), runTran.getOutputFile());
             }
         } // If only weather or soil data is included
