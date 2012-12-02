@@ -8,13 +8,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import static org.agmip.translators.dssat.DssatCommonInput.getSectionData;
 import static org.agmip.translators.dssat.DssatCommonOutput.revisePath;
 import static org.agmip.util.MapUtil.*;
+import org.agmip.util.MapUtil.BucketEntry;
 
 /**
  *
@@ -51,8 +54,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
             new DssatAFileOutput(),
             new DssatTFileOutput(),
             new DssatCulFileOutput(),
-            //            new DssatBatchFileOutput(),
-            //            new DssatRunFileOutput(),
             new DssatACMOJsonOutput() // TODO ACMO data also need to be combined?
         };
 
@@ -60,8 +61,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         String soil_id;
         String wth_id;
         HashMap<String, File> swFiles = new HashMap();
-        boolean wsSubDirFlg = false;
-        HashMap<String, String> expNameMap = checkMultiTrn(expArr);
+        expArr = combineExps(expArr);
         for (int i = 0; i < expArr.size(); i++) {
             expData = expArr.get(i);
             soil_id = getObjectOr(expData, "soil_id", "");
@@ -71,32 +71,22 @@ public class DssatControllerOutput extends DssatCommonOutput {
             exname = getValueOr(expData, "exname", "Experiment_" + i);
             File soilFile = writeSWFile(arg0, expData, new DssatSoilOutput());
             File wthFile = writeSWFile(arg0, expData, new DssatWeatherOutput());
-            writeSingleExp(arg0 + expNameMap.get(exname), expData, outputs);
-            if (!expNameMap.get(exname).equals("")) {
-                subDirs.add(expNameMap.get(exname));
-                swFiles.put(exname + "_S", soilFile);
-                swFiles.put(exname + "_W", wthFile);
-                wsSubDirFlg = true;
-            }
-        }
-        if (wsSubDirFlg) {
-            subDirs.add("SOIL");
-            subDirs.add("WEATHER");
+            writeSingleExp(arg0, expData, outputs);
+            swFiles.put(exname + "_S", soilFile);
+            swFiles.put(exname + "_W", wthFile);
         }
 
         // If experiment data is included
         if (!expArr.isEmpty()) {
             // Write all batch files
             DssatBatchFileOutput batchTran = new DssatBatchFileOutput();
-            batchTran.writeFile(arg0, expArr, expNameMap);
+            batchTran.writeFile(arg0, expArr);
             if (batchTran.getOutputFile() != null) {
-//                files.add(batchTran.getOutputFile());
                 files.put(batchTran.getOutputFile().getPath(), batchTran.getOutputFile());
             }
             DssatRunFileOutput runTran = new DssatRunFileOutput();
             runTran.writeFile(arg0, expArr);
             if (runTran.getOutputFile() != null) {
-//                files.add(runTran.getOutputFile());
                 files.put(runTran.getOutputFile().getPath(), runTran.getOutputFile());
             }
         } // If only weather or soil data is included
@@ -179,12 +169,12 @@ public class DssatControllerOutput extends DssatCommonOutput {
             try {
                 outputs[i].writeFile(arg0, result);
                 if (outputs[i].getOutputFile() != null) {
-    //                files.add(outputs[i].getOutputFile());
+                    //                files.add(outputs[i].getOutputFile());
                     files.put(outputs[i].getOutputFile().getPath(), outputs[i].getOutputFile());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-            }    
+            }
         }
     }
 
@@ -206,9 +196,9 @@ public class DssatControllerOutput extends DssatCommonOutput {
 //                id = id.substring(0, 2);
                 swfiles = soilFiles;
             } else {
-    //            id = getObjectOr(expData, "wst_id", "");
-    //            id = getWthFileName(getObjectOr(expData, "weather", new HashMap()));
-    
+                //            id = getObjectOr(expData, "wst_id", "");
+                //            id = getWthFileName(getObjectOr(expData, "weather", new HashMap()));
+
                 id = wthHelper.createWthFileName(getObjectOr(expData, "weather", new HashMap()));
                 swfiles = wthFiles;
                 expData.put("wst_id", id);
@@ -218,7 +208,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 output.writeFile(arg0, expData);
                 if (output.getOutputFile() != null) {
                     swfiles.put(id, output.getOutputFile());
-    //            files.add(output.getOutputFile());
+                    //            files.add(output.getOutputFile());
                     files.put(output.getOutputFile().getPath(), output.getOutputFile());
                 }
             }
@@ -398,7 +388,148 @@ public class DssatControllerOutput extends DssatCommonOutput {
         return zipFile;
     }
 
-    private HashMap<String, String> checkMultiTrn(ArrayList<HashMap> expArr) {
+    private ArrayList<HashMap> combineExps(ArrayList<HashMap> expArr) {
+
+        // Set experiment groups with same exname
+        ArrayList<HashMap> ret = new ArrayList();
+        LinkedHashMap<String, ArrayList<HashMap>> expGroupMap = new LinkedHashMap();
+        ArrayList<HashMap> subExpArr;
+        String exname;
+        for (int i = 0; i < expArr.size(); i++) {
+            exname = getValueOr(expArr.get(i), "exname", "");
+
+            if (exname.equals("")) {
+                subExpArr = new ArrayList();
+                subExpArr.add(expArr.get(i));
+                expGroupMap.put("Experiment_" + i, subExpArr);
+            } else {
+                exname = getExName(expArr.get(i));
+                subExpArr = expGroupMap.get(exname);
+                if (subExpArr == null) {
+                    subExpArr = new ArrayList();
+                    expGroupMap.put(exname, subExpArr);
+                }
+                subExpArr.add(expArr.get(i));
+            }
+        }
+
+        // Combine the experiments in the same group
+        Collection<ArrayList<HashMap>> expGroups = expGroupMap.values();
+        for (ArrayList<HashMap> expGroup : expGroups) {
+            if (expGroup.size() == 1) {
+                ret.add(expGroup.get(0));
+            } else {
+                HashMap tmp = DssatCommonInput.CopyList(expGroup.get(0));
+                for (int i = 1; i < expGroup.size(); i++) {
+                    HashMap exp = expGroup.get(i);
+                    updateGroupExps(tmp, exp, i + 1);
+                }
+                ret.add(tmp);
+            }
+        }
+        return ret;
+    }
+
+    private void updateGroupExps(HashMap out, HashMap expData, int trno) {
+        int baseId = trno * 100;
+        int seqid;
+        int sm;
+        int em;
+        // Update dssat_sequence data
+        ArrayList<HashMap<String, String>> seqArr = new BucketEntry(getObjectOr(expData, "dssat_sequence", new HashMap())).getDataList();
+        for (int i = 0; i < seqArr.size(); i++) {
+            HashMap tmp = seqArr.get(i);
+
+            try {
+                seqid = Integer.parseInt(getValueOr(tmp, "seqid", "0")) + baseId;
+                sm = Integer.parseInt(getValueOr(tmp, "sm", "0")) + baseId;
+                em = Integer.parseInt(getValueOr(tmp, "em", "0")) + baseId;
+            } catch (NumberFormatException e) {
+                seqid = baseId;
+                sm = baseId;
+                em = baseId;
+            }
+            tmp.put("seqid", seqid + "");
+            tmp.put("sm", sm + "");
+            tmp.put("em", em + "");
+            tmp.put("trno", trno + "");
+        }
+        combineData(out, seqArr, "dssat_sequence");
+
+        // Update management events data
+        ArrayList<HashMap<String, String>> evtArr = new BucketEntry(getObjectOr(expData, "management", new HashMap())).getDataList();
+        for (int i = 0; i < evtArr.size(); i++) {
+            HashMap tmp = evtArr.get(i);
+            try {
+                seqid = Integer.parseInt(getValueOr(tmp, "seqid", "0")) + baseId;
+            } catch (NumberFormatException e) {
+                seqid = baseId;
+            }
+            tmp.put("seqid", seqid + "");
+        }
+        combineData(out, evtArr, "management");
+
+        // Update dssat_environment_modification data
+        ArrayList<HashMap<String, String>> emArr = new BucketEntry(getObjectOr(expData, "dssat_environment_modification", new HashMap())).getDataList();
+        for (int i = 0; i < emArr.size(); i++) {
+            HashMap tmp = emArr.get(i);
+            try {
+                em = Integer.parseInt(getValueOr(tmp, "em", "0")) + baseId;
+            } catch (NumberFormatException e) {
+                em = baseId;
+            }
+            tmp.put("em", em + "");
+        }
+        combineData(out, emArr, "dssat_environment_modification");
+
+        // Update dssat_simulation_control data
+        ArrayList<HashMap<String, String>> smArr = new BucketEntry(getObjectOr(expData, "dssat_simulation_control", new HashMap())).getDataList();
+        for (int i = 0; i < smArr.size(); i++) {
+            HashMap tmp = smArr.get(i);
+            try {
+                sm = Integer.parseInt(getValueOr(tmp, "sm", "0")) + baseId;
+            } catch (NumberFormatException e) {
+                sm = baseId;
+            }
+            tmp.put("sm", sm + "");
+        }
+        combineData(out, smArr, "dssat_simulation_control");
+
+        // Update observation data
+        HashMap obvData = getObjectOr(expData, "observed", new HashMap());
+        obvData.put("trno", trno + "");
+        Object outObvData = getObjectOr(out, "observed", new Object());
+        if (outObvData instanceof HashMap) {
+            ((HashMap) outObvData).put("trno", "1");
+            ArrayList obvArr = new ArrayList();
+            obvArr.add(outObvData);
+            obvArr.add(obvData);
+            out.put("observed", obvArr);
+        } else if (outObvData instanceof ArrayList) {
+            ((ArrayList) outObvData).add(obvData);
+        } else {
+            ArrayList obvArr = new ArrayList();
+            obvArr.add(obvData);
+            out.put("observed", obvArr);
+        }
+    }
+
+    private void combineData(HashMap out, ArrayList arr, String secName) {
+        ArrayList<HashMap<String, String>> seqArrOut;
+        // combine the array of data
+//        seqArrOut = new BucketEntry(getObjectOr(out, secName, new HashMap())).getDataList();
+        HashMap data = getObjectOr(out, secName, new HashMap());
+        if (secName.equals("management")) {
+            seqArrOut = getObjectOr(data, "events", new ArrayList());
+        } else {
+            seqArrOut = getObjectOr(data, "data", new ArrayList());
+        }
+        if (!arr.isEmpty() && !seqArrOut.isEmpty()) {
+            seqArrOut.addAll(arr);
+        }
+    }
+
+    private HashMap<String, String> checkMultiTrn2(ArrayList<HashMap> expArr) {
         HashMap<String, String> ret = new HashMap();
         HashMap<String, Boolean> multiTrnFlgs = new HashMap();
         String exname;

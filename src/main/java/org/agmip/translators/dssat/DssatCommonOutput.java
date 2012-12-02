@@ -55,7 +55,9 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * Format the number with maximum length and type
      *
      * @param bits Maximum length of the output string
-     * @param str Input string of number
+     * @param m the experiment data holder
+     * @param key the key of field in the map
+     * @param defVal the default return value when error happens
      * @return formated string of number
      */
     protected String formatNumStr(int bits, HashMap m, Object key, String defVal) {
@@ -329,7 +331,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * Get the weather file name for auto-generating (extend name not included)
      *
      * @param data experiment data holder or weather data holder
-     * @return
+     * @return the weather file name
      */
     protected String getWthFileName(HashMap data) {
 

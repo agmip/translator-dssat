@@ -26,6 +26,8 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
         // Initial variables
         HashMap<String, String> record;       // Data holder for time series data
+        ArrayList<HashMap> records;
+        ArrayList<HashMap> recordT;
         ArrayList<HashMap> observeRecords;    // Array of data holder for time series data
         BufferedWriter bwT;                         // output object
         StringBuilder sbData = new StringBuilder();             // construct the data info in the output
@@ -40,13 +42,31 @@ public class DssatTFileOutput extends DssatCommonOutput {
             setDefVal();
 
             // Get Data from input holder
-            HashMap tmp = (HashMap) getObjectOr(result, "observed", new HashMap());
-            observeRecords = (ArrayList<HashMap>) getObjectOr(tmp, "timeSeries", new ArrayList<HashMap>());
-            if (observeRecords.isEmpty()) {
-                return;
+            Object tmpData = getObjectOr(result, "observed", new Object());
+            if (tmpData instanceof ArrayList) {
+                records = (ArrayList) tmpData;
+            } else if (tmpData instanceof HashMap) {
+                records = new ArrayList();
+                records.add((HashMap) tmpData);
             } else {
-                String[] sortIds = {"date"};
-                Collections.sort(observeRecords, new DssatSortHelper(sortIds));
+                return;
+            }
+            if (records.isEmpty()) {
+                return;
+            }
+
+            observeRecords = new ArrayList();
+            for (int i = 0; i < records.size(); i++) {
+                recordT = getObjectOr(records.get(i), "timeSeries", new ArrayList());
+                String trno = getValueOr(records.get(i), "trno", "1");
+                if (!recordT.isEmpty()) {
+                    String[] sortIds = {"date"};
+                    Collections.sort(recordT, new DssatSortHelper(sortIds));
+                    for (int j = 0; j < recordT.size(); j++) {
+                        recordT.get(j).put("trno", trno);
+                    }
+                    observeRecords.addAll(recordT);
+                }
             }
 
             // Initial BufferedWriter
@@ -75,7 +95,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
                     } // check if the additional data is too long to output
                     else if (key.toString().length() <= 5) {
-                        if (!key.equals("date")) {
+                        if (!key.equals("date") && !key.equals("trno")) {
                             titleOutput.put(key, key);
                         }
 
@@ -120,7 +140,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
                 for (int j = 0; j < observeRecords.size(); j++) {
 
                     record = (HashMap) observeRecords.get(j);
-                    sbData.append(String.format(" %1$5s", 1));
+                    sbData.append(String.format(" %1$5s", getValueOr(record, "trno", "1")));
                     sbData.append(String.format(" %1$5d", Integer.parseInt(formatDateStr(getObjectOr(record, "date", defValI).toString()))));
                     for (int k = i * 39; k < limit; k++) {
 
