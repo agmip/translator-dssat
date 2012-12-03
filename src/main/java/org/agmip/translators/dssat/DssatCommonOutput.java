@@ -156,8 +156,8 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             ret = ret.substring(0, ret.length() - 1).replace(".", "");
         }
         // TODO need to be updated with a translate rule for other models' exname
-        if (ret.length() > 10 && ret.matches("\\w+_\\d+")) {
-            ret = ret.replaceAll("_\\d+$", "");
+        if (ret.matches("\\w+_+\\d+")) {
+            ret = ret.replaceAll("_+\\d+$", "");
         }
 
         return ret;
