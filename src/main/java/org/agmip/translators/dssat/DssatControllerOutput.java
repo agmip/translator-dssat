@@ -8,10 +8,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import static org.agmip.translators.dssat.DssatCommonInput.getSectionData;
@@ -414,14 +415,24 @@ public class DssatControllerOutput extends DssatCommonOutput {
         }
 
         // Combine the experiments in the same group
-        Collection<ArrayList<HashMap>> expGroups = expGroupMap.values();
-        for (ArrayList<HashMap> expGroup : expGroups) {
-            if (expGroup.size() == 1) {
-                ret.add(expGroup.get(0));
+        Set<Entry<String, ArrayList<HashMap>>> expGroups = expGroupMap.entrySet();
+        for (Entry<String, ArrayList<HashMap>> expGroup : expGroups) {
+            if (expGroup.getValue().size() == 1) {
+                ret.add(expGroup.getValue().get(0));
             } else {
-                HashMap tmp = DssatCommonInput.CopyList(expGroup.get(0));
-                for (int i = 1; i < expGroup.size(); i++) {
-                    HashMap exp = expGroup.get(i);
+                HashMap tmp = DssatCommonInput.CopyList(expGroup.getValue().get(0));
+                if (!tmp.containsKey("dssat_sequence")) {
+                    HashMap seq = new HashMap();
+                    ArrayList<HashMap> seqArr = new ArrayList();
+                    HashMap seqData = new HashMap();
+                    seqData.put("tr_name", getValueOr(tmp, "exname", ""));
+                    seqArr.add(seqData);
+                    tmp.put("dssat_sequence", seq);
+                    seq.put("data", seqArr);
+                }
+                tmp.put("exname", expGroup.getKey());
+                for (int i = 1; i < expGroup.getValue().size(); i++) {
+                    HashMap exp = expGroup.getValue().get(i);
                     updateGroupExps(tmp, exp, i + 1);
                 }
                 ret.add(tmp);
@@ -437,6 +448,9 @@ public class DssatControllerOutput extends DssatCommonOutput {
         int em;
         // Update dssat_sequence data
         ArrayList<HashMap<String, String>> seqArr = new BucketEntry(getObjectOr(expData, "dssat_sequence", new HashMap())).getDataList();
+        if (seqArr.isEmpty()) {
+            seqArr.add(new HashMap());
+        }
         for (int i = 0; i < seqArr.size(); i++) {
             HashMap tmp = seqArr.get(i);
 
@@ -453,6 +467,9 @@ public class DssatControllerOutput extends DssatCommonOutput {
             tmp.put("sm", sm + "");
             tmp.put("em", em + "");
             tmp.put("trno", trno + "");
+            if (tmp.get("tr_name") == null) {
+                tmp.put("tr_name", getValueOr(expData, "exname", ""));
+            }
         }
         combineData(out, seqArr, "dssat_sequence");
 
@@ -493,6 +510,16 @@ public class DssatControllerOutput extends DssatCommonOutput {
             }
             tmp.put("sm", sm + "");
         }
+        if (smArr.isEmpty()) {
+            // SDAT
+            String sdat = (String) expData.get("sdat");
+            if (sdat != null) {
+                HashMap tmp = new HashMap();
+                tmp.put("sm", baseId + "");
+                tmp.put("sdat", sdat);
+                smArr.add(tmp);
+            }
+        }
         combineData(out, smArr, "dssat_simulation_control");
 
         // Update observation data
@@ -518,13 +545,21 @@ public class DssatControllerOutput extends DssatCommonOutput {
         ArrayList<HashMap<String, String>> seqArrOut;
         // combine the array of data
 //        seqArrOut = new BucketEntry(getObjectOr(out, secName, new HashMap())).getDataList();
-        HashMap data = getObjectOr(out, secName, new HashMap());
-        if (secName.equals("management")) {
-            seqArrOut = getObjectOr(data, "events", new ArrayList());
-        } else {
-            seqArrOut = getObjectOr(data, "data", new ArrayList());
-        }
-        if (!arr.isEmpty() && !seqArrOut.isEmpty()) {
+        if (!arr.isEmpty()) {
+            HashMap data = getObjectOr(out, secName, new HashMap());
+            if (data.isEmpty()) {
+                out.put(secName, data);
+            }
+            String subSecName;
+            if (secName.equals("management")) {
+                subSecName = "events";
+            } else {
+                subSecName = "data";
+            }
+            seqArrOut = getObjectOr(data, subSecName, new ArrayList());
+            if (seqArrOut.isEmpty()) {
+                data.put(subSecName, seqArrOut);
+            }
             seqArrOut.addAll(arr);
         }
     }
