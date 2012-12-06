@@ -160,6 +160,11 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             ret = ret.replaceAll("_+\\d+$", "");
         }
 
+        // If length more than 10-bit, only remain first 10-bit
+        if (ret.length() > 10) {
+            ret = ret.substring(0, 10);
+        }
+
         return ret;
     }
 
@@ -205,8 +210,10 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                 if (ret.endsWith(crid)) {
                     ret = ret.substring(0, ret.length() - crid.length());
                 } else {
-                    if (crid.equals("XX") && ret.length() == 10) {
-                        crid = ret.substring(ret.length() - 2, ret.length());
+                    if (ret.length() == 10) {
+                        if (crid.equals("XX")) {
+                            crid = ret.substring(ret.length() - 2, ret.length());
+                        }
                         ret = ret.substring(0, ret.length() - 2);
                     }
                 }
