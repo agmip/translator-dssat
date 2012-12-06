@@ -281,7 +281,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         break;
                     }
                 }
-                if (smData.isEmpty()) {
+                if (getObjectOr(expData, "sdat", "").equals("") && smData.isEmpty()) {
                     smData.put("fertilizer", mfSubArr);
                     smData.put("irrigation", miSubArr);
                     smData.put("planting", mpData);
@@ -316,7 +316,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             // Set cultivals info
                             copyItem(cuData, evtData, "cul_name");
                             copyItem(cuData, evtData, "crid");
-                            copyItem(cuData, evtData, "cul_id", "cul_id", false);
+                            copyItem(cuData, evtData, "cul_id", "dssat_cul_id", false);
                             copyItem(cuData, evtData, "rm");
                             copyItem(cuData, evtData, "cul_notes");
                             translateTo2BitCrid(cuData);
@@ -370,6 +370,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 meNum = setSecDataArr(meSubArr, meArr);
                 mhNum = setSecDataArr(mhSubArr, mhArr);
                 smNum = setSecDataArr(smData, smArr);
+                if (smNum == 0) {
+                    smNum = 1;
+                }
 
                 sbData.append(String.format("%1$2s %2$1s %3$1s %4$1s %5$-25s %6$2s %7$2s %8$2s %9$2s %10$2s %11$2s %12$2s %13$2s %14$2s %15$2s %16$2s %17$2s %18$2s\r\n",
                         getValueOr(sqData, "trno", "1").toString(),
@@ -904,6 +907,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                 sbData.append("\r\n");
                             }
                         }
+                        sbData.append("\r\n");
                     } else {
                         sbData.append(createSMMAStr(idx + 1, expData, secData));
                     }
@@ -1007,7 +1011,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         sb.append("@N RESIDUES    RIPCN RTIME RIDEP\r\n");
         sb.append(sm).append(" RE            100     1    20\r\n");
         sb.append("@N HARVEST     HFRST HLAST HPCNP HPCNR\r\n");
-        sb.append(sm).append(" HA              0 83057   100     0\r\n");
+        sb.append(sm).append(" HA              0 83057   100     0\r\n\r\n");
 
         return sb.toString();
     }
