@@ -281,7 +281,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         break;
                     }
                 }
-                if (getObjectOr(expData, "sdat", "").equals("") && smData.isEmpty()) {
+                if (smData.isEmpty()) {
                     smData.put("fertilizer", mfSubArr);
                     smData.put("irrigation", miSubArr);
                     smData.put("planting", mpData);
@@ -983,7 +983,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //            }
 //        }
 
-        sdate = getObjectOr(expData, "sdat", "").toString();
+        sdate = getValueOr(trData, "sdat", getValueOr(expData, "sdat", "")).toString();
         if (sdate.equals("")) {
             subData = (HashMap) getObjectOr(trData, "planting", new HashMap());
             sdate = getValueOr(subData, "date", defValD);

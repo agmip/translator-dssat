@@ -510,6 +510,16 @@ public class DssatControllerOutput extends DssatCommonOutput {
             }
             tmp.put("sm", sm + "");
         }
+        if (smArr.isEmpty()) {
+            // SDAT
+            String sdat = (String) expData.get("sdat");
+            if (sdat != null) {
+                HashMap tmp = new HashMap();
+                tmp.put("sm", baseId + "");
+                tmp.put("sdat", sdat);
+                smArr.add(tmp);
+            }
+        }
         combineData(out, smArr, "dssat_simulation_control");
 
         // Update observation data
@@ -535,16 +545,21 @@ public class DssatControllerOutput extends DssatCommonOutput {
         ArrayList<HashMap<String, String>> seqArrOut;
         // combine the array of data
 //        seqArrOut = new BucketEntry(getObjectOr(out, secName, new HashMap())).getDataList();
-        HashMap data = getObjectOr(out, secName, new HashMap());
-        if (secName.equals("management")) {
-            seqArrOut = getObjectOr(data, "events", new ArrayList());
-        } else {
-            seqArrOut = getObjectOr(data, "data", new ArrayList());
-        }
-        if (seqArrOut.isEmpty()) {
-            data.put("data", seqArrOut);
-        }
         if (!arr.isEmpty()) {
+            HashMap data = getObjectOr(out, secName, new HashMap());
+            if (data.isEmpty()) {
+                out.put(secName, data);
+            }
+            String subSecName;
+            if (secName.equals("management")) {
+                subSecName = "events";
+            } else {
+                subSecName = "data";
+            }
+            seqArrOut = getObjectOr(data, subSecName, new ArrayList());
+            if (seqArrOut.isEmpty()) {
+                data.put(subSecName, seqArrOut);
+            }
             seqArrOut.addAll(arr);
         }
     }
