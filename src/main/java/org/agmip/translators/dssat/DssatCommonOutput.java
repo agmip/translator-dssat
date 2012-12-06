@@ -210,6 +210,9 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                         ret = ret.substring(0, ret.length() - 2);
                     }
                 }
+                if (ret.length() > 8) {
+                    ret = ret.substring(0, 8);
+                }
 
                 ret += "." + crid + fileType;
             } catch (Exception e) {
