@@ -431,14 +431,29 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     seq.put("data", seqArr);
                 }
                 tmp.put("exname", expGroup.getKey());
+                ArrayList rootArr = new ArrayList();
+                tmp.put("dssat_root", rootArr);
+                rootArr.add(combinaRoot(tmp));
                 for (int i = 1; i < expGroup.getValue().size(); i++) {
                     HashMap exp = expGroup.getValue().get(i);
+                    rootArr.add(combinaRoot(exp));
                     updateGroupExps(tmp, exp, i + 1);
                 }
                 ret.add(tmp);
             }
         }
         return ret;
+    }
+
+    private HashMap combinaRoot(Map m) {
+        Set<Entry<String, Object>> entries = m.entrySet();
+        HashMap items = new HashMap();
+        for (Entry<String, Object> e : entries) {
+            if (e.getValue() instanceof String || e.getKey().equals("dssat_info") || e.getKey().equals("initial_conditions")) {
+                items.put(e.getKey(), e.getValue());
+            }
+        }
+        return items;
     }
 
     private void updateGroupExps(HashMap out, HashMap expData, int trno) {
@@ -510,16 +525,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
             }
             tmp.put("sm", sm + "");
         }
-        if (smArr.isEmpty()) {
-            // SDAT
-            String sdat = (String) expData.get("sdat");
-            if (sdat != null) {
-                HashMap tmp = new HashMap();
-                tmp.put("sm", baseId + "");
-                tmp.put("sdat", sdat);
-                smArr.add(tmp);
-            }
-        }
         combineData(out, smArr, "dssat_simulation_control");
 
         // Update observation data
@@ -562,40 +567,5 @@ public class DssatControllerOutput extends DssatCommonOutput {
             }
             seqArrOut.addAll(arr);
         }
-    }
-
-    private HashMap<String, String> checkMultiTrn2(ArrayList<HashMap> expArr) {
-        HashMap<String, String> ret = new HashMap();
-        HashMap<String, Boolean> multiTrnFlgs = new HashMap();
-        String exname;
-        String subDir;
-
-        for (int i = 0; i < expArr.size(); i++) {
-            exname = getValueOr(expArr.get(i), "exname", "");
-            if (!exname.equals("")) {
-                subDir = getExName(expArr.get(i));
-                if (multiTrnFlgs.containsKey(subDir)) {
-                    multiTrnFlgs.put(subDir, true);
-                } else {
-                    multiTrnFlgs.put(subDir, false);
-                }
-            }
-        }
-
-        for (int i = 0; i < expArr.size(); i++) {
-            exname = getValueOr(expArr.get(i), "exname", "");
-            if (exname.equals("")) {
-                ret.put("Experiment_" + i, "Experiment_" + i);
-            } else {
-                subDir = getExName(expArr.get(i));
-                if (multiTrnFlgs.get(subDir)) {
-                    ret.put(exname, exname);
-                } else {
-                    ret.put(exname, "");
-                }
-            }
-        }
-
-        return ret;
     }
 }
