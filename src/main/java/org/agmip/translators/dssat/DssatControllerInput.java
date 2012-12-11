@@ -95,7 +95,7 @@ public class DssatControllerInput implements TranslatorInput {
             // Set soil data for this treatment
             wthId = getValueOr(expData, "wst_id", "0");
             if (!wthId.equals("0")) {
-                wthData = getSectionData(wthArr, "wst_id", wthId);
+                wthData = getSectionDataWithNocopy(wthArr, "wst_id", wthId);
                 if (wthData != null && !wthData.isEmpty()) {
 //                    expData.put(wthReader.jsonKey, wthData);
                     wthTmpMap.put(wthId, wthData);
@@ -105,7 +105,7 @@ public class DssatControllerInput implements TranslatorInput {
             // Set weather data for this treatment
             soilId = getValueOr(expData, "soil_id", "0");
             if (!soilId.equals("0") && !soilTmpMap.containsKey(soilId)) {
-                soilData = getSectionData(soilArr, "soil_id", soilId);
+                soilData = getSectionDataWithNocopy(soilArr, "soil_id", soilId);
                 // if there is soil analysis data, create new soil block by using soil analysis info
                 if (expData.get("soil_analysis") != null) {
                     if (soilData == null) {
@@ -148,7 +148,7 @@ public class DssatControllerInput implements TranslatorInput {
             HashMap obv = new HashMap();
             expData.put(obvAReader.jsonKey, obv);
             if (!getValueOr(expData, "trno", "0").equals("0")) {
-                HashMap tmp = getSectionData(obvAArr, "trno_a", expData.get("trno").toString());
+                HashMap tmp = getSectionDataWithNocopy(obvAArr, "trno_a", expData.get("trno").toString());
                 if (tmp != null) {
                     obv.putAll(tmp);
                 }
@@ -158,7 +158,7 @@ public class DssatControllerInput implements TranslatorInput {
             obvTFile = getObjectOr(obvTFiles, exname, new HashMap());
             obvTArr = getObjectOr(obvTFile, obvTReader.obvDataKey, new ArrayList<HashMap>());
             if (!getValueOr(expData, "trno", "0").equals("0")) {
-                HashMap tmp = getSectionData(obvTArr, "trno_t", expData.get("trno").toString());
+                HashMap tmp = getSectionDataWithNocopy(obvTArr, "trno_t", expData.get("trno").toString());
                 if (tmp != null) {
                     obv.put("timeSeries", tmp.get(obvTReader.obvDataKey));
                 }
@@ -179,7 +179,7 @@ public class DssatControllerInput implements TranslatorInput {
                 ArrayList<HashMap> culTmpArr = new ArrayList<HashMap>();
                 for (int j = 0; j < eventArr.size(); j++) {
                     if (getObjectOr(eventArr.get(j), "event", "").equals("planting")) {
-                        culData = getSectionData(culArr, "cul_id", (String) eventArr.get(j).get("cul_id"));
+                        culData = getSectionDataWithNocopy(culArr, "cul_id", (String) eventArr.get(j).get("cul_id"));
                         if (culData != null) {
                             culTmpArr.add(culData);
                         }
