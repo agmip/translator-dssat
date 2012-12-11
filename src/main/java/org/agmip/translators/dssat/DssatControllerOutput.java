@@ -84,8 +84,8 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     wthTmp.put("wst_id", wth_id);
                     writeSWFile(arg0, soilTmp, new DssatSoilOutput());
                     writeSWFile(arg0, wthTmp, new DssatWeatherOutput());
-                    soilArrTmp.add(soilTmp);
-                    wthArrTmp.add(wthTmp);
+                    soilArrTmp.add((HashMap) soilTmp.get("soil"));
+                    wthArrTmp.add((HashMap) wthTmp.get("weather"));
                 }
                 expData.put("soil", soilArrTmp);
                 expData.put("weather", wthArrTmp);
