@@ -15,7 +15,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import static org.agmip.translators.dssat.DssatCommonInput.getSectionData;
+import static org.agmip.translators.dssat.DssatCommonInput.getSectionDataWithNocopy;
 import static org.agmip.translators.dssat.DssatCommonOutput.revisePath;
 import static org.agmip.util.MapUtil.*;
 import org.agmip.util.MapUtil.BucketEntry;
@@ -44,8 +44,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
     private void writeMultipleExp(String arg0, Map result) throws FileNotFoundException, IOException {
 
         arg0 = revisePath(arg0);
-        String exname;
-        ArrayList<String> subDirs = new ArrayList();
         ArrayList<HashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
         HashMap expData;
         ArrayList<HashMap> soilArr = getObjectOr(result, "soils", new ArrayList());
@@ -65,16 +63,13 @@ public class DssatControllerOutput extends DssatCommonOutput {
         expArr = combineExps(expArr);
         for (int i = 0; i < expArr.size(); i++) {
             expData = expArr.get(i);
-            soil_id = getObjectOr(expData, "soil_id", "");
-            wth_id = getObjectOr(expData, "wst_id", "");
-            expData.put("soil", getSectionData(soilArr, "soil_id", soil_id));
-            expData.put("weather", getSectionData(wthArr, "wst_id", wth_id));
-            exname = getValueOr(expData, "exname", "Experiment_" + i);
-            File soilFile = writeSWFile(arg0, expData, new DssatSoilOutput());
-            File wthFile = writeSWFile(arg0, expData, new DssatWeatherOutput());
+                soil_id = getObjectOr(expData, "soil_id", "");
+                wth_id = getObjectOr(expData, "wst_id", "");
+            expData.put("soil", getSectionDataWithNocopy(soilArr, "soil_id", soil_id));
+            expData.put("weather", getSectionDataWithNocopy(wthArr, "wst_id", wth_id));
+            writeSWFile(arg0, expData, new DssatSoilOutput());
+            writeSWFile(arg0, expData, new DssatWeatherOutput());
             writeSingleExp(arg0, expData, outputs);
-            swFiles.put(exname + "_S", soilFile);
-            swFiles.put(exname + "_W", wthFile);
         }
 
         // If experiment data is included
@@ -107,14 +102,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         // compress all output files into one zip file
         Calendar cal = Calendar.getInstance();
         zipFile = new File(arg0 + "AGMIP_DSSAT_" + cal.getTimeInMillis() + ".zip");
-        createZip(swFiles);
-
-        // Delete the remained folders
-        File dir;
-        for (int i = 0; i < subDirs.size(); i++) {
-            dir = new File(arg0 + subDirs.get(i));
-            dir.delete();
-        }
+        createZip();
     }
 
     /**
@@ -189,7 +177,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
      */
     private File writeSWFile(String arg0, Map expData, DssatCommonOutput output) {
         String id = "";
-//        String fileName;
         HashMap<String, File> swfiles = null;
         try {
             if (output instanceof DssatSoilOutput) {
@@ -199,7 +186,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
             } else {
                 //            id = getObjectOr(expData, "wst_id", "");
                 //            id = getWthFileName(getObjectOr(expData, "weather", new HashMap()));
-
                 id = wthHelper.createWthFileName(getObjectOr(expData, "weather", new HashMap()));
                 swfiles = wthFiles;
                 expData.put("wst_id", id);
@@ -231,10 +217,8 @@ public class DssatControllerOutput extends DssatCommonOutput {
         ZipEntry entry;
         BufferedInputStream bis;
         byte[] data = new byte[1024];
-//        File file;
 
         for (File file : files.values()) {
-//            file = files.get(i);
             if (file == null) {
                 continue;
             }
@@ -254,73 +238,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
             bis.close();
             file.delete();
         }
-
-        out.close();
-    }
-
-    /**
-     * Compress the files in one zip
-     *
-     * @param swFiles The map contain the relationship between experiments and
-     * soil/weather files
-     * @throws FileNotFoundException
-     * @throws IOException
-     */
-    private void createZip(HashMap<String, File> swFiles) throws FileNotFoundException, IOException {
-
-        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile));
-//        File file;
-        String zipPath;
-
-        for (File file : files.values()) {
-//            file = files.get(i);
-            if (file == null) {
-                continue;
-            }
-
-            if (zipFile.getParent() != null) {
-                zipPath = file.getPath().substring(zipFile.getParent().length() + 1);
-            } else {
-                zipPath = file.getPath();
-            }
-            addToZip(out, zipPath, file);
-
-            if (file.getName().matches(".+\\.\\w{2}[Xx]")) {
-                zipPath = zipPath.substring(0, zipPath.length() - file.getName().length());
-                if (!zipPath.equals("")) {
-                    String exname = zipPath.substring(0, zipPath.length() - 1);
-                    addToZip(out, zipPath, swFiles.get(exname + "_S"));
-                    addToZip(out, zipPath, swFiles.get(exname + "_W"));
-                }
-            }
-//            file.delete();
-        }
-
-        // Delete files
-        for (File file : files.values()) {
-            if (file != null) {
-                file.delete();
-            }
-        }
-        files.clear();
-        soilFiles.clear();
-        wthFiles.clear();
-
-        // Delete Soil files
-//        for (String id : soilFiles.keySet()) {
-//            if (soilFiles.get(id) != null) {
-//                soilFiles.get(id).delete();
-//            }
-//        }
-//        soilFiles.clear();
-//
-//        // Delete Weather files
-//        for (String id : wthFiles.keySet()) {
-//            if (wthFiles.get(id) != null) {
-//                wthFiles.get(id).delete();
-//            }
-//        }
-//        wthFiles.clear();
 
         out.close();
     }

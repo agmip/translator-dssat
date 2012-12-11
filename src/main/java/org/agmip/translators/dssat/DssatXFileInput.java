@@ -1184,7 +1184,7 @@ public class DssatXFileInput extends DssatCommonInput {
         }
 
         if (key.equals("icbl")) {
-            return getSectionData(secArr, key, value);
+            return getSectionDataWithNocopy(secArr, key, value);
         } else {
             HashMap fstNode = (HashMap) secArr.get(0);
             // If it contains multiple sub array of data, or it does not have multiple sub records

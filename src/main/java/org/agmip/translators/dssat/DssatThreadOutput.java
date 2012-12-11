@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import org.agmip.core.types.TranslatorOutput;
 import org.agmip.translators.dssat.DssatControllerOutput;
-import static org.agmip.translators.dssat.DssatCommonInput.getSectionData;
+import static org.agmip.translators.dssat.DssatCommonInput.getSectionDataWithNocopy;
 import static org.agmip.util.MapUtil.getObjectOr;
 
 /**
@@ -20,11 +20,11 @@ public class DssatThreadOutput {
         ArrayList<HashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
         for (int i = 0; i < expArr.size(); i++) {
             HashMap expData = expArr.get(i);
-            HashMap soilData = getSectionData(soilArr, "soil_id", getObjectOr(expData, "soil_id", ""));
+            HashMap soilData = getSectionDataWithNocopy(soilArr, "soil_id", getObjectOr(expData, "soil_id", ""));
             if (soilData != null) {
                 expData.put("soil", soilData);
             }
-            HashMap wthData = getSectionData(wthArr, "wst_id", getObjectOr(expData, "wst_id", ""));
+            HashMap wthData = getSectionDataWithNocopy(wthArr, "wst_id", getObjectOr(expData, "wst_id", ""));
             if (wthData != null) {
                 expData.put("weather", wthData);
             }

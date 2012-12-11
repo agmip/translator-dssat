@@ -757,6 +757,31 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
         return ret;
     }
+    
+    
+
+    /**
+     * Get the section data by given index value and key, without getting a copy of original data
+     *
+     * @param secArr Section data array
+     * @param key index variable name
+     * @param value index variable value
+     */
+    public static HashMap getSectionDataWithNocopy(ArrayList secArr, Object key, String value) {
+
+        HashMap ret = null;
+        // Get First data node
+        if (secArr.isEmpty() || value == null) {
+            return ret;
+        }
+        for (int i = 0; i < secArr.size(); i++) {
+            if (value.equals(((HashMap) secArr.get(i)).get(key))) {
+                return (HashMap) secArr.get(i);
+            }
+        }
+
+        return ret;
+    }
 
     /**
      * Combine two layer data array into a new array by matching the pointed id,
