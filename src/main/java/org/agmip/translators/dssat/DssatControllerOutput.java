@@ -59,16 +59,37 @@ public class DssatControllerOutput extends DssatCommonOutput {
         // Write files
         String soil_id;
         String wth_id;
-        HashMap<String, File> swFiles = new HashMap();
         expArr = combineExps(expArr);
         for (int i = 0; i < expArr.size(); i++) {
             expData = expArr.get(i);
+            ArrayList<HashMap> rootArr = getObjectOr(expData, "dssat_root", new ArrayList());
+            if (rootArr.isEmpty()) {
                 soil_id = getObjectOr(expData, "soil_id", "");
                 wth_id = getObjectOr(expData, "wst_id", "");
                 expData.put("soil", getSectionDataWithNocopy(soilArr, "soil_id", soil_id));
                 expData.put("weather", getSectionDataWithNocopy(wthArr, "wst_id", wth_id));
                 writeSWFile(arg0, expData, new DssatSoilOutput());
                 writeSWFile(arg0, expData, new DssatWeatherOutput());
+            } else {
+                ArrayList<HashMap> soilArrTmp = new ArrayList();
+                ArrayList<HashMap> wthArrTmp = new ArrayList();
+                for (int j = 0; j < rootArr.size(); j++) {
+                    soil_id = getObjectOr(rootArr.get(j), "soil_id", "");
+                    wth_id = getObjectOr(rootArr.get(j), "wst_id", "");
+                    HashMap soilTmp = new HashMap();
+                    HashMap wthTmp = new HashMap();
+                    soilTmp.put("soil", getSectionDataWithNocopy(soilArr, "soil_id", soil_id));
+                    soilTmp.put("soil_id", soil_id);
+                    wthTmp.put("weather", getSectionDataWithNocopy(wthArr, "wst_id", wth_id));
+                    wthTmp.put("wst_id", wth_id);
+                    writeSWFile(arg0, soilTmp, new DssatSoilOutput());
+                    writeSWFile(arg0, wthTmp, new DssatWeatherOutput());
+                    soilArrTmp.add(soilTmp);
+                    wthArrTmp.add(wthTmp);
+                }
+                expData.put("soil", soilArrTmp);
+                expData.put("weather", wthArrTmp);
+            }
             writeSingleExp(arg0, expData, outputs);
         }
 
@@ -190,7 +211,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 id = wthHelper.createWthFileName(getObjectOr(expData, "weather", new HashMap()));
                 swfiles = wthFiles;
                 expData.put("wst_id", id);
-                getObjectOr(expData, "weather", new HashMap()).put("wst_id", id);
             }
             if (!id.equals("") && !swfiles.containsKey(id)) {
                 output.writeFile(arg0, expData);
