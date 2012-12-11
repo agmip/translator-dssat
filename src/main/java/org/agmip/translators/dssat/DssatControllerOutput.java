@@ -65,10 +65,10 @@ public class DssatControllerOutput extends DssatCommonOutput {
             expData = expArr.get(i);
                 soil_id = getObjectOr(expData, "soil_id", "");
                 wth_id = getObjectOr(expData, "wst_id", "");
-            expData.put("soil", getSectionDataWithNocopy(soilArr, "soil_id", soil_id));
-            expData.put("weather", getSectionDataWithNocopy(wthArr, "wst_id", wth_id));
-            writeSWFile(arg0, expData, new DssatSoilOutput());
-            writeSWFile(arg0, expData, new DssatWeatherOutput());
+                expData.put("soil", getSectionDataWithNocopy(soilArr, "soil_id", soil_id));
+                expData.put("weather", getSectionDataWithNocopy(wthArr, "wst_id", wth_id));
+                writeSWFile(arg0, expData, new DssatSoilOutput());
+                writeSWFile(arg0, expData, new DssatWeatherOutput());
             writeSingleExp(arg0, expData, outputs);
         }
 
@@ -112,6 +112,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
      * @param result data holder object
      *
      */
+    @Override
     public void writeFile(String arg0, Map result) {
 
         try {
@@ -342,7 +343,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     HashMap seq = new HashMap();
                     ArrayList<HashMap> seqArr = new ArrayList();
                     HashMap seqData = new HashMap();
-                    seqData.put("tr_name", getValueOr(tmp, "exname", ""));
+                    seqData.put("trt_name", getValueOr(tmp, "exname", ""));
                     seqArr.add(seqData);
                     tmp.put("dssat_sequence", seq);
                     seq.put("data", seqArr);
@@ -399,8 +400,8 @@ public class DssatControllerOutput extends DssatCommonOutput {
             tmp.put("sm", sm + "");
             tmp.put("em", em + "");
             tmp.put("trno", trno + "");
-            if (tmp.get("tr_name") == null) {
-                tmp.put("tr_name", getValueOr(expData, "exname", ""));
+            if (tmp.get("trt_name") == null) {
+                tmp.put("trt_name", getValueOr(expData, "exname", ""));
             }
         }
         combineData(out, seqArr, "dssat_sequence");
