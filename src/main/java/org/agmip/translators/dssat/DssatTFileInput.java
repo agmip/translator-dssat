@@ -132,6 +132,7 @@ public class DssatTFileInput extends DssatCommonInput {
                         // Read line and save into return holder
                         file.putAll(readLine(line, formats));
                         file.put("exname", exname);
+                        flg[0] = "data";
 
                     } // Read data info 
                     else {

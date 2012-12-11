@@ -62,7 +62,11 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // Initial BufferedWriter
             // Get File name
-            String fileName = getWthFileName(wthFile) + ".WTH";
+            String fileName = getValueOr(result, "wst_id", "");
+            if (fileName.equals("")) {
+                fileName = getWthFileName(wthFile);
+            }
+            fileName += ".WTH";
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
             bwW = new BufferedWriter(new FileWriter(outputFile));

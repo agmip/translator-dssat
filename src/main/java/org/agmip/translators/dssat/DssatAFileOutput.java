@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.translators.dssat.DssatCommonInput.CopyList;
 import static org.agmip.util.MapUtil.*;
