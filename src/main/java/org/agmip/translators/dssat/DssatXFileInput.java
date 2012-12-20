@@ -255,7 +255,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("sq", 2);
                         formats.put("op", 2);
                         formats.put("co", 2);
-                        formats.put("tr_name", 26);
+                        formats.put("trt_name", 26);
                         formats.put("ge", 3);
                         formats.put("fl", 3);
                         formats.put("sa", 3);
@@ -271,8 +271,8 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("sm", 3);
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
-                        if (tmp.get("tr_name") == null) {
-                            tmp.put("tr_name", meta.get("exname"));
+                        if (tmp.get("trt_name") == null) {
+                            tmp.put("trt_name", meta.get("exname"));
                         }
                         sqArr.add(tmp);
                     } else {
@@ -932,12 +932,13 @@ public class DssatXFileInput extends DssatCommonInput {
                     dssatSq.put(eventKey, sqArrNew);
                     trData.put("dssat_sequence", dssatSq);
 //                trData.put("dssat_info", dssatInfo);
-                    trMetaData.put("tr_name", sqData.get("tr_name"));
+                    trMetaData.put("trt_name", sqData.get("trt_name"));
                     trMetaData.put("trno", trno);
                     trMetaData.put("exname", exname);
                     seqid = 1;
                 } else {
-                    trMetaData.remove("tr_name");
+                    // The case of multiple sequence
+                    trMetaData.remove("trt_name");
                 }
                 sqData.put("seqid", seqid + "");
                 sqArrNew.add(sqData);
@@ -1184,7 +1185,7 @@ public class DssatXFileInput extends DssatCommonInput {
         }
 
         if (key.equals("icbl")) {
-            return getSectionData(secArr, key, value);
+            return getSectionDataWithNocopy(secArr, key, value);
         } else {
             HashMap fstNode = (HashMap) secArr.get(0);
             // If it contains multiple sub array of data, or it does not have multiple sub records
