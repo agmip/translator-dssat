@@ -85,7 +85,7 @@ public class DssatTFileInput extends DssatCommonInput {
         HashMap mapT;
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
-        ArrayList<HashMap> obvData = new ArrayList();
+        ArrayList<HashMap> obvData;
         ArrayList obvDataSecByTrno = new ArrayList();
         HashMap obvDataByTrno;
         DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
@@ -111,6 +111,7 @@ public class DssatTFileInput extends DssatCommonInput {
             }
 
             file = new HashMap();
+            obvData = new ArrayList();
 
             while ((line = brT.readLine()) != null) {
 
@@ -131,6 +132,7 @@ public class DssatTFileInput extends DssatCommonInput {
                         // Read line and save into return holder
                         file.putAll(readLine(line, formats));
                         file.put("exname", exname);
+                        flg[0] = "data";
 
                     } // Read data info 
                     else {

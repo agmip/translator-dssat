@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
  * @version 1.0
  */
 public abstract class DssatCommonInput implements TranslatorInput {
+
     private static final Logger log = LoggerFactory.getLogger(DssatCommonInput.class);
     protected String[] flg = {"", "", ""};
     protected int flg4 = 0;
@@ -182,7 +183,6 @@ public abstract class DssatCommonInput implements TranslatorInput {
      *
      * @param m input map which might contain date value in it
      * @param id date string with format of "yyddd"
-     * @return result date string with format of "yyyymmdd"
      */
     protected void translateDateStr(HashMap m, String id) {
 
@@ -205,9 +205,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
     /**
      * Translate data str from "yyddd" or "doy" to "yyyymmdd"
      *
-     * @param str date string with format of "yyddd"
-     * @pdate the related planting date
-     * @return result date string with format of "yyyymmdd"
+     * @param m the experiment data holder
+     * @param id the key name of date field in the map
+     * @param pdate the related planting date
      */
     protected void translateDateStrForDOY(HashMap m, String id, String pdate) {
 
@@ -220,7 +220,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * Translate data str from "yyddd" or "doy" to "yyyymmdd"
      *
      * @param str date string with format of "yyddd"
-     * @pdate the related planting date
+     * @param pdate the related planting date
      * @return result date string with format of "yyyymmdd"
      */
     protected String translateDateStrForDOY(String str, String pdate) {
@@ -380,7 +380,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
             while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
-                    
+
                     if (exnames.contains(entry.getName().replaceAll("[Xx]$", ""))) {
 //                        result.put("X", getBuf(in, (int) entry.getSize()));
                         mapX.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
@@ -601,8 +601,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
         log.debug("Array: {}", arr.toString());
         log.debug("Item: {}", item.toString());
         log.debug("Key: {}", key);
-        
-        
+
+
         for (int i = 0; i < arr.size(); i++) {
             elem = (HashMap) arr.get(i);
             if (!key.getClass().isArray()) {
@@ -752,6 +752,31 @@ public abstract class DssatCommonInput implements TranslatorInput {
         for (int i = 0; i < secArr.size(); i++) {
             if (value.equals(((HashMap) secArr.get(i)).get(key))) {
                 return DssatCommonInput.CopyList((HashMap) secArr.get(i));
+            }
+        }
+
+        return ret;
+    }
+    
+    
+
+    /**
+     * Get the section data by given index value and key, without getting a copy of original data
+     *
+     * @param secArr Section data array
+     * @param key index variable name
+     * @param value index variable value
+     */
+    public static HashMap getSectionDataWithNocopy(ArrayList secArr, Object key, String value) {
+
+        HashMap ret = null;
+        // Get First data node
+        if (secArr.isEmpty() || value == null) {
+            return ret;
+        }
+        for (int i = 0; i < secArr.size(); i++) {
+            if (value.equals(((HashMap) secArr.get(i)).get(key))) {
+                return (HashMap) secArr.get(i);
             }
         }
 
