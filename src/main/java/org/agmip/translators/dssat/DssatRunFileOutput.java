@@ -14,7 +14,7 @@ import java.util.Map;
  * @author Meng Zhang
  * @version 1.0
  */
-public class DssatRunFileOutput extends DssatCommonOutput {
+public class DssatRunFileOutput extends DssatCommonOutput implements DssatBtachFile {
 
     /**
      * DSSAT Run File Output method
