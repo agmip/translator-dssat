@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 public class DssatTranslateRunner implements Callable<File> {
 
     private DssatCommonOutput translator;
-    private DssatBtachFile translator2;
     private Map data;
     private ArrayList<HashMap> dataArr;
     private String outputDirectory;
@@ -28,8 +27,8 @@ public class DssatTranslateRunner implements Callable<File> {
         this.outputDirectory = outputDirectory;
     }
 
-    public DssatTranslateRunner(DssatBtachFile translator, ArrayList<HashMap> dataArr, String outputDirectory) {
-        this.translator2 = translator;
+    public DssatTranslateRunner(DssatCommonOutput translator, ArrayList<HashMap> dataArr, String outputDirectory) {
+        this.translator = translator;
         this.dataArr = dataArr;
         this.outputDirectory = outputDirectory;
     }
@@ -39,7 +38,7 @@ public class DssatTranslateRunner implements Callable<File> {
         LOG.debug("Starting new thread!");
         try {
             if (translator instanceof DssatBtachFile) {
-                translator2.writeFile(outputDirectory, dataArr);
+                ((DssatBtachFile)translator).writeFile(outputDirectory, dataArr);
             } else {
                 translator.writeFile(outputDirectory, data);
             }

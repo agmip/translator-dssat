@@ -33,8 +33,8 @@ public class DssatControllerOutput extends DssatCommonOutput {
     private File zipFile;
     private HashMap<String, File> files = new HashMap();
     private ArrayList<Future<File>> futFiles = new ArrayList();
-    private HashMap<String, File> soilFiles = new HashMap();
-    private HashMap<String, File> wthFiles = new HashMap();
+    private HashMap<String, Future<File>> soilFiles = new HashMap();
+    private HashMap<String, Future<File>> wthFiles = new HashMap();
     private DssatWthFileHelper wthHelper = new DssatWthFileHelper();
     private ExecutorService executor = Executors.newFixedThreadPool(64);
 
@@ -182,20 +182,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
         }
     }
 
-//    private void writeSingleExp(String arg0, Map result, DssatCommonOutput... outputs) {
-//        for (int i = 0; i < outputs.length; i++) {
-//            try {
-//                outputs[i].writeFile(arg0, result);
-//                if (outputs[i].getOutputFile() != null) {
-//                    //                files.add(outputs[i].getOutputFile());
-//                    files.put(outputs[i].getOutputFile().getPath(), outputs[i].getOutputFile());
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
     /**
      * write soil/weather files
      *
@@ -204,9 +190,9 @@ public class DssatControllerOutput extends DssatCommonOutput {
      * @param output The DSSAT Writer object
      * @return The created soil/weather file object
      */
-    private File writeSWFile(String arg0, Map expData, DssatCommonOutput output) {
+    private Future<File> writeSWFile(String arg0, Map expData, DssatCommonOutput output) {
         String id = "";
-        HashMap<String, File> swfiles = null;
+        HashMap<String, Future<File>> swfiles = null;
         try {
             if (output instanceof DssatSoilOutput) {
                 id = getObjectOr(expData, "soil_id", "");
@@ -220,12 +206,15 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 expData.put("wst_id", id);
             }
             if (!id.equals("") && !swfiles.containsKey(id)) {
-                output.writeFile(arg0, expData);
-                if (output.getOutputFile() != null) {
-                    swfiles.put(id, output.getOutputFile());
-                    //            files.add(output.getOutputFile());
-                    files.put(output.getOutputFile().getPath(), output.getOutputFile());
-                }
+                Future fut = executor.submit(new DssatTranslateRunner(output, expData, arg0));
+                swfiles.put(id, fut);
+                futFiles.add(fut);
+//                output.writeFile(arg0, expData);
+//                if (output.getOutputFile() != null) {
+//                    swfiles.put(id, output.getOutputFile());
+//                    //            files.add(output.getOutputFile());
+//                    files.put(output.getOutputFile().getPath(), output.getOutputFile());
+//                }
             }
         } catch (Exception e) {
             e.printStackTrace();
