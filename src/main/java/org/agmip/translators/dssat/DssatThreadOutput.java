@@ -1,8 +1,12 @@
 package org.agmip.translators.dssat;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.agmip.core.types.TranslatorOutput;
 import org.agmip.translators.dssat.DssatControllerOutput;
 import static org.agmip.translators.dssat.DssatCommonInput.getSectionDataWithNocopy;
@@ -14,10 +18,12 @@ import static org.agmip.util.MapUtil.getObjectOr;
  */
 public class DssatThreadOutput {
 
-    public void execDssatTranslator(String arg0, HashMap result, ExecutorService executor) {
+    public void execDssatTranslator(String arg0, HashMap result) {
+        ExecutorService executor = Executors.newFixedThreadPool(64);
         ArrayList<HashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
         ArrayList<HashMap> soilArr = getObjectOr(result, "soils", new ArrayList());
         ArrayList<HashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
+        ArrayList<Future<File>> files = new ArrayList();;
         for (int i = 0; i < expArr.size(); i++) {
             HashMap expData = expArr.get(i);
             HashMap soilData = getSectionDataWithNocopy(soilArr, "soil_id", getObjectOr(expData, "soil_id", ""));
@@ -28,27 +34,26 @@ public class DssatThreadOutput {
             if (wthData != null) {
                 expData.put("weather", wthData);
             }
-            executor.execute(new TranslateRunner(new DssatControllerOutput(), expData, arg0));
-
+            files.add(executor.submit(new TranslateRunner(new DssatControllerOutput(), expData, arg0)));
         }
 
     }
 
-    private class TranslateRunner implements Runnable {
+    private class TranslateRunner implements Callable<File> {
 
-        private TranslatorOutput translator;
+        private DssatCommonOutput translator;
         private HashMap data;
         private String outputDirectory;
 //	private static Logger LOG = LoggerFactory.getLogger(TranslateRunner.class);
 
-        public TranslateRunner(TranslatorOutput translator, HashMap data, String outputDirectory) {
+        public TranslateRunner(DssatCommonOutput translator, HashMap data, String outputDirectory) {
             this.translator = translator;
             this.data = data;
             this.outputDirectory = outputDirectory;
         }
 
         @Override
-        public void run() {
+        public File call() throws Exception {
 //		LOG.debug("Starting new thread!");
             try {
                 translator.writeFile(outputDirectory, data);
@@ -56,6 +61,8 @@ public class DssatThreadOutput {
 //                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+            
+            return translator.getOutputFile();
         }
     }
 }
