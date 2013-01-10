@@ -95,7 +95,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             // Output XFile
             // EXP.DETAILS Section
             sbGenData.append(String.format("*EXP.DETAILS: %1$-10s %2$s\r\n\r\n",
-                    getExName(result),
+                    getFileName(result, "").replaceAll("\\.", ""),
                     getObjectOr(expData, "local_name", defValBlank).toString()));
 
             // GENERAL Section

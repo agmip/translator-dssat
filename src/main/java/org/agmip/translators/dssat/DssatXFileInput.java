@@ -122,7 +122,8 @@ public class DssatXFileInput extends DssatCommonInput {
 //        fileName = (String) brMap.get("Z");
             fileName = (String) keyX;
             wid = fileName.length() > 4 ? fileName.substring(0, 4) : fileName;
-            String exname = fileName.replaceAll("\\.", "").replaceAll("X$", "");
+//            String exname = fileName.replaceAll("\\.", "").replaceAll("X$", "");
+            String exname = fileName.replaceAll("\\.\\w\\wX$", "");
             HashMap meta = new HashMap();
             metaData.put(exname, meta);
             
