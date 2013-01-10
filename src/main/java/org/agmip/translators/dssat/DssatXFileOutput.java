@@ -325,7 +325,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             // Set cultivals info
                             copyItem(cuData, evtData, "cul_name");
                             copyItem(cuData, evtData, "crid");
-                            copyItem(cuData, evtData, "cul_id", "dssat_cul_id", false);
+                            copyItem(cuData, evtData, "cul_id");
+                            copyItem(cuData, evtData, "dssat_cul_id");
                             copyItem(cuData, evtData, "rm");
                             copyItem(cuData, evtData, "cul_notes");
                             translateTo2BitCrid(cuData);
@@ -432,7 +433,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     sbData.append(String.format("%1$2s %2$-2s %3$-6s %4$s\r\n",
                             idx + 1, //getObjectOr(secData, "ge", defValI).toString(),
                             getObjectOr(secData, "crid", defValBlank).toString(), // P.S. if missing, default value use blank string
-                            getObjectOr(secData, "cul_id", defValC).toString(), // P.S. Set default value which is deponds on crid(Cancelled)
+                            getObjectOr(secData, "dssat_cul_id", getObjectOr(secData, "cul_id", defValC)).toString(), // P.S. Set default value which is deponds on crid(Cancelled)
                             getObjectOr(secData, "cul_name", defValC).toString()));
 
                     if (!getObjectOr(secData, "rm", "").equals("") || !getObjectOr(secData, "cul_notes", "").equals("")) {
