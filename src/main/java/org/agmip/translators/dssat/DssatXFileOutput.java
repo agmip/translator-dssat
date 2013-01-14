@@ -32,9 +32,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
         // Initial variables
         HashMap expData = (HashMap) result;
         ArrayList<HashMap> soilArr = readSWData(expData, "soil");
-        ArrayList<HashMap> wthArr = readSWData(expData, "weather");
+//        ArrayList<HashMap> wthArr = readSWData(expData, "weather");
         HashMap soilData;
-        HashMap wthData;
+//        HashMap wthData;
         BufferedWriter bwX;                          // output object
         StringBuilder sbGenData = new StringBuilder();      // construct the data info in the output
         StringBuilder sbNotesData = new StringBuilder();      // construct the data info in the output
@@ -189,13 +189,13 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 } else {
                     soilData = soilArr.get(0);
                 }
-                if (i < wthArr.size()) {
-                    wthData = wthArr.get(i);
-                } else if (wthArr.isEmpty()) {
-                    wthData = new HashMap();
-                } else {
-                    wthData = wthArr.get(0);
-                }
+//                if (i < wthArr.size()) {
+//                    wthData = wthArr.get(i);
+//                } else if (wthArr.isEmpty()) {
+//                    wthData = new HashMap();
+//                } else {
+//                    wthData = wthArr.get(0);
+//                }
                 HashMap cuData = new HashMap();
                 HashMap flData = new HashMap();
                 HashMap mpData = new HashMap();
@@ -217,12 +217,13 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 // Set field info
                 copyItem(flData, rootData, "id_field");
-                if (wthData.isEmpty()) {
-                    //                copyItem(flData, expData, "wst_id");
-                    flData.put("wst_id", getWthFileName(rootData));
-                } else {
-                    flData.put("wst_id", getWthFileName(wthData));
-                }
+                flData.put("wst_id", getWthFileName(rootData));
+//                if (i < rootArr.size()) {
+//                    //                copyItem(flData, expData, "wst_id");
+//                    flData.put("wst_id", getWthFileName(rootData));
+//                } else {
+//                    flData.put("wst_id", getWthFileName(wthData));
+//                }
                 copyItem(flData, rootData, "flsl");
                 copyItem(flData, rootData, "flob");
                 copyItem(flData, rootData, "fl_drntype");

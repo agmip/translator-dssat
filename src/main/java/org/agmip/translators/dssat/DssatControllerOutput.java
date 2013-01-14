@@ -71,7 +71,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 writeSWFile(arg0, expData, new DssatWeatherOutput());
             } else {
                 ArrayList<HashMap> soilArrTmp = new ArrayList();
-                ArrayList<HashMap> wthArrTmp = new ArrayList();
+//                ArrayList<HashMap> wthArrTmp = new ArrayList();
                 for (int j = 0; j < rootArr.size(); j++) {
                     soil_id = getObjectOr(rootArr.get(j), "soil_id", "");
                     wth_id = getObjectOr(rootArr.get(j), "wst_id", "");
@@ -84,10 +84,11 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     writeSWFile(arg0, soilTmp, new DssatSoilOutput());
                     writeSWFile(arg0, wthTmp, new DssatWeatherOutput());
                     soilArrTmp.add((HashMap) soilTmp.get("soil"));
-                    wthArrTmp.add(wthTmp);
+//                    wthArrTmp.add(wthTmp);
+                    rootArr.get(j).put("wst_id", getObjectOr(wthTmp, "wst_id", wth_id));
                 }
                 expData.put("soil", soilArrTmp);
-                expData.put("weather", wthArrTmp);
+//                expData.put("weather", wthArrTmp);
             }
             
             DssatCommonOutput[] outputs = {
@@ -142,8 +143,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 // Write files
                 DssatCommonOutput[] outputs = {
                     new DssatXFileOutput(),
-                    new DssatSoilOutput(),
-                    new DssatWeatherOutput(),
                     new DssatAFileOutput(),
                     new DssatTFileOutput(),
                     new DssatCulFileOutput(),
@@ -151,6 +150,8 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     new DssatRunFileOutput(),
                     new DssatACMOJsonOutput()
                 };
+                writeSWFile(arg0, result, new DssatSoilOutput());
+                writeSWFile(arg0, result, new DssatWeatherOutput());
                 writeSingleExp(arg0, result, outputs);
 
                 // compress all output files into one zip file
