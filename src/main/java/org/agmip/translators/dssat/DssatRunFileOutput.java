@@ -49,6 +49,7 @@ public class DssatRunFileOutput extends DssatCommonOutput implements DssatBtachF
             bwR.write("C:\\dssat45\\dscsm045 b dssbatch.v45\r\n");
             bwR.write("@echo off\r\n");
             bwR.write("pause\r\n");
+            bwR.write("exit\r\n");
 
             // Output finish
             bwR.close();
