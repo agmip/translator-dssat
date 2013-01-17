@@ -90,14 +90,12 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 expData.put("soil", soilArrTmp);
 //                expData.put("weather", wthArrTmp);
             }
-            
+
             DssatCommonOutput[] outputs = {
                 new DssatXFileOutput(),
                 new DssatAFileOutput(),
                 new DssatTFileOutput(),
-                new DssatCulFileOutput(),
-                new DssatACMOJsonOutput() // TODO ACMO data also need to be combined?
-            };
+                new DssatCulFileOutput(),};
             writeSingleExp(arg0, expData, outputs);
         }
 
@@ -147,8 +145,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     new DssatTFileOutput(),
                     new DssatCulFileOutput(),
                     new DssatBatchFileOutput(),
-                    new DssatRunFileOutput(),
-                    new DssatACMOJsonOutput()
+                    new DssatRunFileOutput()
                 };
                 writeSWFile(arg0, result, new DssatSoilOutput());
                 writeSWFile(arg0, result, new DssatWeatherOutput());
@@ -162,6 +159,11 @@ public class DssatControllerOutput extends DssatCommonOutput {
             } else {
                 writeMultipleExp(arg0, result);
             }
+
+            executor.shutdown();
+            while (!executor.isTerminated()) {
+            }
+            executor = null;
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
