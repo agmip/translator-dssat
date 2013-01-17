@@ -15,7 +15,7 @@ import static org.agmip.util.MapUtil.*;
  * @author Meng Zhang
  * @version 1.0
  */
-public class DssatBatchFileOutput extends DssatCommonOutput {
+public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtachFile {
 
     /**
      * DSSAT Batch File Output method

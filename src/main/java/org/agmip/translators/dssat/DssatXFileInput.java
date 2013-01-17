@@ -122,7 +122,8 @@ public class DssatXFileInput extends DssatCommonInput {
 //        fileName = (String) brMap.get("Z");
             fileName = (String) keyX;
             wid = fileName.length() > 4 ? fileName.substring(0, 4) : fileName;
-            String exname = fileName.replaceAll("\\.", "").replaceAll("X$", "");
+//            String exname = fileName.replaceAll("\\.", "").replaceAll("X$", "");
+            String exname = fileName.replaceAll("\\.\\w\\wX$", "");
             HashMap meta = new HashMap();
             metaData.put(exname, meta);
             
@@ -291,7 +292,12 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("cul_id", 7);
                         formats.put("cul_name", 17);
                         // Read line and save into return holder
-                        cuArr.add(readLine(line, formats));
+                        HashMap tmp = readLine(line, formats);
+                        Object cul_id = tmp.get("cul_id");
+                        if (cul_id != null) {
+                            tmp.put("dssat_cul_id", cul_id);
+                        }
+                        cuArr.add(tmp);
                     } else {
                     }
                 } // Read FIELDS Section
