@@ -230,7 +230,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 copyItem(flData, rootData, "fldrd");
                 copyItem(flData, rootData, "fldrs");
                 copyItem(flData, rootData, "flst");
-                copyItem(flData, soilData, "sltx");
+                if (soilData.get("sltx") != null) {
+                    copyItem(flData, soilData, "sltx");
+                } else {
+                    copyItem(flData, rootData, "sltx");
+                }
                 copyItem(flData, soilData, "sldp");
                 copyItem(flData, rootData, "soil_id");
                 copyItem(flData, rootData, "fl_name");
