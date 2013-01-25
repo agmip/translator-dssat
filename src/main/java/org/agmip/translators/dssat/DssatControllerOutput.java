@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DssatControllerOutput extends DssatCommonOutput {
 
-    private File zipFile;
     private HashMap<String, File> files = new HashMap();
     private ArrayList<Future<File>> futFiles = new ArrayList();
 //    private HashMap<String, Future<File>> soilFiles = new HashMap();
@@ -116,11 +115,13 @@ public class DssatControllerOutput extends DssatCommonOutput {
             for (int i = 0; i < soilArr.size(); i++) {
                 HashMap tmp = new HashMap();
                 tmp.put("soil", soilArr.get(i));
+                tmp.put("soil_id", getObjectOr(soilArr.get(i), "soil_id", ""));
                 recordSWData(tmp, new DssatSoilOutput());
             }
             for (int i = 0; i < wthArr.size(); i++) {
                 HashMap tmp = new HashMap();
                 tmp.put("weather", wthArr.get(i));
+                tmp.put("wst_id", getObjectOr(wthArr.get(i), "wst_id", ""));
                 recordSWData(tmp, new DssatWeatherOutput());
             }
         }
@@ -131,7 +132,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
 
         // compress all output files into one zip file
         Calendar cal = Calendar.getInstance();
-        zipFile = new File(arg0 + "AGMIP_DSSAT_" + cal.getTimeInMillis() + ".zip");
+        outputFile = new File(arg0 + "AGMIP_DSSAT_" + cal.getTimeInMillis() + ".zip");
         createZip(arg0);
     }
 
@@ -165,7 +166,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 writeSingleExp(arg0, result, outputs);
 
                 // compress all output files into one zip file
-                zipFile = new File(revisePath(arg0) + getZipFileName(outputs));
+                outputFile = new File(revisePath(arg0) + getZipFileName(outputs));
 
                 createZip(arg0);
 
@@ -276,7 +277,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
      */
     private void createZip(String path) throws FileNotFoundException, IOException {
 
-        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile));
+        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outputFile));
         ZipEntry entry;
         BufferedInputStream bis;
         byte[] data = new byte[1024];
@@ -310,8 +311,8 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 continue;
             }
 
-            if (zipFile.getParent() != null) {
-                entry = new ZipEntry(file.getPath().substring(zipFile.getParent().length() + 1));
+            if (outputFile.getParent() != null) {
+                entry = new ZipEntry(file.getPath().substring(outputFile.getParent().length() + 1));
             } else {
                 entry = new ZipEntry(file.getPath());
             }
@@ -391,7 +392,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
      * Get output zip file
      */
     public File getOutputZipFile() {
-        return zipFile;
+        return outputFile;
     }
 
     private ArrayList<HashMap> combineExps(ArrayList<HashMap> expArr) {

@@ -92,9 +92,12 @@ public class DssatSoilOutput extends DssatCommonOutput {
 
                 // Output Soil File
                 // Titel Section
-                sbTitle.append(getObjectOr((HashMap) soilSite, "sl_notes", defValBlank)).append("; ");
+                String sl_notes = getObjectOr((HashMap) soilSite, "sl_notes", defValBlank);
+                if (!sl_notes.equals(defValBlank)) {
+                    sbTitle.append(sl_notes).append("; ");
+                }
                 sbData.append("!The ACE ID is ").append(getValueOr(expData, "id", "N/A")).append(".\r\n");
-                sbData.append("!This soil data is used for the experiment of ").append(getValueOr(expData, "exname", "N/A")).append(".\r\n\r\n");
+                sbData.append("!This soil data is used for the experiment of ").append(getValueOr(expData, "exname", "N/A")).append(".\r\n!\r\n");
 
                 // Site Info Section
                 sbData.append(String.format("*%1$-10s  %2$-11s %3$-5s %4$5s %5$s\r\n",

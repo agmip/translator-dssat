@@ -25,9 +25,6 @@ public class DssatWthFileHelper {
     public String createWthFileName(Map wthData) {
         
         String hash = getObjectOr(wthData, "wst_id", "").toString();
-        if (hash.equals("")) {
-            return "";
-        }
         
         if (hashToName.containsKey(hash)) {
             return hashToName.get(hash);
@@ -38,6 +35,9 @@ public class DssatWthFileHelper {
                 insiName = getNextDefName();
             }
             names.add(insiName + yearDur);
+            if (hash.equals("")) {
+                hash = insiName + yearDur;
+            }
             hashToName.put(hash, insiName + yearDur);
             return insiName + yearDur;
         }
@@ -82,7 +82,7 @@ public class DssatWthFileHelper {
         
         String agmipFileHack = getValueOr(wthData, "wst_name", "");
         if (agmipFileHack.length() >= 4) {
-            return agmipFileHack.substring(0, 4);
+            return agmipFileHack.substring(0, 4).toUpperCase();
         } else {
             return "";
         }
