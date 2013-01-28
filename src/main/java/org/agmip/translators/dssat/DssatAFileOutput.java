@@ -71,8 +71,6 @@ public class DssatAFileOutput extends DssatCommonOutput {
             if (fileName.endsWith(".XXA")) {
                 String crid = getValueOr(result, "crid", "XX");
                 fileName = fileName.replaceAll("XX", crid);
-                System.out.println("******************************");
-                System.out.println(crid);
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);

@@ -1,13 +1,17 @@
 package org.agmip.translators.dssat;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.CharArrayReader;
+import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -61,7 +65,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             ret = readFile(getBufferReader(filePath));
 
         } catch (FileNotFoundException fe) {
-            System.out.println("File not found under following path : [" + filePath + "]!");
+            log.warn("File not found under following path : [" + filePath + "]!");
             return ret;
         } catch (Exception e) {
             //System.out.println(e.getMessage());
@@ -72,59 +76,6 @@ public abstract class DssatCommonInput implements TranslatorInput {
 //        return readFileById(arg0, 0);
     }
 
-//    /**
-//     * DSSAT XFile Data input method, get the data object by array index
-//     * 
-//     * @param arg0  file name
-//     * @return result data holder object
-//     */
-//    public HashMap readFileById(String arg0, int id) {
-//
-//        ArrayList<HashMap> ret = new ArrayList<HashMap>();
-//        String filePath = arg0;
-//
-//        try {
-//            // read file by file
-//            ret = readFileAll(filePath);
-//
-//        } catch (Exception e) {
-//            //System.out.println(e.getMessage());
-//            e.printStackTrace();
-//        }
-//
-//        // If read failed, return blank map
-//        if (ret.isEmpty() || id >= ret.size() || id < 0) {
-//            return new HashMap();
-//        } else {
-//            return ret.get(id);
-//        }
-//    }
-//
-//    /**
-//     * DSSAT XFile Data input method, return whole array
-//     * 
-//     * @param arg0  file name
-//     * @return result data holder object
-//     */
-//    public ArrayList<HashMap> readFileAll(String arg0) {
-//
-//        ArrayList<HashMap> ret = new ArrayList<HashMap>();
-//        String filePath = arg0;
-//
-//        try {
-//            // read file by file
-//            ret = readFile(getBufferReader(filePath));
-//
-//        } catch (FileNotFoundException fe) {
-//            System.out.println("File not found under following path : [" + filePath + "]!");
-//            return ret;
-//        } catch (Exception e) {
-//            //System.out.println(e.getMessage());
-//            e.printStackTrace();
-//        }
-//
-//        return ret;
-//    }
     /**
      * Set reading flgs for reading lines
      *
@@ -383,23 +334,23 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
                     if (exnames.contains(entry.getName().replaceAll("[Xx]$", ""))) {
 //                        result.put("X", getBuf(in, (int) entry.getSize()));
-                        mapX.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
+                        mapX.put(entry.getName().toUpperCase(), getBuf(in, entry));
                     } else if (entry.getName().toUpperCase().endsWith(".WTH")) {
-                        mapW.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
+                        mapW.put(entry.getName().toUpperCase(), getBuf(in, entry));
                     } else if (entry.getName().toUpperCase().endsWith(".SOL")) {
-                        mapS.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
+                        mapS.put(entry.getName().toUpperCase(), getBuf(in, entry));
                     } else if (exnames.contains(entry.getName().replaceAll("[Aa]$", ""))) {
 //                        result.put("A", getBuf(in, (int) entry.getSize()));
-                        mapA.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
+                        mapA.put(entry.getName().toUpperCase(), getBuf(in, entry));
                     } else if (exnames.contains(entry.getName().replaceAll("[Tt]$", ""))) {
 //                        result.put("T", getBuf(in, (int) entry.getSize()));
-                        mapT.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
+                        mapT.put(entry.getName().toUpperCase(), getBuf(in, entry));
                     } else if (entry.getName().toUpperCase().endsWith(".OUT")) {
-                        result.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
+                        result.put(entry.getName().toUpperCase(), getBuf(in, entry));
                     } else if (entry.getName().toUpperCase().endsWith(".CUL")) {
-                        mapC.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
+                        mapC.put(entry.getName().toUpperCase(), getBuf(in, entry));
                     } else if (entry.getName().toUpperCase().endsWith(".JSON")) {
-                        result.put(entry.getName().toUpperCase(), getBuf(in, (int) entry.getSize()));
+                        result.put(entry.getName().toUpperCase(), getBuf(in, entry));
                     }
                 }
             }
@@ -444,14 +395,28 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * Get BufferReader object from Zip entry
      *
      * @param in The input stream of zip file
-     * @param size The entry size
+     * @param entry The current entry of zip input stream
      * @return result The char array for current entry
      * @throws IOException
      */
-    private static char[] getBuf(InputStream in, int size) throws IOException {
+    private static char[] getBuf(InputStream in, ZipEntry entry) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        char[] buf = new char[size];
-        br.read(buf);
+        char[] buf;
+        long size = entry.getSize();;
+
+        if (size > 0 && size <= Integer.MAX_VALUE) {
+            buf = new char[(int) size];
+            br.read(buf);
+        } else {
+            char[] b = new char[1024];
+            CharArrayWriter cw = new CharArrayWriter();
+            int chunk;
+            while ((chunk = br.read(b)) > 0) {
+                cw.write(b, 0, chunk);
+            }
+            buf = cw.toCharArray();
+        }
+
         return buf;
     }
 
@@ -757,11 +722,10 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
         return ret;
     }
-    
-    
 
     /**
-     * Get the section data by given index value and key, without getting a copy of original data
+     * Get the section data by given index value and key, without getting a copy
+     * of original data
      *
      * @param secArr Section data array
      * @param key index variable name
