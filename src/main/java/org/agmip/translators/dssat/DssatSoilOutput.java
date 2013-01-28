@@ -89,7 +89,6 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 sbError = new StringBuilder();
                 sbData = new StringBuilder();
 
-
                 // Output Soil File
                 // Titel Section
                 String sl_notes = getObjectOr((HashMap) soilSite, "sl_notes", defValBlank);
@@ -100,8 +99,14 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 sbData.append("!This soil data is used for the experiment of ").append(getValueOr(expData, "exname", "N/A")).append(".\r\n!\r\n");
 
                 // Site Info Section
+                String soil_id = getSoilID(soilSite);
+                if (soil_id.equals("")) {
+                    sbError.append("! Warning: Incompleted record because missing data : [soil_id]\r\n");
+                } else if (soil_id.length() > 10) {
+                    sbError.append("! Warning: Oversized data : [soil_id] ").append(soil_id).append("\r\n");
+                }
                 sbData.append(String.format("*%1$-10s  %2$-11s %3$-5s %4$5s %5$s\r\n",
-                        getObjectOr(soilSite, "soil_id", defValC).toString(),
+                        soil_id,
                         getObjectOr(soilSite, "sl_source", defValC).toString(),
                         getObjectOr(soilSite, "sltx", defValC).toString(),
                         formatNumStr(5, soilSite, "sldp", defValR),
