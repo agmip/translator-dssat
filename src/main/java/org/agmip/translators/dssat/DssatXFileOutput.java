@@ -230,7 +230,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 copyItem(flData, rootData, "fldrd");
                 copyItem(flData, rootData, "fldrs");
                 copyItem(flData, rootData, "flst");
-                copyItem(flData, soilData, "sltx");
+                if (soilData.get("sltx") != null) {
+                    copyItem(flData, soilData, "sltx");
+                } else {
+                    copyItem(flData, rootData, "sltx");
+                }
                 copyItem(flData, soilData, "sldp");
                 copyItem(flData, rootData, "soil_id");
                 copyItem(flData, rootData, "fl_name");
@@ -470,8 +474,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 if (getObjectOr(secData, "wst_id", "").equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [wst_id]\r\n");
                 }
-                if (getObjectOr(secData, "soil_id", "").equals("")) {
+                String soil_id = getSoilID(secData);
+                if (soil_id.equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [soil_id]\r\n");
+                } else if (soil_id.length() > 10) {
+                    sbError.append("! Warning: Oversized data : [soil_id] ").append(soil_id).append("\r\n");
                 }
                 sbData.append(String.format("%1$2s %2$-8s %3$-8s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$-5s %10$-5s%11$5s  %12$-10s %13$s\r\n", // P.S. change length definition to match current way
                         idx + 1, //getObjectOr(secData, "fl", defValI).toString(),
@@ -485,7 +492,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         getObjectOr(secData, "flst", defValC).toString(),
                         getObjectOr(secData, "sltx", defValC).toString(),
                         formatNumStr(5, secData, "sldp", defValR),
-                        getObjectOr(secData, "soil_id", defValC).toString(),
+                        soil_id,
                         getObjectOr(secData, "fl_name", defValC).toString()));
 
                 eventPart2.append(String.format("%1$2s %2$15s %3$15s %4$9s %5$17s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
