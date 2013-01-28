@@ -359,6 +359,24 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     }
 
     /**
+     * Get the soil_id with legal length (8~10 bits), filled with "_"
+     *
+     * @param data experiment data holder or weather data holder
+     * @return the weather file name
+     */
+    protected String getSoilID(HashMap data) {
+        String ret = getObjectOr(data, "soil_id", "");
+        ret = ret.trim();
+        if (ret.equals("")) {
+            return ret;
+        }
+        while (ret.length() < 8) {
+            ret += "_";
+        }
+        return ret;
+    }
+
+    /**
      * Set default value for missing data
      *
      */
