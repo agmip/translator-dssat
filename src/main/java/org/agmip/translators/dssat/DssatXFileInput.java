@@ -337,8 +337,8 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Set variables' formats
                         formats.clear();
                         formats.put("fl", 2);
-                        formats.put("fl_lat", 16);
                         formats.put("fl_long", 16);
+                        formats.put("fl_lat", 16);
                         formats.put("flele", 10);
                         formats.put("farea", 18);
                         formats.put("", 6);             // P.S. id do not find in the master list (? it seems to be calculated by other fields)

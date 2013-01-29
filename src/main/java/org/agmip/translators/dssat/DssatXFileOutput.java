@@ -497,8 +497,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 eventPart2.append(String.format("%1$2s %2$15s %3$15s %4$9s %5$17s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
                         idx + 1, //getObjectOr(secData, "fl", defValI).toString(),
-                        formatNumStr(15, secData, "fl_lat", defValR),
                         formatNumStr(15, secData, "fl_long", defValR),
+                        formatNumStr(15, secData, "fl_lat", defValR),
                         formatNumStr(9, secData, "flele", defValR),
                         formatNumStr(17, secData, "farea", defValR),
                         "-99", // P.S. SLEN keeps -99
