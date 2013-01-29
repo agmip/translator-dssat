@@ -107,14 +107,14 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 }
                 sbData.append(String.format("*%1$-10s  %2$-11s %3$-5s %4$5s %5$s\r\n",
                         soil_id,
-                        getObjectOr(soilSite, "sl_source", defValC).toString(),
-                        getObjectOr(soilSite, "sltx", defValC).toString(),
+                        formatStr(11, soilSite, "sl_source", defValC),
+                        formatStr(5, soilSite, "sltx", defValC),
                         formatNumStr(5, soilSite, "sldp", defValR),
                         getObjectOr(soilSite, "soil_name", defValC).toString()));
                 sbData.append("@SITE        COUNTRY          LAT     LONG SCS FAMILY\r\n");
                 sbData.append(String.format(" %1$-11s %2$-11s %3$9s%4$8s %5$s\r\n",
-                        getObjectOr(soilSite, "sl_loc_3", defValC).toString(),
-                        getObjectOr(soilSite, "sl_loc_1", defValC).toString(),
+                        formatStr(11, soilSite, "sl_loc_3", defValC),
+                        formatStr(11, soilSite, "sl_loc_1", defValC),
                         formatNumStr(8, soilSite, "soil_lat", defValR), // P.S. Definition changed 9 -> 10 (06/24)
                         formatNumStr(8, soilSite, "soil_long", defValR), // P.S. Definition changed 9 -> 8  (06/24)
                         getObjectOr(soilSite, "classification", defValC).toString()));
