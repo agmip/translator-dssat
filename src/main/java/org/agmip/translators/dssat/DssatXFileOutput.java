@@ -394,7 +394,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         getValueOr(sqData, "sq", "1").toString(), // P.S. default value here is based on document DSSAT vol2.pdf
                         getValueOr(sqData, "op", "1").toString(),
                         getValueOr(sqData, "co", "0").toString(),
-                        getValueOr(sqData, "trt_name", getValueOr(rootData, "trt_name", getValueOr(rootData, "exname", defValC))).toString(),
+                        formatStr(25, sqData, "trt_name", getValueOr(rootData, "trt_name", getValueOr(rootData, "exname", defValC))),
                         cuNum, //getObjectOr(data, "ge", defValI).toString(), 
                         flNum, //getObjectOr(data, "fl", defValI).toString(), 
                         saNum, //getObjectOr(data, "sa", defValI).toString(),
@@ -437,8 +437,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     }
                     sbData.append(String.format("%1$2s %2$-2s %3$-6s %4$s\r\n",
                             idx + 1, //getObjectOr(secData, "ge", defValI).toString(),
-                            getObjectOr(secData, "crid", defValBlank).toString(), // P.S. if missing, default value use blank string
-                            getObjectOr(secData, "dssat_cul_id", getObjectOr(secData, "cul_id", defValC)).toString(), // P.S. Set default value which is deponds on crid(Cancelled)
+                            formatStr(2, secData, "crid", defValBlank), // P.S. if missing, default value use blank string
+                            formatStr(6, secData, "dssat_cul_id", getObjectOr(secData, "cul_id", defValC)), // P.S. Set default value which is deponds on crid(Cancelled)
                             getObjectOr(secData, "cul_name", defValC).toString()));
 
                     if (!getObjectOr(secData, "rm", "").equals("") || !getObjectOr(secData, "cul_notes", "").equals("")) {

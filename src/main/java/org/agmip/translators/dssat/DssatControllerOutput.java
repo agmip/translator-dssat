@@ -216,7 +216,12 @@ public class DssatControllerOutput extends DssatCommonOutput {
             } else {
                 //            id = getObjectOr(expData, "wst_id", "");
                 //            id = getWthFileName(getObjectOr(expData, "weather", new HashMap()));
-                id = wthHelper.createWthFileName(getObjectOr(expData, "weather", new HashMap()));
+                Map wthTmp = getObjectOr(expData, "weather", new HashMap());
+                if (wthTmp.isEmpty()) {
+                    id = getObjectOr(expData, "wst_id", "");
+                } else {
+                    id = wthHelper.createWthFileName(wthTmp);
+                }
                 swData = wthData;
                 expData.put("wst_id", id);
             }
@@ -431,7 +436,10 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     HashMap seq = new HashMap();
                     ArrayList<HashMap> seqArr = new ArrayList();
                     HashMap seqData = new HashMap();
-                    seqData.put("trt_name", getValueOr(tmp, "exname", ""));
+                    String trt_name = getValueOr(tmp, "trt_name", getValueOr(tmp, "exname", ""));
+                    if (!trt_name.equals("")) {
+                        seqData.put("trt_name", trt_name);
+                    }
                     seqArr.add(seqData);
                     tmp.put("dssat_sequence", seq);
                     seq.put("data", seqArr);
@@ -489,7 +497,10 @@ public class DssatControllerOutput extends DssatCommonOutput {
             tmp.put("em", em + "");
             tmp.put("trno", trno + "");
             if (tmp.get("trt_name") == null) {
-                tmp.put("trt_name", getValueOr(expData, "exname", ""));
+                String trt_name = getValueOr(expData, "trt_name", getValueOr(expData, "exname", ""));
+                if (!trt_name.equals("")) {
+                    tmp.put("trt_name", trt_name);
+                }
             }
         }
         combineData(out, seqArr, "dssat_sequence");
