@@ -71,6 +71,10 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
             // Initial BufferedWriter
             String fileName = getFileName(result, "T");
+            if (fileName.endsWith(".XXT")) {
+                String crid = getValueOr(result, "crid", "XX");
+                fileName = fileName.replaceAll("XX", crid);
+            }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
             bwT = new BufferedWriter(new FileWriter(outputFile));
@@ -78,7 +82,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
             // Output Observation File
             // Titel Section
             sbData.append(String.format("*EXP.DATA (T): %1$-10s %2$s\r\n\r\n",
-                    getExName(result),
+                    fileName.replaceAll("\\.", "").replaceAll("T$", ""),
                     getObjectOr(result, "local_name", defValBlank)));
 
             titleOutput = new HashMap();

@@ -32,9 +32,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
         // Initial variables
         HashMap expData = (HashMap) result;
         ArrayList<HashMap> soilArr = readSWData(expData, "soil");
-        ArrayList<HashMap> wthArr = readSWData(expData, "weather");
+//        ArrayList<HashMap> wthArr = readSWData(expData, "weather");
         HashMap soilData;
-        HashMap wthData;
+//        HashMap wthData;
         BufferedWriter bwX;                          // output object
         StringBuilder sbGenData = new StringBuilder();      // construct the data info in the output
         StringBuilder sbNotesData = new StringBuilder();      // construct the data info in the output
@@ -95,7 +95,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             // Output XFile
             // EXP.DETAILS Section
             sbGenData.append(String.format("*EXP.DETAILS: %1$-10s %2$s\r\n\r\n",
-                    getExName(result),
+                    getFileName(result, "").replaceAll("\\.", ""),
                     getObjectOr(expData, "local_name", defValBlank).toString()));
 
             // GENERAL Section
@@ -189,13 +189,13 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 } else {
                     soilData = soilArr.get(0);
                 }
-                if (i < wthArr.size()) {
-                    wthData = wthArr.get(i);
-                } else if (wthArr.isEmpty()) {
-                    wthData = new HashMap();
-                } else {
-                    wthData = wthArr.get(0);
-                }
+//                if (i < wthArr.size()) {
+//                    wthData = wthArr.get(i);
+//                } else if (wthArr.isEmpty()) {
+//                    wthData = new HashMap();
+//                } else {
+//                    wthData = wthArr.get(0);
+//                }
                 HashMap cuData = new HashMap();
                 HashMap flData = new HashMap();
                 HashMap mpData = new HashMap();
@@ -217,19 +217,24 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 // Set field info
                 copyItem(flData, rootData, "id_field");
-                if (wthData.isEmpty()) {
-                    //                copyItem(flData, expData, "wst_id");
-                    flData.put("wst_id", getWthFileName(rootData));
-                } else {
-                    flData.put("wst_id", getWthFileName(wthData));
-                }
+                flData.put("wst_id", getWthFileName(rootData));
+//                if (i < rootArr.size()) {
+//                    //                copyItem(flData, expData, "wst_id");
+//                    flData.put("wst_id", getWthFileName(rootData));
+//                } else {
+//                    flData.put("wst_id", getWthFileName(wthData));
+//                }
                 copyItem(flData, rootData, "flsl");
                 copyItem(flData, rootData, "flob");
                 copyItem(flData, rootData, "fl_drntype");
                 copyItem(flData, rootData, "fldrd");
                 copyItem(flData, rootData, "fldrs");
                 copyItem(flData, rootData, "flst");
-                copyItem(flData, soilData, "sltx");
+                if (soilData.get("sltx") != null) {
+                    copyItem(flData, soilData, "sltx");
+                } else {
+                    copyItem(flData, rootData, "sltx");
+                }
                 copyItem(flData, soilData, "sldp");
                 copyItem(flData, rootData, "soil_id");
                 copyItem(flData, rootData, "fl_name");
@@ -325,7 +330,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             // Set cultivals info
                             copyItem(cuData, evtData, "cul_name");
                             copyItem(cuData, evtData, "crid");
-                            copyItem(cuData, evtData, "cul_id", "dssat_cul_id", false);
+                            copyItem(cuData, evtData, "cul_id");
+                            copyItem(cuData, evtData, "dssat_cul_id");
                             copyItem(cuData, evtData, "rm");
                             copyItem(cuData, evtData, "cul_notes");
                             translateTo2BitCrid(cuData);
@@ -388,7 +394,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         getValueOr(sqData, "sq", "1").toString(), // P.S. default value here is based on document DSSAT vol2.pdf
                         getValueOr(sqData, "op", "1").toString(),
                         getValueOr(sqData, "co", "0").toString(),
-                        getValueOr(sqData, "trt_name", getValueOr(rootData, "trt_name", getValueOr(rootData, "exname", defValC))).toString(),
+                        formatStr(25, sqData, "trt_name", getValueOr(rootData, "trt_name", getValueOr(rootData, "exname", defValC))),
                         cuNum, //getObjectOr(data, "ge", defValI).toString(), 
                         flNum, //getObjectOr(data, "fl", defValI).toString(), 
                         saNum, //getObjectOr(data, "sa", defValI).toString(),
@@ -431,8 +437,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     }
                     sbData.append(String.format("%1$2s %2$-2s %3$-6s %4$s\r\n",
                             idx + 1, //getObjectOr(secData, "ge", defValI).toString(),
-                            getObjectOr(secData, "crid", defValBlank).toString(), // P.S. if missing, default value use blank string
-                            getObjectOr(secData, "cul_id", defValC).toString(), // P.S. Set default value which is deponds on crid(Cancelled)
+                            formatStr(2, secData, "crid", defValBlank), // P.S. if missing, default value use blank string
+                            formatStr(6, secData, "dssat_cul_id", getObjectOr(secData, "cul_id", defValC)), // P.S. Set default value which is deponds on crid(Cancelled)
                             getObjectOr(secData, "cul_name", defValC).toString()));
 
                     if (!getObjectOr(secData, "rm", "").equals("") || !getObjectOr(secData, "cul_notes", "").equals("")) {
@@ -468,8 +474,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 if (getObjectOr(secData, "wst_id", "").equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [wst_id]\r\n");
                 }
-                if (getObjectOr(secData, "soil_id", "").equals("")) {
+                String soil_id = getSoilID(secData);
+                if (soil_id.equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [soil_id]\r\n");
+                } else if (soil_id.length() > 10) {
+                    sbError.append("! Warning: Oversized data : [soil_id] ").append(soil_id).append("\r\n");
                 }
                 sbData.append(String.format("%1$2s %2$-8s %3$-8s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$-5s %10$-5s%11$5s  %12$-10s %13$s\r\n", // P.S. change length definition to match current way
                         idx + 1, //getObjectOr(secData, "fl", defValI).toString(),
@@ -483,13 +492,13 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         getObjectOr(secData, "flst", defValC).toString(),
                         getObjectOr(secData, "sltx", defValC).toString(),
                         formatNumStr(5, secData, "sldp", defValR),
-                        getObjectOr(secData, "soil_id", defValC).toString(),
+                        soil_id,
                         getObjectOr(secData, "fl_name", defValC).toString()));
 
                 eventPart2.append(String.format("%1$2s %2$15s %3$15s %4$9s %5$17s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
                         idx + 1, //getObjectOr(secData, "fl", defValI).toString(),
-                        formatNumStr(15, secData, "fl_lat", defValR),
                         formatNumStr(15, secData, "fl_long", defValR),
+                        formatNumStr(15, secData, "fl_lat", defValR),
                         formatNumStr(9, secData, "flele", defValR),
                         formatNumStr(17, secData, "farea", defValR),
                         "-99", // P.S. SLEN keeps -99

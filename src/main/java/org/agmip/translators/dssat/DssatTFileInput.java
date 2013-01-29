@@ -51,6 +51,7 @@ public class DssatTFileInput extends DssatCommonInput {
                 expData = new HashMap();
                 obv = new HashMap();
                 copyItem(expData, files.get(exname), "exname");
+                copyItem(expData, files.get(exname), "crid");
                 copyItem(expData, files.get(exname), "local_name");
                 expData.put(jsonKey, obv);
                 obv.put(obvFileKey, obvData.get(i).get(obvDataKey));
@@ -103,7 +104,9 @@ public class DssatTFileInput extends DssatCommonInput {
 
             buf = mapT.get(keyT);
             String fileName = (String) keyT;
-            String exname = fileName.replaceAll("\\.", "").replaceAll("T$", "");
+//            String exname = fileName.replaceAll("\\.", "").replaceAll("T$", "");
+            String exname = fileName.replaceAll("\\.\\w\\wT$", "");
+            String crid = fileName.replaceAll("\\w+\\.", "").replaceAll("T$", "");
             if (buf instanceof char[]) {
                 brT = new BufferedReader(new CharArrayReader((char[]) buf));
             } else {
@@ -132,6 +135,7 @@ public class DssatTFileInput extends DssatCommonInput {
                         // Read line and save into return holder
                         file.putAll(readLine(line, formats));
                         file.put("exname", exname);
+                        file.put("crid", crid);
                         flg[0] = "data";
 
                     } // Read data info 
