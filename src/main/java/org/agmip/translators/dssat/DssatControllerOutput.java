@@ -216,7 +216,12 @@ public class DssatControllerOutput extends DssatCommonOutput {
             } else {
                 //            id = getObjectOr(expData, "wst_id", "");
                 //            id = getWthFileName(getObjectOr(expData, "weather", new HashMap()));
-                id = wthHelper.createWthFileName(getObjectOr(expData, "weather", new HashMap()));
+                Map wthTmp = getObjectOr(expData, "weather", new HashMap());
+                if (wthTmp.isEmpty()) {
+                    id = getObjectOr(expData, "wst_id", "");
+                } else {
+                    id = wthHelper.createWthFileName(wthTmp);
+                }
                 swData = wthData;
                 expData.put("wst_id", id);
             }

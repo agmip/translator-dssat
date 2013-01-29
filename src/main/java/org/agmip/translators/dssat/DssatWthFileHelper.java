@@ -76,7 +76,7 @@ public class DssatWthFileHelper {
      */
     public static String getWthInsiCode(Map wthData) {
         String wst_id = getValueOr(wthData, "wst_id", "");
-        if (wst_id.length() == 4) {
+        if (wst_id.matches("\\w{4}")) {
             return wst_id;
         }
         
