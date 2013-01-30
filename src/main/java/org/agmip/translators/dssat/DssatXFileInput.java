@@ -122,7 +122,8 @@ public class DssatXFileInput extends DssatCommonInput {
 //        fileName = (String) brMap.get("Z");
             fileName = (String) keyX;
             wid = fileName.length() > 4 ? fileName.substring(0, 4) : fileName;
-            String exname = fileName.replaceAll("\\.", "").replaceAll("X$", "");
+//            String exname = fileName.replaceAll("\\.", "").replaceAll("X$", "");
+            String exname = fileName.replaceAll("\\.\\w\\wX$", "");
             HashMap meta = new HashMap();
             metaData.put(exname, meta);
             
@@ -255,7 +256,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("sq", 2);
                         formats.put("op", 2);
                         formats.put("co", 2);
-                        formats.put("tr_name", 26);
+                        formats.put("trt_name", 26);
                         formats.put("ge", 3);
                         formats.put("fl", 3);
                         formats.put("sa", 3);
@@ -271,8 +272,8 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("sm", 3);
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
-                        if (tmp.get("tr_name") == null) {
-                            tmp.put("tr_name", meta.get("exname"));
+                        if (tmp.get("trt_name") == null) {
+                            tmp.put("trt_name", meta.get("exname"));
                         }
                         sqArr.add(tmp);
                     } else {
@@ -291,7 +292,12 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("cul_id", 7);
                         formats.put("cul_name", 17);
                         // Read line and save into return holder
-                        cuArr.add(readLine(line, formats));
+                        HashMap tmp = readLine(line, formats);
+                        Object cul_id = tmp.get("cul_id");
+                        if (cul_id != null) {
+                            tmp.put("dssat_cul_id", cul_id);
+                        }
+                        cuArr.add(tmp);
                     } else {
                     }
                 } // Read FIELDS Section
@@ -331,8 +337,8 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Set variables' formats
                         formats.clear();
                         formats.put("fl", 2);
-                        formats.put("fl_lat", 16);
                         formats.put("fl_long", 16);
+                        formats.put("fl_lat", 16);
                         formats.put("flele", 10);
                         formats.put("farea", 18);
                         formats.put("", 6);             // P.S. id do not find in the master list (? it seems to be calculated by other fields)
@@ -932,12 +938,13 @@ public class DssatXFileInput extends DssatCommonInput {
                     dssatSq.put(eventKey, sqArrNew);
                     trData.put("dssat_sequence", dssatSq);
 //                trData.put("dssat_info", dssatInfo);
-                    trMetaData.put("tr_name", sqData.get("tr_name"));
+                    trMetaData.put("trt_name", sqData.get("trt_name"));
                     trMetaData.put("trno", trno);
                     trMetaData.put("exname", exname);
                     seqid = 1;
                 } else {
-                    trMetaData.remove("tr_name");
+                    // The case of multiple sequence
+                    trMetaData.remove("trt_name");
                 }
                 sqData.put("seqid", seqid + "");
                 sqArrNew.add(sqData);
@@ -1184,7 +1191,7 @@ public class DssatXFileInput extends DssatCommonInput {
         }
 
         if (key.equals("icbl")) {
-            return getSectionData(secArr, key, value);
+            return getSectionDataWithNocopy(secArr, key, value);
         } else {
             HashMap fstNode = (HashMap) secArr.get(0);
             // If it contains multiple sub array of data, or it does not have multiple sub records

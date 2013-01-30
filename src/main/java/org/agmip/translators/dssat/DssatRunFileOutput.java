@@ -14,7 +14,7 @@ import java.util.Map;
  * @author Meng Zhang
  * @version 1.0
  */
-public class DssatRunFileOutput extends DssatCommonOutput {
+public class DssatRunFileOutput extends DssatCommonOutput implements DssatBtachFile {
 
     /**
      * DSSAT Run File Output method
@@ -49,6 +49,7 @@ public class DssatRunFileOutput extends DssatCommonOutput {
             bwR.write("C:\\dssat45\\dscsm045 b dssbatch.v45\r\n");
             bwR.write("@echo off\r\n");
             bwR.write("pause\r\n");
+            bwR.write("exit\r\n");
 
             // Output finish
             bwR.close();

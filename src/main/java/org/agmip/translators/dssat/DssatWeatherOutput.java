@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import static org.agmip.util.MapUtil.*;
 
@@ -38,7 +39,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
         minDailyData.add("tmax");
         minDailyData.add("tmin");
         minDailyData.add("rain");
-        HashMap optDailyData = new HashMap();   // Define optional daily data fields
+        LinkedHashMap optDailyData = new LinkedHashMap();   // Define optional daily data fields
         optDailyData.put("tdew", "DEWP");
         optDailyData.put("wind", "WIND");
         optDailyData.put("pard", "PAR");
@@ -62,7 +63,11 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // Initial BufferedWriter
             // Get File name
-            String fileName = getWthFileName(wthFile) + ".WTH";
+            String fileName = getValueOr(result, "wst_id", "");
+            if (fileName.equals("")) {
+                fileName = getWthFileName(wthFile);
+            }
+            fileName += ".WTH";
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
             bwW = new BufferedWriter(new FileWriter(outputFile));
@@ -72,9 +77,13 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             sbData.append(String.format("*WEATHER DATA : %1$s\r\n\r\n", getObjectOr(wthFile, "wst_name", defValBlank).toString()));
 
             // Weather Station Section
+            String wid = getObjectOr(wthFile, "wst_id", defValC);
+            if (wid.length() > 4) {
+                wid = wid.substring(0, 4);
+            }
             sbData.append("@ INSI      LAT     LONG  ELEV   TAV   AMP REFHT WNDHT\r\n");
             sbData.append(String.format("  %1$-4s %2$8s %3$8s %4$5s %5$5s %6$5s %7$5s %8$5s\r\n",
-                    getObjectOr(wthFile, "wst_id", defValC).toString(),
+                    wid,
                     formatNumStr(8, wthFile, "wst_lat", defValR),
                     formatNumStr(8, wthFile, "wst_long", defValR),
                     formatNumStr(5, wthFile, "elev", defValR),
@@ -101,7 +110,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                     sbData.append(String.format("%1$6s", optDailyData.get(title).toString()));
                 } else {
                     adtDaily.add("");
-                    sbData.append("      ");
+                    sbData.append(String.format("%1$6s", optDailyData.get(title).toString()));
                 }
             }
 

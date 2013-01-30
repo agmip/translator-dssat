@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.translators.dssat.DssatCommonInput.CopyList;
 import static org.agmip.util.MapUtil.*;
@@ -69,6 +68,10 @@ public class DssatAFileOutput extends DssatCommonOutput {
 
             // Initial BufferedWriter
             String fileName = getFileName(result, "A");
+            if (fileName.endsWith(".XXA")) {
+                String crid = getValueOr(result, "crid", "XX");
+                fileName = fileName.replaceAll("XX", crid);
+            }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
             bwA = new BufferedWriter(new FileWriter(outputFile));
@@ -76,7 +79,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
             // Output Observation File
             // Titel Section
             sbData.append(String.format("*EXP.DATA (A): %1$-10s %2$s\r\n\r\n",
-                    getExName(result),
+                    fileName.replaceAll("\\.", "").replaceAll("T$", ""),
                     getObjectOr(result, "local_name", defValBlank)));
 
             // Check if which field is available

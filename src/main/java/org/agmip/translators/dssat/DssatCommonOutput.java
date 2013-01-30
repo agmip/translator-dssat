@@ -72,7 +72,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             return String.format("%" + bits + "s", defVal);
         } else if (inputStr[0].length() > bits) {
             //throw new Exception();
-            sbError.append("! Waring: There is a variable [").append(key).append("] with oversized number [").append(str).append("] (Limitation is ").append(bits).append("bits)\r\n");
+            sbError.append("! Waring: There is a variable [").append(key).append("] with oversized number [").append(ret).append("] (Limitation is ").append(bits).append(" bits)\r\n");
             return String.format("%" + bits + "s", defVal);
         } else {
             ret = inputStr[0];
@@ -97,6 +97,29 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             if (ret.length() < bits) {
                 ret = String.format("%1$" + bits + "s", ret);
             }
+        }
+
+        return ret;
+    }
+
+    /**
+     * Format the output string with maximum length
+     *
+     * @param bits Maximum length of the output string
+     * @param m the experiment data holder
+     * @param key the key of field in the map
+     * @param defVal the default return value when error happens
+     * @return formated string of number
+     */
+    protected String formatStr(int bits, HashMap m, Object key, String defVal) {
+
+        String ret = getObjectOr(m, key, defVal).trim();
+        if (ret.equals("")) {
+            return ret;
+        } else if (ret.length() > bits) {
+            //throw new Exception();
+            sbError.append("! Waring: There is a variable [").append(key).append("] with oversized content [").append(ret).append("], only first ").append(bits).append(" bits will be applied.\r\n");
+            return ret.substring(0, bits);
         }
 
         return ret;
@@ -160,6 +183,11 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             ret = ret.replaceAll("_+\\d+$", "");
         }
 
+        // If length more than 10-bit, only remain first 10-bit
+        if (ret.length() > 10) {
+            ret = ret.substring(0, 10);
+        }
+
         return ret;
     }
 
@@ -205,8 +233,10 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                 if (ret.endsWith(crid)) {
                     ret = ret.substring(0, ret.length() - crid.length());
                 } else {
-                    if (crid.equals("XX") && ret.length() == 10) {
-                        crid = ret.substring(ret.length() - 2, ret.length());
+                    if (ret.length() == 10) {
+                        if (crid.equals("XX")) {
+                            crid = ret.substring(ret.length() - 2, ret.length());
+                        }
                         ret = ret.substring(0, ret.length() - 2);
                     }
                 }
@@ -348,6 +378,24 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             }
         }
 
+        return ret;
+    }
+
+    /**
+     * Get the soil_id with legal length (8~10 bits), filled with "_"
+     *
+     * @param data experiment data holder or weather data holder
+     * @return the weather file name
+     */
+    protected String getSoilID(HashMap data) {
+        String ret = getObjectOr(data, "soil_id", "");
+        ret = ret.trim();
+        if (ret.equals("")) {
+            return ret;
+        }
+        while (ret.length() < 8) {
+            ret += "_";
+        }
         return ret;
     }
 

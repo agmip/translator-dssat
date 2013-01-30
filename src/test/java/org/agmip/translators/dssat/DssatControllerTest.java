@@ -27,10 +27,12 @@ public class DssatControllerTest {
     DssatControllerInput obDssatControllerInput;
     URL resource;
     String fileName =
-            "UFGA8401_CPX.ZIP";
-//            "UFGA8201_MZX.ZIP";
-//            "UFGA8202_MZX.ZIP";
-//            "UFGA8201_MZX_dummy.ZIP";
+            //            "UFGA8401_CPX.ZIP";
+            //            "GHWA0401_MZX.ZIP";
+            //            "UFGA8201_MZX.ZIP";
+                        "UFGA8202_MZX.ZIP";
+            //            "UFGA8201_MZX_dummy.ZIP";
+            //            "SWData.zip";
 
     @Before
     public void setUp() throws Exception {
@@ -42,20 +44,18 @@ public class DssatControllerTest {
     @Test
     public void test() throws IOException, Exception {
         HashMap result;
-        File f;
-        BufferedOutputStream bo;
         result = obDssatControllerInput.readFile(resource.getPath());
+//        BufferedOutputStream bo;
 //        f = new File(fileName.replaceAll("[Xx]*\\.\\w+$", ".json"));
 //        bo = new BufferedOutputStream(new FileOutputStream(f));
 //
 //        // Output json for reading
 //        bo.write(JSONAdapter.toJSON(result).getBytes());
 //        bo.close();
-//        f.delete();
 
         obDssatControllerOutput = new DssatControllerOutput();
         obDssatControllerOutput.writeFile("", result);
-        File file = obDssatControllerOutput.getOutputZipFile();
+        File file = obDssatControllerOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
             assertTrue(file.getName().toUpperCase().matches("^AGMIP_DSSAT_\\d+\\.ZIP$"));
@@ -68,11 +68,11 @@ public class DssatControllerTest {
         jsonStr = br.readLine();
         obDssatControllerOutput = new DssatControllerOutput();
         obDssatControllerOutput.writeFile("", JSONAdapter.fromJSON(jsonStr));
-        file = obDssatControllerOutput.getOutputZipFile();
-        if (file != null) {
-            assertTrue(file.exists());
-            assertTrue(file.getName().toUpperCase().matches("^AGMIP_DSSAT_\\d+\\.ZIP$"));
-            assertTrue(file.delete());
+        File file2 = obDssatControllerOutput.getOutputFile();
+        if (file2 != null) {
+            assertTrue(file2.exists());
+            assertTrue(file2.getName().toUpperCase().matches("^AGMIP_DSSAT_\\d+\\.ZIP$"));
+            assertTrue(file2.delete());
         }
     }
 }

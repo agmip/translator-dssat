@@ -30,9 +30,12 @@ public class DssatSoilOutput extends DssatCommonOutput {
         // Initial variables
 //        ArrayList soilSites;                            // Soil site data array
         HashMap soilSite;                       // Data holder for one site of soil data
+        ArrayList<Map> soilSistes;
         ArrayList soilRecords;                          // Soil layer data array
         HashMap soilRecord;                     // Data holder for one layer data
         BufferedWriter bwS;                             // output object
+        StringBuilder sbTitle = new StringBuilder();
+        StringBuilder sbSites = new StringBuilder();
         StringBuilder sbData = new StringBuilder();     // construct the data info in the output
         StringBuilder sbLyrP2 = new StringBuilder();    // output string for second part of layer data
         boolean p2Flg;
@@ -44,7 +47,13 @@ public class DssatSoilOutput extends DssatCommonOutput {
             // Set default value for missing data
             setDefVal();
 
-            soilSite = (HashMap) getObjectOr(result, "soil", new HashMap());
+            soilSistes = getObjectOr(result, "soils", new ArrayList());
+            if (soilSistes.isEmpty()) {
+                soilSistes.add(result);
+            }
+
+            Map expData = soilSistes.get(0);
+            soilSite = (HashMap) getObjectOr(expData, "soil", new HashMap());
             if (soilSite.isEmpty()) {
                 return;
             }
@@ -66,137 +75,156 @@ public class DssatSoilOutput extends DssatCommonOutput {
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
-            boolean existFlg = outputFile.exists();
-            bwS = new BufferedWriter(new FileWriter(outputFile, existFlg));
+//                boolean existFlg = outputFile.exists();
+            bwS = new BufferedWriter(new FileWriter(outputFile));
 
-            // Output Soil File
             // Description info for output by translator
-            if (!existFlg) {
-                bwS.write("!This soil file is created by DSSAT translator tool on " + Calendar.getInstance().getTime() + ".\r\n");
-            }
+            sbTitle.append("!This soil file is created by DSSAT translator tool on ").append(Calendar.getInstance().getTime()).append(".\r\n");
+            sbTitle.append("*SOILS: ");
 
-            // Titel Section
-            if (!existFlg) {
-                sbData.append("*SOILS: ").append(getObjectOr((HashMap) soilSite, "sl_notes", defValBlank)).append("\r\n\r\n");
-            }
-            sbData.append("!The ACE ID is ").append(getValueOr(result, "id", "N/A")).append(".\r\n");
-            sbData.append("!This soil data is used for the experiment of ").append(getValueOr(result, "exname", "N/A")).append(".\r\n\r\n");
+            for (int i = 0; i < soilSistes.size(); i++) {
 
-            // Site Info Section
-            sbData.append(String.format("*%1$-10s  %2$-11s %3$-5s %4$5s %5$s\r\n",
-                    getObjectOr(soilSite, "soil_id", defValC).toString(),
-                    getObjectOr(soilSite, "sl_source", defValC).toString(),
-                    getObjectOr(soilSite, "sltx", defValC).toString(),
-                    formatNumStr(5, soilSite, "sldp", defValR),
-                    getObjectOr(soilSite, "soil_name", defValC).toString()));
-            sbData.append("@SITE        COUNTRY          LAT     LONG SCS FAMILY\r\n");
-            sbData.append(String.format(" %1$-11s %2$-11s %3$9s%4$8s %5$s\r\n",
-                    getObjectOr(soilSite, "sl_loc_3", defValC).toString(),
-                    getObjectOr(soilSite, "sl_loc_1", defValC).toString(),
-                    formatNumStr(8, soilSite, "soil_lat", defValR), // P.S. Definition changed 9 -> 10 (06/24)
-                    formatNumStr(8, soilSite, "soil_long", defValR), // P.S. Definition changed 9 -> 8  (06/24)
-                    getObjectOr(soilSite, "classification", defValC).toString()));
-            sbData.append("@ SCOM  SALB  SLU1  SLDR  SLRO  SLNF  SLPF  SMHB  SMPX  SMKE\r\n");
-            if (getObjectOr(soilSite, "slnf", "").equals("")) {
-                sbError.append("! Warning: missing data : [slnf], and will automatically use default value '1'\r\n");
-            }
-            if (getObjectOr(soilSite, "slpf", "").equals("")) {
-                sbError.append("! Warning: missing data : [slpf], and will automatically use default value '0.92'\r\n");
-            }
-            sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$-5s %9$-5s %10$-5s\r\n",
-                    getObjectOr(soilSite, "scom", defValC).toString(),
-                    formatNumStr(5, soilSite, "salb", defValR),
-                    formatNumStr(5, soilSite, "slu1", defValR),
-                    formatNumStr(5, soilSite, "sldr", defValR),
-                    formatNumStr(5, soilSite, "slro", defValR),
-                    formatNumStr(5, soilSite, "slnf", "1"), // P.S. Set default value as '1'
-                    formatNumStr(5, soilSite, "slpf", "0.92"), // P.S. Set default value as '0.92'
-                    getObjectOr(soilSite, "smhb", defValC).toString(),
-                    getObjectOr(soilSite, "smpx", defValC).toString(),
-                    getObjectOr(soilSite, "smke", defValC).toString()));
+                expData = soilSistes.get(i);
+                soilSite = (HashMap) getObjectOr(expData, "soil", new HashMap());
+                sbError = new StringBuilder();
+                sbData = new StringBuilder();
 
-            // Soil Layer data section
-            soilRecords = (ArrayList) getObjectOr(soilSite, layerKey, new ArrayList());
-
-            // part one
-            sbData.append("@  SLB  SLMH  SLLL  SDUL  SSAT  SRGF  SSKS  SBDM  SLOC  SLCL  SLSI  SLCF  SLNI  SLHW  SLHB  SCEC  SADC\r\n");
-            // part two
-            // Get first site record
-            HashMap fstRecord = new HashMap();
-            if (!soilRecords.isEmpty()) {
-                fstRecord = (HashMap) soilRecords.get(0);
-            }
-
-            // Check if there is 2nd part of layer data for output
-            p2Flg = false;
-            for (int j = 0; j < p2Ids.length; j++) {
-                if (!getObjectOr(fstRecord, p2Ids[j], "").toString().equals("")) {
-                    p2Flg = true;
-                    break;
+                // Output Soil File
+                // Titel Section
+                String sl_notes = getObjectOr((HashMap) soilSite, "sl_notes", defValBlank);
+                if (!sl_notes.equals(defValBlank)) {
+                    sbTitle.append(sl_notes).append("; ");
                 }
-            }
-            if (p2Flg) {
-                sbLyrP2.append("@  SLB  SLPX  SLPT  SLPO CACO3  SLAL  SLFE  SLMN  SLBS  SLPA  SLPB  SLKE  SLMG  SLNA  SLSU  SLEC  SLCA\r\n");
-            }
+                sbData.append("!The ACE ID is ").append(getValueOr(expData, "id", "N/A")).append(".\r\n");
+                sbData.append("!This soil data is used for the experiment of ").append(getValueOr(expData, "exname", "N/A")).append(".\r\n!\r\n");
 
-            // Loop for laryer data
-            for (int j = 0; j < soilRecords.size(); j++) {
+                // Site Info Section
+                String soil_id = getSoilID(soilSite);
+                if (soil_id.equals("")) {
+                    sbError.append("! Warning: Incompleted record because missing data : [soil_id]\r\n");
+                } else if (soil_id.length() > 10) {
+                    sbError.append("! Warning: Oversized data : [soil_id] ").append(soil_id).append("\r\n");
+                }
+                sbData.append(String.format("*%1$-10s  %2$-11s %3$-5s %4$5s %5$s\r\n",
+                        soil_id,
+                        formatStr(11, soilSite, "sl_source", defValC),
+                        formatStr(5, soilSite, "sltx", defValC),
+                        formatNumStr(5, soilSite, "sldp", defValR),
+                        getObjectOr(soilSite, "soil_name", defValC).toString()));
+                sbData.append("@SITE        COUNTRY          LAT     LONG SCS FAMILY\r\n");
+                sbData.append(String.format(" %1$-11s %2$-11s %3$9s%4$8s %5$s\r\n",
+                        formatStr(11, soilSite, "sl_loc_3", defValC),
+                        formatStr(11, soilSite, "sl_loc_1", defValC),
+                        formatNumStr(8, soilSite, "soil_lat", defValR), // P.S. Definition changed 9 -> 10 (06/24)
+                        formatNumStr(8, soilSite, "soil_long", defValR), // P.S. Definition changed 9 -> 8  (06/24)
+                        getObjectOr(soilSite, "classification", defValC).toString()));
+                sbData.append("@ SCOM  SALB  SLU1  SLDR  SLRO  SLNF  SLPF  SMHB  SMPX  SMKE\r\n");
+//                if (getObjectOr(soilSite, "slnf", "").equals("")) {
+//                    sbError.append("! Warning: missing data : [slnf], and will automatically use default value '1'\r\n");
+//                }
+//                if (getObjectOr(soilSite, "slpf", "").equals("")) {
+//                    sbError.append("! Warning: missing data : [slpf], and will automatically use default value '0.92'\r\n");
+//                }
+                sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
+                        getObjectOr(soilSite, "scom", defValC).toString(),
+                        formatNumStr(5, soilSite, "salb", defValR),
+                        formatNumStr(5, soilSite, "slu1", defValR),
+                        formatNumStr(5, soilSite, "sldr", defValR),
+                        formatNumStr(5, soilSite, "slro", defValR),
+                        formatNumStr(5, soilSite, "slnf", defValR), // P.S. Remove default value as '1'
+                        formatNumStr(5, soilSite, "slpf", defValR), // P.S. Remove default value as '0.92'
+                        getObjectOr(soilSite, "smhb", defValC).toString(),
+                        getObjectOr(soilSite, "smpx", defValC).toString(),
+                        getObjectOr(soilSite, "smke", defValC).toString()));
 
-                soilRecord = (HashMap) soilRecords.get(j);
+                // Soil Layer data section
+                soilRecords = (ArrayList) getObjectOr(soilSite, layerKey, new ArrayList());
+
                 // part one
-                sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s %16$5s %17$5s\r\n",
-                        formatNumStr(5, soilRecord, "sllb", defValR),
-                        getObjectOr(soilRecord, "slmh", defValC).toString(),
-                        formatNumStr(5, soilRecord, "slll", defValR),
-                        formatNumStr(5, soilRecord, "sldul", defValR),
-                        formatNumStr(5, soilRecord, "slsat", defValR),
-                        formatNumStr(5, soilRecord, "slrgf", defValR),
-                        formatNumStr(5, soilRecord, "sksat", defValR),
-                        formatNumStr(5, soilRecord, "slbdm", defValR),
-                        formatNumStr(5, soilRecord, "sloc", defValR),
-                        formatNumStr(5, soilRecord, "slcly", defValR),
-                        formatNumStr(5, soilRecord, "slsil", defValR),
-                        formatNumStr(5, soilRecord, "slcf", defValR),
-                        formatNumStr(5, soilRecord, "slni", defValR),
-                        formatNumStr(5, soilRecord, "slphw", defValR),
-                        formatNumStr(5, soilRecord, "slphb", defValR),
-                        formatNumStr(5, soilRecord, "slcec", defValR),
-                        formatNumStr(5, soilRecord, "sadc", defValR)));
-
+                sbData.append("@  SLB  SLMH  SLLL  SDUL  SSAT  SRGF  SSKS  SBDM  SLOC  SLCL  SLSI  SLCF  SLNI  SLHW  SLHB  SCEC  SADC\r\n");
                 // part two
-                if (p2Flg) {
-                    sbLyrP2.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s %16$5s %17$5s\r\n",
-                            formatNumStr(5, soilRecord, "sllb", defValR),
-                            formatNumStr(5, soilRecord, "slpx", defValR),
-                            formatNumStr(5, soilRecord, "slpt", defValR),
-                            formatNumStr(5, soilRecord, "slpo", defValR),
-                            formatNumStr(5, soilRecord, "caco3", defValR), // P.S. Different with document (DSSAT vol2.pdf)
-                            formatNumStr(5, soilRecord, "slal", defValR),
-                            formatNumStr(5, soilRecord, "slfe", defValR),
-                            formatNumStr(5, soilRecord, "slmn", defValR),
-                            formatNumStr(5, soilRecord, "slbs", defValR),
-                            formatNumStr(5, soilRecord, "slpa", defValR),
-                            formatNumStr(5, soilRecord, "slpb", defValR),
-                            formatNumStr(5, soilRecord, "slke", defValR),
-                            formatNumStr(5, soilRecord, "slmg", defValR),
-                            formatNumStr(5, soilRecord, "slna", defValR),
-                            formatNumStr(5, soilRecord, "slsu", defValR),
-                            formatNumStr(5, soilRecord, "slec", defValR),
-                            formatNumStr(5, soilRecord, "slca", defValR)));
+                // Get first site record
+                HashMap fstRecord = new HashMap();
+                if (!soilRecords.isEmpty()) {
+                    fstRecord = (HashMap) soilRecords.get(0);
                 }
-            }
 
-            // Add part two
-            if (p2Flg) {
-                sbData.append(sbLyrP2.toString()).append("\r\n");
+                // Check if there is 2nd part of layer data for output
+                p2Flg = false;
+                for (int j = 0; j < p2Ids.length; j++) {
+                    if (!getObjectOr(fstRecord, p2Ids[j], "").toString().equals("")) {
+                        p2Flg = true;
+                        break;
+                    }
+                }
+                if (p2Flg) {
+                    sbLyrP2.append("@  SLB  SLPX  SLPT  SLPO CACO3  SLAL  SLFE  SLMN  SLBS  SLPA  SLPB  SLKE  SLMG  SLNA  SLSU  SLEC  SLCA\r\n");
+                }
+
+                // Loop for laryer data
+                for (int j = 0; j < soilRecords.size(); j++) {
+
+                    soilRecord = (HashMap) soilRecords.get(j);
+                    // part one
+                    sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s %16$5s %17$5s\r\n",
+                            formatNumStr(5, soilRecord, "sllb", defValR),
+                            getObjectOr(soilRecord, "slmh", defValC).toString(),
+                            formatNumStr(5, soilRecord, "slll", defValR),
+                            formatNumStr(5, soilRecord, "sldul", defValR),
+                            formatNumStr(5, soilRecord, "slsat", defValR),
+                            formatNumStr(5, soilRecord, "slrgf", defValR),
+                            formatNumStr(5, soilRecord, "sksat", defValR),
+                            formatNumStr(5, soilRecord, "slbdm", defValR),
+                            formatNumStr(5, soilRecord, "sloc", defValR),
+                            formatNumStr(5, soilRecord, "slcly", defValR),
+                            formatNumStr(5, soilRecord, "slsil", defValR),
+                            formatNumStr(5, soilRecord, "slcf", defValR),
+                            formatNumStr(5, soilRecord, "slni", defValR),
+                            formatNumStr(5, soilRecord, "slphw", defValR),
+                            formatNumStr(5, soilRecord, "slphb", defValR),
+                            formatNumStr(5, soilRecord, "slcec", defValR),
+                            formatNumStr(5, soilRecord, "sadc", defValR)));
+
+                    // part two
+                    if (p2Flg) {
+                        sbLyrP2.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s %16$5s %17$5s\r\n",
+                                formatNumStr(5, soilRecord, "sllb", defValR),
+                                formatNumStr(5, soilRecord, "slpx", defValR),
+                                formatNumStr(5, soilRecord, "slpt", defValR),
+                                formatNumStr(5, soilRecord, "slpo", defValR),
+                                formatNumStr(5, soilRecord, "caco3", defValR), // P.S. Different with document (DSSAT vol2.pdf)
+                                formatNumStr(5, soilRecord, "slal", defValR),
+                                formatNumStr(5, soilRecord, "slfe", defValR),
+                                formatNumStr(5, soilRecord, "slmn", defValR),
+                                formatNumStr(5, soilRecord, "slbs", defValR),
+                                formatNumStr(5, soilRecord, "slpa", defValR),
+                                formatNumStr(5, soilRecord, "slpb", defValR),
+                                formatNumStr(5, soilRecord, "slke", defValR),
+                                formatNumStr(5, soilRecord, "slmg", defValR),
+                                formatNumStr(5, soilRecord, "slna", defValR),
+                                formatNumStr(5, soilRecord, "slsu", defValR),
+                                formatNumStr(5, soilRecord, "slec", defValR),
+                                formatNumStr(5, soilRecord, "slca", defValR)));
+                    }
+                }
+
+                // Add part two
+                if (p2Flg) {
+                    sbData.append(sbLyrP2.toString()).append("\r\n");
 //                sbLyrP2 = new StringBuilder();
-            } else {
-                sbData.append("\r\n");
+                } else {
+                    sbData.append("\r\n");
+                }
+
+                // Finish one site
+                sbSites.append(sbError.toString());
+                sbSites.append(sbData.toString());
             }
 
             // Output finish
-            bwS.write(sbError.toString());
-            bwS.write(sbData.toString());
+            sbTitle.append("\r\n\r\n");
+            bwS.write(sbTitle.toString());
+            bwS.write(sbSites.toString());
             bwS.close();
 
         } catch (IOException e) {
