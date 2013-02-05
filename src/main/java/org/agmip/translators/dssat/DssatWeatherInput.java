@@ -74,8 +74,9 @@ public class DssatWeatherInput extends DssatCommonInput {
 
             fileName = (String) key;
             if (fileName.lastIndexOf(".") > 0) {
-                fileName = fileName.substring(0 , fileName.lastIndexOf("."));
+                fileName = fileName.substring(0, fileName.lastIndexOf("."));
             }
+            String wst_id = fileName = String.format("%4s", fileName.substring(0, Math.min(4, fileName.length())));
             buf = mapW.get(key);
             if (buf instanceof char[]) {
                 brW = new BufferedReader(new CharArrayReader((char[]) buf));
@@ -85,7 +86,7 @@ public class DssatWeatherInput extends DssatCommonInput {
             file = new HashMap();
             daily = new ArrayList();
             titles = new ArrayList();
-            file.put("wst_id", fileName);
+            file.put("wst_id", wst_id);
 
             while ((line = brW.readLine()) != null) {
 
@@ -116,7 +117,6 @@ public class DssatWeatherInput extends DssatCommonInput {
                         formats.put("wndht", 6);
                         // Read line and save into return holder
                         file.putAll(readLine(line, formats));
-                        String wst_id = String.format("%4s", fileName.substring(0, Math.min(4, fileName.length())));
                         String wst_name = (String) file.get("wst_name");
                         if (wst_name != null) {
                             file.put("wst_name", wst_id + " " + wst_name);
