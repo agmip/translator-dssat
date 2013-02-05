@@ -31,15 +31,19 @@ public class DssatWthFileHelper {
         } else {
             String insiName = getWthInsiCodeOr(wthData);
             String yearDur = getWthYearDuration(wthData);
-            while (names.contains(insiName + yearDur)) {
-                insiName = getNextDefName();
+            String wst_id = insiName;
+            if (insiName.length() == 4) {
+                wst_id += yearDur;
             }
-            names.add(insiName + yearDur);
+            while (names.contains(wst_id)) {
+                wst_id = getNextDefName() + yearDur;
+            }
+            names.add(wst_id);
             if (hash.equals("")) {
-                hash = insiName + yearDur;
+                hash = wst_id;
             }
-            hashToName.put(hash, insiName + yearDur);
-            return insiName + yearDur;
+            hashToName.put(hash, wst_id);
+            return wst_id;
         }
     }
     
@@ -76,7 +80,7 @@ public class DssatWthFileHelper {
      */
     public static String getWthInsiCode(Map wthData) {
         String wst_id = getValueOr(wthData, "wst_id", "");
-        if (wst_id.matches("\\w{4}")) {
+        if (wst_id.matches("(\\w{4})|(\\w{8})")) {
             return wst_id;
         }
         
