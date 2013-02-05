@@ -84,12 +84,18 @@ public class DssatWthFileHelper {
             return wst_id;
         }
         
-        String agmipFileHack = getValueOr(wthData, "wst_name", "");
-        if (agmipFileHack.length() >= 4) {
-            return agmipFileHack.substring(0, 4).toUpperCase();
-        } else {
-            return "";
+        wst_id = getValueOr(wthData, "dssat_wst_id", "");
+        if (wst_id.matches("(\\w{4})|(\\w{8})")) {
+            return wst_id;
         }
+        
+        return "";
+//        String agmipFileHack = getValueOr(wthData, "wst_name", "");
+//        if (agmipFileHack.length() >= 4) {
+//            return agmipFileHack.substring(0, 4).toUpperCase();
+//        } else {
+//            return "";
+//        }
     }
     
     /**
