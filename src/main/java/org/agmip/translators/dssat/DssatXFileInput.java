@@ -3,6 +3,7 @@ package org.agmip.translators.dssat;
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -504,6 +505,13 @@ public class DssatXFileInput extends DssatCommonInput {
                         HashMap tmp = readLine(line, formats);
                         translateDateStr(tmp, "pdate");
                         translateDateStr(tmp, "pldae");
+                        // cm -> mm
+                        String pldp = getObjectOr(tmp, "pldp", "");
+                        if (!pldp.equals("")) {
+                            BigDecimal pldpBD = new BigDecimal(pldp);
+                            pldpBD = pldpBD.multiply(new BigDecimal("10"));
+                            tmp.put("pldp", pldpBD.toString());
+                        }
                         plArr.add(tmp);
                     } else {
                     }
