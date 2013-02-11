@@ -206,8 +206,8 @@ public class DssatControllerOutput extends DssatCommonOutput {
      * @param output The DSSAT Writer object
      */
     private void recordSWData(Map expData, DssatCommonOutput output) {
-        String id = "";
-        HashMap<String, Map> swData = null;
+        String id;
+        HashMap<String, Map> swData;
         try {
             if (output instanceof DssatSoilOutput) {
                 id = getObjectOr(expData, "soil_id", "");
@@ -415,7 +415,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 subExpArr.add(expArr.get(i));
                 expGroupMap.put("Experiment_" + i, subExpArr);
             } else {
-                exname = getExName(expArr.get(i));
+                exname = getFileName(expArr.get(i), "");
                 subExpArr = expGroupMap.get(exname);
                 if (subExpArr == null) {
                     subExpArr = new ArrayList();
@@ -444,7 +444,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     tmp.put("dssat_sequence", seq);
                     seq.put("data", seqArr);
                 }
-                tmp.put("exname", expGroup.getKey());
                 ArrayList rootArr = new ArrayList();
                 tmp.put("dssat_root", rootArr);
                 rootArr.add(combinaRoot(tmp));
