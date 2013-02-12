@@ -440,7 +440,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
     }
 
     private void updateGroupExps(HashMap out, HashMap expData, int trno) {
-        int baseId = trno * 100;
+        int baseId = trno * 1000;
         int seqid;
         int sm;
         int em;
