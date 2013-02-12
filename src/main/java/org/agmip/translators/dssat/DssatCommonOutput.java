@@ -224,13 +224,19 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     protected String getFileName(Map result, String fileType) {
         String exname = getExName(result);
         String crid = getCrid(result);
+        if (exname.length() == 10) {
+            if (crid.equals("XX")) {
+                crid = exname.substring(exname.length() - 2, exname.length());
+            }
+        }
+
         String ret;
-        if (exToFileMap.containsKey(exname)) {
-            ret = exToFileMap.get(exname);
+        if (exToFileMap.containsKey(exname + "_" + crid)) {
+            return exToFileMap.get(exname + "_" + crid) + fileType;
         } else {
             ret = exname;
             if (ret == null || ret.equals("")) {
-                ret = "TEMP";
+                ret = "TEMP0001";
             } else {
                 try {
                     if (ret.endsWith(crid)) {
@@ -245,13 +251,13 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                         ret = ret.substring(0, ret.length() - 2) + "01";
                     }
                 } catch (Exception e) {
-                    ret = "TEMP";
+                    ret = "TEMP0001";
                 }
             }
 
             // Find a non-repeated file name
             int count;
-            while (fileNameSet.contains(ret)) {
+            while (fileNameSet.contains(ret + "." + crid)) {
                 try {
                     count = Integer.parseInt(ret.substring(ret.length() - 2, ret.length()));
                     count++;
@@ -262,14 +268,8 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             }
         }
 
-        if (exname.length() == 10) {
-            if (crid.equals("XX")) {
-                crid = exname.substring(exname.length() - 2, exname.length());
-            }
-        }
-
-        exToFileMap.put(exname, ret);
-        fileNameSet.add(ret);
+        exToFileMap.put(exname + "_" + crid, ret + "." + crid);
+        fileNameSet.add(ret + "." + crid);
 
         return ret + "." + crid + fileType;
     }
