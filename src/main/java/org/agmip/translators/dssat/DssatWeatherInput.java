@@ -108,14 +108,39 @@ public class DssatWeatherInput extends DssatCommonInput {
 
                         // Set variables' formats
                         formats.clear();
-                        formats.put("dssat_wst_id", 6);
-                        formats.put("wst_lat", 9);
-                        formats.put("wst_long", 9);
-                        formats.put("elev", 6);
-                        formats.put("tav", 6);
-                        formats.put("tamp", 6);
-                        formats.put("refht", 6);
-                        formats.put("wndht", 6);
+                        String[] names = flg[1].split("\\s+");
+                        for (int i = 0; i < names.length; i++) {
+                            if (names[i].equalsIgnoreCase("INSI")) {
+                                formats.put("dssat_wst_id", 6);
+                            } else if (names[i].equalsIgnoreCase("LAT")) {
+                                formats.put("wst_lat", 9);
+                            } else if (names[i].equalsIgnoreCase("LONG")) {
+                                formats.put("wst_long", 9);
+                            } else if (names[i].equalsIgnoreCase("ELEV")) {
+                                formats.put("elev", 6);
+                            } else if (names[i].equalsIgnoreCase("TAV")) {
+                                formats.put("tav", 6);
+                            } else if (names[i].equalsIgnoreCase("AMP")) {
+                                formats.put("tamp", 6);
+                            } else if (names[i].equalsIgnoreCase("REFHT")) {
+                                formats.put("refht", 6);
+                            } else if (names[i].equalsIgnoreCase("WNDHT")) {
+                                formats.put("wndht", 6);
+                            } else if (names[i].equalsIgnoreCase("CO2")) {
+                                formats.put("co2y", 6);
+                            } else if (names[i].equalsIgnoreCase("CCO2")) {
+                                formats.put("co2y", 6);
+                            } else {
+                                int end = flg[1].indexOf(names[i]) + names[i].length();
+                                int start = 0;
+                                if (i > 0) {
+                                    start = flg[1].indexOf(names[i - 1]) + names[i - 1].length();
+                                }
+                                System.out.println(start + ", " + end);
+                                formats.put(names[i].toLowerCase(), end - start);
+                            }
+                        }
+
                         // Read line and save into return holder
                         file.putAll(readLine(line, formats));
 //                        String wst_name = (String) file.get("wst_name");
