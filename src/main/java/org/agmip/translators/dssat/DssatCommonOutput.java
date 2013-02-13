@@ -28,6 +28,8 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     protected File outputFile;
     protected static HashMap<String, String> exToFileMap = new HashMap();
     protected static HashSet<String> fileNameSet = new HashSet();
+    protected static DssatWthFileHelper wthHelper = new DssatWthFileHelper();
+    protected static DssatSoilFileHelper soilHelper = new DssatSoilFileHelper();
 
     /**
      * Translate data str from "yyyymmdd" to "yyddd"
@@ -396,7 +398,6 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 //        }
         String ret = getObjectOr(data, "wst_id", "").toString();
         if (ret.equals("") || ret.length() > 8) {
-            DssatWthFileHelper wthHelper = new DssatWthFileHelper();
             ret = wthHelper.createWthFileName(getObjectOr(data, "weather", data));
             if (ret.equals("")) {
                 ret = "AGMP";
@@ -413,15 +414,16 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @return the weather file name
      */
     protected String getSoilID(HashMap data) {
-        String ret = getObjectOr(data, "soil_id", "");
-        ret = ret.trim();
-        if (ret.equals("")) {
-            return ret;
-        }
-        while (ret.length() < 8) {
-            ret += "_";
-        }
-        return ret;
+        return soilHelper.getSoilID(data);
+//        String ret = getObjectOr(data, "soil_id", "");
+//        ret = ret.trim();
+//        if (ret.equals("")) {
+//            return ret;
+//        }
+//        while (ret.length() < 8) {
+//            ret += "_";
+//        }
+//        return ret;
     }
 
     /**

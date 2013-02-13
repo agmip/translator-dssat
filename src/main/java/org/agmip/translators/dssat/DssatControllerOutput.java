@@ -38,7 +38,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
 //    private HashMap<String, Future<File>> wthFiles = new HashMap();
     private HashMap<String, Map> soilData = new HashMap();
     private HashMap<String, Map> wthData = new HashMap();
-    private DssatWthFileHelper wthHelper = new DssatWthFileHelper();
     private ExecutorService executor = Executors.newFixedThreadPool(64);
     private static final Logger log = LoggerFactory.getLogger(DssatControllerOutput.class);
 
@@ -210,9 +209,15 @@ public class DssatControllerOutput extends DssatCommonOutput {
         HashMap<String, Map> swData;
         try {
             if (output instanceof DssatSoilOutput) {
-                id = getObjectOr(expData, "soil_id", "");
+                Map soilTmp = getObjectOr(expData, "soil", new HashMap());
+                if (soilTmp.isEmpty()) {
+                    id = getObjectOr(expData, "soil_id", "");
+                } else {
+                    id = soilHelper.getSoilID(soilTmp);
+                }
 //                id = id.substring(0, 2);
                 swData = soilData;
+                expData.put("soil_id", id);
             } else {
                 //            id = getObjectOr(expData, "wst_id", "");
                 //            id = getWthFileName(getObjectOr(expData, "weather", new HashMap()));
