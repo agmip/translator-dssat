@@ -508,9 +508,12 @@ public class DssatXFileInput extends DssatCommonInput {
                         // cm -> mm
                         String pldp = getObjectOr(tmp, "pldp", "");
                         if (!pldp.equals("")) {
-                            BigDecimal pldpBD = new BigDecimal(pldp);
-                            pldpBD = pldpBD.multiply(new BigDecimal("10"));
-                            tmp.put("pldp", pldpBD.toString());
+                            try {
+                                BigDecimal pldpBD = new BigDecimal(pldp);
+                                pldpBD = pldpBD.multiply(new BigDecimal("10"));
+                                tmp.put("pldp", pldpBD.toString());
+                            } catch (NumberFormatException e) {
+                            }
                         }
                         plArr.add(tmp);
                     } else {
