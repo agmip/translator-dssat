@@ -136,7 +136,6 @@ public class DssatWeatherInput extends DssatCommonInput {
                                 if (i > 0) {
                                     start = flg[1].indexOf(names[i - 1]) + names[i - 1].length();
                                 }
-                                System.out.println(start + ", " + end);
                                 formats.put(names[i].toLowerCase(), end - start);
                             }
                         }
