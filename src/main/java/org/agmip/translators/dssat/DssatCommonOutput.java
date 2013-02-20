@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import org.agmip.core.types.TranslatorOutput;
 import static org.agmip.util.MapUtil.*;
@@ -25,6 +26,10 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     // construct the error message in the output
     protected StringBuilder sbError;
     protected File outputFile;
+    protected static HashMap<String, String> exToFileMap = new HashMap();
+    protected static HashSet<String> fileNameSet = new HashSet();
+    protected static DssatWthFileHelper wthHelper = new DssatWthFileHelper();
+    protected static DssatSoilFileHelper soilHelper = new DssatSoilFileHelper();
 
     /**
      * Translate data str from "yyyymmdd" to "yyddd"
@@ -167,10 +172,10 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     }
 
     /**
-     * Get exname with normal format
+     * Get experiment name without any extention content after first underscore
      *
      * @param result date holder for experiment data
-     * @return exname
+     * @return experiment name
      */
     protected String getExName(Map result) {
 
@@ -179,13 +184,8 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             ret = ret.substring(0, ret.length() - 1).replace(".", "");
         }
         // TODO need to be updated with a translate rule for other models' exname
-        if (ret.matches("\\w+_+\\d+")) {
-            ret = ret.replaceAll("_+\\d+$", "");
-        }
-
-        // If length more than 10-bit, only remain first 10-bit
-        if (ret.length() > 10) {
-            ret = ret.substring(0, 10);
+        if (ret.matches("[\\w ]+(_+\\d+)+$")) {
+            ret = ret.replaceAll("(_+\\d+)+$", "");
         }
 
         return ret;
@@ -224,29 +224,56 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @return file name
      */
     protected String getFileName(Map result, String fileType) {
-        String ret = getExName(result);
+        String exname = getExName(result);
         String crid = getCrid(result);
-        if (ret == null || ret.equals("")) {
-            ret = "TEMP.XX" + fileType;
-        } else {
-            try {
-                if (ret.endsWith(crid)) {
-                    ret = ret.substring(0, ret.length() - crid.length());
-                } else {
-                    if (ret.length() == 10) {
-                        if (crid.equals("XX")) {
-                            crid = ret.substring(ret.length() - 2, ret.length());
-                        }
-                        ret = ret.substring(0, ret.length() - 2);
-                    }
-                }
-
-                ret += "." + crid + fileType;
-            } catch (Exception e) {
-                ret = "TEMP.XX" + fileType;
+        if (exname.length() == 10) {
+            if (crid.equals("XX")) {
+                crid = exname.substring(exname.length() - 2, exname.length());
             }
         }
-        return ret;
+
+        String ret;
+        if (exToFileMap.containsKey(exname + "_" + crid)) {
+            return exToFileMap.get(exname + "_" + crid) + fileType;
+        } else {
+            ret = exname;
+            if (ret == null || ret.equals("")) {
+                ret = "TEMP0001";
+            } else {
+                try {
+                    if (ret.endsWith(crid)) {
+                        ret = ret.substring(0, ret.length() - crid.length());
+                    }
+                    // If the exname is too long
+                    if (ret.length() > 8) {
+                        ret = ret.substring(0, 8);
+                    }
+                    // If the exname do not follow the Dssat rule
+                    if (!ret.matches("[\\w ]{1,6}\\d{2}$")) {
+                        ret = ret.substring(0, ret.length() - 2) + "01";
+                    }
+                } catch (Exception e) {
+                    ret = "TEMP0001";
+                }
+            }
+
+            // Find a non-repeated file name
+            int count;
+            while (fileNameSet.contains(ret + "." + crid)) {
+                try {
+                    count = Integer.parseInt(ret.substring(ret.length() - 2, ret.length()));
+                    count++;
+                } catch (Exception e) {
+                    count = 1;
+                }
+                ret = ret.replaceAll("\\w{2}$", String.format("%02d", count));
+            }
+        }
+
+        exToFileMap.put(exname + "_" + crid, ret + "." + crid);
+        fileNameSet.add(ret + "." + crid);
+
+        return ret + "." + crid + fileType;
     }
 
     /**
@@ -371,7 +398,6 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 //        }
         String ret = getObjectOr(data, "wst_id", "").toString();
         if (ret.equals("") || ret.length() > 8) {
-            DssatWthFileHelper wthHelper = new DssatWthFileHelper();
             ret = wthHelper.createWthFileName(getObjectOr(data, "weather", data));
             if (ret.equals("")) {
                 ret = "AGMP";
@@ -388,15 +414,16 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @return the weather file name
      */
     protected String getSoilID(HashMap data) {
-        String ret = getObjectOr(data, "soil_id", "");
-        ret = ret.trim();
-        if (ret.equals("")) {
-            return ret;
-        }
-        while (ret.length() < 8) {
-            ret += "_";
-        }
-        return ret;
+        return soilHelper.getSoilID(data);
+//        String ret = getObjectOr(data, "soil_id", "");
+//        ret = ret.trim();
+//        if (ret.equals("")) {
+//            return ret;
+//        }
+//        while (ret.length() < 8) {
+//            ret += "_";
+//        }
+//        return ret;
     }
 
     /**

@@ -47,7 +47,7 @@ public class DssatCulFileOutput extends DssatCommonOutput {
             // Initial BufferedWriter
             // Get File name
             String fileName = getFileName(result, "X");
-            if (fileName.equals("TEMP.XXX")) {
+            if (fileName.matches("TEMP\\d{4}\\.\\w{2}X")) {
                 fileName = "Cultivar.CUL";
             } else {
                 try {
