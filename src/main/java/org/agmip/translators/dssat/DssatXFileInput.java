@@ -3,6 +3,7 @@ package org.agmip.translators.dssat;
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -126,7 +127,7 @@ public class DssatXFileInput extends DssatCommonInput {
             String exname = fileName.replaceAll("\\.\\w\\wX$", "");
             HashMap meta = new HashMap();
             metaData.put(exname, meta);
-            
+
             ArrayList<HashMap> sqArr = new ArrayList<HashMap>();
             HashMap sqData;
             ArrayList<HashMap> cuArr = new ArrayList<HashMap>();
@@ -252,8 +253,8 @@ public class DssatXFileInput extends DssatCommonInput {
                     if (flg[2].equals("data")) {
                         // Set variables' formats
                         formats.clear();
-                        formats.put("trno", 2);
-                        formats.put("sq", 2);
+                        formats.put("trno", 3); // For 3-bit treatment number (2->3)
+                        formats.put("sq", 1);   // For 3-bit treatment number (2->1)
                         formats.put("op", 2);
                         formats.put("co", 2);
                         formats.put("trt_name", 26);
@@ -504,6 +505,16 @@ public class DssatXFileInput extends DssatCommonInput {
                         HashMap tmp = readLine(line, formats);
                         translateDateStr(tmp, "pdate");
                         translateDateStr(tmp, "pldae");
+                        // cm -> mm
+                        String pldp = getObjectOr(tmp, "pldp", "");
+                        if (!pldp.equals("")) {
+                            try {
+                                BigDecimal pldpBD = new BigDecimal(pldp);
+                                pldpBD = pldpBD.multiply(new BigDecimal("10"));
+                                tmp.put("pldp", pldpBD.toString());
+                            } catch (NumberFormatException e) {
+                            }
+                        }
                         plArr.add(tmp);
                     } else {
                     }

@@ -38,7 +38,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
 //    private HashMap<String, Future<File>> wthFiles = new HashMap();
     private HashMap<String, Map> soilData = new HashMap();
     private HashMap<String, Map> wthData = new HashMap();
-    private DssatWthFileHelper wthHelper = new DssatWthFileHelper();
     private ExecutorService executor = Executors.newFixedThreadPool(64);
     private static final Logger log = LoggerFactory.getLogger(DssatControllerOutput.class);
 
@@ -206,13 +205,19 @@ public class DssatControllerOutput extends DssatCommonOutput {
      * @param output The DSSAT Writer object
      */
     private void recordSWData(Map expData, DssatCommonOutput output) {
-        String id = "";
-        HashMap<String, Map> swData = null;
+        String id;
+        HashMap<String, Map> swData;
         try {
             if (output instanceof DssatSoilOutput) {
-                id = getObjectOr(expData, "soil_id", "");
+                Map soilTmp = getObjectOr(expData, "soil", new HashMap());
+                if (soilTmp.isEmpty()) {
+                    id = getObjectOr(expData, "soil_id", "");
+                } else {
+                    id = soilHelper.getSoilID(soilTmp);
+                }
 //                id = id.substring(0, 2);
                 swData = soilData;
+                expData.put("soil_id", id);
             } else {
                 //            id = getObjectOr(expData, "wst_id", "");
                 //            id = getWthFileName(getObjectOr(expData, "weather", new HashMap()));
@@ -337,39 +342,9 @@ public class DssatControllerOutput extends DssatCommonOutput {
     }
 
     /**
-     * Add current file into zip package
-     *
-     * @param out The ZipOutputStream object
-     * @param zipPath The inside file path of zip package
-     * @param file The file which will be zipped
-     * @throws FileNotFoundException
-     * @throws IOException
-     */
-    private void addToZip(ZipOutputStream out, String zipPath, File file) throws FileNotFoundException, IOException {
-
-        if (file == null || !file.exists()) {
-            return;
-        } else if (zipPath.endsWith(File.separator)) {
-            zipPath += file.getName();
-        }
-
-        ZipEntry entry = new ZipEntry(zipPath);
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-        int count;
-        byte[] data = new byte[1024];
-
-        out.putNextEntry(entry);
-        while ((count = bis.read(data)) != -1) {
-            out.write(data, 0, count);
-        }
-        bis.close();
-    }
-
-    /**
      * Get all output files
      */
     public ArrayList<File> getOutputFiles() {
-//        return files;
         return new ArrayList(files.values());
     }
 
@@ -415,7 +390,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 subExpArr.add(expArr.get(i));
                 expGroupMap.put("Experiment_" + i, subExpArr);
             } else {
-                exname = getExName(expArr.get(i));
+                exname = getFileName(expArr.get(i), "");
                 subExpArr = expGroupMap.get(exname);
                 if (subExpArr == null) {
                     subExpArr = new ArrayList();
@@ -444,7 +419,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     tmp.put("dssat_sequence", seq);
                     seq.put("data", seqArr);
                 }
-                tmp.put("exname", expGroup.getKey());
                 ArrayList rootArr = new ArrayList();
                 tmp.put("dssat_root", rootArr);
                 rootArr.add(combinaRoot(tmp));
@@ -471,7 +445,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
     }
 
     private void updateGroupExps(HashMap out, HashMap expData, int trno) {
-        int baseId = trno * 100;
+        int baseId = trno * 1000;
         int seqid;
         int sm;
         int em;

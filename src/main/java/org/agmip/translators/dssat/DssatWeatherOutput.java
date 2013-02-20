@@ -81,8 +81,8 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             if (wid.length() > 4) {
                 wid = wid.substring(0, 4);
             }
-            sbData.append("@ INSI      LAT     LONG  ELEV   TAV   AMP REFHT WNDHT\r\n");
-            sbData.append(String.format("  %1$-4s %2$8s %3$8s %4$5s %5$5s %6$5s %7$5s %8$5s\r\n",
+            sbData.append("@ INSI      LAT     LONG  ELEV   TAV   AMP REFHT WNDHT   CO2\r\n");
+            sbData.append(String.format("  %1$-4s %2$8s %3$8s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s\r\n",
                     formatStr(4, wthFile, "dssat_wst_id", wid),
                     formatNumStr(8, wthFile, "wst_lat", defValR),
                     formatNumStr(8, wthFile, "wst_long", defValR),
@@ -90,7 +90,8 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                     formatNumStr(5, wthFile, "tav", defValR),
                     formatNumStr(5, wthFile, "tamp", defValR),
                     formatNumStr(5, wthFile, "refht", defValR),
-                    formatNumStr(5, wthFile, "wndht", defValR)));
+                    formatNumStr(5, wthFile, "wndht", defValR),
+                    formatNumStr(5, wthFile, "co2y", defValR)));
 
             // Daily weather data section
             // Fixed Title
