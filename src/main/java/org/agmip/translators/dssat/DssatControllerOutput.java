@@ -58,6 +58,18 @@ public class DssatControllerOutput extends DssatCommonOutput {
         ArrayList<HashMap> soilArr = getObjectOr(result, "soils", new ArrayList());
         ArrayList<HashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
 
+        // Setup output file
+        Calendar cal = Calendar.getInstance();
+        if (!expArr.isEmpty() && soilArr.isEmpty() && wthArr.isEmpty()) {
+            outputFile = new File(arg0 + "AGMIP_DSSAT_EXPERIMENTS_" + cal.getTimeInMillis() + ".zip");
+        } else if (expArr.isEmpty() && !soilArr.isEmpty() && wthArr.isEmpty()) {
+            outputFile = new File(arg0 + "AGMIP_DSSAT_SOILS_" + cal.getTimeInMillis() + ".zip");
+        } else if (expArr.isEmpty() && soilArr.isEmpty() && !wthArr.isEmpty()) {
+            outputFile = new File(arg0 + "AGMIP_DSSAT_WEATHERS_" + cal.getTimeInMillis() + ".zip");
+        } else {
+            outputFile = new File(arg0 + "AGMIP_DSSAT_" + cal.getTimeInMillis() + ".zip");
+        }
+        
         // Write files
         String soil_id;
         String wth_id;
@@ -130,8 +142,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
         writeSoilFiles(arg0);
 
         // compress all output files into one zip file
-        Calendar cal = Calendar.getInstance();
-        outputFile = new File(arg0 + "AGMIP_DSSAT_" + cal.getTimeInMillis() + ".zip");
         createZip();
     }
 
