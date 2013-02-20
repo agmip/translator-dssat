@@ -73,11 +73,16 @@ public class DssatWeatherInput extends DssatCommonInput {
         for (Object key : mapW.keySet()) {
 
             fileName = (String) key;
+            String wst_id;
             if (fileName.lastIndexOf(".") > 0) {
                 fileName = fileName.substring(0, fileName.lastIndexOf("."));
             }
-            fileName = String.format("%4s", fileName.substring(0, Math.min(4, fileName.length())));
-            String wst_id = fileName;
+            // Check if the weather file name is following the old standard
+            if (fileName.matches("\\w{4}\\d{4}$")) {
+                wst_id = fileName.substring(0, 4);
+            } else {
+                wst_id = fileName;
+            }
             buf = mapW.get(key);
             if (buf instanceof char[]) {
                 brW = new BufferedReader(new CharArrayReader((char[]) buf));
@@ -87,7 +92,6 @@ public class DssatWeatherInput extends DssatCommonInput {
             file = new HashMap();
             daily = new ArrayList();
             titles = new ArrayList();
-            file.put("wst_id", wst_id);
 
             while ((line = brW.readLine()) != null) {
 
@@ -187,14 +191,30 @@ public class DssatWeatherInput extends DssatCommonInput {
                 } else {
                 }
             }
+            
+            // Double check if the weather file name is following the old standard
+            if (!daily.isEmpty() && wst_id.length() == 4) {
+                String firstDay = daily.get(0).get("w_date");
+                if (firstDay != null && firstDay.length() > 3) {
+                    int year = 80;
+                    try {
+                         year = Integer.parseInt(firstDay.substring(2, 4));
+                    } catch (NumberFormatException e) {
+                    }
+                    if (!fileName.startsWith(wst_id + String.format("%02d", year))) {
+                        wst_id = fileName;
+                    }
+                }
+            }
+            file.put("wst_id", wst_id);
 
-            if (!dailyById.containsKey(file.get("wst_id"))) {
-                dailyById.put((String) file.get("wst_id"), daily);
+            if (!dailyById.containsKey(wst_id)) {
+                dailyById.put(wst_id, daily);
                 file.put("wst_source", "DSSAT");
                 file.put(dailyKey, daily);
                 files.add(file);
             } else {
-                ArrayList tmpArr = dailyById.get(file.get("wst_id"));
+                ArrayList tmpArr = dailyById.get(wst_id);
 //                tmpArr.addAll(daily);
                 addDaily(tmpArr, daily);
             }

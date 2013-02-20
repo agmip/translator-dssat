@@ -327,7 +327,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         addToArray(flArr, tmp, "fl");
                         // Read weather station id
                         wid = (String) tmp.get("wst_id");
-                        if (wid != null && wid.length() > 4) {
+                        if (wid != null && wid.matches("\\w{4}\\d{4}$")) {
                             wid = wid.substring(0, 4);
                             tmp.put("wst_id", wid);
                         }
