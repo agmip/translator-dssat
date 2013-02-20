@@ -132,7 +132,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         // compress all output files into one zip file
         Calendar cal = Calendar.getInstance();
         outputFile = new File(arg0 + "AGMIP_DSSAT_" + cal.getTimeInMillis() + ".zip");
-        createZip(arg0);
+        createZip();
     }
 
     /**
@@ -167,7 +167,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 // compress all output files into one zip file
                 outputFile = new File(revisePath(arg0) + getZipFileName(outputs));
 
-                createZip(arg0);
+                createZip();
 
             } else {
                 writeMultipleExp(arg0, result);
@@ -179,9 +179,9 @@ public class DssatControllerOutput extends DssatCommonOutput {
             executor = null;
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 
@@ -237,7 +237,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
 //                futFiles.add(fut);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 
@@ -280,12 +280,10 @@ public class DssatControllerOutput extends DssatCommonOutput {
     /**
      * Compress the files in one zip
      *
-     * @param path The output path
-     *
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private void createZip(String path) throws FileNotFoundException, IOException {
+    private void createZip() throws FileNotFoundException, IOException {
 
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outputFile));
         ZipEntry entry;
@@ -300,10 +298,10 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     files.put(f.getPath(), f);
                 }
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                log.error(ex.getMessage());
             } catch (ExecutionException ex) {
                 if (!ex.getMessage().contains("NoOutputFileException")) {
-                    ex.printStackTrace();
+                    log.error(ex.getMessage());
                 }
             }
         }
