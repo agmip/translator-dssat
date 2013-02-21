@@ -79,7 +79,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         ArrayList meArr = new ArrayList();     // array for enveronment modification record
         ArrayList mhArr = new ArrayList();   // array for harvest record
         ArrayList smArr = new ArrayList();     // array for simulation control record
-        String exName;
+//        String exName;
 
         try {
 
@@ -192,6 +192,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     soilData = new HashMap();
                 } else {
                     soilData = soilArr.get(0);
+                }
+                if (soilData == null) {
+                    soilData = new HashMap();
                 }
 //                if (i < wthArr.size()) {
 //                    wthData = wthArr.get(i);
