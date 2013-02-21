@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.translators.dssat.DssatCommonInput.copyItem;
 import static org.agmip.util.MapUtil.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DSSAT Experiment Data I/O API Class
@@ -19,6 +21,7 @@ import static org.agmip.util.MapUtil.*;
  */
 public class DssatXFileOutput extends DssatCommonOutput {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DssatXFileOutput.class);
     public static final DssatCRIDHelper crHelper = new DssatCRIDHelper();
 
     /**
@@ -955,8 +958,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             bwX.write(sbData.toString());
             bwX.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(DssatCommonOutput.getStackTrace(e));
         }
     }
 

@@ -1,6 +1,9 @@
 package org.agmip.translators.dssat;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -336,7 +339,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     protected void decompressData(ArrayList arr) {
 
         HashMap fstData = null; // The first data record (Map type)
-        HashMap cprData = null; // The following data record which will be compressed
+        HashMap cprData;        // The following data record which will be compressed
 
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i) instanceof ArrayList) {
@@ -438,5 +441,12 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         defValI = "-99";
         sbError = new StringBuilder();
         outputFile = null;
+    }
+
+    protected static String getStackTrace(Throwable aThrowable) {
+        final Writer result = new StringWriter();
+        final PrintWriter printWriter = new PrintWriter(result);
+        aThrowable.printStackTrace(printWriter);
+        return result.toString();
     }
 }

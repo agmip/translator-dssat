@@ -191,14 +191,14 @@ public class DssatWeatherInput extends DssatCommonInput {
                 } else {
                 }
             }
-            
+
             // Double check if the weather file name is following the old standard
             if (!daily.isEmpty() && wst_id.length() == 4) {
                 String firstDay = daily.get(0).get("w_date");
                 if (firstDay != null && firstDay.length() > 3) {
                     int year = 80;
                     try {
-                         year = Integer.parseInt(firstDay.substring(2, 4));
+                        year = Integer.parseInt(firstDay.substring(2, 4));
                     } catch (NumberFormatException e) {
                     }
                     if (!fileName.startsWith(wst_id + String.format("%02d", year))) {

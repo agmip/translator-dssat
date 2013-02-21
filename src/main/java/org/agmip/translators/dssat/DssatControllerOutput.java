@@ -39,7 +39,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
     private HashMap<String, Map> soilData = new HashMap();
     private HashMap<String, Map> wthData = new HashMap();
     private ExecutorService executor = Executors.newFixedThreadPool(64);
-    private static final Logger log = LoggerFactory.getLogger(DssatControllerOutput.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DssatControllerOutput.class);
 
     /**
      * ALL DSSAT Data Output method
@@ -69,7 +69,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         } else {
             outputFile = new File(arg0 + "AGMIP_DSSAT_" + cal.getTimeInMillis() + ".zip");
         }
-        
+
         // Write files
         String soil_id;
         String wth_id;
@@ -189,9 +189,9 @@ public class DssatControllerOutput extends DssatCommonOutput {
             executor = null;
 
         } catch (FileNotFoundException e) {
-            log.error(e.getMessage());
+            LOG.error(getStackTrace(e));
         } catch (IOException e) {
-            log.error(e.getMessage());
+            LOG.error(getStackTrace(e));
         }
     }
 
@@ -247,7 +247,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
 //                futFiles.add(fut);
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            LOG.error(getStackTrace(e));
         }
     }
 
@@ -308,19 +308,19 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     files.put(f.getPath(), f);
                 }
             } catch (InterruptedException ex) {
-                log.error(ex.getMessage());
+                LOG.error(getStackTrace(ex));
             } catch (ExecutionException ex) {
                 if (!ex.getMessage().contains("NoOutputFileException")) {
-                    log.error(ex.getMessage());
+                    LOG.error(getStackTrace(ex));
                 }
             }
         }
 
-        log.info("Start zipping all the files...");
+        LOG.info("Start zipping all the files...");
 
         // Check if there is file been created
         if (files == null) {
-            log.warn("No files here for zipping");
+            LOG.warn("No files here for zipping");
             return;
         }
 
@@ -346,7 +346,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         }
 
         out.close();
-        log.info("End zipping");
+        LOG.info("End zipping");
     }
 
     /**

@@ -7,6 +7,8 @@ import java.util.HashMap;
 import org.agmip.core.types.TranslatorInput;
 import static org.agmip.translators.dssat.DssatCommonInput.*;
 import static org.agmip.util.MapUtil.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -20,6 +22,7 @@ public class DssatControllerInput implements TranslatorInput {
     private DssatAFileInput obvAReader = new DssatAFileInput();
     private DssatTFileInput obvTReader = new DssatTFileInput();
     private DssatCulFileInput culReader = new DssatCulFileInput();
+    private static final Logger LOG = LoggerFactory.getLogger(DssatControllerInput.class);
 
     /**
      * All DSSAT Data input method
@@ -79,10 +82,10 @@ public class DssatControllerInput implements TranslatorInput {
             culArr = culReader.readCultivarData(brMap, metaData);
 
         } catch (FileNotFoundException fe) {
-            System.out.println("File not found under following path : [" + arg0 + "]!");
+            LOG.warn("File not found under following path : [" + arg0 + "]!");
             return ret;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error(DssatCommonOutput.getStackTrace(e));
             return ret;
         }
 

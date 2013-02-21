@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.translators.dssat.DssatCommonInput.CopyList;
 import static org.agmip.util.MapUtil.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DSSAT Observation Data I/O API Class
@@ -17,6 +19,8 @@ import static org.agmip.util.MapUtil.*;
  * @version 1.0
  */
 public class DssatAFileOutput extends DssatCommonOutput {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DssatAFileOutput.class);
 
     /**
      * DSSAT Observation Data Output method
@@ -59,8 +63,8 @@ public class DssatAFileOutput extends DssatCommonOutput {
                 return;
             }
             record = CopyList(records.get(0));
-            Object[] keys = record.keySet().toArray();
-            for (Object key : keys) {
+            String[] keys = record.keySet().toArray(new String[0]);
+            for (String key : keys) {
                 if (!(record.get(key) instanceof String)) {
                     record.remove(key);
                 }
@@ -153,8 +157,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
             bwA.write(sbData.toString());
             bwA.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(DssatCommonOutput.getStackTrace(e));
         }
     }
 

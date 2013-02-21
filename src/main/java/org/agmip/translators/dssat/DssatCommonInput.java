@@ -1,7 +1,6 @@
 package org.agmip.translators.dssat;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.CharArrayReader;
 import java.io.CharArrayWriter;
 import java.io.File;
@@ -10,8 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -19,7 +16,6 @@ import java.util.LinkedHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.agmip.core.types.TranslatorInput;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +35,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
     protected String defValI = "-99";
     protected String defValD = "20110101";
     protected String jsonKey = "unknown";
+    private static final Logger LOG = LoggerFactory.getLogger(DssatCommonInput.class);
 
     /**
      * DSSAT Data Output method for Controller using
@@ -68,8 +65,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             log.warn("File not found under following path : [" + filePath + "]!");
             return ret;
         } catch (Exception e) {
-            //System.out.println(e.getMessage());
-            e.printStackTrace();
+            LOG.error(DssatCommonOutput.getStackTrace(e));
         }
 
         return ret;
@@ -314,7 +310,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             // Get experiment name
             ZipEntry entry;
             ArrayList<String> exnames = new ArrayList();
-            String exname = "";
+            String exname;
             in = new ZipInputStream(new FileInputStream(filePath));
             while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
@@ -402,7 +398,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
     private static char[] getBuf(InputStream in, ZipEntry entry) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         char[] buf;
-        long size = entry.getSize();;
+        long size = entry.getSize();
 
         if (size > 0 && size <= Integer.MAX_VALUE) {
             buf = new char[(int) size];
@@ -465,7 +461,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
     protected void compressData(ArrayList arr) {
 
         HashMap fstData = null; // The first data record (Map type)
-        HashMap cprData = null; // The following data record which will be compressed
+        HashMap cprData;        // The following data record which will be compressed
 
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i) instanceof ArrayList) {
@@ -605,11 +601,11 @@ public abstract class DssatCommonInput implements TranslatorInput {
     protected String getPdate(HashMap m, String trno, String fileName) {
 
         BufferedReader br;
-        Object buf = null;
+        Object buf;
         String line;
         LinkedHashMap formats = new LinkedHashMap();
         String pl = null;
-        String[] flgP = new String[3];
+        String[] flgP;
         DssatXFileInput xfile = new DssatXFileInput();
 
 //        buf = (char[]) m.get("X");
@@ -688,8 +684,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
             br.close();
         } catch (IOException ex) {
-            //            Logger.getLogger(DssatCommonInput.class.getName()).log(Level.SEVERE, null, ex);
-            ex.printStackTrace();
+            LOG.error(DssatCommonOutput.getStackTrace(ex));
         }
 
         return "";
@@ -770,7 +765,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             HashMap toTmp = new HashMap();
             HashMap fromTmp = (HashMap) fromArr.get(j);
             String fromKeyVal = fromKeyArr.get(j);
-            String toKeyVal = "";
+            String toKeyVal;
 
             for (int k = cnt; k < toKeyArr.size(); k++, cnt++) {
                 toKeyVal = toKeyArr.get(k);
@@ -950,5 +945,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 to.put(toKey, from.get(fromKey));
             }
         }
+    }
+
+    protected String getStackTrace(Throwable aThrowable) {
+        return DssatCommonOutput.getStackTrace(aThrowable);
     }
 }

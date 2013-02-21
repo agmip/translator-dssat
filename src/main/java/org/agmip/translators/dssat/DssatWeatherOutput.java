@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import static org.agmip.util.MapUtil.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DSSAT Weather Data I/O API Class
@@ -17,6 +19,8 @@ import static org.agmip.util.MapUtil.*;
  * @version 1.0
  */
 public class DssatWeatherOutput extends DssatCommonOutput {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DssatWeatherOutput.class);
 
     /**
      * DSSAT Weather Data Output method
@@ -169,8 +173,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 //            adtDaily = new ArrayList();
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(DssatCommonOutput.getStackTrace(e));
         }
     }
 }
