@@ -102,7 +102,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                 if (flg[0].equals("weather") && flg[1].equals("") && flg[2].equals("data")) {
 
                     // header info
-                    file.put("wst_name", line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*([Dd][Aa][Tt][Aa]\\s*)*:?", "").trim());
+                    file.put("wst_notes", line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*([Dd][Aa][Tt][Aa]\\s*)*:?", "").trim());
 
                 } // Read Weather Data
                 else if (flg[2].equals("data")) {
@@ -206,6 +206,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                     }
                 }
             }
+            file.put("wst_name", wst_id);
             file.put("wst_id", wst_id);
 
             if (!dailyById.containsKey(wst_id)) {

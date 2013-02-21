@@ -80,6 +80,11 @@ public class DssatWthFileHelper {
      * @return the 4-bit institute code
      */
     public static String getWthInsiCode(Map wthData) {
+        String wst_name = getValueOr(wthData, "wst_name", "");
+        if (wst_name.matches("(\\w{4})|(\\w{8})")) {
+            return wst_name;
+        }
+        
         String wst_id = getValueOr(wthData, "wst_id", "");
         if (wst_id.matches("(\\w{4})|(\\w{8})")) {
             return wst_id;
@@ -91,12 +96,6 @@ public class DssatWthFileHelper {
         }
 
         return "";
-//        String agmipFileHack = getValueOr(wthData, "wst_name", "");
-//        if (agmipFileHack.length() >= 4) {
-//            return agmipFileHack.substring(0, 4).toUpperCase();
-//        } else {
-//            return "";
-//        }
     }
 
     /**
