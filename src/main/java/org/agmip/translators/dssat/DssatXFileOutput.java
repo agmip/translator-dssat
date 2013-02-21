@@ -489,15 +489,15 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 }
                 sbData.append(String.format("%1$2s %2$-8s %3$-8s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$-5s %10$-5s%11$5s  %12$-10s %13$s\r\n", // P.S. change length definition to match current way
                         idx + 1, //getObjectOr(secData, "fl", defValI).toString(),
-                        getObjectOr(secData, "id_field", defValC).toString(),
-                        getObjectOr(secData, "wst_id", defValC).toString(),
-                        getObjectOr(secData, "flsl", defValC).toString(),
+                        formatStr(8, secData, "id_field", defValC),
+                        formatStr(8, secData, "wst_id", defValC),
+                        formatStr(4, secData, "flsl", defValC),
                         formatNumStr(5, secData, "flob", defValR),
-                        getObjectOr(secData, "fl_drntype", defValC).toString(),
+                        formatStr(5, secData, "fl_drntype", defValC),
                         formatNumStr(5, secData, "fldrd", defValR),
                         formatNumStr(5, secData, "fldrs", defValR),
-                        getObjectOr(secData, "flst", defValC).toString(),
-                        getObjectOr(secData, "sltx", defValC).toString(),
+                        formatStr(5, secData, "flst", defValC),
+                        formatStr(5, secData, "sltx", defValC),
                         formatNumStr(5, secData, "sldp", defValR),
                         soil_id,
                         getObjectOr(secData, "fl_name", defValC).toString()));
@@ -511,7 +511,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         "-99", // P.S. SLEN keeps -99
                         formatNumStr(5, secData, "fllwr", defValR),
                         formatNumStr(5, secData, "flsla", defValR),
-                        getObjectOr(secData, "flhst", defValC).toString(),
+                        formatStr(5, secData, "flhst", defValC),
                         formatNumStr(5, secData, "fhdur", defValR)));
             }
             if (!flArr.isEmpty()) {
