@@ -253,7 +253,10 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                     }
                     // If the exname do not follow the Dssat rule
                     if (!ret.matches("[\\w ]{1,6}\\d{2}$")) {
-                        ret = ret.substring(0, ret.length() - 2) + "01";
+                        if (ret.length() > 6) {
+                            ret = ret.substring(0 ,6);
+                        }
+                        ret += "01";
                     }
                 } catch (Exception e) {
                     ret = "TEMP0001";
