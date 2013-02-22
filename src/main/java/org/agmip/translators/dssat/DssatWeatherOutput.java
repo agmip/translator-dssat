@@ -47,6 +47,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
         optDailyData.put("tdew", "DEWP");
         optDailyData.put("wind", "WIND");
         optDailyData.put("pard", "PAR");
+        optDailyData.put("vprsd", "VPRS");
         ArrayList adtDaily = new ArrayList();           // Record the additional field from other model for output
         String dailyKey = "dailyWeather";  // P.S. the key name might change
 
