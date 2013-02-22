@@ -182,6 +182,8 @@ public class DssatWeatherInput extends DssatCommonInput {
                                 titles.add("pard");
                             } else if (title.equalsIgnoreCase("VPRS")) {
                                 titles.add("vprsd");
+                            } else if (title.equalsIgnoreCase("RHUM")) {
+                                titles.add("rhumd");
                             } else if (title.equals("")) {
                                 titles.add("null" + i);
                             } else {

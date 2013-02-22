@@ -48,6 +48,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
         optDailyData.put("wind", "WIND");
         optDailyData.put("pard", "PAR");
         optDailyData.put("vprsd", "VPRS");
+        optDailyData.put("rhumd", "RHUM");
         ArrayList adtDaily = new ArrayList();           // Record the additional field from other model for output
         String dailyKey = "dailyWeather";  // P.S. the key name might change
 
@@ -86,7 +87,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             if (wid.length() > 4) {
                 wid = wid.substring(0, 4);
             }
-            sbData.append("@ INSI      LAT     LONG  ELEV   TAV   AMP REFHT WNDHT   CO2\r\n");
+            sbData.append("@ INSI      LAT     LONG  ELEV   TAV   AMP REFHT WNDHT  CCO2\r\n");
             sbData.append(String.format("  %1$-4s %2$8s %3$8s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s\r\n",
                     formatStr(4, wthFile, "dssat_wst_id", wid),
                     formatNumStr(8, wthFile, "wst_lat", defValR),
