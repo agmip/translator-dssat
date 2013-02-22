@@ -121,7 +121,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                             } else if (names[i].equalsIgnoreCase("LONG")) {
                                 formats.put("wst_long", 9);
                             } else if (names[i].equalsIgnoreCase("ELEV")) {
-                                formats.put("wst_elev", 6);
+                                formats.put("elev", 6);
                             } else if (names[i].equalsIgnoreCase("TAV")) {
                                 formats.put("tav", 6);
                             } else if (names[i].equalsIgnoreCase("AMP")) {

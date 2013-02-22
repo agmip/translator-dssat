@@ -90,7 +90,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                     formatStr(4, wthFile, "dssat_wst_id", wid),
                     formatNumStr(8, wthFile, "wst_lat", defValR),
                     formatNumStr(8, wthFile, "wst_long", defValR),
-                    formatNumStr(5, wthFile, "wst_elev", defValR),
+                    formatNumStr(5, wthFile, "elev", defValR),
                     formatNumStr(5, wthFile, "tav", defValR),
                     formatNumStr(5, wthFile, "tamp", defValR),
                     formatNumStr(5, wthFile, "refht", defValR),
