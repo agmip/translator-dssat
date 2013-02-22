@@ -61,11 +61,11 @@ public class DssatControllerTest {
         if (file != null) {
             assertTrue(file.exists());
             assertTrue(file.getName().toUpperCase().matches("^AGMIP_DSSAT_((WEATHERS_)|(SOILS_)|(EXPERIMENTS_))?\\d+\\.ZIP$"));
-            assertTrue(file.delete());
+//            assertTrue(file.delete());
         }
 
         String jsonStr;
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream("Machakos_1Exp-1Yr.json");
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream("qryAgMIPS_Extract_Phase1.json");
         BufferedReader br = new BufferedReader(new InputStreamReader(is));
         jsonStr = br.readLine();
         obDssatControllerOutput = new DssatControllerOutput();

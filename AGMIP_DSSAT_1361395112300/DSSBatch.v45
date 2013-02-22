@@ -1,0 +1,15 @@
+$BATCH(MAIZE)
+!
+! Command Line : C:\DSSAT45\DSCSM045.EXE B DSSBatch.v45
+! Crop         : Maize
+! Experiment   : UFGA8201.MZX
+! ExpNo        : 1
+! Debug        : C:\DSSAT45\DSCSM045.EXE " B DSSBatch.v45"
+!
+@FILEX                                                                                        TRTNO     RP     SQ     OP     CO
+UFG01.MZX                                                                                         1      1      1      0      0
+UFG01.MZX                                                                                         2      1      1      0      0
+UFG01.MZX                                                                                         3      1      1      0      0
+UFG01.MZX                                                                                         4      1      1      0      0
+UFG01.MZX                                                                                         5      1      1      0      0
+UFG01.MZX                                                                                         6      1      1      0      0

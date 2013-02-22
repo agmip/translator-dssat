@@ -1,0 +1,30 @@
+<configuration>
+  <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
+  <!--appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>logFile-${bySecond}.log</file>
+
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} %-5level %logger{35} - %msg%n</pattern>
+    </encoder>
+  </appender-->
+  <appender name="CLI" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</pattern>
+    </encoder>
+  </appender> 
+
+<!-- UNCOMMENT WHICH COMPONENTS TO DEBUG 
+  <logger name="org.agmip.functions" level="DEBUG" />
+  <logger name="org.agmip.dome" level="DEBUG" />
+  <logger name="org.agmip.dome.DomeFunctions" level="DEBUG" />
+  <logger name="org.agmip.ui.quadui" level="DEBUG" />
+  <logger name="org.agmip.util.AcmoUtil" level="DEBUG" />
+  <logger name="org.agmip.ui.quadui.TranslateFromTask" level="DEBUG" />
+  <logger name="org.agmip.ui.quadui.ApplyDomeTask" level="DEBUG" />
+  <logger name="org.agmip.ui.quadui.QuadUIWindow" level="DEBUG" />
+  <logger name="org.agmip.translators.csv.CSVInput" level="DEBUG" />
+-->
+  <root level="INFO">
+    <appender-ref ref="CLI" />
+  </root>
+</configuration>
