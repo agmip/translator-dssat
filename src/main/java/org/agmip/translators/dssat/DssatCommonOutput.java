@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.agmip.core.types.TranslatorOutput;
 import static org.agmip.util.MapUtil.*;
 
@@ -254,7 +255,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                     // If the exname do not follow the Dssat rule
                     if (!ret.matches("[\\w ]{1,6}\\d{2}$")) {
                         if (ret.length() > 6) {
-                            ret = ret.substring(0 ,6);
+                            ret = ret.substring(0, 6);
                         }
                         ret += "01";
                     }
@@ -451,5 +452,58 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         final PrintWriter printWriter = new PrintWriter(result);
         aThrowable.printStackTrace(printWriter);
         return result.toString();
+    }
+
+    protected class HeaderArrayList<E> extends ArrayList<E> {
+
+        private HashSet<E> items = new HashSet();
+        private HashSet<E> curItems;
+
+        @Override
+        public boolean contains(Object header) {
+            return items.contains(header);
+        }
+
+        @Override
+        public boolean add(E e) {
+            if (!contains(e)) {
+                super.add(e);
+                items.add(e);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
+        @Override
+        public E get(int index) {
+            if (curItems != null) {
+                curItems.remove(super.get(index));
+            }
+            return super.get(index);
+        }
+        
+        public void seCurItems(Set set) {
+            curItems = new HashSet();
+            curItems.addAll(set);
+        }
+        
+        public boolean hasMoreItem() {
+            if (curItems == null || curItems.isEmpty()) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        
+        public E applyNext() {
+            if (hasMoreItem()) {
+                E ret = curItems.iterator().next();
+                curItems.remove(ret);
+                this.add(ret);
+                return ret;
+            }
+            return null;
+        }
     }
 }
