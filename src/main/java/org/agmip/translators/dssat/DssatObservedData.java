@@ -11,10 +11,10 @@ import java.util.HashSet;
  */
 public class DssatObservedData {
 
-    private HashSet summaryList = new HashSet();        // Define the variables used in AFile
-    private HashSet timeCourseList = new HashSet();     // Define the variables used in TFile
-    private HashSet dateTypeList = new HashSet();       // Define the variables of data types
-    private HashMap dapDateTypeList = new HashMap();    // Define the variables of data types comes with day after planting (dap) variable; value means dap variable code
+    private static HashSet summaryList = new HashSet();        // Define the variables used in AFile
+    private static HashSet timeCourseList = new HashSet();     // Define the variables used in TFile
+    private static HashSet dateTypeList = new HashSet();       // Define the variables of data types
+    private static HashMap dapDateTypeList = new HashMap();    // Define the variables of data types comes with day after planting (dap) variable; value means dap variable code
 
     public DssatObservedData() {
 
