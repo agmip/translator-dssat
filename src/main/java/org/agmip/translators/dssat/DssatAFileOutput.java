@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import static org.agmip.translators.dssat.DssatCommonInput.CopyList;
 import static org.agmip.util.MapUtil.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,13 +61,6 @@ public class DssatAFileOutput extends DssatCommonOutput {
             if (records.isEmpty()) {
                 return;
             }
-            record = CopyList(records.get(0));
-            String[] keys = record.keySet().toArray(new String[0]);
-            for (String key : keys) {
-                if (!(record.get(key) instanceof String)) {
-                    record.remove(key);
-                }
-            }
 
             // Initial BufferedWriter
             String fileName = getFileName(result, "A");
@@ -87,34 +79,46 @@ public class DssatAFileOutput extends DssatCommonOutput {
                     getObjectOr(result, "local_name", defValBlank)));
 
             // Check if which field is available
-            for (Object key : record.keySet()) {
-                // check if the data is belong to summary data
-                if (obvDataList.isSummaryData(key)) {
-                    titleOutput.put(key, key);
+            for (int i = 0; i < records.size(); i++) {
+                record = records.get(i);
+                for (String key : record.keySet()) {
 
-                } // check if the additional data is too long to output
-                else if (!key.equals("trno") && key.toString().length() <= 5) {
-                    titleOutput.put(key, key);
-
-                } // If it is too long for DSSAT, give a warning message
-                else {
-                    sbError.append("! Waring: Unsuitable data for DSSAT observed data (too long): [").append(key).append("]\r\n");
-                }
-            }
-
-            // Check if all necessary field is available
-            for (String title : altTitleList.keySet()) {
-
-                // check which optional data is exist, if not, remove from map
-                if (getValueOr(record, title, "").equals("")) {
-
-                    if (!getValueOr(record, altTitleList.get(title), "").equals("")) {
-                        titleOutput.put(title, altTitleList.get(title));
-                    } else {
-                        sbError.append("! Waring: Incompleted record because missing data : [").append(title).append("]\r\n");
+                    if (!(record.get(key) instanceof String)) {
+                        continue;
+                    } else if (titleOutput.containsKey(key)) {
+                        continue;
+                    } else if (key.equals("trno")) {
+                        continue;
                     }
 
-                } else {
+                    // check if the data is belong to summary data
+                    if (obvDataList.isSummaryData(key)) {
+                        titleOutput.put(key, key);
+
+                    } // check if the additional data is too long to output
+                    else if (key.toString().length() <= 5) {
+                        titleOutput.put(key, key);
+
+                    } // If it is too long for DSSAT, give a warning message
+                    else {
+                        sbError.append("! Waring: Unsuitable data for DSSAT observed data (too long): [").append(key).append("]\r\n");
+                    }
+                }
+
+                // Check if all necessary field is available
+                for (String title : altTitleList.keySet()) {
+
+                    // check which optional data is exist, if not, remove from map
+                    if (getValueOr(record, title, "").equals("")) {
+
+                        if (!getValueOr(record, altTitleList.get(title), "").equals("")) {
+                            titleOutput.put(title, altTitleList.get(title));
+                        } else {
+                            sbError.append("! Waring: Incompleted record because missing data : [").append(title).append("]\r\n");
+                        }
+
+                    } else {
+                    }
                 }
             }
 
