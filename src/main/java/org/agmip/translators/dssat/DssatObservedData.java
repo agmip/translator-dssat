@@ -2,6 +2,7 @@ package org.agmip.translators.dssat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Define observed data codes
@@ -10,10 +11,10 @@ import java.util.HashMap;
  */
 public class DssatObservedData {
 
-    private ArrayList summaryList = new ArrayList();        // Define the variables used in AFile
-    private ArrayList timeCourseList = new ArrayList();     // Define the variables used in TFile
-    private ArrayList dateTypeList = new ArrayList();       // Define the variables of data types
-    private HashMap dapDateTypeList = new HashMap();        // Define the variables of data types comes with day after planting (dap) variable; value means dap variable code
+    private HashSet summaryList = new HashSet();        // Define the variables used in AFile
+    private HashSet timeCourseList = new HashSet();     // Define the variables used in TFile
+    private HashSet dateTypeList = new HashSet();       // Define the variables of data types
+    private HashMap dapDateTypeList = new HashMap();    // Define the variables of data types comes with day after planting (dap) variable; value means dap variable code
 
     public DssatObservedData() {
 
@@ -739,7 +740,7 @@ public class DssatObservedData {
      * @return summary variable list
      */
     public ArrayList getSummaryList() {
-        return summaryList;
+        return new ArrayList(summaryList);
     }
 
     /**
@@ -748,7 +749,7 @@ public class DssatObservedData {
      * @return time-course variable list
      */
     public ArrayList getTimeCourseList() {
-        return timeCourseList;
+        return new ArrayList(timeCourseList);
     }
 
     /**
@@ -757,7 +758,7 @@ public class DssatObservedData {
      * @return list of data type variable
      */
     public ArrayList getDateTypeList() {
-        return dateTypeList;
+        return new ArrayList(dateTypeList);
     }
 
     /**
