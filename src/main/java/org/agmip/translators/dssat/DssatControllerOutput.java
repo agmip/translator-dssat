@@ -86,7 +86,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 recordSWData(expData, new DssatWeatherOutput());
             } else {
                 ArrayList<HashMap> soilArrTmp = new ArrayList();
-//                ArrayList<HashMap> wthArrTmp = new ArrayList();
+                ArrayList<HashMap> wthArrTmp = new ArrayList();
                 for (int j = 0; j < rootArr.size(); j++) {
                     soil_id = getObjectOr(rootArr.get(j), "soil_id", "");
                     wth_id = getObjectOr(rootArr.get(j), "wst_id", "");
@@ -101,11 +101,11 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     recordSWData(soilTmp, new DssatSoilOutput());
                     recordSWData(wthTmp, new DssatWeatherOutput());
                     soilArrTmp.add((HashMap) soilTmp.get("soil"));
-//                    wthArrTmp.add(wthTmp);
+                    wthArrTmp.add(wthTmp);
                     rootArr.get(j).put("wst_id", getObjectOr(wthTmp, "wst_id", wth_id));
                 }
                 expData.put("soil", soilArrTmp);
-//                expData.put("weather", wthArrTmp);
+                expData.put("weather", wthArrTmp);
             }
 
             DssatCommonOutput[] outputs = {

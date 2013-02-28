@@ -36,9 +36,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
         // Initial variables
         HashMap expData = (HashMap) result;
         ArrayList<HashMap> soilArr = readSWData(expData, "soil");
-//        ArrayList<HashMap> wthArr = readSWData(expData, "weather");
+        ArrayList<HashMap> wthArr = readSWData(expData, "weather");
         HashMap soilData;
-//        HashMap wthData;
+        HashMap wthData;
         BufferedWriter bwX;                          // output object
         StringBuilder sbGenData = new StringBuilder();      // construct the data info in the output
         StringBuilder sbNotesData = new StringBuilder();      // construct the data info in the output
@@ -196,13 +196,16 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 if (soilData == null) {
                     soilData = new HashMap();
                 }
-//                if (i < wthArr.size()) {
-//                    wthData = wthArr.get(i);
-//                } else if (wthArr.isEmpty()) {
-//                    wthData = new HashMap();
-//                } else {
-//                    wthData = wthArr.get(0);
-//                }
+                if (i < wthArr.size()) {
+                    wthData = wthArr.get(i);
+                } else if (wthArr.isEmpty()) {
+                    wthData = new HashMap();
+                } else {
+                    wthData = wthArr.get(0);
+                }
+                if (wthData == null) {
+                    wthData = new HashMap();
+                }
                 HashMap cuData = new HashMap();
                 HashMap flData = new HashMap();
                 HashMap mpData = new HashMap();
@@ -323,6 +326,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                    smData.put("planting", mpData);
 //                }
                 copyItem(smData, rootData, "sdat");
+                copyItem(smData, getObjectOr(wthData, "weather", new HashMap()), "co2y");
 
                 // Loop all event data
                 for (int j = 0; j < evtArr.size(); j++) {
@@ -977,6 +981,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         StringBuilder sb = new StringBuilder();
         String nitro = "Y";
         String water = "Y";
+        String co2 = "M";
         String sdate;
         String sm = String.format("%2d", smid);
         ArrayList<HashMap> dataArr;
@@ -1017,6 +1022,12 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                }
 //            }
 //        }
+        
+        // Check if CO2Y value is provided and the value is positive, then set CO2 switch to W
+        String co2y = getValueOr(trData, "co2y", "").trim();
+        if (!co2y.equals("") && !co2y.startsWith("-")) {
+            co2 = "W";
+        }
 
         sdate = getValueOr(trData, "sdat", "").toString();
         if (sdate.equals("")) {
@@ -1029,7 +1040,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
         sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
         sb.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
-        sb.append(sm).append(" OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     Y     M\r\n");
+        sb.append(sm).append(" OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     Y     ").append(co2).append("\r\n");
         sb.append("@N METHODS     WTHER INCON LIGHT EVAPO INFIL PHOTO HYDRO NSWIT MESOM MESEV MESOL\r\n");
         sb.append(sm).append(" ME              M     M     E     R     S     L     R     1     P     S     2\r\n"); // P.S. 2012/09/02 MESOM "G" -> "P"
         sb.append("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
