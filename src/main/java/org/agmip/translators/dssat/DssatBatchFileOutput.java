@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.util.MapUtil.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DSSAT Batch File I/O API Class
@@ -17,12 +19,15 @@ import static org.agmip.util.MapUtil.*;
  */
 public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtachFile {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DssatBatchFileOutput.class);
+
     /**
      * DSSAT Batch File Output method
      *
      * @param arg0 file output path
      * @param results array of data holder object
      */
+    @Override
     public void writeFile(String arg0, ArrayList<HashMap> results) {
 
         // Initial variables
@@ -110,8 +115,7 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
             bwB.write(sbData.toString());
             bwB.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(DssatCommonOutput.getStackTrace(e));
         }
 
     }
@@ -191,8 +195,7 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
             bwB.write(sbData.toString());
             bwB.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(DssatCommonOutput.getStackTrace(e));
         }
     }
 
@@ -204,7 +207,7 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
      */
     private String getCropName(Map result) {
         String ret;
-        String crid = null;
+        String crid;
 
         // Get crop id
         crid = getCrid(result);
