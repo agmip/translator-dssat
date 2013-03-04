@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import static org.agmip.util.MapUtil.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DSSAT Observation Data I/O API Class
@@ -14,6 +16,8 @@ import static org.agmip.util.MapUtil.*;
  * @version 1.0
  */
 public class DssatTFileOutput extends DssatCommonOutput {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DssatTFileOutput.class);
 
     /**
      * DSSAT Observation Data Output method
@@ -168,8 +172,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
             bwT.write(sbData.toString());
             bwT.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(DssatCommonOutput.getStackTrace(e));
         }
     }
 }

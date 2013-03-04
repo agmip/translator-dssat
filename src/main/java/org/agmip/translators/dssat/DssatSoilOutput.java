@@ -9,6 +9,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.util.MapUtil.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DSSAT Soil Data I/O API Class
@@ -17,6 +19,8 @@ import static org.agmip.util.MapUtil.*;
  * @version 1.0
  */
 public class DssatSoilOutput extends DssatCommonOutput {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DssatSoilOutput.class);
 
     /**
      * DSSAT Soil Data Output method
@@ -36,7 +40,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
         BufferedWriter bwS;                             // output object
         StringBuilder sbTitle = new StringBuilder();
         StringBuilder sbSites = new StringBuilder();
-        StringBuilder sbData = new StringBuilder();     // construct the data info in the output
+        StringBuilder sbData;                           // construct the data info in the output
         StringBuilder sbLyrP2 = new StringBuilder();    // output string for second part of layer data
         boolean p2Flg;
         String[] p2Ids = {"slpx", "slpt", "slpo", "caco3", "slal", "slfe", "slmn", "slbs", "slpa", "slpb", "slke", "slmg", "slna", "slsu", "slec", "slca"};
@@ -228,8 +232,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
             bwS.close();
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(DssatCommonOutput.getStackTrace(e));
         }
     }
 }

@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 
 /**
  * DSSAT Soil Data I/O API Class
- * 
+ *
  * @author Meng Zhang
  * @version 1.0
  */
@@ -18,9 +18,8 @@ public class DssatSoilInput extends DssatCommonInput {
     public String layerKey = "soilLayer";  // P.S. the key name might change
 
     /**
-     * Constructor with no parameters
-     * Set jsonKey as "soil"
-     * 
+     * Constructor with no parameters Set jsonKey as "soil"
+     *
      */
     public DssatSoilInput() {
         super();
@@ -29,8 +28,8 @@ public class DssatSoilInput extends DssatCommonInput {
 
     /**
      * DSSAT Soil Data input method for only inputing soil file
-     * 
-     * @param brMap  The holder for BufferReader objects for all files
+     *
+     * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
     @Override
@@ -44,9 +43,10 @@ public class DssatSoilInput extends DssatCommonInput {
     }
 
     /**
-     * DSSAT Soil Data input method for Controller using (return map will not be compressed)
-     * 
-     * @param brMap  The holder for BufferReader objects for all files
+     * DSSAT Soil Data input method for Controller using (return map will not be
+     * compressed)
+     *
+     * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
      */
     protected ArrayList<HashMap> readSoilSites(HashMap brMap, HashMap ret) throws IOException {
@@ -224,8 +224,8 @@ public class DssatSoilInput extends DssatCommonInput {
 
     /**
      * Set reading flgs for title lines (marked with *)
-     * 
-     * @param line  the string of reading line
+     *
+     * @param line the string of reading line
      */
     @Override
     protected void setTitleFlgs(String line) {

@@ -11,21 +11,22 @@ import static org.agmip.util.MapUtil.*;
  * @author Meng Zhang
  */
 public class DssatWthFileHelper {
-    
+
     private HashSet<String> names = new HashSet();
     private HashMap<String, String> hashToName = new HashMap();
     private int defInsiName = 0xAAAA;
-    
+
     /**
-     * Generate the weather file name for auto-generating (extend name not included)
+     * Generate the weather file name for auto-generating (extend name not
+     * included)
      *
      * @param wthData weather data holder
      * @return the weather file name
      */
     public String createWthFileName(Map wthData) {
-        
+
         String hash = getObjectOr(wthData, "wst_id", "").toString();
-        
+
         if (hashToName.containsKey(hash)) {
             return hashToName.get(hash);
         } else {
@@ -46,12 +47,13 @@ public class DssatWthFileHelper {
             return wst_id;
         }
     }
-    
+
     /**
-     * Get the 4-bit institute code for weather file name, if not available from data holder, then use default code
-     * 
-     * @param wthData   Weather data holder
-     * @return 
+     * Get the 4-bit institute code for weather file name, if not available from
+     * data holder, then use default code
+     *
+     * @param wthData Weather data holder
+     * @return
      */
     private String getWthInsiCodeOr(Map wthData) {
         String insiName = getWthInsiCode(wthData);
@@ -61,16 +63,15 @@ public class DssatWthFileHelper {
             return insiName;
         }
     }
+
     /**
      * Generate the institute code
-     * 
-     * @return 
+     *
+     * @return
      */
     private String getNextDefName() {
         return Integer.toHexString(defInsiName++).toUpperCase();
     }
-    
-    
 
     /**
      * Get the 4-bit institute code for weather file nam
@@ -79,27 +80,27 @@ public class DssatWthFileHelper {
      * @return the 4-bit institute code
      */
     public static String getWthInsiCode(Map wthData) {
+        String wst_name = getValueOr(wthData, "wst_name", "");
+        if (wst_name.matches("(\\w{4})|(\\w{8})")) {
+            return wst_name;
+        }
+        
         String wst_id = getValueOr(wthData, "wst_id", "");
         if (wst_id.matches("(\\w{4})|(\\w{8})")) {
             return wst_id;
         }
-        
+
         wst_id = getValueOr(wthData, "dssat_wst_id", "");
         if (wst_id.matches("(\\w{4})|(\\w{8})")) {
             return wst_id;
         }
-        
+
         return "";
-//        String agmipFileHack = getValueOr(wthData, "wst_name", "");
-//        if (agmipFileHack.length() >= 4) {
-//            return agmipFileHack.substring(0, 4).toUpperCase();
-//        } else {
-//            return "";
-//        }
     }
-    
+
     /**
-     * Get the last 2-bit year number and 2-bit of the duration for weather file name
+     * Get the last 2-bit year number and 2-bit of the duration for weather file
+     * name
      *
      * @param wthData weather data holder
      * @return the 4-bit number for year and duration
@@ -128,8 +129,7 @@ public class DssatWthFileHelper {
                 }
             }
         }
-        
+
         return yearDur;
     }
-
 }

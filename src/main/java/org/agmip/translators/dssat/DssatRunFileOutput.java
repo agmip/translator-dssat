@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DSSAT Run File I/O API Class
@@ -16,12 +18,15 @@ import java.util.Map;
  */
 public class DssatRunFileOutput extends DssatCommonOutput implements DssatBtachFile {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DssatRunFileOutput.class);
+
     /**
      * DSSAT Run File Output method
      *
      * @param arg0 file output path
      * @param results array of data holder object
      */
+    @Override
     public void writeFile(String arg0, ArrayList<HashMap> results) {
         writeFile(arg0, new HashMap());
     }
@@ -54,8 +59,7 @@ public class DssatRunFileOutput extends DssatCommonOutput implements DssatBtachF
             // Output finish
             bwR.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(DssatCommonOutput.getStackTrace(e));
         }
     }
 }

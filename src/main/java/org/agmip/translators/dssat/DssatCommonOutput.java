@@ -1,11 +1,15 @@
 package org.agmip.translators.dssat;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.agmip.core.types.TranslatorOutput;
 import static org.agmip.util.MapUtil.*;
 
@@ -250,7 +254,10 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                     }
                     // If the exname do not follow the Dssat rule
                     if (!ret.matches("[\\w ]{1,6}\\d{2}$")) {
-                        ret = ret.substring(0, ret.length() - 2) + "01";
+                        if (ret.length() > 6) {
+                            ret = ret.substring(0, 6);
+                        }
+                        ret += "01";
                     }
                 } catch (Exception e) {
                     ret = "TEMP0001";
@@ -336,7 +343,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     protected void decompressData(ArrayList arr) {
 
         HashMap fstData = null; // The first data record (Map type)
-        HashMap cprData = null; // The following data record which will be compressed
+        HashMap cprData;        // The following data record which will be compressed
 
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i) instanceof ArrayList) {
@@ -438,5 +445,65 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         defValI = "-99";
         sbError = new StringBuilder();
         outputFile = null;
+    }
+
+    protected static String getStackTrace(Throwable aThrowable) {
+        final Writer result = new StringWriter();
+        final PrintWriter printWriter = new PrintWriter(result);
+        aThrowable.printStackTrace(printWriter);
+        return result.toString();
+    }
+
+    protected class HeaderArrayList<E> extends ArrayList<E> {
+
+        private HashSet<E> items = new HashSet();
+        private HashSet<E> curItems;
+
+        @Override
+        public boolean contains(Object header) {
+            return items.contains(header);
+        }
+
+        @Override
+        public boolean add(E e) {
+            if (!contains(e)) {
+                super.add(e);
+                items.add(e);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
+        @Override
+        public E get(int index) {
+            if (curItems != null) {
+                curItems.remove(super.get(index));
+            }
+            return super.get(index);
+        }
+        
+        public void seCurItems(Set set) {
+            curItems = new HashSet();
+            curItems.addAll(set);
+        }
+        
+        public boolean hasMoreItem() {
+            if (curItems == null || curItems.isEmpty()) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        
+        public E applyNext() {
+            if (hasMoreItem()) {
+                E ret = curItems.iterator().next();
+                curItems.remove(ret);
+                this.add(ret);
+                return ret;
+            }
+            return null;
+        }
     }
 }
