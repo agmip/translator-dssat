@@ -933,11 +933,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 keys[9] = "sm_harvests";
 
                 // Loop all the simulation control records
+                sbData.append("*SIMULATION CONTROLS\r\n");
                 for (int idx = 0; idx < smArr.size(); idx++) {
                     secData = (HashMap) smArr.get(idx);
 
                     if (secData.containsKey("sm_general")) {
-                        sbData.append("*SIMULATION CONTROLS\r\n");
                         secData.remove("sm");
 //                        Object[] keys = secData.keySet().toArray();
                         for (int i = 0; i < keys.length; i++) {
@@ -1036,7 +1036,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
         }
         sdate = formatDateStr(sdate);
 
-        sb.append("*SIMULATION CONTROLS\r\n");
         sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
         sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
         sb.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
