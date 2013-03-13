@@ -259,7 +259,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 // remove the "_trno" in the soil_id when soil analysis is available
                 String soilId = getValueOr(flData, "soil_id", "");
                 if (soilId.length() > 10 && soilId.matches("\\w+_\\d+")) {
-                    flData.put("soil_id", soilId.replaceAll("_\\d+$", ""));
+                    flData.put("soil_id", getSoilID(flData));
                 }
                 flNum = setSecDataArr(flData, flArr);
 
@@ -485,7 +485,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 if (getObjectOr(secData, "wst_id", "").equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [wst_id]\r\n");
                 }
-                String soil_id = getSoilID(secData);
+                String soil_id = getValueOr(result, "soil_id", defValC);
                 if (soil_id.equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [soil_id]\r\n");
                 } else if (soil_id.length() > 10) {
