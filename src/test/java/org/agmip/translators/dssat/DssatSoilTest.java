@@ -55,7 +55,7 @@ public class DssatSoilTest {
         File file = obDssatSoilOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
-            assertTrue(file.getName().equals("IB.SOL"));
+            assertEquals("IB.SOL", file.getName());
             assertTrue(file.delete());
         }
     }
