@@ -733,9 +733,20 @@ public abstract class DssatCommonInput implements TranslatorInput {
         if (secArr.isEmpty() || value == null) {
             return ret;
         }
-        for (int i = 0; i < secArr.size(); i++) {
-            if (value.equals(((HashMap) secArr.get(i)).get(key))) {
-                return (HashMap) secArr.get(i);
+        if (key.equals("wst_id")) {
+            for (int i = 0; i < secArr.size(); i++) {
+                if (value.matches("\\w{4}\\d{4}$")) {
+                    value = value.substring(0, 4);
+                }
+                if (value.equals(((HashMap) secArr.get(i)).get(key))) {
+                    return (HashMap) secArr.get(i);
+                }
+            }
+        } else {
+            for (int i = 0; i < secArr.size(); i++) {
+                if (value.equals(((HashMap) secArr.get(i)).get(key))) {
+                    return (HashMap) secArr.get(i);
+                }
             }
         }
 

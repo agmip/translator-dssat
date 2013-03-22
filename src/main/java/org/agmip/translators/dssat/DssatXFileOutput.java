@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public class DssatXFileOutput extends DssatCommonOutput {
 
     private static final Logger LOG = LoggerFactory.getLogger(DssatXFileOutput.class);
-    public static final DssatCRIDHelper crHelper = new DssatCRIDHelper();
+//    public static final DssatCRIDHelper crHelper = new DssatCRIDHelper();
 
     /**
      * DSSAT Experiment Data Output method
@@ -259,7 +259,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 // remove the "_trno" in the soil_id when soil analysis is available
                 String soilId = getValueOr(flData, "soil_id", "");
                 if (soilId.length() > 10 && soilId.matches("\\w+_\\d+")) {
-                    flData.put("soil_id", soilId.replaceAll("_\\d+$", ""));
+                    flData.put("soil_id", getSoilID(flData));
                 }
                 flNum = setSecDataArr(flData, flArr);
 
@@ -485,7 +485,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 if (getObjectOr(secData, "wst_id", "").equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [wst_id]\r\n");
                 }
-                String soil_id = getSoilID(secData);
+                String soil_id = getValueOr(result, "soil_id", defValC);
                 if (soil_id.equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [soil_id]\r\n");
                 } else if (soil_id.length() > 10) {
@@ -933,11 +933,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 keys[9] = "sm_harvests";
 
                 // Loop all the simulation control records
+                sbData.append("*SIMULATION CONTROLS\r\n");
                 for (int idx = 0; idx < smArr.size(); idx++) {
                     secData = (HashMap) smArr.get(idx);
 
                     if (secData.containsKey("sm_general")) {
-                        sbData.append("*SIMULATION CONTROLS\r\n");
                         secData.remove("sm");
 //                        Object[] keys = secData.keySet().toArray();
                         for (int i = 0; i < keys.length; i++) {
@@ -1022,7 +1022,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                }
 //            }
 //        }
-        
+
         // Check if CO2Y value is provided and the value is positive, then set CO2 switch to W
         String co2y = getValueOr(trData, "co2y", "").trim();
         if (!co2y.equals("") && !co2y.startsWith("-")) {
@@ -1036,7 +1036,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
         }
         sdate = formatDateStr(sdate);
 
-        sb.append("*SIMULATION CONTROLS\r\n");
         sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
         sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
         sb.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
@@ -1162,8 +1161,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
     private void translateTo2BitCrid(HashMap cuData, String id) {
         String crid = getObjectOr(cuData, id, "");
         if (!crid.equals("")) {
-            DssatCRIDHelper crids = new DssatCRIDHelper();
-            cuData.put(id, crids.get2BitCrid(crid));
+//            DssatCRIDHelper crids = new DssatCRIDHelper();
+            cuData.put(id, DssatCRIDHelper.get2BitCrid(crid));
         }
     }
 

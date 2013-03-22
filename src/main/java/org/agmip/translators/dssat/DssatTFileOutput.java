@@ -76,7 +76,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
             // Initial BufferedWriter
             String fileName = getFileName(result, "T");
             if (fileName.endsWith(".XXT")) {
-                String crid = getValueOr(result, "crid", "XX");
+                String crid = DssatCRIDHelper.get2BitCrid(getValueOr(result, "crid", "XX"));
                 fileName = fileName.replaceAll("XX", crid);
             }
             arg0 = revisePath(arg0);
