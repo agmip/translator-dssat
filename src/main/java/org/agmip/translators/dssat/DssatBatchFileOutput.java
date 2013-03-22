@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import org.agmip.ace.LookupCodes;
 import static org.agmip.util.MapUtil.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -213,70 +214,77 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
         crid = getCrid(result);
 
         // Get crop name string
-        if ("BH".equals(crid)) {
-            ret = "Bahia";
-        } else if ("BA".equals(crid)) {
-            ret = "Barley";
-        } else if ("BR".equals(crid)) {
-            ret = "Brachiaria";
-        } else if ("CB".equals(crid)) {
-            ret = "Cabbage";
-        } else if ("CS".equals(crid)) {
-            ret = "Cassava";
-        } else if ("CH".equals(crid)) {
-            ret = "Chickpea";
-        } else if ("CO".equals(crid)) {
-            ret = "Cotton";
-        } else if ("CP".equals(crid)) {
-            ret = "Cowpea";
-        } else if ("BN".equals(crid)) {
-            ret = "Drybean";
-        } else if ("FB".equals(crid)) {
-            ret = "FabaBean";
-        } else if ("FA".equals(crid)) {
-            ret = "Fallow";
-        } else if ("GB".equals(crid)) {
-            ret = "GreenBean";
-        } else if ("MZ".equals(crid)) {
-            ret = "Maize";
-        } else if ("ML".equals(crid)) {
-            ret = "Millet";
-        } else if ("PN".equals(crid)) {
-            ret = "Peanut";
-        } else if ("PR".equals(crid)) {
-            ret = "Pepper";
-        } else if ("PI".equals(crid)) {
-            ret = "PineApple";
-        } else if ("PT".equals(crid)) {
-            ret = "Potato";
-        } else if ("RI".equals(crid)) {
-            ret = "Rice";
-        } else if ("SG".equals(crid)) {
-            ret = "Sorghum";
-        } else if ("SB".equals(crid)) {
-            ret = "Soybean";
-        } else if ("SC".equals(crid)) {
-            ret = "Sugarcane";
-        } else if ("SU".equals(crid)) {
-            ret = "Sunflower";
-        } else if ("SW".equals(crid)) {
-            ret = "SweetCorn";
-        } else if ("TN".equals(crid)) {
-            ret = "Tanier";
-        } else if ("TR".equals(crid)) {
-            ret = "Taro";
-        } else if ("TM".equals(crid)) {
-            ret = "Tomato";
-        } else if ("VB".equals(crid)) {
-            ret = "Velvetbean";
-        } else if ("WH".equals(crid)) {
-            ret = "Wheat";
-        } else if ("SQ".equals(crid)) {
-            ret = "Sequence";
-        } else {
+        ret = LookupCodes.lookupCode("CRID", crid, "common", "DSSAT");
+        if (ret.equals(crid)) {
             ret = "Unkown";
             sbError.append("! Warning: Undefined crop id: [").append(crid).append("]\r\n");
         }
+
+//        // Get crop name string
+//        if ("BH".equals(crid)) {
+//            ret = "Bahia";
+//        } else if ("BA".equals(crid)) {
+//            ret = "Barley";
+//        } else if ("BR".equals(crid)) {
+//            ret = "Brachiaria";
+//        } else if ("CB".equals(crid)) {
+//            ret = "Cabbage";
+//        } else if ("CS".equals(crid)) {
+//            ret = "Cassava";
+//        } else if ("CH".equals(crid)) {
+//            ret = "Chickpea";
+//        } else if ("CO".equals(crid)) {
+//            ret = "Cotton";
+//        } else if ("CP".equals(crid)) {
+//            ret = "Cowpea";
+//        } else if ("BN".equals(crid)) {
+//            ret = "Drybean";
+//        } else if ("FB".equals(crid)) {
+//            ret = "FabaBean";
+//        } else if ("FA".equals(crid)) {
+//            ret = "Fallow";
+//        } else if ("GB".equals(crid)) {
+//            ret = "GreenBean";
+//        } else if ("MZ".equals(crid)) {
+//            ret = "Maize";
+//        } else if ("ML".equals(crid)) {
+//            ret = "Millet";
+//        } else if ("PN".equals(crid)) {
+//            ret = "Peanut";
+//        } else if ("PR".equals(crid)) {
+//            ret = "Pepper";
+//        } else if ("PI".equals(crid)) {
+//            ret = "PineApple";
+//        } else if ("PT".equals(crid)) {
+//            ret = "Potato";
+//        } else if ("RI".equals(crid)) {
+//            ret = "Rice";
+//        } else if ("SG".equals(crid)) {
+//            ret = "Sorghum";
+//        } else if ("SB".equals(crid)) {
+//            ret = "Soybean";
+//        } else if ("SC".equals(crid)) {
+//            ret = "Sugarcane";
+//        } else if ("SU".equals(crid)) {
+//            ret = "Sunflower";
+//        } else if ("SW".equals(crid)) {
+//            ret = "SweetCorn";
+//        } else if ("TN".equals(crid)) {
+//            ret = "Tanier";
+//        } else if ("TR".equals(crid)) {
+//            ret = "Taro";
+//        } else if ("TM".equals(crid)) {
+//            ret = "Tomato";
+//        } else if ("VB".equals(crid)) {
+//            ret = "Velvetbean";
+//        } else if ("WH".equals(crid)) {
+//            ret = "Wheat";
+//        } else if ("SQ".equals(crid)) {
+//            ret = "Sequence";
+//        } else {
+//            ret = "Unkown";
+//            sbError.append("! Warning: Undefined crop id: [").append(crid).append("]\r\n");
+//        }
         return ret;
     }
 }

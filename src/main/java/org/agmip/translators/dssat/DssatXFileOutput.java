@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public class DssatXFileOutput extends DssatCommonOutput {
 
     private static final Logger LOG = LoggerFactory.getLogger(DssatXFileOutput.class);
-    public static final DssatCRIDHelper crHelper = new DssatCRIDHelper();
+//    public static final DssatCRIDHelper crHelper = new DssatCRIDHelper();
 
     /**
      * DSSAT Experiment Data Output method
@@ -1022,7 +1022,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                }
 //            }
 //        }
-        
+
         // Check if CO2Y value is provided and the value is positive, then set CO2 switch to W
         String co2y = getValueOr(trData, "co2y", "").trim();
         if (!co2y.equals("") && !co2y.startsWith("-")) {
@@ -1161,8 +1161,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
     private void translateTo2BitCrid(HashMap cuData, String id) {
         String crid = getObjectOr(cuData, id, "");
         if (!crid.equals("")) {
-            DssatCRIDHelper crids = new DssatCRIDHelper();
-            cuData.put(id, crids.get2BitCrid(crid));
+//            DssatCRIDHelper crids = new DssatCRIDHelper();
+            cuData.put(id, DssatCRIDHelper.get2BitCrid(crid));
         }
     }
 
