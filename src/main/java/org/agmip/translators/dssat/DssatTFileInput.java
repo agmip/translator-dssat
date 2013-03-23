@@ -135,7 +135,7 @@ public class DssatTFileInput extends DssatCommonInput {
                         // Read line and save into return holder
                         file.putAll(readLine(line, formats));
                         file.put("exname", exname);
-                        file.put("crid", crid);
+                        file.put("crid", DssatCRIDHelper.get3BitCrid(crid));
                         flg[0] = "data";
 
                     } // Read data info 

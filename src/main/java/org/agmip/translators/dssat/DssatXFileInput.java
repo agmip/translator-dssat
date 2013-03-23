@@ -298,6 +298,11 @@ public class DssatXFileInput extends DssatCommonInput {
                         if (cul_id != null) {
                             tmp.put("dssat_cul_id", cul_id);
                         }
+                        Object crid = tmp.get("crid");
+                        if (crid == null) {
+                            crid = fileName.replaceAll("\\w+\\.", "").replaceAll("X$", "");
+                        }
+                        tmp.put("crid", DssatCRIDHelper.get3BitCrid((String) crid));
                         cuArr.add(tmp);
                     } else {
                     }
@@ -329,7 +334,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         wid = (String) tmp.get("wst_id");
                         if (wid != null && wid.matches("\\w{4}\\d{4}$")) {
                             wid = wid.substring(0, 4);
-                            tmp.put("wst_id", wid);
+//                            tmp.put("wst_id", wid);
                         }
 
                     }// // Read field info 2nd line

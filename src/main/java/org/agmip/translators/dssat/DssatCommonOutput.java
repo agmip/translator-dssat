@@ -211,13 +211,12 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                 if (crid == null) {
                     crid = (String) events.get(i).get("crid");
                 } else if (!crid.equals(events.get(i).get("crid"))) {
-                    crid = "SQ";
-                    break;
+                    return "SQ";
                 }
             }
         }
-        DssatCRIDHelper crids = new DssatCRIDHelper();
-        return crids.get2BitCrid(crid);
+//        DssatCRIDHelper crids = new DssatCRIDHelper();
+        return DssatCRIDHelper.get2BitCrid(crid);
     }
 
     /**
@@ -474,7 +473,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                 return false;
             }
         }
-        
+
         @Override
         public E get(int index) {
             if (curItems != null) {
@@ -482,12 +481,12 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             }
             return super.get(index);
         }
-        
+
         public void seCurItems(Set set) {
             curItems = new HashSet();
             curItems.addAll(set);
         }
-        
+
         public boolean hasMoreItem() {
             if (curItems == null || curItems.isEmpty()) {
                 return false;
@@ -495,7 +494,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                 return true;
             }
         }
-        
+
         public E applyNext() {
             if (hasMoreItem()) {
                 E ret = curItems.iterator().next();
