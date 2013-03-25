@@ -142,7 +142,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         writeSoilFiles(arg0);
 
         // compress all output files into one zip file
-        createZip();
+        //createZip();
     }
 
     /**
@@ -175,9 +175,9 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 writeSingleExp(arg0, result, outputs);
 
                 // compress all output files into one zip file
-                outputFile = new File(revisePath(arg0) + getZipFileName(outputs));
+                //outputFile = new File(revisePath(arg0) + getZipFileName(outputs));
 
-                createZip();
+                //createZip();
 
             } else {
                 writeMultipleExp(arg0, result);

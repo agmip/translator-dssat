@@ -12,6 +12,7 @@ import java.util.HashMap;
 import org.agmip.util.JSONAdapter;
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -44,6 +45,7 @@ public class DssatControllerTest {
     }
 
     @Test
+    @Ignore
     public void test() throws IOException, Exception {
         HashMap result;
         result = obDssatControllerInput.readFile(resource.getPath());
