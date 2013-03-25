@@ -228,7 +228,12 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      */
     protected String getFileName(Map result, String fileType) {
         String exname = getExName(result);
-        String crid = getCrid(result);
+        String crid;
+        if (getValueOr(result, "seasonal_dome_applied", "N").equals("Y")) {
+            crid = "SN";
+        } else {
+            crid = getCrid(result);
+        }
         if (exname.length() == 10) {
             if (crid.equals("XX")) {
                 crid = exname.substring(exname.length() - 2, exname.length());
@@ -276,6 +281,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             }
         }
 
+        
         exToFileMap.put(exname + "_" + crid, ret + "." + crid);
         fileNameSet.add(ret + "." + crid);
 
