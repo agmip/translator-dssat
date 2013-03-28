@@ -955,6 +955,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 }
 
             } else {
+                sbData.append("*SIMULATION CONTROLS\r\n");
                 sbData.append(createSMMAStr(1, new HashMap()));
             }
 
@@ -1035,6 +1036,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             sdate = getValueOr(subData, "date", defValD);
         }
         sdate = formatDateStr(sdate);
+        sdate = String.format("%5s", sdate);
 
         sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
         sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
