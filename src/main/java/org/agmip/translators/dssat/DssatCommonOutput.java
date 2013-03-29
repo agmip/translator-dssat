@@ -1,9 +1,11 @@
 package org.agmip.translators.dssat;
 
+import com.google.common.base.Function;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -73,39 +75,19 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 
         String ret = "";
         String str = getObjectOr(m, key, defVal);
-        double decimalPower;
-        long decimalPart;
-        double input;
         String[] inputStr = str.split("\\.");
         if (str.trim().equals("")) {
             return String.format("%" + bits + "s", defVal);
+        } else if (str.length() <= bits) {
+            ret = String.format("%1$" + bits + "s", str);
         } else if (inputStr[0].length() > bits) {
             //throw new Exception();
             sbError.append("! Waring: There is a variable [").append(key).append("] with oversized number [").append(ret).append("] (Limitation is ").append(bits).append(" bits)\r\n");
             return String.format("%" + bits + "s", defVal);
         } else {
-            ret = inputStr[0];
-
-            if (inputStr.length > 1 && inputStr[0].length() < bits) {
-
-                if (inputStr[1].length() <= bits - inputStr[0].length() - 1) {
-                    ret = ret + "." + inputStr[1];
-                } else {
-                    try {
-                        input = Math.abs(Double.valueOf(str));
-                    } catch (Exception e) {
-                        // TODO throw exception
-                        return str;
-                    }
-                    //decimalPower = Math.pow(10, Math.min(bits - inputStr[0].length(), inputStr[1].length()) - 1);
-                    decimalPower = Math.pow(10, bits - inputStr[0].length() - 1);
-                    decimalPart = Double.valueOf(Math.round(input * decimalPower) % decimalPower).longValue();
-                    ret = ret + "." + (decimalPart == 0 && (bits - inputStr[0].length() < 2) ? "" : decimalPart);
-                }
-            }
-            if (ret.length() < bits) {
-                ret = String.format("%1$" + bits + "s", ret);
-            }
+            int decimalLength = bits - inputStr[0].length() - 1;
+            decimalLength = decimalLength < 0 ? 0 : decimalLength;
+            ret = org.agmip.common.Functions.round(str, decimalLength);
         }
 
         return ret;
