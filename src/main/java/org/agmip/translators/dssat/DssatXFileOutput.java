@@ -105,26 +105,26 @@ public class DssatXFileOutput extends DssatCommonOutput {
             // GENERAL Section
             sbGenData.append("*GENERAL\r\n");
             // People
-            if (!getObjectOr(expData, "people", "").equals("")) {
-                sbGenData.append(String.format("@PEOPLE\r\n %1$s\r\n", getObjectOr(expData, "people", defValBlank).toString()));
+            if (!getObjectOr(expData, "person_notes", "").equals("")) {
+                sbGenData.append(String.format("@PEOPLE\r\n %1$s\r\n", getObjectOr(expData, "person_notes", defValBlank).toString()));
             }
             // Address
             if (getObjectOr(expData, "institution", "").equals("")) {
-                if (!getObjectOr(expData, "fl_loc_1", "").equals("")
-                        && getObjectOr(expData, "fl_loc_2", "").equals("")
-                        && getObjectOr(expData, "fl_loc_3", "").equals("")) {
-                    sbGenData.append(String.format("@ADDRESS\r\n %3$s, %2$s, %1$s\r\n",
-                            getObjectOr(expData, "fl_loc_1", defValBlank).toString(),
-                            getObjectOr(expData, "fl_loc_2", defValBlank).toString(),
-                            getObjectOr(expData, "fl_loc_3", defValBlank).toString()));
-                }
+//                if (!getObjectOr(expData, "fl_loc_1", "").equals("")
+//                        && getObjectOr(expData, "fl_loc_2", "").equals("")
+//                        && getObjectOr(expData, "fl_loc_3", "").equals("")) {
+//                    sbGenData.append(String.format("@ADDRESS\r\n %3$s, %2$s, %1$s\r\n",
+//                            getObjectOr(expData, "fl_loc_1", defValBlank).toString(),
+//                            getObjectOr(expData, "fl_loc_2", defValBlank).toString(),
+//                            getObjectOr(expData, "fl_loc_3", defValBlank).toString()));
+//                }
             } else {
                 sbGenData.append(String.format("@ADDRESS\r\n %1$s\r\n", getObjectOr(expData, "institution", defValBlank).toString()));
             }
 
             // Site
-            if (!getObjectOr(expData, "site", "").equals("")) {
-                sbGenData.append(String.format("@SITE\r\n %1$s\r\n", getObjectOr(expData, "site", defValBlank).toString()));
+            if (!getObjectOr(expData, "site_name", "").equals("")) {
+                sbGenData.append(String.format("@SITE\r\n %1$s\r\n", getObjectOr(expData, "site_name", defValBlank).toString()));
             }
             // Plot Info
             if (isPlotInfoExist(expData)) {
@@ -136,7 +136,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         formatNumStr(5, expData, "pltln", defValR),
                         formatNumStr(5, expData, "pldr", defValI),
                         formatNumStr(5, expData, "pltsp", defValI),
-                        getObjectOr(expData, "plot_layout", defValC).toString(),
+                        getObjectOr(expData, "pllay", defValC).toString(),
                         formatNumStr(5, expData, "pltha", defValR),
                         formatNumStr(5, expData, "plth#", defValI),
                         formatNumStr(5, expData, "plthl", defValR),
@@ -659,7 +659,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             formatNumStr(5, secData, "pldp", defValR), // P.S. Set default value as "7"(Cancelled)
                             formatNumStr(5, secData, "plmwt", defValR),
                             formatNumStr(5, secData, "page", defValR),
-                            formatNumStr(5, secData, "penv", defValR),
+                            formatNumStr(5, secData, "plenv", defValR),
                             formatNumStr(5, secData, "plph", defValR),
                             formatNumStr(5, secData, "plspl", defValR),
                             getObjectOr(secData, "pl_name", defValC).toString()));
@@ -896,8 +896,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                 getObjectOr(secData, "hastg", defValC).toString(),
                                 getObjectOr(secData, "hacom", defValC).toString(),
                                 getObjectOr(secData, "hasiz", defValC).toString(),
-                                formatNumStr(5, secData, "hapc", defValR),
-                                formatNumStr(5, secData, "habpc", defValR),
+                                formatNumStr(5, secData, "hap%", defValR),
+                                formatNumStr(5, secData, "hab%", defValR),
                                 getObjectOr(secData, "ha_name", defValC).toString()));
 
                     }
@@ -1115,7 +1115,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
      */
     private boolean isPlotInfoExist(Map expData) {
 
-        String[] plotIds = {"plta", "pltr#", "pltln", "pldr", "pltsp", "plot_layout", "pltha", "plth#", "plthl", "plthm"};
+        String[] plotIds = {"plta", "pltr#", "pltln", "pldr", "pltsp", "pllay", "pltha", "plth#", "plthl", "plthm"};
         for (int i = 0; i < plotIds.length; i++) {
             if (!getValueOr(expData, plotIds[i], "").equals("")) {
                 return true;
