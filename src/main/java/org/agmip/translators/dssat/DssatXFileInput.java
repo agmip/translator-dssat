@@ -463,6 +463,10 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
                         translateDateStr(tmp, "icdat");
+                        Object icpcr = tmp.get("icpcr");
+                        if (icpcr != null) {
+                            tmp.put("icpcr", DssatCRIDHelper.get3BitCrid((String) icpcr));
+                        }
                         icArr.add(tmp);
                         icdArr = new ArrayList<HashMap>();
                         tmp.put(icEventKey, icdArr);
