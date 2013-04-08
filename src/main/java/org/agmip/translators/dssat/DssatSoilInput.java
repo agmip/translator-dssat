@@ -131,7 +131,7 @@ public class DssatSoilInput extends DssatCommonInput {
 
                         // Set variables' formats
                         formats.clear();
-                        formats.put("scom", 6);
+                        formats.put("sscol", 6);
                         formats.put("salb", 6);
                         formats.put("slu1", 6);
                         formats.put("sldr", 6);
@@ -166,7 +166,7 @@ public class DssatSoilInput extends DssatCommonInput {
                         formats.put("slphw", 6);
                         formats.put("slphb", 6);
                         formats.put("slcec", 6);
-                        formats.put("sadc", 6);
+                        formats.put("sladc", 6);
                         // Read line and save into return holder
 //                        addToArray((ArrayList) ((HashMap) sites.get(sites.size() - 1)).get(layerKey),
 //                                readLine(line, formats),
