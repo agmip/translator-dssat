@@ -170,50 +170,49 @@ public class DssatXFileInput extends DssatCommonInput {
                     // People info
                     if (flg[1].equals("people") && flg[2].equals("data")) {
                         if (checkValidValue(line.trim())) {
-                            meta.put("people", line.trim());
+                            meta.put("person_notes", line.trim());
                         }
 
                     } // Address info
                     else if (flg[1].equals("address") && flg[2].equals("data")) {
-                        String[] addr;
+//                        String[] addr;
                         if (checkValidValue(line.trim())) {
-                            addr = line.split(",[ ]*");
+//                            addr = line.split(",[ ]*");
                             meta.put("institution", line.trim());
                         } else {
-                            addr = new String[0];
+//                            addr = new String[0];
                         }
-                        //                    ret.put("address", line.trim());    // P.S. no longer to use this field
 
-                        switch (addr.length) {
-                            case 0:
-                                break;
-                            case 1:
-                                meta.put("fl_loc_1", addr[0]);
-                                break;
-                            case 2:
-                                meta.put("fl_loc_1", addr[1]);
-                                meta.put("fl_loc_2", addr[0]);
-                                break;
-                            case 3:
-                                meta.put("fl_loc_1", addr[2]);
-                                meta.put("fl_loc_2", addr[1]);
-                                meta.put("fl_loc_3", addr[0]);
-                                break;
-                            default:
-                                meta.put("fl_loc_1", addr[addr.length - 1]);
-                                meta.put("fl_loc_2", addr[addr.length - 2]);
-                                String loc3 = "";
-                                for (int i = 0; i < addr.length - 2; i++) {
-                                    loc3 += addr[i] + ", ";
-                                }
-                                meta.put("fl_loc_3", loc3.substring(0, loc3.length() - 2));
-                        }
+//                        switch (addr.length) {
+//                            case 0:
+//                                break;
+//                            case 1:
+//                                meta.put("fl_loc_1", addr[0]);
+//                                break;
+//                            case 2:
+//                                meta.put("fl_loc_1", addr[1]);
+//                                meta.put("fl_loc_2", addr[0]);
+//                                break;
+//                            case 3:
+//                                meta.put("fl_loc_1", addr[2]);
+//                                meta.put("fl_loc_2", addr[1]);
+//                                meta.put("fl_loc_3", addr[0]);
+//                                break;
+//                            default:
+//                                meta.put("fl_loc_1", addr[addr.length - 1]);
+//                                meta.put("fl_loc_2", addr[addr.length - 2]);
+//                                String loc3 = "";
+//                                for (int i = 0; i < addr.length - 2; i++) {
+//                                    loc3 += addr[i] + ", ";
+//                                }
+//                                meta.put("fl_loc_3", loc3.substring(0, loc3.length() - 2));
+//                        }
 
                     } // Site info
                     else if ((flg[1].equals("site") || flg[1].equals("sites")) && flg[2].equals("data")) {
                         // P.S. site is missing in the master variables list
                         if (checkValidValue(line.trim())) {
-                            meta.put("site", line.trim());
+                            meta.put("site_name", line.trim());
                         }
 
                     } // Plot Info
@@ -226,7 +225,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("pltln", 6);
                         formats.put("pldr", 6);
                         formats.put("pltsp", 6);
-                        formats.put("plot_layout", 6);
+                        formats.put("pllay", 6);
                         formats.put("pltha", 6);
                         formats.put("plth#", 6);
                         formats.put("plthl", 6);
@@ -464,6 +463,10 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
                         translateDateStr(tmp, "icdat");
+                        Object icpcr = tmp.get("icpcr");
+                        if (icpcr != null) {
+                            tmp.put("icpcr", DssatCRIDHelper.get3BitCrid((String) icpcr));
+                        }
                         icArr.add(tmp);
                         icdArr = new ArrayList<HashMap>();
                         tmp.put(icEventKey, icdArr);
@@ -502,7 +505,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("pldp", 6);
                         formats.put("plmwt", 6);
                         formats.put("page", 6);
-                        formats.put("penv", 6);
+                        formats.put("plenv", 6);
                         formats.put("plph", 6);
                         formats.put("plspl", 6);
                         formats.put("pl_name", line.length());
@@ -701,16 +704,16 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Set variables' formats
                         formats.clear();
                         formats.put("ha", 2);
-                        formats.put("hdate", 6);
+                        formats.put("hadat", 6);
                         formats.put("hastg", 6);
                         formats.put("hacom", 6);
                         formats.put("hasiz", 6);
-                        formats.put("hapc", 6);
-                        formats.put("habpc", 6);
+                        formats.put("hap%", 6);
+                        formats.put("hab%", 6);
                         formats.put("ha_name", line.length());
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
-                        translateDateStr(tmp, "hdate");
+                        translateDateStr(tmp, "hadat");
                         haArr.add(tmp);
                     } else {
                     }
@@ -1093,7 +1096,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 // harvest
                 if (!getObjectOr(sqData, "ha", "0").equals("0")) {
                     // add event data into array
-                    addEvent(evtArr, (HashMap) getSectionDataObj(haArr, "ha", sqData.get("ha").toString()), "hdate", "harvest", seqid);
+                    addEvent(evtArr, (HashMap) getSectionDataObj(haArr, "ha", sqData.get("ha").toString()), "hadat", "harvest", seqid);
                 }
 
                 // simulation

@@ -130,7 +130,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
 //                    sbError.append("! Warning: missing data : [slpf], and will automatically use default value '0.92'\r\n");
 //                }
                 sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
-                        getObjectOr(soilSite, "scom", defValC).toString(),
+                        getObjectOr(soilSite, "sscol", defValC).toString(),
                         formatNumStr(5, soilSite, "salb", defValR),
                         formatNumStr(5, soilSite, "slu1", defValR),
                         formatNumStr(5, soilSite, "sldr", defValR),
@@ -187,7 +187,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
                             formatNumStr(5, soilRecord, "slphw", defValR),
                             formatNumStr(5, soilRecord, "slphb", defValR),
                             formatNumStr(5, soilRecord, "slcec", defValR),
-                            formatNumStr(5, soilRecord, "sadc", defValR)));
+                            formatNumStr(5, soilRecord, "sladc", defValR)));
 
                     // part two
                     if (p2Flg) {
