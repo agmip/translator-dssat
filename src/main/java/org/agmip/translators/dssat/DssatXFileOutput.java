@@ -378,14 +378,15 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 }
 
-                // If alternative fields are avaiable for fertilizer data
-                if (mfSubArr.isEmpty()) {
-                    if (!getObjectOr(result, "fen_tot", "").equals("")
-                            || !getObjectOr(result, "fep_tot", "").equals("")
-                            || !getObjectOr(result, "fek_tot", "").equals("")) {
-                        mfSubArr.add(new HashMap());
-                    }
-                }
+                // Cancel for assume default value handling
+//                // If alternative fields are avaiable for fertilizer data
+//                if (mfSubArr.isEmpty()) {
+//                    if (!getObjectOr(result, "fen_tot", "").equals("")
+//                            || !getObjectOr(result, "fep_tot", "").equals("")
+//                            || !getObjectOr(result, "fek_tot", "").equals("")) {
+//                        mfSubArr.add(new HashMap());
+//                    }
+//                }
 
                 cuNum = setSecDataArr(cuData, cuArr);
                 mpNum = setSecDataArr(mpData, mpArr);
