@@ -270,6 +270,11 @@ public class DssatControllerOutput extends DssatCommonOutput {
             } else {
                 soil_id = soil_id.substring(0, 2);
             }
+            
+            Map soil = (Map) data.get("soil");
+            if (soil == null || soil.isEmpty()) {
+                continue;
+            }
 
             if (soilTmp.containsKey(soil_id)) {
                 soilTmp.get(soil_id).add(data);
