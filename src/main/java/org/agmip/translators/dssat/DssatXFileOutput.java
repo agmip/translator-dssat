@@ -1041,10 +1041,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         sdate = String.format("%5s", sdate);
         
         if (!getValueOr(trData, "hadat", "").trim().equals("")) {
-            LOG.info(getValueOr(trData, "hadat", ""));
             harOpt = "R";
-        } else {
-            LOG.info("NO HARVEST DATE FOUND");
         }
 
         sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
