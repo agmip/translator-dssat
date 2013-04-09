@@ -370,6 +370,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         } // harvest event
                         else if (getValueOr(evtData, "event", "").equals("harvest")) {
                             mhSubArr.add(evtData);
+                            copyItem(smData, evtData, "hadat", "date", false);
                         } else {
                         }
                     } else {
@@ -983,6 +984,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         String nitro = "Y";
         String water = "Y";
         String co2 = "M";
+        String harOpt = "M";
         String sdate;
         String sm = String.format("%2d", smid);
         ArrayList<HashMap> dataArr;
@@ -1037,6 +1039,13 @@ public class DssatXFileOutput extends DssatCommonOutput {
         }
         sdate = formatDateStr(sdate);
         sdate = String.format("%5s", sdate);
+        
+        if (!getValueOr(trData, "hadat", "").trim().equals("")) {
+            LOG.info(getValueOr(trData, "hadat", ""));
+            harOpt = "R";
+        } else {
+            LOG.info("NO HARVEST DATE FOUND");
+        }
 
         sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
         sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
@@ -1045,7 +1054,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         sb.append("@N METHODS     WTHER INCON LIGHT EVAPO INFIL PHOTO HYDRO NSWIT MESOM MESEV MESOL\r\n");
         sb.append(sm).append(" ME              M     M     E     R     S     L     R     1     P     S     2\r\n"); // P.S. 2012/09/02 MESOM "G" -> "P"
         sb.append("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
-        sb.append(sm).append(" MA              R     R     R     R     M\r\n");
+        sb.append(sm).append(" MA              R     R     R     R     ").append(harOpt).append("\r\n");
         sb.append("@N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT\r\n");
         sb.append(sm).append(" OU              N     Y     Y     1     Y     Y     N     N     N     N     N     N     N\r\n\r\n");
         sb.append("@  AUTOMATIC MANAGEMENT\r\n");
