@@ -58,6 +58,11 @@
             <artifactId>agmip-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.agmip</groupId>
+            <artifactId>agmip-common-functions</artifactId>
+            <version>1.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
