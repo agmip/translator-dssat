@@ -734,9 +734,14 @@ public abstract class DssatCommonInput implements TranslatorInput {
             return ret;
         }
         if (key.equals("wst_id")) {
+            String wst_id = value;
+            if (value.matches("\\w{4}\\d{4}$")) {
+                wst_id = value.substring(0, 4);
+            }
             for (int i = 0; i < secArr.size(); i++) {
-                if (value.matches("\\w{4}\\d{4}$")) {
-                    value = value.substring(0, 4);
+                Object id = ((HashMap) secArr.get(i)).get(key);
+                if (wst_id.equals(id)) {
+                    return (HashMap) secArr.get(i);
                 }
                 if (value.equals(((HashMap) secArr.get(i)).get(key))) {
                     return (HashMap) secArr.get(i);
