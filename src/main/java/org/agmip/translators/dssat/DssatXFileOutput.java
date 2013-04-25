@@ -487,7 +487,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 if (getObjectOr(secData, "wst_id", "").equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [wst_id]\r\n");
                 }
-                String soil_id = getValueOr(result, "soil_id", defValC);
+                String soil_id = getValueOr(secData, "soil_id", defValC);
                 if (soil_id.equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [soil_id]\r\n");
                 } else if (soil_id.length() > 10) {
@@ -910,50 +910,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
             // SIMULATION CONTROLS and AUTOMATIC MANAGEMENT Section
             if (!smArr.isEmpty()) {
 
-                // Set Title list
-                ArrayList smTitles = new ArrayList();
-                smTitles.add("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME.................... SMODEL\r\n");
-                smTitles.add("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
-                smTitles.add("@N METHODS     WTHER INCON LIGHT EVAPO INFIL PHOTO HYDRO NSWIT MESOM MESEV MESOL\r\n");
-                smTitles.add("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
-                smTitles.add("@N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT\r\n");
-                smTitles.add("@  AUTOMATIC MANAGEMENT\r\n@N PLANTING    PFRST PLAST PH2OL PH2OU PH2OD PSTMX PSTMN\r\n");
-                smTitles.add("@N IRRIGATION  IMDEP ITHRL ITHRU IROFF IMETH IRAMT IREFF\r\n");
-                smTitles.add("@N NITROGEN    NMDEP NMTHR NAMNT NCODE NAOFF\r\n");
-                smTitles.add("@N RESIDUES    RIPCN RTIME RIDEP\r\n");
-                smTitles.add("@N HARVEST     HFRST HLAST HPCNP HPCNR\r\n");
-                String[] keys = new String[10];
-                keys[0] = "sm_general";
-                keys[1] = "sm_options";
-                keys[2] = "sm_methods";
-                keys[3] = "sm_management";
-                keys[4] = "sm_outputs";
-                keys[5] = "sm_planting";
-                keys[6] = "sm_irrigation";
-                keys[7] = "sm_nitrogen";
-                keys[8] = "sm_residues";
-                keys[9] = "sm_harvests";
-
                 // Loop all the simulation control records
                 sbData.append("*SIMULATION CONTROLS\r\n");
                 for (int idx = 0; idx < smArr.size(); idx++) {
                     secData = (HashMap) smArr.get(idx);
-
-                    if (secData.containsKey("sm_general")) {
-                        secData.remove("sm");
-//                        Object[] keys = secData.keySet().toArray();
-                        for (int i = 0; i < keys.length; i++) {
-
-                            sbData.append(smTitles.get(i));
-                            sbData.append(String.format("%2s ", idx + 1)).append(((String) secData.get(keys[i]))).append("\r\n");
-                            if (i == 4) {
-                                sbData.append("\r\n");
-                            }
-                        }
-                        sbData.append("\r\n");
-                    } else {
-                        sbData.append(createSMMAStr(idx + 1, secData));
-                    }
+                    sbData.append(createSMMAStr(idx + 1, secData));
                 }
 
             } else {
@@ -1040,32 +1001,88 @@ public class DssatXFileOutput extends DssatCommonOutput {
         }
         sdate = formatDateStr(sdate);
         sdate = String.format("%5s", sdate);
-        
+
         if (!getValueOr(trData, "hadat", "").trim().equals("")) {
             harOpt = "R";
         }
 
+        String smStr;
+        // GENERAL
         sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
-        sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
+        if (!(smStr = getValueOr(trData, "sm_general", "")).equals("")) {
+            if (!sdate.trim().equals("-99") && !sdate.trim().equals("")) {
+                smStr = replaceSMStr(smStr, sdate, 30);
+            }
+            sb.append(sm).append(" ").append(smStr).append("\r\n");
+        } else {
+            sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
+        }
+        // OPTIONS
         sb.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
-        sb.append(sm).append(" OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     Y     ").append(co2).append("\r\n");
+        if (!(smStr = getValueOr(trData, "sm_options", "")).equals("")) {
+            smStr = replaceSMStr(smStr, co2, 64);
+            sb.append(sm).append(" ").append(smStr).append("\r\n");
+        } else {
+            sb.append(sm).append(" OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     Y     ").append(co2).append("\r\n");
+        }
+        // METHODS
         sb.append("@N METHODS     WTHER INCON LIGHT EVAPO INFIL PHOTO HYDRO NSWIT MESOM MESEV MESOL\r\n");
-        sb.append(sm).append(" ME              M     M     E     R     S     L     R     1     P     S     2\r\n"); // P.S. 2012/09/02 MESOM "G" -> "P"
+        if (!(smStr = getValueOr(trData, "sm_methods", "")).equals("")) {
+            sb.append(sm).append(" ").append(smStr).append("\r\n");
+        } else {
+            sb.append(sm).append(" ME              M     M     E     R     S     L     R     1     P     S     2\r\n"); // P.S. 2012/09/02 MESOM "G" -> "P"
+        }
+        // MANAGEMENT
         sb.append("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
-        sb.append(sm).append(" MA              R     R     R     R     ").append(harOpt).append("\r\n");
+        if (!(smStr = getValueOr(trData, "sm_management", "")).equals("")) {
+            smStr = replaceSMStr(smStr, harOpt, 40);
+            sb.append(sm).append(" ").append(smStr).append("\r\n");
+        } else {
+            sb.append(sm).append(" MA              R     R     R     R     ").append(harOpt).append("\r\n");
+        }
+        // OUTPUTS
         sb.append("@N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT\r\n");
-        sb.append(sm).append(" OU              N     Y     Y     1     Y     Y     N     N     N     N     N     N     N\r\n\r\n");
+        if (!(smStr = getValueOr(trData, "sm_outputs", "")).equals("")) {
+            sb.append(sm).append(" ").append(smStr).append("\r\n\r\n");
+        } else {
+            sb.append(sm).append(" OU              N     Y     Y     1     Y     Y     N     N     N     N     N     N     N\r\n\r\n");
+        }
+        // PLANTING
         sb.append("@  AUTOMATIC MANAGEMENT\r\n");
         sb.append("@N PLANTING    PFRST PLAST PH2OL PH2OU PH2OD PSTMX PSTMN\r\n");
-        sb.append(sm).append(" PL          82050 82064    40   100    30    40    10\r\n");
+        if (!(smStr = getValueOr(trData, "sm_planting", "")).equals("")) {
+            sb.append(sm).append(" ").append(smStr).append("\r\n");
+        } else {
+            sb.append(sm).append(" PL          82050 82064    40   100    30    40    10\r\n");
+        }
+        // IRRIGATION
         sb.append("@N IRRIGATION  IMDEP ITHRL ITHRU IROFF IMETH IRAMT IREFF\r\n");
-        sb.append(sm).append(" IR             30    50   100 GS000 IR001    10  1.00\r\n");
+        if (!(smStr = getValueOr(trData, "sm_irrigation", "")).equals("")) {
+            sb.append(sm).append(" ").append(smStr).append("\r\n");
+        } else {
+            sb.append(sm).append(" IR             30    50   100 GS000 IR001    10  1.00\r\n");
+        }
+        // NITROGEN
         sb.append("@N NITROGEN    NMDEP NMTHR NAMNT NCODE NAOFF\r\n");
-        sb.append(sm).append(" NI             30    50    25 FE001 GS000\r\n");
+        if (!(smStr = getValueOr(trData, "sm_nitrogen", "")).equals("")) {
+            sb.append(sm).append(" ").append(smStr).append("\r\n");
+        } else {
+            sb.append(sm).append(" NI             30    50    25 FE001 GS000\r\n");
+        }
+        // RESIDUES
         sb.append("@N RESIDUES    RIPCN RTIME RIDEP\r\n");
-        sb.append(sm).append(" RE            100     1    20\r\n");
+        if (!(smStr = getValueOr(trData, "sm_residues", "")).equals("")) {
+            sb.append(sm).append(" ").append(smStr).append("\r\n");
+        } else {
+            sb.append(sm).append(" RE            100     1    20\r\n");
+        }
+        // HARVEST
         sb.append("@N HARVEST     HFRST HLAST HPCNP HPCNR\r\n");
-        sb.append(sm).append(" HA              0 83057   100     0\r\n\r\n");
+        if (!(smStr = getValueOr(trData, "sm_harvests", "")).equals("")) {
+            sb.append(sm).append(" ").append(smStr).append("\r\n");
+        } else {
+            sb.append(sm).append(" HA              0 83057   100     0\r\n\r\n");
+        }
 
         return sb.toString();
     }
@@ -1206,5 +1223,15 @@ public class DssatXFileOutput extends DssatCommonOutput {
         }
 
         return ret;
+    }
+
+    private String replaceSMStr(String smStr, String val, int start) {
+        if (smStr.length() < start) {
+            smStr = String.format("%-" + start + "s", smStr);
+        }
+        smStr = smStr.substring(0, start)
+                + val
+                + smStr.substring(start + val.length());
+        return smStr;
     }
 }
