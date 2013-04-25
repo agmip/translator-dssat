@@ -370,7 +370,10 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         } // harvest event
                         else if (getValueOr(evtData, "event", "").equals("harvest")) {
                             mhSubArr.add(evtData);
-                            copyItem(smData, evtData, "hadat", "date", false);
+                            if (!getValueOr(evtData, "date", "").trim().equals("")) {
+                                smData.put("hadat_valid", "Y");
+                            }
+//                            copyItem(smData, evtData, "hadat", "date", false);
                         } else {
                         }
                     } else {
@@ -1002,7 +1005,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         sdate = formatDateStr(sdate);
         sdate = String.format("%5s", sdate);
 
-        if (!getValueOr(trData, "hadat", "").trim().equals("")) {
+        if (!getValueOr(trData, "hadat_valid", "").trim().equals("")) {
             harOpt = "R";
         }
 
@@ -1079,7 +1082,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         // HARVEST
         sb.append("@N HARVEST     HFRST HLAST HPCNP HPCNR\r\n");
         if (!(smStr = getValueOr(trData, "sm_harvests", "")).equals("")) {
-            sb.append(sm).append(" ").append(smStr).append("\r\n");
+            sb.append(sm).append(" ").append(smStr).append("\r\n\r\n");
         } else {
             sb.append(sm).append(" HA              0 83057   100     0\r\n\r\n");
         }
