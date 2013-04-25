@@ -487,7 +487,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 if (getObjectOr(secData, "wst_id", "").equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [wst_id]\r\n");
                 }
-                String soil_id = getValueOr(result, "soil_id", defValC);
+                String soil_id = getValueOr(secData, "soil_id", defValC);
                 if (soil_id.equals("")) {
                     sbError.append("! Warning: Incompleted record because missing data : [soil_id]\r\n");
                 } else if (soil_id.length() > 10) {
