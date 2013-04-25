@@ -215,7 +215,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 // Add part two
                 if (p2Flg) {
                     sbData.append(sbLyrP2.toString()).append("\r\n");
-//                sbLyrP2 = new StringBuilder();
+                    sbLyrP2 = new StringBuilder();
                 } else {
                     sbData.append("\r\n");
                 }
