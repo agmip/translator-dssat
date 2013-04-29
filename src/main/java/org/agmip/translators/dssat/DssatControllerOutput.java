@@ -40,6 +40,11 @@ public class DssatControllerOutput extends DssatCommonOutput {
     private HashMap<String, Map> wthData = new HashMap();
     private ExecutorService executor = Executors.newFixedThreadPool(64);
     private static final Logger LOG = LoggerFactory.getLogger(DssatControllerOutput.class);
+    
+    public DssatControllerOutput() {
+        soilHelper = new DssatSoilFileHelper();
+        wthHelper = new DssatWthFileHelper();
+    }
 
     /**
      * ALL DSSAT Data Output method
