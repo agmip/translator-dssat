@@ -108,6 +108,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     soilArrTmp.add((HashMap) soilTmp.get("soil"));
                     wthArrTmp.add(wthTmp);
                     rootArr.get(j).put("wst_id", getObjectOr(wthTmp, "wst_id", wth_id));
+                    rootArr.get(j).put("soil_id", getObjectOr(soilTmp, "soil_id", wth_id));
                 }
                 expData.put("soil", soilArrTmp);
                 expData.put("weather", wthArrTmp);
