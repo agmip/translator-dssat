@@ -258,7 +258,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 copyItem(flData, getObjectOr(rootData, "dssat_info", new HashMap()), "fhdur");
                 // remove the "_trno" in the soil_id when soil analysis is available
                 String soilId = getValueOr(flData, "soil_id", "");
-                if (soilId.length() > 10 && soilId.matches("\\w+_\\d+")) {
+                if (soilId.length() > 10 && soilId.matches("\\w+_\\d+") || soilId.length() < 8) {
                     flData.put("soil_id", getSoilID(flData));
                 }
                 flNum = setSecDataArr(flData, flArr);
