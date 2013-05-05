@@ -2,19 +2,20 @@ package org.agmip.translators.dssat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Define observed data codes
- * 
+ *
  * @author Meng Zhang
  */
 public class DssatObservedData {
-    
-    private ArrayList summaryList = new ArrayList();        // Define the variables used in AFile
-    private ArrayList timeCourseList = new ArrayList();     // Define the variables used in TFile
-    private ArrayList dateTypeList = new ArrayList();       // Define the variables of data types
-    private HashMap dapDateTypeList = new HashMap();        // Define the variables of data types comes with day after planting (dap) variable; value means dap variable code
-    
+
+    private static HashSet summaryList = new HashSet();        // Define the variables used in AFile
+    private static HashSet timeCourseList = new HashSet();     // Define the variables used in TFile
+    private static HashSet dateTypeList = new HashSet();       // Define the variables of data types
+    private static HashMap dapDateTypeList = new HashMap();    // Define the variables of data types comes with day after planting (dap) variable; value means dap variable code
+
     public DssatObservedData() {
 
         // Summary variables list
@@ -730,39 +731,39 @@ public class DssatObservedData {
         dapDateTypeList.put("idat", "idap");
         dapDateTypeList.put("mdat", "mdap");
         dapDateTypeList.put("tdat", "tdap");
-        
+
     }
 
     /**
      * Get summary variable list
-     * 
+     *
      * @return summary variable list
      */
     public ArrayList getSummaryList() {
-        return summaryList;
+        return new ArrayList(summaryList);
     }
 
     /**
      * Get time-course variable list
-     * 
+     *
      * @return time-course variable list
      */
     public ArrayList getTimeCourseList() {
-        return timeCourseList;
+        return new ArrayList(timeCourseList);
     }
 
     /**
      * Get list of data type variable
-     * 
+     *
      * @return list of data type variable
      */
     public ArrayList getDateTypeList() {
-        return dateTypeList;
+        return new ArrayList(dateTypeList);
     }
 
     /**
      * Get the list of data type variables with dap variable
-     * 
+     *
      * @return the list of data type variables with dap variable
      */
     public HashMap getDapDateTypeList() {
@@ -771,9 +772,9 @@ public class DssatObservedData {
 
     /**
      * Check if the varibale is the summary variable
-     * 
-     * @param variableName  the code of variable, like "hwam"
-     * 
+     *
+     * @param variableName the code of variable, like "hwam"
+     *
      * @return true for summary variable, false for not
      */
     public boolean isSummaryData(Object variableName) {
@@ -782,9 +783,9 @@ public class DssatObservedData {
 
     /**
      * Check if the variable is the time-series variable
-     * 
-     * @param variableName  the code of variable, like "hwam"
-     * 
+     *
+     * @param variableName the code of variable, like "hwam"
+     *
      * @return true for time-series variable, false for not
      */
     public boolean isTimeSeriesData(Object variableName) {
@@ -793,9 +794,9 @@ public class DssatObservedData {
 
     /**
      * Check if the variable is the date type
-     * 
-     * @param variableName  the code of variable, like "adat"
-     * 
+     *
+     * @param variableName the code of variable, like "adat"
+     *
      * @return true for date type, false for not
      */
     public boolean isDateType(Object variableName) {
@@ -804,9 +805,9 @@ public class DssatObservedData {
 
     /**
      * Check if the variable is DAP (Date After Planting) variable
-     * 
-     * @param variableName  the code of variable, like "adat"
-     * 
+     *
+     * @param variableName the code of variable, like "adat"
+     *
      * @return true for DAP variable, false for not
      */
     public boolean isDapDateType(Object variableName) {
@@ -815,10 +816,10 @@ public class DssatObservedData {
 
     /**
      * Check if the variable is DAP (Date After Planting) variable
-     * 
-     * @param variableName  the code of variable, like "adat"
-     * @param dapName       the code of variable, like "adap"
-     * 
+     *
+     * @param variableName the code of variable, like "adat"
+     * @param dapName the code of variable, like "adap"
+     *
      * @return true for DAP variable, false for not
      */
     public boolean isDapDateType(Object variableName, Object dapName) {
@@ -827,9 +828,9 @@ public class DssatObservedData {
 
     /**
      * Get the DAP variable name related to the input variable name
-     * 
-     * @param variableName  the code of variable, like "adat"
-     * 
+     *
+     * @param variableName the code of variable, like "adat"
+     *
      * @return the DAP variable name
      */
     public String getDapCode(Object variableName) {

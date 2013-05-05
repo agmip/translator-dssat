@@ -127,7 +127,7 @@ public class DssatAFileInput extends DssatCommonInput {
                         // Read line and save into return holder
                         file.putAll(readLine(line, formats));
                         file.put("exname", exname);
-                        file.put("crid", crid);
+                        file.put("crid", DssatCRIDHelper.get3BitCrid(crid));
 
                     } // Read data info 
                     else {
@@ -137,7 +137,7 @@ public class DssatAFileInput extends DssatCommonInput {
                             formats.put(titles.get(i), 6);
                         }
                         // Read line and save into return holder
-                        HashMap tmp = readLine(line, formats, "");
+                        HashMap tmp = readLine(line, formats);
                         pdate = getPdate(brMap, (String) tmp.get("trno_a"), fileName.replaceAll("A$", "X"));
                         for (int i = 0; i < titles.size(); i++) {
                             String title = (String) titles.get(i);

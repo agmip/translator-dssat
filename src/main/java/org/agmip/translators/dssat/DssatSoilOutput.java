@@ -9,6 +9,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.util.MapUtil.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DSSAT Soil Data I/O API Class
@@ -17,6 +19,8 @@ import static org.agmip.util.MapUtil.*;
  * @version 1.0
  */
 public class DssatSoilOutput extends DssatCommonOutput {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DssatSoilOutput.class);
 
     /**
      * DSSAT Soil Data Output method
@@ -36,7 +40,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
         BufferedWriter bwS;                             // output object
         StringBuilder sbTitle = new StringBuilder();
         StringBuilder sbSites = new StringBuilder();
-        StringBuilder sbData = new StringBuilder();     // construct the data info in the output
+        StringBuilder sbData;                           // construct the data info in the output
         StringBuilder sbLyrP2 = new StringBuilder();    // output string for second part of layer data
         boolean p2Flg;
         String[] p2Ids = {"slpx", "slpt", "slpo", "caco3", "slal", "slfe", "slmn", "slbs", "slpa", "slpb", "slke", "slmg", "slna", "slsu", "slec", "slca"};
@@ -126,7 +130,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
 //                    sbError.append("! Warning: missing data : [slpf], and will automatically use default value '0.92'\r\n");
 //                }
                 sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
-                        getObjectOr(soilSite, "scom", defValC).toString(),
+                        getObjectOr(soilSite, "sscol", defValC).toString(),
                         formatNumStr(5, soilSite, "salb", defValR),
                         formatNumStr(5, soilSite, "slu1", defValR),
                         formatNumStr(5, soilSite, "sldr", defValR),
@@ -183,7 +187,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
                             formatNumStr(5, soilRecord, "slphw", defValR),
                             formatNumStr(5, soilRecord, "slphb", defValR),
                             formatNumStr(5, soilRecord, "slcec", defValR),
-                            formatNumStr(5, soilRecord, "sadc", defValR)));
+                            formatNumStr(5, soilRecord, "sladc", defValR)));
 
                     // part two
                     if (p2Flg) {
@@ -211,7 +215,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 // Add part two
                 if (p2Flg) {
                     sbData.append(sbLyrP2.toString()).append("\r\n");
-//                sbLyrP2 = new StringBuilder();
+                    sbLyrP2 = new StringBuilder();
                 } else {
                     sbData.append("\r\n");
                 }
@@ -228,8 +232,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
             bwS.close();
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(DssatCommonOutput.getStackTrace(e));
         }
     }
 }

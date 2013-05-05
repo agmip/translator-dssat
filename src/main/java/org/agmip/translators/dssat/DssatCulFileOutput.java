@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.util.MapUtil.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DSSAT Cultivar Data I/O API Class
@@ -16,6 +18,8 @@ import static org.agmip.util.MapUtil.*;
  * @version 1.0
  */
 public class DssatCulFileOutput extends DssatCommonOutput {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DssatCulFileOutput.class);
 
     /**
      * DSSAT Cultivar Data Output method
@@ -47,7 +51,7 @@ public class DssatCulFileOutput extends DssatCommonOutput {
             // Initial BufferedWriter
             // Get File name
             String fileName = getFileName(result, "X");
-            if (fileName.equals("TEMP.XXX")) {
+            if (fileName.matches("TEMP\\d{4}\\.\\w{2}X")) {
                 fileName = "Cultivar.CUL";
             } else {
                 try {
@@ -78,7 +82,7 @@ public class DssatCulFileOutput extends DssatCommonOutput {
                 }
                 // Write data line
                 sbData.append(getObjectOr(culArr.get(i), "cul_info", "")).append("\r\n");
-                
+
             }
 
             // Output finish
@@ -87,8 +91,7 @@ public class DssatCulFileOutput extends DssatCommonOutput {
             bwC.close();
 
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(DssatCommonOutput.getStackTrace(e));
         }
     }
 }

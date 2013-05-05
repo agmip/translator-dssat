@@ -59,7 +59,7 @@ public class DssatXFileTest {
         File file = obDssatXFileOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
-            assertTrue(file.getName().equals("UFGA8202.MZX"));
+            assertEquals("UFGA8202.MZX", file.getName());
             assertTrue(file.delete());
         }
     }
