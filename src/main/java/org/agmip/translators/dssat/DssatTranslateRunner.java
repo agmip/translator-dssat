@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Translation runner for multiple thread mode
  *
  * @author Meng Zhang
  */
@@ -38,16 +39,16 @@ public class DssatTranslateRunner implements Callable<File> {
         LOG.debug("Starting new thread!");
         try {
             if (translator instanceof DssatBtachFile) {
-                ((DssatBtachFile)translator).writeFile(outputDirectory, dataArr);
+                ((DssatBtachFile) translator).writeFile(outputDirectory, dataArr);
             } else {
                 translator.writeFile(outputDirectory, data);
             }
         } catch (IOException e) {
             LOG.error(e.getMessage());
         }
-        
+
         File ret = translator.getOutputFile();
-        
+
         if (ret == null) {
             LOG.debug("Job canceled!");
             throw new NoOutputFileException();
@@ -56,8 +57,7 @@ public class DssatTranslateRunner implements Callable<File> {
             return ret;
         }
     }
-    
+
     class NoOutputFileException extends RuntimeException {
-        
     }
 }

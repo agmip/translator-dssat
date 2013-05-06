@@ -18,8 +18,9 @@ class DssatSortHelper implements Comparator<HashMap> {
 
     /**
      * Constructor, initial the array of sorting id
-     * 
-     * @param sortIds array of id for sorting process, order in the array means priority of sorting
+     *
+     * @param sortIds array of id for sorting process, order in the array means
+     * priority of sorting
      */
     public DssatSortHelper(String[] sortIds) {
         this(sortIds, true);
@@ -27,8 +28,9 @@ class DssatSortHelper implements Comparator<HashMap> {
 
     /**
      * Constructor, initial the array of sorting id
-     * 
-     * @param sortIds array of id for sorting process, order in the array means priority of sorting
+     *
+     * @param sortIds array of id for sorting process, order in the array means
+     * priority of sorting
      * @sortFlg true: descending; false:ascending
      */
     public DssatSortHelper(String[] sortIds, boolean sortFlg) {
@@ -46,11 +48,12 @@ class DssatSortHelper implements Comparator<HashMap> {
 
     /**
      * Compare two element in the array, by using sorting IDs.
-     * 
-     * @param m1    Data record 1st
-     * @param m2    Data record 2nd
-     * @return 
+     *
+     * @param m1 Data record 1st
+     * @param m2 Data record 2nd
+     * @return
      */
+    @Override
     public int compare(HashMap m1, HashMap m2) {
         double val1;
         double val2;
@@ -68,10 +71,10 @@ class DssatSortHelper implements Comparator<HashMap> {
 
     /**
      * Get number value by using key from map
-     * 
-     * @param m     Data record
-     * @param key   variable name
-     * @return 
+     *
+     * @param m Data record
+     * @param key variable name
+     * @return
      */
     private double getValue(HashMap m, String key) {
         try {

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import org.agmip.util.JSONAdapter;
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -33,6 +34,8 @@ public class DssatControllerTest {
                         "UFGA8202_MZX.ZIP";
             //            "UFGA8201_MZX_dummy.ZIP";
             //            "SWData.zip";
+//            "AGMIP_DSSAT_1359154224136.zip";
+//    "HSC_wth_bak.zip";
 
     @Before
     public void setUp() throws Exception {
@@ -42,11 +45,12 @@ public class DssatControllerTest {
     }
 
     @Test
+    @Ignore
     public void test() throws IOException, Exception {
         HashMap result;
         result = obDssatControllerInput.readFile(resource.getPath());
 //        BufferedOutputStream bo;
-//        f = new File(fileName.replaceAll("[Xx]*\\.\\w+$", ".json"));
+//        File f = new File(fileName.replaceAll("[Xx]*\\.\\w+$", ".json"));
 //        bo = new BufferedOutputStream(new FileOutputStream(f));
 //
 //        // Output json for reading
@@ -58,7 +62,7 @@ public class DssatControllerTest {
         File file = obDssatControllerOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
-            assertTrue(file.getName().toUpperCase().matches("^AGMIP_DSSAT_\\d+\\.ZIP$"));
+            assertTrue(file.getName().toUpperCase().matches("^AGMIP_DSSAT_((WEATHERS_)|(SOILS_)|(EXPERIMENTS_))?\\d+\\.ZIP$"));
             assertTrue(file.delete());
         }
 
@@ -71,7 +75,7 @@ public class DssatControllerTest {
         File file2 = obDssatControllerOutput.getOutputFile();
         if (file2 != null) {
             assertTrue(file2.exists());
-            assertTrue(file2.getName().toUpperCase().matches("^AGMIP_DSSAT_\\d+\\.ZIP$"));
+            assertTrue(file2.getName().toUpperCase().matches("^AGMIP_DSSAT_((WEATHERS_)|(SOILS_)|(EXPERIMENTS_))?\\d+\\.ZIP$"));
             assertTrue(file2.delete());
         }
     }

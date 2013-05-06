@@ -38,9 +38,13 @@ public class DssatControllerOutput extends DssatCommonOutput {
 //    private HashMap<String, Future<File>> wthFiles = new HashMap();
     private HashMap<String, Map> soilData = new HashMap();
     private HashMap<String, Map> wthData = new HashMap();
-    private DssatWthFileHelper wthHelper = new DssatWthFileHelper();
     private ExecutorService executor = Executors.newFixedThreadPool(64);
-    private static final Logger log = LoggerFactory.getLogger(DssatControllerOutput.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DssatControllerOutput.class);
+    
+    public DssatControllerOutput() {
+        soilHelper = new DssatSoilFileHelper();
+        wthHelper = new DssatWthFileHelper();
+    }
 
     /**
      * ALL DSSAT Data Output method
@@ -59,6 +63,18 @@ public class DssatControllerOutput extends DssatCommonOutput {
         ArrayList<HashMap> soilArr = getObjectOr(result, "soils", new ArrayList());
         ArrayList<HashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
 
+        // Setup output file
+        Calendar cal = Calendar.getInstance();
+        if (!expArr.isEmpty() && soilArr.isEmpty() && wthArr.isEmpty()) {
+            outputFile = new File(arg0 + "AGMIP_DSSAT_EXPERIMENTS_" + cal.getTimeInMillis() + ".zip");
+        } else if (expArr.isEmpty() && !soilArr.isEmpty() && wthArr.isEmpty()) {
+            outputFile = new File(arg0 + "AGMIP_DSSAT_SOILS_" + cal.getTimeInMillis() + ".zip");
+        } else if (expArr.isEmpty() && soilArr.isEmpty() && !wthArr.isEmpty()) {
+            outputFile = new File(arg0 + "AGMIP_DSSAT_WEATHERS_" + cal.getTimeInMillis() + ".zip");
+        } else {
+            outputFile = new File(arg0 + "AGMIP_DSSAT_" + cal.getTimeInMillis() + ".zip");
+        }
+
         // Write files
         String soil_id;
         String wth_id;
@@ -75,7 +91,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 recordSWData(expData, new DssatWeatherOutput());
             } else {
                 ArrayList<HashMap> soilArrTmp = new ArrayList();
-//                ArrayList<HashMap> wthArrTmp = new ArrayList();
+                ArrayList<HashMap> wthArrTmp = new ArrayList();
                 for (int j = 0; j < rootArr.size(); j++) {
                     soil_id = getObjectOr(rootArr.get(j), "soil_id", "");
                     wth_id = getObjectOr(rootArr.get(j), "wst_id", "");
@@ -90,11 +106,12 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     recordSWData(soilTmp, new DssatSoilOutput());
                     recordSWData(wthTmp, new DssatWeatherOutput());
                     soilArrTmp.add((HashMap) soilTmp.get("soil"));
-//                    wthArrTmp.add(wthTmp);
+                    wthArrTmp.add(wthTmp);
                     rootArr.get(j).put("wst_id", getObjectOr(wthTmp, "wst_id", wth_id));
+                    rootArr.get(j).put("soil_id", getObjectOr(soilTmp, "soil_id", wth_id));
                 }
                 expData.put("soil", soilArrTmp);
-//                expData.put("weather", wthArrTmp);
+                expData.put("weather", wthArrTmp);
             }
 
             DssatCommonOutput[] outputs = {
@@ -131,9 +148,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         writeSoilFiles(arg0);
 
         // compress all output files into one zip file
-        Calendar cal = Calendar.getInstance();
-        outputFile = new File(arg0 + "AGMIP_DSSAT_" + cal.getTimeInMillis() + ".zip");
-        createZip(arg0);
+        //createZip();
     }
 
     /**
@@ -166,9 +181,9 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 writeSingleExp(arg0, result, outputs);
 
                 // compress all output files into one zip file
-                outputFile = new File(revisePath(arg0) + getZipFileName(outputs));
+                //outputFile = new File(revisePath(arg0) + getZipFileName(outputs));
 
-                createZip(arg0);
+                //createZip();
 
             } else {
                 writeMultipleExp(arg0, result);
@@ -180,9 +195,9 @@ public class DssatControllerOutput extends DssatCommonOutput {
             executor = null;
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            LOG.error(getStackTrace(e));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error(getStackTrace(e));
         }
     }
 
@@ -206,13 +221,19 @@ public class DssatControllerOutput extends DssatCommonOutput {
      * @param output The DSSAT Writer object
      */
     private void recordSWData(Map expData, DssatCommonOutput output) {
-        String id = "";
-        HashMap<String, Map> swData = null;
+        String id;
+        HashMap<String, Map> swData;
         try {
             if (output instanceof DssatSoilOutput) {
-                id = getObjectOr(expData, "soil_id", "");
+                Map soilTmp = getObjectOr(expData, "soil", new HashMap());
+                if (soilTmp.isEmpty()) {
+                    id = getObjectOr(expData, "soil_id", "");
+                } else {
+                    id = soilHelper.getSoilID(soilTmp);
+                }
 //                id = id.substring(0, 2);
                 swData = soilData;
+                expData.put("soil_id", id);
             } else {
                 //            id = getObjectOr(expData, "wst_id", "");
                 //            id = getWthFileName(getObjectOr(expData, "weather", new HashMap()));
@@ -232,7 +253,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
 //                futFiles.add(fut);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(getStackTrace(e));
         }
     }
 
@@ -255,6 +276,11 @@ public class DssatControllerOutput extends DssatCommonOutput {
             } else {
                 soil_id = soil_id.substring(0, 2);
             }
+            
+            Map soil = (Map) data.get("soil");
+            if (soil == null || soil.isEmpty()) {
+                continue;
+            }
 
             if (soilTmp.containsKey(soil_id)) {
                 soilTmp.get(soil_id).add(data);
@@ -275,12 +301,10 @@ public class DssatControllerOutput extends DssatCommonOutput {
     /**
      * Compress the files in one zip
      *
-     * @param path The output path
-     *
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private void createZip(String path) throws FileNotFoundException, IOException {
+    private void createZip() throws FileNotFoundException, IOException {
 
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outputFile));
         ZipEntry entry;
@@ -295,19 +319,19 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     files.put(f.getPath(), f);
                 }
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                LOG.error(getStackTrace(ex));
             } catch (ExecutionException ex) {
                 if (!ex.getMessage().contains("NoOutputFileException")) {
-                    ex.printStackTrace();
+                    LOG.error(getStackTrace(ex));
                 }
             }
         }
 
-        log.info("Start zipping all the files...");
+        LOG.info("Start zipping all the files...");
 
         // Check if there is file been created
         if (files == null) {
-            log.warn("No files here for zipping");
+            LOG.warn("No files here for zipping");
             return;
         }
 
@@ -333,43 +357,13 @@ public class DssatControllerOutput extends DssatCommonOutput {
         }
 
         out.close();
-        log.info("End zipping");
-    }
-
-    /**
-     * Add current file into zip package
-     *
-     * @param out The ZipOutputStream object
-     * @param zipPath The inside file path of zip package
-     * @param file The file which will be zipped
-     * @throws FileNotFoundException
-     * @throws IOException
-     */
-    private void addToZip(ZipOutputStream out, String zipPath, File file) throws FileNotFoundException, IOException {
-
-        if (file == null || !file.exists()) {
-            return;
-        } else if (zipPath.endsWith(File.separator)) {
-            zipPath += file.getName();
-        }
-
-        ZipEntry entry = new ZipEntry(zipPath);
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-        int count;
-        byte[] data = new byte[1024];
-
-        out.putNextEntry(entry);
-        while ((count = bis.read(data)) != -1) {
-            out.write(data, 0, count);
-        }
-        bis.close();
+        LOG.info("End zipping");
     }
 
     /**
      * Get all output files
      */
     public ArrayList<File> getOutputFiles() {
-//        return files;
         return new ArrayList(files.values());
     }
 
@@ -415,7 +409,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 subExpArr.add(expArr.get(i));
                 expGroupMap.put("Experiment_" + i, subExpArr);
             } else {
-                exname = getExName(expArr.get(i));
+                exname = getFileName(expArr.get(i), "");
                 subExpArr = expGroupMap.get(exname);
                 if (subExpArr == null) {
                     subExpArr = new ArrayList();
@@ -444,7 +438,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     tmp.put("dssat_sequence", seq);
                     seq.put("data", seqArr);
                 }
-                tmp.put("exname", expGroup.getKey());
                 ArrayList rootArr = new ArrayList();
                 tmp.put("dssat_root", rootArr);
                 rootArr.add(combinaRoot(tmp));
@@ -471,7 +464,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
     }
 
     private void updateGroupExps(HashMap out, HashMap expData, int trno) {
-        int baseId = trno * 100;
+        int baseId = trno * 1000;
         int seqid;
         int sm;
         int em;

@@ -1,10 +1,17 @@
 package org.agmip.translators.dssat;
 
+import com.google.common.base.Function;
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.agmip.core.types.TranslatorOutput;
 import static org.agmip.util.MapUtil.*;
 
@@ -25,6 +32,10 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     // construct the error message in the output
     protected StringBuilder sbError;
     protected File outputFile;
+    protected static HashMap<String, String> exToFileMap = new HashMap();
+    protected static HashSet<String> fileNameSet = new HashSet();
+    protected static DssatWthFileHelper wthHelper = new DssatWthFileHelper();
+    protected static DssatSoilFileHelper soilHelper = new DssatSoilFileHelper();
 
     /**
      * Translate data str from "yyyymmdd" to "yyddd"
@@ -64,39 +75,19 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 
         String ret = "";
         String str = getObjectOr(m, key, defVal);
-        double decimalPower;
-        long decimalPart;
-        double input;
         String[] inputStr = str.split("\\.");
         if (str.trim().equals("")) {
             return String.format("%" + bits + "s", defVal);
+        } else if (str.length() <= bits) {
+            ret = String.format("%1$" + bits + "s", str);
         } else if (inputStr[0].length() > bits) {
             //throw new Exception();
             sbError.append("! Waring: There is a variable [").append(key).append("] with oversized number [").append(ret).append("] (Limitation is ").append(bits).append(" bits)\r\n");
             return String.format("%" + bits + "s", defVal);
         } else {
-            ret = inputStr[0];
-
-            if (inputStr.length > 1 && inputStr[0].length() < bits) {
-
-                if (inputStr[1].length() <= bits - inputStr[0].length() - 1) {
-                    ret = ret + "." + inputStr[1];
-                } else {
-                    try {
-                        input = Math.abs(Double.valueOf(str));
-                    } catch (Exception e) {
-                        // TODO throw exception
-                        return str;
-                    }
-                    //decimalPower = Math.pow(10, Math.min(bits - inputStr[0].length(), inputStr[1].length()) - 1);
-                    decimalPower = Math.pow(10, bits - inputStr[0].length() - 1);
-                    decimalPart = Double.valueOf(Math.round(input * decimalPower) % decimalPower).longValue();
-                    ret = ret + "." + (decimalPart == 0 && (bits - inputStr[0].length() < 2) ? "" : decimalPart);
-                }
-            }
-            if (ret.length() < bits) {
-                ret = String.format("%1$" + bits + "s", ret);
-            }
+            int decimalLength = bits - inputStr[0].length() - 1;
+            decimalLength = decimalLength < 0 ? 0 : decimalLength;
+            ret = org.agmip.common.Functions.round(str, decimalLength);
         }
 
         return ret;
@@ -167,25 +158,20 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     }
 
     /**
-     * Get exname with normal format
+     * Get experiment name without any extention content after first underscore
      *
      * @param result date holder for experiment data
-     * @return exname
+     * @return experiment name
      */
     protected String getExName(Map result) {
 
         String ret = getValueOr(result, "exname", "");
-        if (ret.contains(".")) {
+        if (ret.matches("\\w+\\.\\w{2}[Xx]")) {
             ret = ret.substring(0, ret.length() - 1).replace(".", "");
         }
         // TODO need to be updated with a translate rule for other models' exname
-        if (ret.matches("\\w+_+\\d+")) {
-            ret = ret.replaceAll("_+\\d+$", "");
-        }
-
-        // If length more than 10-bit, only remain first 10-bit
-        if (ret.length() > 10) {
-            ret = ret.substring(0, 10);
+        if (ret.matches(".+(_+\\d+)+$")) {
+            ret = ret.replaceAll("(_+\\d+)+$", "");
         }
 
         return ret;
@@ -207,13 +193,12 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                 if (crid == null) {
                     crid = (String) events.get(i).get("crid");
                 } else if (!crid.equals(events.get(i).get("crid"))) {
-                    crid = "SQ";
-                    break;
+                    return "SQ";
                 }
             }
         }
-        DssatCRIDHelper crids = new DssatCRIDHelper();
-        return crids.get2BitCrid(crid);
+//        DssatCRIDHelper crids = new DssatCRIDHelper();
+        return DssatCRIDHelper.get2BitCrid(crid);
     }
 
     /**
@@ -224,29 +209,65 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @return file name
      */
     protected String getFileName(Map result, String fileType) {
-        String ret = getExName(result);
-        String crid = getCrid(result);
-        if (ret == null || ret.equals("")) {
-            ret = "TEMP.XX" + fileType;
+        String exname = getExName(result);
+        String crid;
+        if (getValueOr(result, "seasonal_dome_applied", "N").equals("Y")) {
+            crid = "SN";
         } else {
-            try {
-                if (ret.endsWith(crid)) {
-                    ret = ret.substring(0, ret.length() - crid.length());
-                } else {
-                    if (ret.length() == 10) {
-                        if (crid.equals("XX")) {
-                            crid = ret.substring(ret.length() - 2, ret.length());
-                        }
-                        ret = ret.substring(0, ret.length() - 2);
-                    }
-                }
-
-                ret += "." + crid + fileType;
-            } catch (Exception e) {
-                ret = "TEMP.XX" + fileType;
+            crid = getCrid(result);
+        }
+        if (exname.length() == 10) {
+            if (crid.equals("XX")) {
+                crid = exname.substring(exname.length() - 2, exname.length());
             }
         }
-        return ret;
+
+        String ret;
+        if (exToFileMap.containsKey(exname + "_" + crid)) {
+            return exToFileMap.get(exname + "_" + crid) + fileType;
+        } else {
+            ret = exname;
+            if (ret == null || ret.equals("")) {
+                ret = "TEMP0001";
+            } else {
+                try {
+                    if (ret.endsWith(crid)) {
+                        ret = ret.substring(0, ret.length() - crid.length());
+                    }
+                    // If the exname is too long
+                    if (ret.length() > 8) {
+                        ret = ret.substring(0, 8);
+                    }
+                    // If the exname do not follow the Dssat rule
+                    if (!ret.matches("[\\w ]{1,6}\\d{2}$")) {
+                        if (ret.length() > 6) {
+                            ret = ret.substring(0, 6);
+                        }
+                        ret += "01";
+                    }
+                } catch (Exception e) {
+                    ret = "TEMP0001";
+                }
+            }
+
+            // Find a non-repeated file name
+            int count;
+            while (fileNameSet.contains(ret + "." + crid)) {
+                try {
+                    count = Integer.parseInt(ret.substring(ret.length() - 2, ret.length()));
+                    count++;
+                } catch (Exception e) {
+                    count = 1;
+                }
+                ret = ret.replaceAll("\\w{2}$", String.format("%02d", count));
+            }
+        }
+
+        
+        exToFileMap.put(exname + "_" + crid, ret + "." + crid);
+        fileNameSet.add(ret + "." + crid);
+
+        return ret + "." + crid + fileType;
     }
 
     /**
@@ -309,7 +330,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     protected void decompressData(ArrayList arr) {
 
         HashMap fstData = null; // The first data record (Map type)
-        HashMap cprData = null; // The following data record which will be compressed
+        HashMap cprData;        // The following data record which will be compressed
 
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i) instanceof ArrayList) {
@@ -371,7 +392,6 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 //        }
         String ret = getObjectOr(data, "wst_id", "").toString();
         if (ret.equals("") || ret.length() > 8) {
-            DssatWthFileHelper wthHelper = new DssatWthFileHelper();
             ret = wthHelper.createWthFileName(getObjectOr(data, "weather", data));
             if (ret.equals("")) {
                 ret = "AGMP";
@@ -388,15 +408,16 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @return the weather file name
      */
     protected String getSoilID(HashMap data) {
-        String ret = getObjectOr(data, "soil_id", "");
-        ret = ret.trim();
-        if (ret.equals("")) {
-            return ret;
-        }
-        while (ret.length() < 8) {
-            ret += "_";
-        }
-        return ret;
+        return soilHelper.getSoilID(data);
+//        String ret = getObjectOr(data, "soil_id", "");
+//        ret = ret.trim();
+//        if (ret.equals("")) {
+//            return ret;
+//        }
+//        while (ret.length() < 8) {
+//            ret += "_";
+//        }
+//        return ret;
     }
 
     /**
@@ -411,5 +432,65 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         defValI = "-99";
         sbError = new StringBuilder();
         outputFile = null;
+    }
+
+    protected static String getStackTrace(Throwable aThrowable) {
+        final Writer result = new StringWriter();
+        final PrintWriter printWriter = new PrintWriter(result);
+        aThrowable.printStackTrace(printWriter);
+        return result.toString();
+    }
+
+    protected class HeaderArrayList<E> extends ArrayList<E> {
+
+        private HashSet<E> items = new HashSet();
+        private HashSet<E> curItems;
+
+        @Override
+        public boolean contains(Object header) {
+            return items.contains(header);
+        }
+
+        @Override
+        public boolean add(E e) {
+            if (!contains(e)) {
+                super.add(e);
+                items.add(e);
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public E get(int index) {
+            if (curItems != null) {
+                curItems.remove(super.get(index));
+            }
+            return super.get(index);
+        }
+
+        public void seCurItems(Set set) {
+            curItems = new HashSet();
+            curItems.addAll(set);
+        }
+
+        public boolean hasMoreItem() {
+            if (curItems == null || curItems.isEmpty()) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        public E applyNext() {
+            if (hasMoreItem()) {
+                E ret = curItems.iterator().next();
+                curItems.remove(ret);
+                this.add(ret);
+                return ret;
+            }
+            return null;
+        }
     }
 }
