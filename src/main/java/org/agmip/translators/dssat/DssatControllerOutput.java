@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import org.agmip.translators.dssat.DssatBatchFileOutput.DssatVersion;
 import static org.agmip.translators.dssat.DssatCommonInput.getSectionDataWithNocopy;
 import static org.agmip.translators.dssat.DssatCommonOutput.revisePath;
 import static org.agmip.util.MapUtil.*;
@@ -125,8 +126,10 @@ public class DssatControllerOutput extends DssatCommonOutput {
         // If experiment data is included
         if (!expArr.isEmpty()) {
             // Write all batch files
-            futFiles.add(executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(), expArr, arg0)));
-            futFiles.add(executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(), expArr, arg0)));
+            futFiles.add(executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT45), expArr, arg0)));
+            futFiles.add(executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT46), expArr, arg0)));
+            futFiles.add(executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT45), expArr, arg0)));
+            futFiles.add(executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT46), expArr, arg0)));
         } // If only weather or soil data is included
         else {
             for (int i = 0; i < soilArr.size(); i++) {
@@ -171,8 +174,10 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     new DssatAFileOutput(),
                     new DssatTFileOutput(),
                     new DssatCulFileOutput(),
-                    new DssatBatchFileOutput(),
-                    new DssatRunFileOutput()
+                    new DssatBatchFileOutput(DssatVersion.DSSAT45),
+                    new DssatBatchFileOutput(DssatVersion.DSSAT46),
+                    new DssatRunFileOutput(DssatVersion.DSSAT45),
+                    new DssatRunFileOutput(DssatVersion.DSSAT46)
                 };
                 recordSWData(result, new DssatSoilOutput());
                 recordSWData(result, new DssatWeatherOutput());
