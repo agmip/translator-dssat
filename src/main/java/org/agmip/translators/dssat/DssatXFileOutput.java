@@ -1287,7 +1287,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 domeKey = "seasonal_strategy";
             }
             String[] domeIds = getValueOr(data, domeKey, "").split("[|]");
-            LOG.info(getValueOr(data, domeKey, ""));
             String[] failedDomeIds = getValueOr(data, domeType + "_dome_failed", "").split("[|]");
             HashSet<String> domes = new HashSet();
             // Add all dome ids
