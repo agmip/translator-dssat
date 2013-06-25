@@ -75,7 +75,11 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // Output Weather File
             // Titel Section
-            sbData.append(String.format("*WEATHER DATA : %1$s\r\n\r\n", getObjectOr(wthFile, "wst_notes", defValBlank).toString()));
+            if (getObjectOr(wthFile, "wst_notes", ".AgMIP File").equals(".AgMIP File")) {
+                sbData.append(String.format("*WEATHER DATA : %1$s\r\n\r\n", getObjectOr(wthFile, "wst_source", defValBlank).toString()));
+            } else {
+                sbData.append(String.format("*WEATHER DATA : %1$s\r\n\r\n", getObjectOr(wthFile, "wst_notes", defValBlank).toString()));
+            }
 
             // Weather Station Section
             String wid = getObjectOr(wthFile, "wst_id", defValC);
