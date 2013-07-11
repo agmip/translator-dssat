@@ -328,6 +328,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     for (int j = 0; j < soilLarys.size(); j++) {
                         saSubData = new HashMap();
                         copyItem(saSubData, soilLarys.get(j), "sabl", "sllb", false);
+                        copyItem(saSubData, soilLarys.get(j), "saoc", "sloc", false);
                         copyItem(saSubData, soilLarys.get(j), "sasc", "slsc", false);
                         saSubArr.add(saSubData);
                     }
