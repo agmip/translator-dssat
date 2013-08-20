@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import org.agmip.common.Functions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DSSAT Weather Data I/O API Class
@@ -15,6 +18,7 @@ import java.util.LinkedHashMap;
  */
 public class DssatWeatherInput extends DssatCommonInput {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DssatWeatherInput.class);
     public String dailyKey = "dailyWeather";  // P.S. the key name might change
 
     /**
@@ -73,16 +77,10 @@ public class DssatWeatherInput extends DssatCommonInput {
         for (Object key : mapW.keySet()) {
 
             fileName = (String) key;
-            String wst_id;
             if (fileName.lastIndexOf(".") > 0) {
                 fileName = fileName.substring(0, fileName.lastIndexOf("."));
             }
-            // Check if the weather file name is following the old standard
-            if (fileName.matches("\\w{4}\\d{4}$")) {
-                wst_id = fileName.substring(0, 4);
-            } else {
-                wst_id = fileName;
-            }
+            String wst_id = fileName;
             buf = mapW.get(key);
             if (buf instanceof char[]) {
                 brW = new BufferedReader(new CharArrayReader((char[]) buf));
@@ -146,7 +144,11 @@ public class DssatWeatherInput extends DssatCommonInput {
 
                         // Read line and save into return holder
                         file.putAll(readLine(line, formats));
-//                        String wst_name = (String) file.get("wst_name");
+                        String dssat_wst_id = (String) file.get("dssat_wst_id");
+                        if (!fileName.startsWith(dssat_wst_id)) {
+                            LOG.warn("The name of weather file [{}] does not match with the WEST_ID in the file.", key);
+                        }
+                        wst_id = dssat_wst_id;
 //                        if (wst_name != null) {
 //                            file.put("wst_name", fileName + " " + wst_name);
 //                        } else {
@@ -196,19 +198,8 @@ public class DssatWeatherInput extends DssatCommonInput {
                 }
             }
 
-            // Double check if the weather file name is following the old standard
-            if (!daily.isEmpty() && wst_id.length() == 4) {
-                String firstDay = daily.get(0).get("w_date");
-                if (firstDay != null && firstDay.length() > 3) {
-                    int year = 80;
-                    try {
-                        year = Integer.parseInt(firstDay.substring(2, 4));
-                    } catch (NumberFormatException e) {
-                    }
-                    if (!fileName.startsWith(wst_id + String.format("%02d", year))) {
-                        wst_id = fileName;
-                    }
-                }
+            if (fileName.length() == 8 && !fileName.matches("\\w{4}\\d{4}$")) {
+                file.put("clim_id", fileName.substring(4));
             }
             file.put("wst_name", wst_id);
             file.put("wst_id", wst_id);
