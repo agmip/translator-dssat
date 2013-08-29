@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import org.agmip.common.Functions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +79,16 @@ public class DssatWeatherInput extends DssatCommonInput {
             if (fileName.lastIndexOf(".") > 0) {
                 fileName = fileName.substring(0, fileName.lastIndexOf("."));
             }
-            String wst_id = fileName;
+            String wst_id;
+            String clim_id;
+            if (fileName.length() == 8 && !fileName.matches("\\w{4}\\d{4}$")) {
+                wst_id = fileName;
+                clim_id = fileName.substring(4);
+            } else {
+                wst_id = fileName.substring(0 ,4);
+                clim_id = "0XXX";
+            }
+            
             buf = mapW.get(key);
             if (buf instanceof char[]) {
                 brW = new BufferedReader(new CharArrayReader((char[]) buf));
@@ -113,7 +121,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                         String[] names = flg[1].split("\\s+");
                         for (int i = 0; i < names.length; i++) {
                             if (names[i].equalsIgnoreCase("INSI")) {
-                                formats.put("dssat_wst_id", 6);
+                                formats.put("dssat_insi", 6);
                             } else if (names[i].equalsIgnoreCase("LAT")) {
                                 formats.put("wst_lat", 9);
                             } else if (names[i].equalsIgnoreCase("LONG")) {
@@ -144,11 +152,11 @@ public class DssatWeatherInput extends DssatCommonInput {
 
                         // Read line and save into return holder
                         file.putAll(readLine(line, formats));
-                        String dssat_wst_id = (String) file.get("dssat_wst_id");
-                        if (!fileName.startsWith(dssat_wst_id)) {
-                            LOG.warn("The name of weather file [{}] does not match with the WEST_ID in the file.", key);
+                        // Check if the WST_ID inside file is matching with the file name
+                        String dssat_insi = (String) file.get("dssat_insi");
+                        if (!wst_id.startsWith(dssat_insi)) {
+                            LOG.warn("The name of weather file [{}] does not match with the INSI ({}) in the file.", key, dssat_insi);
                         }
-                        wst_id = dssat_wst_id;
 //                        if (wst_name != null) {
 //                            file.put("wst_name", fileName + " " + wst_name);
 //                        } else {
@@ -194,15 +202,35 @@ public class DssatWeatherInput extends DssatCommonInput {
                         }
                     } else {
                     }
+//                } else if (flg[2].equals("comment")) {
+//                    if (line.startsWith("!Climate ID: ")) {
+//                        clim_id = line.substring(13).trim();
+//                        if (clim_id.toUpperCase().equals("N/A")) {
+//                            clim_id = "";
+//                        }
+//                    }
                 } else {
                 }
             }
 
-            if (fileName.length() == 8 && !fileName.matches("\\w{4}\\d{4}$")) {
-                file.put("clim_id", fileName.substring(4));
+            // Double check if the weather file name is following the old standard
+            if (!daily.isEmpty() && wst_id.length() == 4) {
+                String firstDay = daily.get(0).get("w_date");
+                if (firstDay != null && firstDay.length() > 3) {
+                    int year = 80;
+                    try {
+                        year = Integer.parseInt(firstDay.substring(2, 4));
+                    } catch (NumberFormatException e) {
+                    }
+                    if (!fileName.startsWith(wst_id + String.format("%02d", year))) {
+                        wst_id = fileName;
+                        clim_id = fileName.substring(4);
+                    }
+                }
             }
             file.put("wst_name", wst_id);
             file.put("wst_id", wst_id);
+            file.put("clim_id", clim_id);
 
             if (!dailyById.containsKey(wst_id)) {
                 dailyById.put(wst_id, daily);
