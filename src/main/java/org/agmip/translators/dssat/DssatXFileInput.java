@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import org.agmip.util.MapUtil;
 import static org.agmip.util.MapUtil.*;
 
 /**
@@ -328,6 +329,10 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("fl_name", line.length());
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
+                        String sltx = MapUtil.getValueOr(tmp, "sltx", "");
+                        if (!sltx.equals("")) {
+                            tmp.put("sltx", transSltx(sltx));
+                        }
                         addToArray(flArr, tmp, "fl");
                         // Read weather station id
                         wid = (String) tmp.get("wst_id");
