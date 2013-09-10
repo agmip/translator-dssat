@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import static org.agmip.translators.dssat.DssatCommonInput.copyItem;
 import static org.agmip.util.MapUtil.*;
@@ -41,6 +43,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         HashMap wthData;
         BufferedWriter bwX;                          // output object
         StringBuilder sbGenData = new StringBuilder();      // construct the data info in the output
+        StringBuilder sbDomeData = new StringBuilder();     // construct the dome info in the output
         StringBuilder sbNotesData = new StringBuilder();      // construct the data info in the output
         StringBuilder sbData = new StringBuilder();         // construct the data info in the output
         StringBuilder eventPart2 = new StringBuilder();                   // output string for second part of event data
@@ -172,6 +175,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
             String seqId;
             String em;
             String sm;
+            boolean isAnyDomeApplied = false;
+            LinkedHashMap<String, String> appliedDomes = new LinkedHashMap<String, String>();
             sbData.append("*TREATMENTS                        -------------FACTOR LEVELS------------\r\n");
             sbData.append("@N R O C TNAME.................... CU FL SA IC MP MI MF MR MC MT ME MH SM\r\n");
 
@@ -223,6 +228,27 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     rootData = rootArr.get(i);
                 } else {
                     rootData = expData;
+                }
+
+                // Applied DOME Info
+                String trt_name = getValueOr(sqData, "trt_name", getValueOr(rootData, "trt_name", getValueOr(rootData, "exname", defValC)));
+                if (getValueOr(rootData, "dome_applied", "").equals("Y")) {
+                    // If it comes with seasonal exname style
+                    if (trt_name.matches(".+[^_]__\\d+$")) {
+                        trt_name = trt_name.replaceAll("__\\d+$", "_*");
+                        if (appliedDomes.get(trt_name + " Field    ") == null) {
+                            appliedDomes.put(trt_name + " Field    ", getAppliedDomes(rootData, "field"));
+                        }
+                        if (appliedDomes.get(trt_name + " Seasonal ") == null) {
+                            appliedDomes.put(trt_name + " Seasonal ", getAppliedDomes(rootData, "seasonal"));
+                        }
+                    } else {
+                        appliedDomes.put(trt_name + " Field    ", getAppliedDomes(rootData, "field"));
+                        appliedDomes.put(trt_name + " Seasonal ", getAppliedDomes(rootData, "seasonal"));
+                    }
+                    isAnyDomeApplied = true;
+                } else {
+                    appliedDomes.put(trt_name, "");
                 }
 
                 // Set field info
@@ -302,6 +328,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     for (int j = 0; j < soilLarys.size(); j++) {
                         saSubData = new HashMap();
                         copyItem(saSubData, soilLarys.get(j), "sabl", "sllb", false);
+                        copyItem(saSubData, soilLarys.get(j), "saoc", "sloc", false);
                         copyItem(saSubData, soilLarys.get(j), "sasc", "slsc", false);
                         saSubArr.add(saSubData);
                     }
@@ -925,8 +952,21 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 sbData.append(createSMMAStr(1, new HashMap()));
             }
 
+            // DOME Info Section
+            if (isAnyDomeApplied) {
+                sbDomeData.append("! APPLIED DOME INFO\r\n");
+                for (String exname : appliedDomes.keySet()) {
+                    if (!getValueOr(appliedDomes, exname, "").equals("")) {
+                        sbDomeData.append("! ").append(exname).append("\t");
+                        sbDomeData.append(appliedDomes.get(exname));
+                        sbDomeData.append("\r\n");
+                    }
+                }
+            }
+
             // Output finish
             bwX.write(sbError.toString());
+            bwX.write(sbDomeData.toString());
             bwX.write(sbGenData.toString());
             bwX.write(sbNotesData.toString());
             bwX.write(sbData.toString());
@@ -1236,5 +1276,44 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 + val
                 + smStr.substring(start + val.length());
         return smStr;
+    }
+
+    private String getAppliedDomes(HashMap data, String domeType) {
+        if (getValueOr(data, domeType + "_dome_applied", "").equals("Y")) {
+            // Get dome ids
+            String domeKey = "";
+            if (domeType.equals("field")) {
+                domeKey = "field_overlay";
+            } else if (domeType.equals("seasonal")) {
+                domeKey = "seasonal_strategy";
+            }
+            String[] domeIds = getValueOr(data, domeKey, "").split("[|]");
+            String[] failedDomeIds = getValueOr(data, domeType + "_dome_failed", "").split("[|]");
+            HashSet<String> domes = new HashSet();
+            // Add all dome ids
+            for (int j = 0; j < domeIds.length; j++) {
+                if (!domeIds[j].equals("")) {
+                    domes.add(domeIds[j]);
+                }
+            }
+            // Remove failed dome id
+            for (int j = 0; j < failedDomeIds.length; j++) {
+                if (!failedDomeIds[j].equals("")) {
+                    domes.remove(failedDomeIds[j]);
+                }
+            }
+            // Convert to string format, divide by "|"
+            StringBuilder ret = new StringBuilder();
+            String[] domeArr = domes.toArray(new String[0]);
+            if (domeArr.length > 0) {
+                ret.append(domeArr[0]);
+            }
+            for (int i = 1; i < domeArr.length; i++) {
+                ret.append("|").append(domeArr[i]);
+            }
+            return ret.toString();
+        } else {
+            return "";
+        }
     }
 }

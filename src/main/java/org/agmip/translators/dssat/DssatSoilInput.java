@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import org.agmip.util.MapUtil;
 
 /**
  * DSSAT Soil Data I/O API Class
@@ -107,6 +108,10 @@ public class DssatSoilInput extends DssatCommonInput {
                         site = readLine(line.substring(1), formats);
                         if (slNotes != null && !slNotes.equals("")) {
                             site.put("sl_notes", slNotes);
+                        }
+                        String sltx = MapUtil.getValueOr(site, "sltx", "");
+                        if (!sltx.equals("")) {
+                            site.put("sltx", transSltx(sltx));
                         }
                         sites.add(site);
                         layers = new ArrayList();

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import static org.agmip.util.MapUtil.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,15 @@ import org.slf4j.LoggerFactory;
 public class DssatRunFileOutput extends DssatCommonOutput implements DssatBtachFile {
 
     private static final Logger LOG = LoggerFactory.getLogger(DssatRunFileOutput.class);
+    private String dssatVerStr;
+
+    public DssatRunFileOutput() {
+        dssatVerStr = null;
+    }
+
+    public DssatRunFileOutput(DssatBatchFileOutput.DssatVersion version) {
+        dssatVerStr = version.toString();
+    }
 
     /**
      * DSSAT Run File Output method
@@ -45,13 +55,21 @@ public class DssatRunFileOutput extends DssatCommonOutput implements DssatBtachF
 
         try {
 
+            // Get version number
+            if (dssatVerStr == null) {
+                dssatVerStr = getObjectOr(result, "crop_model_version", "").replaceAll("\\D", "");
+                if (!dssatVerStr.matches("\\d+")) {
+                    dssatVerStr = DssatBatchFileOutput.DssatVersion.DSSAT45.toString();
+                }
+            }
+
             // Initial BufferedWriter
             arg0 = revisePath(arg0);
-            outputFile = new File(arg0 + "Run.bat");
+            outputFile = new File(arg0 + "Run" + dssatVerStr + ".bat");
             bwR = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Run File
-            bwR.write("C:\\dssat45\\dscsm045 b dssbatch.v45\r\n");
+            bwR.write("C:\\dssat" + dssatVerStr + "\\dscsm0" + dssatVerStr + " b dssbatch.v" + dssatVerStr + "\r\n");
             bwR.write("@echo off\r\n");
             bwR.write("pause\r\n");
             bwR.write("exit\r\n");
