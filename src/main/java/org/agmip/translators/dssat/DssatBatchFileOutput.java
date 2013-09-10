@@ -21,6 +21,31 @@ import org.slf4j.LoggerFactory;
 public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtachFile {
 
     private static final Logger LOG = LoggerFactory.getLogger(DssatBatchFileOutput.class);
+    private String dssatVerStr;
+
+    public enum DssatVersion {
+
+        DSSAT45 {
+            @Override
+            public String toString() {
+                return "45";
+            }
+        },
+        DSSAT46 {
+            @Override
+            public String toString() {
+                return "46";
+            }
+        }
+    }
+
+    public DssatBatchFileOutput() {
+        dssatVerStr = null;
+    }
+
+    public DssatBatchFileOutput(DssatVersion version) {
+        dssatVerStr = version.toString();
+    }
 
     /**
      * DSSAT Batch File Output method
@@ -47,34 +72,32 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
             }
             result = results.get(0);
 
+            // Get version number
+            if (dssatVerStr == null) {
+                dssatVerStr = getObjectOr(result, "crop_model_version", "").replaceAll("\\D", "");
+                if (!dssatVerStr.matches("\\d+")) {
+                    dssatVerStr = DssatVersion.DSSAT45.toString();
+                }
+            }
             // Initial BufferedWriter
-
             arg0 = revisePath(arg0);
-            outputFile = new File(arg0 + "DSSBatch.v45");
+            outputFile = new File(arg0 + "DSSBatch.v" + dssatVerStr);
             bwB = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Batch File
             // Titel Section
             String crop = getCropName(result);
-            String dssatPath = "C:\\DSSAT45\\";
+            String dssatPath = "C:\\DSSAT" + dssatVerStr + "\\";
             String exFileName = getFileName(result, "X");
-            int dssatVersion;
             int expNo = results.size();
-            // Get version number
-            try {
-                String cropVersion = getObjectOr(result, "crop_model_version", "").replaceAll("\\D", "");
-                dssatVersion = Integer.parseInt(cropVersion);
-            } catch (Exception e) {
-                dssatVersion = 45;
-            }
 
             // Write title section
             sbData.append("$BATCH(").append(crop.toUpperCase()).append(")\r\n!\r\n");
-            sbData.append(String.format("! Command Line : %1$sDSCSM%2$03d.EXE B DSSBatch.v%2$02d\r\n", dssatPath, dssatVersion));
+            sbData.append(String.format("! Command Line : %1$sDSCS0M%2$s.EXE B DSSBatch.v%2$s\r\n", dssatPath, dssatVerStr));
             sbData.append("! Crop         : ").append(crop).append("\r\n");
             sbData.append("! Experiment   : ").append(exFileName).append("\r\n");
             sbData.append("! ExpNo        : ").append(expNo).append("\r\n");
-            sbData.append(String.format("! Debug        : %1$sDSCSM%2$03d.EXE \" B DSSBatch.v%2$02d\"\r\n!\r\n", dssatPath, dssatVersion));
+            sbData.append(String.format("! Debug        : %1$sDSCSM0%2$s.EXE \" B DSSBatch.v%2$s\"\r\n!\r\n", dssatPath, dssatVerStr));
 
             // Body Section
             sbData.append("@FILEX                                                                                        TRTNO     RP     SQ     OP     CO\r\n");
@@ -139,33 +162,33 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
             // Set default value for missing data
             setDefVal();
 
+            // Get version number
+            if (dssatVerStr == null) {
+                dssatVerStr = getObjectOr(result, "crop_model_version", "").replaceAll("\\D", "");
+                if (!dssatVerStr.matches("\\d+")) {
+                    dssatVerStr = DssatVersion.DSSAT45.toString();
+                }
+            }
+
             // Initial BufferedWriter
             arg0 = revisePath(arg0);
-            outputFile = new File(arg0 + "DSSBatch.v45");
+            outputFile = new File(arg0 + "DSSBatch.v" + dssatVerStr);
             bwB = new BufferedWriter(new FileWriter(outputFile));
 
             // Output Batch File
             // Titel Section
             String crop = getCropName(result);
-            String dssatPath = "C:\\DSSAT45\\";
+            String dssatPath = "C:\\DSSAT" + dssatVerStr + "\\";
             String exFileName = getFileName(result, "X");
-            int dssatVersion;
             int expNo = 1;
-            // Get version number
-            try {
-                String cropVersion = getObjectOr(result, "crop_model_version", "").replaceAll("\\D", "");
-                dssatVersion = Integer.parseInt(cropVersion);
-            } catch (Exception e) {
-                dssatVersion = 45;
-            }
 
             // Write title section
             sbData.append("$BATCH(").append(crop).append(")\r\n!\r\n");
-            sbData.append(String.format("! Command Line : %1$sDSCSM%2$03d.EXE B DSSBatch.v%2$02d\r\n", dssatPath, dssatVersion));
+            sbData.append(String.format("! Command Line : %1$sDSCSM%2$03d.EXE B DSSBatch.v%2$s\r\n", dssatPath, dssatVerStr));
             sbData.append("! Crop         : ").append(crop).append("\r\n");
             sbData.append("! Experiment   : ").append(exFileName).append("\r\n");
             sbData.append("! ExpNo        : ").append(expNo).append("\r\n");
-            sbData.append(String.format("! Debug        : %1$sDSCSM%2$03d.EXE \" B DSSBatch.v%2$02d\"\r\n!\r\n", dssatPath, dssatVersion));
+            sbData.append(String.format("! Debug        : %1$sDSCSM%2$03d.EXE \" B DSSBatch.v%2$s\"\r\n!\r\n", dssatPath, dssatVerStr));
 
             // Body Section
             sbData.append("@FILEX                                                                                        TRTNO     RP     SQ     OP     CO\r\n");
