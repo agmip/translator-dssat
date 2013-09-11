@@ -1,19 +1,20 @@
 package org.agmip.translators.dssat;
 
-import com.google.common.base.Function;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.agmip.ace.LookupCodes;
 import org.agmip.core.types.TranslatorOutput;
 import static org.agmip.util.MapUtil.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DSSAT Experiment Data I/O API Class
@@ -22,6 +23,8 @@ import static org.agmip.util.MapUtil.*;
  * @version 1.0
  */
 public abstract class DssatCommonOutput implements TranslatorOutput {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(DssatCommonInput.class);
 
     // Default value for each type of value (R: real number; C: String; I: Integer; D: Date)
     protected String defValR = "0.00";
@@ -105,15 +108,27 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     protected String formatStr(int bits, HashMap m, Object key, String defVal) {
 
         String ret = getObjectOr(m, key, defVal).trim();
-        if (ret.equals("")) {
-            return ret;
-        } else if (ret.length() > bits) {
-            //throw new Exception();
-            sbError.append("! Waring: There is a variable [").append(key).append("] with oversized content [").append(ret).append("], only first ").append(bits).append(" bits will be applied.\r\n");
-            return ret.substring(0, bits);
-        }
+        return formatStr(bits, ret, key);
+    }
 
-        return ret;
+    /**
+     * Format the output string with maximum length
+     *
+     * @param bits Maximum length of the output string
+     * @param val the value of data
+     * @param key the key of field in the map
+     * @return formated string of number
+     */
+    protected String formatStr(int bits, String val, Object key) {
+        if (val.equals("")) {
+            return val;
+        } else if (val.length() > bits) {
+            //throw new Exception();
+            sbError.append("! Waring: There is a variable [").append(key).append("] with oversized content [").append(val).append("], only first ").append(bits).append(" bits will be applied.\r\n");
+            return val.substring(0, bits);
+        }
+        
+        return val;
     }
 
     /**
@@ -492,5 +507,11 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             }
             return null;
         }
+    }
+    
+    protected String transSltx(String sltx) {
+        String ret = LookupCodes.lookupCode("sltx", sltx, "Alternate").toUpperCase();
+        LOG.debug("{} is translated to {}", sltx, ret);
+        return ret;
     }
 }

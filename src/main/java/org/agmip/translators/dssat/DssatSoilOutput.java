@@ -112,7 +112,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 sbData.append(String.format("*%1$-10s  %2$-11s %3$-5s %4$5s %5$s\r\n",
                         soil_id,
                         formatStr(11, soilSite, "sl_source", defValC),
-                        formatStr(5, soilSite, "sltx", defValC),
+                        formatStr(5, transSltx(getValueOr(soilSite, "sltx", defValC)), "sltx"),
                         formatNumStr(5, soilSite, "sldp", defValR),
                         getObjectOr(soilSite, "soil_name", defValC).toString()));
                 sbData.append("@SITE        COUNTRY          LAT     LONG SCS FAMILY\r\n");

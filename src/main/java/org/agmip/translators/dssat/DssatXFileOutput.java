@@ -533,7 +533,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         formatNumStr(5, secData, "fldrd", defValR),
                         formatNumStr(5, secData, "fldrs", defValR),
                         formatStr(5, secData, "flst", defValC),
-                        formatStr(5, secData, "sltx", defValC),
+                        formatStr(5, transSltx(getValueOr(secData, "sltx", defValC)), "sltx"),
                         formatNumStr(5, secData, "sldp", defValR),
                         soil_id,
                         getObjectOr(secData, "fl_name", defValC).toString()));
