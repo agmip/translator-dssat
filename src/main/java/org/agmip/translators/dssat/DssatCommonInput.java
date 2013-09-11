@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class DssatCommonInput implements TranslatorInput {
 
-    private static final Logger log = LoggerFactory.getLogger(DssatCommonInput.class);
     protected String[] flg = {"", "", ""};
     protected int flg4 = 0;
     protected String defValR = "-99.0";
@@ -63,7 +62,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             ret = readFile(getBufferReader(filePath));
 
         } catch (FileNotFoundException fe) {
-            log.warn("File not found under following path : [" + filePath + "]!");
+            LOG.warn("File not found under following path : [" + filePath + "]!");
             return ret;
         } catch (Exception e) {
             LOG.error(DssatCommonOutput.getStackTrace(e));
@@ -560,9 +559,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
         boolean unmatchFlg = true;
 
         // Added logging (cv)
-        log.debug("Array: {}", arr.toString());
-        log.debug("Item: {}", item.toString());
-        log.debug("Key: {}", key);
+        LOG.debug("Array: {}", arr.toString());
+        LOG.debug("Item: {}", item.toString());
+        LOG.debug("Key: {}", key);
 
 
         for (int i = 0; i < arr.size(); i++) {
