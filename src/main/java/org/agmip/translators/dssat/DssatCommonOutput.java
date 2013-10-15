@@ -223,7 +223,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @param fileType the last letter from file extend name
      * @return file name
      */
-    protected String getFileName(Map result, String fileType) {
+    protected synchronized String getFileName(Map result, String fileType) {
         String exname = getExName(result);
         String crid;
         if (getValueOr(result, "seasonal_dome_applied", "N").equals("Y")) {
@@ -399,7 +399,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @param data experiment data holder or weather data holder
      * @return the weather file name
      */
-    protected String getWthFileName(HashMap data) {
+    protected synchronized String getWthFileName(HashMap data) {
 
 //        String agmipFileHack = getValueOr(wthFile, "wst_name", "");
 //        if (agmipFileHack.length() == 8) {
@@ -422,7 +422,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @param data experiment data holder or weather data holder
      * @return the weather file name
      */
-    protected String getSoilID(HashMap data) {
+    protected synchronized String getSoilID(HashMap data) {
         return soilHelper.getSoilID(data);
 //        String ret = getObjectOr(data, "soil_id", "");
 //        ret = ret.trim();
