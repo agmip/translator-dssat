@@ -681,7 +681,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s                        %16$s\r\n",
                             idx + 1, //getObjectOr(data, "pl", defValI).toString(),
                             formatDateStr(getObjectOr(secData, "date", defValD).toString()),
-                            formatDateStr(getObjectOr(secData, "pldae", defValD).toString()),
+                            formatDateStr(getObjectOr(secData, "edate", defValD).toString()),
                             formatNumStr(5, secData, "plpop", getObjectOr(secData, "plpoe", defValR)),
                             formatNumStr(5, secData, "plpoe", getObjectOr(secData, "plpop", defValR)),
                             getObjectOr(secData, "plma", defValC).toString(), // P.S. Set default value as "S"(Cancelled)

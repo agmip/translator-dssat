@@ -500,7 +500,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.clear();
                         formats.put("pl", 2);
                         formats.put("pdate", 6);
-                        formats.put("pldae", 6);
+                        formats.put("edate", 6);
                         formats.put("plpop", 6);
                         formats.put("plpoe", 6);
                         formats.put("plma", 6);     // P.S. 2012.07.13 changed from plme to plma
@@ -517,7 +517,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
                         translateDateStr(tmp, "pdate");
-                        translateDateStr(tmp, "pldae");
+                        translateDateStr(tmp, "edate");
                         // cm -> mm
                         String pldp = getObjectOr(tmp, "pldp", "");
                         if (!pldp.equals("")) {
