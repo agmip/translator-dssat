@@ -153,7 +153,7 @@ public class DssatTFileInput extends DssatCommonInput {
                         pdate = getPdate(brMap, (String) tmp.get("trno_t"), fileName.replaceAll("T$", "X"));
                         for (int i = 0; i < titles.size(); i++) {
                             if (obvDataList.isDateType(titles.get(i))) {
-                                translateDateStrForDOY(tmp, (String) titles.get(i), pdate);
+                                translateDateStrForDOY(tmp, (String) titles.get(i), pdate, "");
                             }
                         }
 

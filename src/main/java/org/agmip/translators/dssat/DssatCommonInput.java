@@ -6,6 +6,7 @@ import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,9 +14,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.agmip.ace.LookupCodes;
+import org.agmip.common.Functions;
 import org.agmip.core.types.TranslatorInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,11 +158,20 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param m the experiment data holder
      * @param id the key name of date field in the map
      * @param pdate the related planting date
+     * @param smMgnFlg the simulation control flag
      */
-    protected void translateDateStrForDOY(HashMap m, String id, String pdate) {
+    protected void translateDateStrForDOY(HashMap m, String id, String pdate, String smMgnFlg) {
 
-        if (m.get(id) != null) {
+        if (m.get(id) != null && !smMgnFlg.equalsIgnoreCase("D")) {
             m.put(id, translateDateStrForDOY((String) m.get(id), pdate));
+        } else {
+            String val = (String) m.get(id);
+            String ret = Functions.dateOffset(pdate, val);
+            if (ret == null) {
+                LOG.warn("Invalid DAP value [{}] for {}", val, id);
+                ret = val;
+            }
+            m.put(id, ret);
         }
     }
 
@@ -317,7 +329,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                     if (entry.getName().matches(".+\\.\\w{2}[Xx]")) {
                         exname = entry.getName().replaceAll("[Xx]$", "");
                         exnames.add(exname);
-//                        break;
+                        //                        break;
                     }
                 }
             }
@@ -329,17 +341,17 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 if (!entry.isDirectory()) {
 
                     if (exnames.contains(entry.getName().replaceAll("[Xx]$", ""))) {
-//                        result.put("X", getBuf(in, (int) entry.getSize()));
+                        //                        result.put("X", getBuf(in, (int) entry.getSize()));
                         mapX.put(entry.getName().toUpperCase(), getBuf(in, entry));
                     } else if (entry.getName().toUpperCase().endsWith(".WTH")) {
                         mapW.put(entry.getName().toUpperCase(), getBuf(in, entry));
                     } else if (entry.getName().toUpperCase().endsWith(".SOL")) {
                         mapS.put(entry.getName().toUpperCase(), getBuf(in, entry));
                     } else if (exnames.contains(entry.getName().replaceAll("[Aa]$", ""))) {
-//                        result.put("A", getBuf(in, (int) entry.getSize()));
+                        //                        result.put("A", getBuf(in, (int) entry.getSize()));
                         mapA.put(entry.getName().toUpperCase(), getBuf(in, entry));
                     } else if (exnames.contains(entry.getName().replaceAll("[Tt]$", ""))) {
-//                        result.put("T", getBuf(in, (int) entry.getSize()));
+                        //                        result.put("T", getBuf(in, (int) entry.getSize()));
                         mapT.put(entry.getName().toUpperCase(), getBuf(in, entry));
                     } else if (entry.getName().toUpperCase().endsWith(".OUT")) {
                         result.put(entry.getName().toUpperCase(), getBuf(in, entry));
@@ -356,17 +368,17 @@ public abstract class DssatCommonInput implements TranslatorInput {
             File f = new File(filePath);
             if (filePath.matches(".+\\.\\w{2}[Xx]")) {
                 mapX.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
-//                result.put("X", new BufferedReader(new InputStreamReader(in)));
+                //                result.put("X", new BufferedReader(new InputStreamReader(in)));
             } else if (filePath.toUpperCase().endsWith(".WTH")) {
                 mapW.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
             } else if (filePath.toUpperCase().endsWith(".SOL")) {
                 mapS.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
             } else if (filePath.matches(".+\\.\\w{2}[Aa]")) {
                 mapA.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
-//                result.put("A", new BufferedReader(new InputStreamReader(in)));
+                //                result.put("A", new BufferedReader(new InputStreamReader(in)));
             } else if (filePath.matches(".+\\.\\w{2}[Tt]")) {
                 mapT.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
-//                result.put("T", new BufferedReader(new InputStreamReader(in)));
+                //                result.put("T", new BufferedReader(new InputStreamReader(in)));
             } else if (f.getName().toUpperCase().endsWith(".OUT")) {
                 result.put(f.getName().toUpperCase(), new BufferedReader(new InputStreamReader(in)));
             } else if (f.getName().toUpperCase().endsWith(".CUL")) {
@@ -383,6 +395,60 @@ public abstract class DssatCommonInput implements TranslatorInput {
         result.put("T", mapT);
         result.put("C", mapC);
         result.put("Z", tmp[tmp.length - 1]);
+
+        return result;
+    }
+
+    /**
+     * Get BufferReader for each type of file
+     *
+     * @param files the list of the input files
+     * @return result the holder of BufferReader for different type of files
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    protected static HashMap getBufferReader(List<File> files) throws IOException {
+
+        HashMap result = new HashMap();
+        HashMap mapW = new HashMap();
+        HashMap mapS = new HashMap();
+        HashMap mapC = new HashMap();
+        HashMap mapX = new HashMap();
+        HashMap mapA = new HashMap();
+        HashMap mapT = new HashMap();
+
+        for (File file : files) {
+            if (!file.exists()) {
+                LOG.warn("File not found for : [" + file.getPath() + "]!");
+                continue;
+            }
+            String name = file.getName().toUpperCase();
+            if (name.matches(".+\\.\\w{2}[Xx]")) {
+                mapX.put(name, new BufferedReader(new FileReader(file)));
+            } else if (name.endsWith(".WTH")) {
+                mapW.put(name, new BufferedReader(new FileReader(file)));
+            } else if (name.endsWith(".SOL")) {
+                mapS.put(name, new BufferedReader(new FileReader(file)));
+            } else if (name.matches(".+\\.\\w{2}[Aa]")) {
+                mapA.put(name, new BufferedReader(new FileReader(file)));
+            } else if (name.matches(".+\\.\\w{2}[Tt]")) {
+                mapT.put(name, new BufferedReader(new FileReader(file)));
+//            } else if (name.endsWith(".OUT")) {
+//                result.put(name, new BufferedReader(new FileReader(file)));
+            } else if (name.endsWith(".CUL")) {
+                mapC.put(name, new BufferedReader(new FileReader(file)));
+//            } else if (name.endsWith(".JSON")) {
+//                result.put(name, new BufferedReader(new FileReader(file)));
+            } else {
+            }
+        }
+
+        result.put("W", mapW);
+        result.put("S", mapS);
+        result.put("X", mapX);
+        result.put("A", mapA);
+        result.put("T", mapT);
+        result.put("C", mapC);
 
         return result;
     }
@@ -966,7 +1032,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
     protected String getStackTrace(Throwable aThrowable) {
         return DssatCommonOutput.getStackTrace(aThrowable);
     }
-    
+
     protected String transSltx(String sltx) {
         String ret = LookupCodes.lookupCode("sltx", sltx, "code", "Alternate").toUpperCase();
         LOG.debug("{} is translated to {}", sltx, ret);
