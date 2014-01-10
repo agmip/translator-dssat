@@ -41,7 +41,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
         altTitleList.put("adat", "adap");
         altTitleList.put("cwam", "");
         HashMap titleOutput = new HashMap();    // contain output data field id
-        DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
+        DssatObservedData obvDataList = DssatObservedData.INSTANCE;  // Varibale list definition
 
         try {
 

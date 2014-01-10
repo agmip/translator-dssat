@@ -82,7 +82,7 @@ public class DssatAFileInput extends DssatCommonInput {
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
         ArrayList obvData;
-        DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
+        DssatObservedData obvDataList = DssatObservedData.INSTANCE;    // Varibale list definition
         String pdate;
 
         mapA = (HashMap) brMap.get("A");

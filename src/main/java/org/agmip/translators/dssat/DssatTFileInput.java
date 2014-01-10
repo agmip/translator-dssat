@@ -89,7 +89,7 @@ public class DssatTFileInput extends DssatCommonInput {
         ArrayList<HashMap> obvData;
         ArrayList obvDataSecByTrno = new ArrayList();
         HashMap obvDataByTrno;
-        DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
+        DssatObservedData obvDataList = DssatObservedData.INSTANCE;    // Varibale list definition
         String pdate;
         String trno = "0";
 
