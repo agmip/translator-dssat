@@ -58,7 +58,7 @@ public class DssatWthFileHelper {
      * data holder, then use default code
      *
      * @param wthData Weather data holder
-     * @return
+     * @return 4-bit institute code
      */
     private String getWthInsiCodeOr(Map wthData) {
         String insiName = getWthInsiCode(wthData);
@@ -72,7 +72,7 @@ public class DssatWthFileHelper {
     /**
      * Generate the institute code
      *
-     * @return
+     * @return auto-generated institute code
      */
     private String getNextDefName() {
         return Integer.toHexString(defInsiName++).toUpperCase();

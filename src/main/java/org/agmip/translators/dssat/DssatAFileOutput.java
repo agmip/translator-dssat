@@ -169,7 +169,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
      * Remove the 2-bit year number from input date string
      *
      * @param str input date string
-     * @return
+     * @return the days of year
      */
     private String cutYear(String str) {
         if (str.length() > 3) {

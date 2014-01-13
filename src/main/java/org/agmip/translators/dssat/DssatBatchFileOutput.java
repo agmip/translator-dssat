@@ -227,7 +227,7 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
      * Get crop name string
      *
      * @param result experiment data holder
-     * @return
+     * @return the crop name
      */
     private String getCropName(Map result) {
         String ret;
