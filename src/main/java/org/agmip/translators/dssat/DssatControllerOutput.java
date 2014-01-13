@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -218,8 +219,18 @@ public class DssatControllerOutput extends DssatCommonOutput {
             executor.shutdown();
             long timer = System.currentTimeMillis();
             HashSet<String> keys = new HashSet(futFiles.keySet());
+            int counter = 0;
             while (!executor.isTerminated()) {
                 if (System.currentTimeMillis() - timer > estTime) {
+                    counter++;
+                    timer = System.currentTimeMillis();
+                    if (keys.isEmpty()) {
+                        LOG.info("The executor should be terminated");
+                        executor.shutdownNow();
+                    } else if (counter > 3) {
+                        LOG.info("The executor is going to be force terminated");
+                        executor.shutdownNow();
+                    }
                     String[] arr = keys.toArray(new String[0]);
                     for (String key : arr) {
                         Future futFile = futFiles.get(key);
@@ -229,8 +240,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
                             LOG.info("DSSAT translation for {} is still under processing...", key);
                         }
                     }
-                } else {
-                    timer = System.currentTimeMillis();
                 }
             }
             executor = null;

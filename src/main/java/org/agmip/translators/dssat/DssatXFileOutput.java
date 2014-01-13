@@ -1078,6 +1078,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         // MANAGEMENT
         sb.append("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
         if (!(smStr = getValueOr(trData, "sm_management", "")).equals("")) {
+            smStr = smStr.replaceAll("     D", "     R");
             smStr = replaceSMStr(smStr, harOpt, 40);
             sb.append(sm).append(" ").append(smStr).append("\r\n");
         } else {

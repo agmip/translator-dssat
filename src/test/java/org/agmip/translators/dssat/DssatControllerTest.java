@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import org.agmip.util.JSONAdapter;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -26,6 +27,7 @@ public class DssatControllerTest {
     DssatControllerOutput obDssatControllerOutput;
     DssatControllerInput obDssatControllerInput;
     URL resource;
+    URL resource2;
     String fileName =
 //                        "UFGA8401_CPX.ZIP";
                         "GHWA0401_MZX.ZIP";
@@ -41,10 +43,11 @@ public class DssatControllerTest {
         obDssatControllerOutput = new DssatControllerOutput();
         obDssatControllerInput = new DssatControllerInput();
         resource = this.getClass().getResource("/" + fileName);
+        resource2 = this.getClass().getResource("/CRAFT/Sample_Run");
     }
 
     @Test
-//    @Ignore
+    @Ignore
     public void test() throws IOException, Exception {
         HashMap result;
         Calendar cal;
@@ -53,12 +56,13 @@ public class DssatControllerTest {
         File[] files;
         result = obDssatControllerInput.readFile(resource.getPath());
         BufferedOutputStream bo;
-        File f = new File(fileName.replaceAll("[Xx]*\\.\\w+$", ".json"));
-        bo = new BufferedOutputStream(new FileOutputStream(f));
-
-        // Output json for reading
-        bo.write(JSONAdapter.toJSON(result).getBytes());
-        bo.close();
+//        File f = new File(fileName.replaceAll("[Xx]*\\.\\w+$", ".json"));
+//        bo = new BufferedOutputStream(new FileOutputStream(f));
+//
+//        // Output json for reading
+//        bo.write(JSONAdapter.toJSON(result).getBytes());
+//        bo.close();
+//        f.delete();
 
         cal = Calendar.getInstance();
         outPath = "output\\AGMIP_DSSAT_" + cal.getTimeInMillis();
@@ -80,6 +84,28 @@ public class DssatControllerTest {
         outPath = "output\\AGMIP_DSSAT_" + cal.getTimeInMillis();
         obDssatControllerOutput = new DssatControllerOutput();
         obDssatControllerOutput.writeFile(outPath, JSONAdapter.fromJSON(jsonStr));
+        outDir = new File(outPath);
+        files = outDir.listFiles();
+        for (File file : files) {
+            System.out.println("Generated: " + file.getName());
+            file.delete();
+        }
+        outDir.delete();
+        
+        // Test for CRAFT
+        result = obDssatControllerInput.readFileFromCRAFT(resource2.getPath());
+//        f = new File("output/CRAFT.json");
+//        bo = new BufferedOutputStream(new FileOutputStream(f));
+//
+//        // Output json for reading
+//        bo.write(JSONAdapter.toJSON(result).getBytes());
+//        bo.close();
+//        f.delete();
+        
+        cal = Calendar.getInstance();
+        outPath = "output\\AGMIP_DSSAT_" + cal.getTimeInMillis();
+        obDssatControllerOutput = new DssatControllerOutput();
+        obDssatControllerOutput.writeFile(outPath, result);
         outDir = new File(outPath);
         files = outDir.listFiles();
         for (File file : files) {
