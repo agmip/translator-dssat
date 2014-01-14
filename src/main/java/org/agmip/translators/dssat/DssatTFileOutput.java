@@ -38,7 +38,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
         HashMap<String, String> altTitleList = new HashMap();   // Define alternative fields for the necessary observation data fields; key is necessary field
         // P.S. Add alternative fields here
         HashMap titleOutput;                              // contain output data field id
-        DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
+        DssatObservedData obvDataList = DssatObservedData.INSTANCE;    // Varibale list definition
 
         try {
 

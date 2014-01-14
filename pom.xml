@@ -3,7 +3,7 @@
 
     <groupId>org.agmip.translators</groupId>
     <artifactId>translator-dssat</artifactId>
-    <version>1.2.5</version>
+    <version>1.2.6</version>
     <packaging>jar</packaging>
     <name>translator-dssat</name>
     <description>
@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.agmip.translators</groupId>
         <artifactId>translator-dist</artifactId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
     </parent>
 
     <properties>
@@ -60,7 +60,6 @@
         <dependency>
             <groupId>org.agmip</groupId>
             <artifactId>agmip-common-functions</artifactId>
-            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -76,7 +75,7 @@
     <connection>scm:git:git://github.com/agmip/translator-dssat.git</connection>
     <developerConnection>scm:git:git@github.com:agmip/translator-dssat.git</developerConnection>
     <url>https://github.com/agmip/translator-dssat</url>
-    <tag>translator-dssat-1.2.5</tag>
+    <tag>translator-dssat-1.2.6</tag>
 </scm>
 <build>
     <plugins>

@@ -34,7 +34,12 @@ public class DssatWthFileHelper {
             String yearDur = getWthYearDuration(wthData);
             String wst_id = insiName;
             if (insiName.length() == 4) {
-                wst_id += yearDur;
+                String clim_id = getValueOr(wthData, "clim_id", "0XXX");
+                if (!clim_id.startsWith("0")) {
+                    wst_id += clim_id;
+                } else {
+                    wst_id += yearDur;
+                }
             }
             while (names.contains(wst_id)) {
                 wst_id = getNextDefName() + yearDur;
@@ -53,7 +58,7 @@ public class DssatWthFileHelper {
      * data holder, then use default code
      *
      * @param wthData Weather data holder
-     * @return
+     * @return 4-bit institute code
      */
     private String getWthInsiCodeOr(Map wthData) {
         String insiName = getWthInsiCode(wthData);
@@ -67,7 +72,7 @@ public class DssatWthFileHelper {
     /**
      * Generate the institute code
      *
-     * @return
+     * @return auto-generated institute code
      */
     private String getNextDefName() {
         return Integer.toHexString(defInsiName++).toUpperCase();
@@ -90,7 +95,7 @@ public class DssatWthFileHelper {
             return wst_id;
         }
 
-        wst_id = getValueOr(wthData, "dssat_wst_id", "");
+        wst_id = getValueOr(wthData, "dssat_insi", "");
         if (wst_id.matches("(\\w{4})|(\\w{8})")) {
             return wst_id;
         }
