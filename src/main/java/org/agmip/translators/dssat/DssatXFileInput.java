@@ -53,7 +53,9 @@ public class DssatXFileInput extends DssatCommonInput {
             // Set soil_analysis block to soil block
             copyItem(expData, expData, "soil", "soil_analysis", true);
             HashMap soilTmp = getObjectOr(expData, "soil", new HashMap());
-            expData.put("soil_id", expData.get("soil_id") + "_" + (i + 1));
+            if (!soilTmp.isEmpty()) {
+                expData.put("soil_id", expData.get("soil_id") + "_" + (i + 1));
+            }
             copyItem(soilTmp, expData, "soil_id");
             copyItem(soilTmp, expData, "sltx");
             copyItem(soilTmp, expData, "sldp");
@@ -336,9 +338,12 @@ public class DssatXFileInput extends DssatCommonInput {
                         addToArray(flArr, tmp, "fl");
                         // Read weather station id
                         wid = (String) tmp.get("wst_id");
-                        if (wid != null && wid.matches("\\w{4}\\d{4}$")) {
-                            wid = wid.substring(0, 4);
-//                            tmp.put("wst_id", wid);
+                        if (wid != null) {
+                            tmp.put("dssat_wst_id", wid);
+                            if (wid.matches("\\w{4}\\d{4}$")) {
+                                wid = wid.substring(0, 4);
+                                tmp.put("wst_id", wid);
+                            }
                         }
 
                     }// // Read field info 2nd line
