@@ -37,6 +37,7 @@ public class DssatWthFileHelper {
                 String clim_id = getValueOr(wthData, "clim_id", "0XXX");
                 if (!clim_id.startsWith("0")) {
                     wst_id += clim_id;
+                    yearDur = clim_id;
                 } else {
                     wst_id += yearDur;
                 }
@@ -89,7 +90,7 @@ public class DssatWthFileHelper {
         if (wst_name.matches("(\\w{4})|(\\w{8})")) {
             return wst_name;
         }
-        
+
         String wst_id = getValueOr(wthData, "wst_id", "");
         if (wst_id.matches("(\\w{4})|(\\w{8})")) {
             return wst_id;
