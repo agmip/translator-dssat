@@ -25,7 +25,7 @@ public class DssatWthFileHelper {
      */
     public String createWthFileName(Map wthData) {
 
-        String hash = getObjectOr(wthData, "wst_id", "").toString();
+        String hash = getValueOr(wthData, "wst_id", "") + getValueOr(wthData, "clim_id", "");
 
         if (hashToName.containsKey(hash)) {
             return hashToName.get(hash);

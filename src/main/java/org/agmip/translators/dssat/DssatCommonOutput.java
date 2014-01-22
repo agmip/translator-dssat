@@ -399,7 +399,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @param data experiment data holder or weather data holder
      * @return the weather file name
      */
-    protected synchronized String getWthFileName(HashMap data) {
+    protected synchronized String getWthFileName(Map data) {
 
 //        String agmipFileHack = getValueOr(wthFile, "wst_name", "");
 //        if (agmipFileHack.length() == 8) {

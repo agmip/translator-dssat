@@ -66,7 +66,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             // Get File name
             String fileName = getValueOr(result, "wst_id", "");
             if (fileName.equals("")) {
-                fileName = getWthFileName(wthFile);
+                fileName = getWthFileName(result);
             }
             fileName += ".WTH";
             arg0 = revisePath(arg0);
