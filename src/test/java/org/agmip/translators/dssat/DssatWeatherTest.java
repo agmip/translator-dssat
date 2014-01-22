@@ -49,7 +49,7 @@ public class DssatWeatherTest {
         ArrayList<HashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
         HashMap expData = new HashMap();
         expData.put("weather", wthArr.get(0));
-        obDssatWeatherOutput.writeFile("", expData);
+        obDssatWeatherOutput.writeFile("output", expData);
         File file = obDssatWeatherOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
@@ -62,7 +62,7 @@ public class DssatWeatherTest {
         expData = new HashMap();
         expData.put("weather", wthArr.get(0));
         wthArr.get(0).put("clim_id", "5FPA");
-        obDssatWeatherOutput.writeFile("", expData);
+        obDssatWeatherOutput.writeFile("output", expData);
         file = obDssatWeatherOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
