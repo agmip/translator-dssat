@@ -298,11 +298,12 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                 path += File.separator;
             }
             File f = new File(path);
-            if (f.isFile()) {
-                f = f.getParentFile();
-            }
             if (f != null && !f.exists()) {
                 f.mkdirs();
+            }
+            if (!f.isDirectory()) {
+                f = f.getParentFile();
+                path = f.getPath();
             }
         }
         return path;
@@ -399,7 +400,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @param data experiment data holder or weather data holder
      * @return the weather file name
      */
-    protected synchronized String getWthFileName(HashMap data) {
+    protected synchronized String getWthFileName(Map data) {
 
 //        String agmipFileHack = getValueOr(wthFile, "wst_name", "");
 //        if (agmipFileHack.length() == 8) {
@@ -456,6 +457,9 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         return result.toString();
     }
 
+    /**
+     * To support different amount of weather variables in each day
+     */
     protected class HeaderArrayList<E> extends ArrayList<E> {
 
         private HashSet<E> items = new HashSet();
@@ -508,7 +512,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             return null;
         }
     }
-    
+
     protected String transSltx(String sltx) {
         String ret = LookupCodes.lookupCode("sltx", sltx, "Alternate").toUpperCase();
         LOG.debug("{} is translated to {}", sltx, ret);

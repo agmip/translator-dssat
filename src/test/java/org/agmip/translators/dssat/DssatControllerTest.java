@@ -1,9 +1,7 @@
 package org.agmip.translators.dssat;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,7 +45,7 @@ public class DssatControllerTest {
     }
 
     @Test
-    @Ignore
+//    @Ignore
     public void test() throws IOException, Exception {
         HashMap result;
         Calendar cal;
@@ -55,8 +53,8 @@ public class DssatControllerTest {
         File outDir;
         File[] files;
         result = obDssatControllerInput.readFile(resource.getPath());
-        BufferedOutputStream bo;
-//        File f = new File(fileName.replaceAll("[Xx]*\\.\\w+$", ".json"));
+//        BufferedOutputStream bo;
+//        File f = new File("output\\" + fileName.replaceAll("[Xx]*\\.\\w+$", ".json"));
 //        bo = new BufferedOutputStream(new FileOutputStream(f));
 //
 //        // Output json for reading
