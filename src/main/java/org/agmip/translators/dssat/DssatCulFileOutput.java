@@ -62,7 +62,7 @@ public class DssatCulFileOutput extends DssatCommonOutput {
             }
             arg0 = revisePath(arg0);
             outputFile = new File(arg0 + fileName);
-            bwC = new BufferedWriter(new FileWriter(outputFile));
+            bwC = new BufferedWriter(new FileWriter(outputFile, outputFile.exists()));
 
             // Output Cultivar File
             String lastHeaderInfo = "";

@@ -154,7 +154,7 @@ public class DssatWeatherInput extends DssatCommonInput {
                         file.putAll(readLine(line, formats));
                         // Check if the WST_ID inside file is matching with the file name
                         String dssat_insi = (String) file.get("dssat_insi");
-                        if (!wst_id.startsWith(dssat_insi)) {
+                        if (dssat_insi == null || !wst_id.startsWith(dssat_insi)) {
                             LOG.warn("The name of weather file [{}] does not match with the INSI ({}) in the file.", key, dssat_insi);
                         }
 //                        if (wst_name != null) {
