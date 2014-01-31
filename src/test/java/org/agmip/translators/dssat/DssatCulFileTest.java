@@ -49,12 +49,14 @@ public class DssatCulFileTest {
 
         ArrayList<HashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
         expArr.get(0).put("exname", "APAN9304PN");
-        obOutput.writeFile("", expArr.get(0));
+        obOutput.writeFile("output", expArr.get(0));
         File file = obOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
             assertEquals("APAN9304_PNX.CUL", file.getName());
             assertTrue(file.delete());
+        } else {
+            assertTrue(file != null);
         }
     }
 }

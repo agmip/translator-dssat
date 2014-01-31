@@ -112,7 +112,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 sbData.append(String.format("*%1$-10s  %2$-11s %3$-5s %4$5s %5$s\r\n",
                         soil_id,
                         formatStr(11, soilSite, "sl_source", defValC),
-                        formatStr(5, soilSite, "sltx", defValC),
+                        formatStr(5, transSltx(getValueOr(soilSite, "sltx", defValC)), "sltx"),
                         formatNumStr(5, soilSite, "sldp", defValR),
                         getObjectOr(soilSite, "soil_name", defValC).toString()));
                 sbData.append("@SITE        COUNTRY          LAT     LONG SCS FAMILY\r\n");
@@ -147,28 +147,13 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 // part one
                 sbData.append("@  SLB  SLMH  SLLL  SDUL  SSAT  SRGF  SSKS  SBDM  SLOC  SLCL  SLSI  SLCF  SLNI  SLHW  SLHB  SCEC  SADC\r\n");
                 // part two
-                // Get first site record
-                HashMap fstRecord = new HashMap();
-                if (!soilRecords.isEmpty()) {
-                    fstRecord = (HashMap) soilRecords.get(0);
-                }
-
-                // Check if there is 2nd part of layer data for output
+                sbLyrP2.append("@  SLB  SLPX  SLPT  SLPO CACO3  SLAL  SLFE  SLMN  SLBS  SLPA  SLPB  SLKE  SLMG  SLNA  SLSU  SLEC  SLCA\r\n");
                 p2Flg = false;
-                for (int j = 0; j < p2Ids.length; j++) {
-                    if (!getObjectOr(fstRecord, p2Ids[j], "").toString().equals("")) {
-                        p2Flg = true;
-                        break;
-                    }
-                }
-                if (p2Flg) {
-                    sbLyrP2.append("@  SLB  SLPX  SLPT  SLPO CACO3  SLAL  SLFE  SLMN  SLBS  SLPA  SLPB  SLKE  SLMG  SLNA  SLSU  SLEC  SLCA\r\n");
-                }
 
                 // Loop for laryer data
-                for (int j = 0; j < soilRecords.size(); j++) {
+                for (int k = 0; k < soilRecords.size(); k++) {
 
-                    soilRecord = (HashMap) soilRecords.get(j);
+                    soilRecord = (HashMap) soilRecords.get(k);
                     // part one
                     sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s %16$5s %17$5s\r\n",
                             formatNumStr(5, soilRecord, "sllb", defValR),
@@ -190,25 +175,33 @@ public class DssatSoilOutput extends DssatCommonOutput {
                             formatNumStr(5, soilRecord, "sladc", defValR)));
 
                     // part two
-                    if (p2Flg) {
-                        sbLyrP2.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s %16$5s %17$5s\r\n",
-                                formatNumStr(5, soilRecord, "sllb", defValR),
-                                formatNumStr(5, soilRecord, "slpx", defValR),
-                                formatNumStr(5, soilRecord, "slpt", defValR),
-                                formatNumStr(5, soilRecord, "slpo", defValR),
-                                formatNumStr(5, soilRecord, "caco3", defValR), // P.S. Different with document (DSSAT vol2.pdf)
-                                formatNumStr(5, soilRecord, "slal", defValR),
-                                formatNumStr(5, soilRecord, "slfe", defValR),
-                                formatNumStr(5, soilRecord, "slmn", defValR),
-                                formatNumStr(5, soilRecord, "slbs", defValR),
-                                formatNumStr(5, soilRecord, "slpa", defValR),
-                                formatNumStr(5, soilRecord, "slpb", defValR),
-                                formatNumStr(5, soilRecord, "slke", defValR),
-                                formatNumStr(5, soilRecord, "slmg", defValR),
-                                formatNumStr(5, soilRecord, "slna", defValR),
-                                formatNumStr(5, soilRecord, "slsu", defValR),
-                                formatNumStr(5, soilRecord, "slec", defValR),
-                                formatNumStr(5, soilRecord, "slca", defValR)));
+                    sbLyrP2.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s %16$5s %17$5s\r\n",
+                            formatNumStr(5, soilRecord, "sllb", defValR),
+                            formatNumStr(5, soilRecord, "slpx", defValR),
+                            formatNumStr(5, soilRecord, "slpt", defValR),
+                            formatNumStr(5, soilRecord, "slpo", defValR),
+                            formatNumStr(5, soilRecord, "caco3", defValR), // P.S. Different with document (DSSAT vol2.pdf)
+                            formatNumStr(5, soilRecord, "slal", defValR),
+                            formatNumStr(5, soilRecord, "slfe", defValR),
+                            formatNumStr(5, soilRecord, "slmn", defValR),
+                            formatNumStr(5, soilRecord, "slbs", defValR),
+                            formatNumStr(5, soilRecord, "slpa", defValR),
+                            formatNumStr(5, soilRecord, "slpb", defValR),
+                            formatNumStr(5, soilRecord, "slke", defValR),
+                            formatNumStr(5, soilRecord, "slmg", defValR),
+                            formatNumStr(5, soilRecord, "slna", defValR),
+                            formatNumStr(5, soilRecord, "slsu", defValR),
+                            formatNumStr(5, soilRecord, "slec", defValR),
+                            formatNumStr(5, soilRecord, "slca", defValR)));
+
+                    // Check if there is 2nd part of layer data for output
+                    if (!p2Flg) {
+                        for (int j = 0; j < p2Ids.length; j++) {
+                            if (!getValueOr(soilRecord, p2Ids[j], "").equals("")) {
+                                p2Flg = true;
+                                break;
+                            }
+                        }
                     }
                 }
 

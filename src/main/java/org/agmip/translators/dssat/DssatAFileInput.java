@@ -82,7 +82,7 @@ public class DssatAFileInput extends DssatCommonInput {
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
         ArrayList obvData;
-        DssatObservedData obvDataList = new DssatObservedData();    // Varibale list definition
+        DssatObservedData obvDataList = DssatObservedData.INSTANCE;    // Varibale list definition
         String pdate;
 
         mapA = (HashMap) brMap.get("A");
@@ -142,7 +142,7 @@ public class DssatAFileInput extends DssatCommonInput {
                         for (int i = 0; i < titles.size(); i++) {
                             String title = (String) titles.get(i);
                             if (obvDataList.isDateType(title)) {
-                                translateDateStrForDOY(tmp, (String) title, pdate);
+                                translateDateStrForDOY(tmp, (String) title, pdate, "");
 //                            String val = (String) tmp.get(title);
 //                            if (val != null && val.length() > 3) {
 //                                tmp.put(title, val.substring(val.length() - 3, val.length()));

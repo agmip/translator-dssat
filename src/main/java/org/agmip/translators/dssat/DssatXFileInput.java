@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import org.agmip.util.MapUtil;
 import static org.agmip.util.MapUtil.*;
 
 /**
@@ -52,7 +53,9 @@ public class DssatXFileInput extends DssatCommonInput {
             // Set soil_analysis block to soil block
             copyItem(expData, expData, "soil", "soil_analysis", true);
             HashMap soilTmp = getObjectOr(expData, "soil", new HashMap());
-            expData.put("soil_id", expData.get("soil_id") + "_" + (i + 1));
+            if (!soilTmp.isEmpty()) {
+                expData.put("soil_id", expData.get("soil_id") + "_" + (i + 1));
+            }
             copyItem(soilTmp, expData, "soil_id");
             copyItem(soilTmp, expData, "sltx");
             copyItem(soilTmp, expData, "sldp");
@@ -328,12 +331,19 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.put("fl_name", line.length());
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
+                        String sltx = MapUtil.getValueOr(tmp, "sltx", "");
+                        if (!sltx.equals("")) {
+                            tmp.put("sltx", transSltx(sltx));
+                        }
                         addToArray(flArr, tmp, "fl");
                         // Read weather station id
                         wid = (String) tmp.get("wst_id");
-                        if (wid != null && wid.matches("\\w{4}\\d{4}$")) {
-                            wid = wid.substring(0, 4);
-//                            tmp.put("wst_id", wid);
+                        if (wid != null) {
+                            tmp.put("dssat_wst_id", wid);
+                            if (wid.matches("\\w{4}\\d{4}$")) {
+                                wid = wid.substring(0, 4);
+                                tmp.put("wst_id", wid);
+                            }
                         }
 
                     }// // Read field info 2nd line
@@ -495,7 +505,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         formats.clear();
                         formats.put("pl", 2);
                         formats.put("pdate", 6);
-                        formats.put("pldae", 6);
+                        formats.put("edate", 6);
                         formats.put("plpop", 6);
                         formats.put("plpoe", 6);
                         formats.put("plma", 6);     // P.S. 2012.07.13 changed from plme to plma
@@ -512,7 +522,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
                         translateDateStr(tmp, "pdate");
-                        translateDateStr(tmp, "pldae");
+                        translateDateStr(tmp, "edate");
                         // cm -> mm
                         String pldp = getObjectOr(tmp, "pldp", "");
                         if (!pldp.equals("")) {
@@ -1001,10 +1011,42 @@ public class DssatXFileInput extends DssatCommonInput {
                         evtArr.get(evtArr.size() - 1).putAll(crData);
                     }
                     // Get planting date for DOY value handling
-                    pdate = getValueOr(evtArr.get(evtArr.size() - 1), "pdate", "");
-                    if (pdate.length() > 5) {
-                        pdate = pdate.substring(2);
+                    pdate = getValueOr(evtArr.get(evtArr.size() - 1), "date", "");
+//                    if (pdate.length() > 5) {
+//                        pdate = pdate.substring(2);
+//                    }
+                }
+
+                // simulation
+                HashMap<String, String> smManagements = new HashMap();
+                if (!getObjectOr(sqData, "sm", "0").equals("0")) {
+                    String sm = (String) sqData.get("sm");
+                    HashMap smData = (HashMap) getSectionDataObj(smArr, "sm", sm);
+//                sqData.putAll((HashMap) getSectionDataObj(smArr, "sm", sm));
+                    // Read SM management
+                    formats.clear();
+                    formats.put("management", 12);
+                    formats.put("plant", 6);
+                    formats.put("irrig", 6);
+                    formats.put("ferti", 6);
+                    formats.put("resid", 6);
+                    formats.put("harvs", 6);
+                    smManagements = readLine(getValueOr(smData, "sm_management", ""), formats);
+
+                    HashMap tmp = getObjectOr(trData, "dssat_simulation_control", new HashMap());
+                    ArrayList<HashMap> arr = getObjectOr(tmp, eventKey, new ArrayList());
+                    boolean isExistFlg = false;
+                    for (int j = 0; j < arr.size(); j++) {
+                        if (sm.equals(arr.get(j).get("sm"))) {
+                            isExistFlg = true;
+                            break;
+                        }
                     }
+                    if (!isExistFlg) {
+                        arr.add(smData);
+                    }
+                    tmp.put(eventKey, arr);
+                    trData.put("dssat_simulation_control", tmp);
                 }
 
                 // irrigation
@@ -1014,7 +1056,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     ArrayList<HashMap> irTmpSubs = getObjectOr(irTmp, "data", new ArrayList());
                     for (int j = 0; j < irTmpSubs.size(); j++) {
                         HashMap irTmpSub = irTmpSubs.get(j);
-                        translateDateStrForDOY(irTmpSub, "idate", pdate);
+                        translateDateStrForDOY(irTmpSub, "idate", pdate, smManagements.get("irrig"));
                     }
 
                     // add event data into array
@@ -1029,7 +1071,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     for (int j = 0; j < feTmps.size(); j++) {
                         feTmp = feTmps.get(j);
                         // Date adjust based on realted treatment info (handling for DOY type value)
-                        translateDateStrForDOY(feTmp, "fdate", pdate);
+                        translateDateStrForDOY(feTmp, "fdate", pdate, smManagements.get("ferti"));
 
                         // add event data into array
                         addEvent(evtArr, feTmp, "fdate", "fertilizer", seqid);
@@ -1043,7 +1085,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     for (int j = 0; j < omTmps.size(); j++) {
                         omTmp = omTmps.get(j);
                         // Date adjust based on realted treatment info (handling for DOY type value)
-                        translateDateStrForDOY(omTmp, "omdat", pdate);
+                        translateDateStrForDOY(omTmp, "omdat", pdate, smManagements.get("resid"));
                         // add event data into array
                         addEvent(evtArr, omTmp, "omdat", "organic_matter", seqid); // P.S. change event name to organic-materials; Back to organic_matter again
                     }
@@ -1097,28 +1139,6 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (!getObjectOr(sqData, "ha", "0").equals("0")) {
                     // add event data into array
                     addEvent(evtArr, (HashMap) getSectionDataObj(haArr, "ha", sqData.get("ha").toString()), "hadat", "harvest", seqid);
-                }
-
-                // simulation
-                if (!getObjectOr(sqData, "sm", "0").equals("0")) {
-                    String sm = (String) sqData.get("sm");
-                    HashMap smData = (HashMap) getSectionDataObj(smArr, "sm", sm);
-//                sqData.putAll((HashMap) getSectionDataObj(smArr, "sm", sm));
-
-                    HashMap tmp = getObjectOr(trData, "dssat_simulation_control", new HashMap());
-                    ArrayList<HashMap> arr = getObjectOr(tmp, eventKey, new ArrayList());
-                    boolean isExistFlg = false;
-                    for (int j = 0; j < arr.size(); j++) {
-                        if (sm.equals(arr.get(j).get("sm"))) {
-                            isExistFlg = true;
-                            break;
-                        }
-                    }
-                    if (!isExistFlg) {
-                        arr.add(smData);
-                    }
-                    tmp.put(eventKey, arr);
-                    trData.put("dssat_simulation_control", tmp);
                 }
 
                 // soil_analysis

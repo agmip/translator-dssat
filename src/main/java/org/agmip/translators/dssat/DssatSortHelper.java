@@ -80,7 +80,7 @@ class DssatSortHelper implements Comparator<HashMap> {
         try {
             return Double.parseDouble(getValueOr(m, key, ""));
         } catch (Exception e) {
-            return -99;
+            return Double.MIN_VALUE;
         }
     }
 }

@@ -37,7 +37,7 @@ public class DssatBatchFileTest {
         result = obDssatControllerInput.readFile(resource.getPath());
         ArrayList<HashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
 
-        obDssatBatchFileOutput.writeFile("", expArr);
+        obDssatBatchFileOutput.writeFile("output", expArr);
         File file = obDssatBatchFileOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());

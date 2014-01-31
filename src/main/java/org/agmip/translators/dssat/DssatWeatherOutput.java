@@ -66,7 +66,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             // Get File name
             String fileName = getValueOr(result, "wst_id", "");
             if (fileName.equals("")) {
-                fileName = getWthFileName(wthFile);
+                fileName = getWthFileName(result);
             }
             fileName += ".WTH";
             arg0 = revisePath(arg0);
@@ -75,7 +75,11 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // Output Weather File
             // Titel Section
-            sbData.append(String.format("*WEATHER DATA : %1$s\r\n\r\n", getObjectOr(wthFile, "wst_notes", defValBlank).toString()));
+            if (getObjectOr(wthFile, "wst_notes", ".AgMIP File").equals(".AgMIP File")) {
+                sbData.append(String.format("*WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_source", defValBlank).toString(), getValueOr(wthFile, "clim_id", "N/A")));
+            } else {
+                sbData.append(String.format("*WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_notes", defValBlank).toString(), getValueOr(wthFile, "clim_id", "N/A")));
+            }
 
             // Weather Station Section
             String wid = getObjectOr(wthFile, "wst_id", defValC);
@@ -84,7 +88,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             }
             sbData.append("@ INSI      LAT     LONG  ELEV   TAV   AMP REFHT WNDHT  CCO2\r\n");
             sbData.append(String.format("  %1$-4s %2$8s %3$8s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s\r\n",
-                    formatStr(4, wthFile, "dssat_wst_id", wid),
+                    formatStr(4, wthFile, "dssat_insi", wid),
                     formatNumStr(8, wthFile, "wst_lat", defValR),
                     formatNumStr(8, wthFile, "wst_long", defValR),
                     formatNumStr(5, wthFile, "wst_elev", defValR),
