@@ -1,5 +1,7 @@
 .settings/*
 bin/*
+output/*
+src/test/resources/CRAFT/*
 .classpath
 *.swp
 *.jar
@@ -9,5 +11,3 @@ pretty_print*
 target/*
 *.tmp
 .DS_Store
-/output/*
-/src/test/resources/CRAFT/*
