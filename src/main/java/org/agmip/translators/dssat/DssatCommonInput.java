@@ -326,8 +326,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
             in = new ZipInputStream(new FileInputStream(filePath));
             while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
-                    if (entry.getName().matches(".+\\.\\w{2}[Xx]")) {
-                        exname = entry.getName().replaceAll("[Xx]$", "");
+                    String fileName = getFileNameFromZipEntry(entry);
+                    if (fileName.matches(".+\\.\\w{2}[Xx]")) {
+                        exname = fileName.replaceAll("[Xx]$", "");
                         exnames.add(exname);
                         //                        break;
                     }
@@ -339,26 +340,33 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
             while ((entry = ((ZipInputStream) in).getNextEntry()) != null) {
                 if (!entry.isDirectory()) {
+                    String fileName = getFileNameFromZipEntry(entry);
+                    int idx;
+                    if ((idx = fileName.lastIndexOf("/")) > -1
+                            || (idx = fileName.lastIndexOf(File.separator)) > -1 ) {
+                        fileName = fileName.substring(idx + 1);
+                    }
+                    
 
-                    if (exnames.contains(entry.getName().replaceAll("[Xx]$", ""))) {
+                    if (exnames.contains(fileName.replaceAll("[Xx]$", ""))) {
                         //                        result.put("X", getBuf(in, (int) entry.getSize()));
-                        mapX.put(entry.getName().toUpperCase(), getBuf(in, entry));
-                    } else if (entry.getName().toUpperCase().endsWith(".WTH")) {
-                        mapW.put(entry.getName().toUpperCase(), getBuf(in, entry));
-                    } else if (entry.getName().toUpperCase().endsWith(".SOL")) {
-                        mapS.put(entry.getName().toUpperCase(), getBuf(in, entry));
-                    } else if (exnames.contains(entry.getName().replaceAll("[Aa]$", ""))) {
+                        mapX.put(fileName.toUpperCase(), getBuf(in, entry));
+                    } else if (fileName.toUpperCase().endsWith(".WTH")) {
+                        mapW.put(fileName.toUpperCase(), getBuf(in, entry));
+                    } else if (fileName.toUpperCase().endsWith(".SOL")) {
+                        mapS.put(fileName.toUpperCase(), getBuf(in, entry));
+                    } else if (exnames.contains(fileName.replaceAll("[Aa]$", ""))) {
                         //                        result.put("A", getBuf(in, (int) entry.getSize()));
-                        mapA.put(entry.getName().toUpperCase(), getBuf(in, entry));
-                    } else if (exnames.contains(entry.getName().replaceAll("[Tt]$", ""))) {
+                        mapA.put(fileName.toUpperCase(), getBuf(in, entry));
+                    } else if (exnames.contains(fileName.replaceAll("[Tt]$", ""))) {
                         //                        result.put("T", getBuf(in, (int) entry.getSize()));
-                        mapT.put(entry.getName().toUpperCase(), getBuf(in, entry));
-                    } else if (entry.getName().toUpperCase().endsWith(".OUT")) {
-                        result.put(entry.getName().toUpperCase(), getBuf(in, entry));
-                    } else if (entry.getName().toUpperCase().endsWith(".CUL")) {
-                        mapC.put(entry.getName().toUpperCase(), getBuf(in, entry));
-                    } else if (entry.getName().toUpperCase().endsWith(".JSON")) {
-                        result.put(entry.getName().toUpperCase(), getBuf(in, entry));
+                        mapT.put(fileName.toUpperCase(), getBuf(in, entry));
+                    } else if (fileName.toUpperCase().endsWith(".OUT")) {
+                        result.put(fileName.toUpperCase(), getBuf(in, entry));
+                    } else if (fileName.toUpperCase().endsWith(".CUL")) {
+                        mapC.put(fileName.toUpperCase(), getBuf(in, entry));
+                    } else if (fileName.toUpperCase().endsWith(".JSON")) {
+                        result.put(fileName.toUpperCase(), getBuf(in, entry));
                     }
                 }
             }
@@ -397,6 +405,16 @@ public abstract class DssatCommonInput implements TranslatorInput {
         result.put("Z", tmp[tmp.length - 1]);
 
         return result;
+    }
+    
+    private static String getFileNameFromZipEntry(ZipEntry entry) {
+        String fileName = entry.getName();
+        int idx;
+        if ((idx = fileName.lastIndexOf("/")) > -1
+                || (idx = fileName.lastIndexOf(File.separator)) > -1 ) {
+            fileName = fileName.substring(idx + 1);
+        }
+        return fileName;
     }
 
     /**
