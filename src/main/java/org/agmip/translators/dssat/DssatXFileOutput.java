@@ -988,7 +988,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         String harOpt = "M";
         String sdate;
         String sm = String.format("%2d", smid);
-        ArrayList<HashMap> dataArr;
+//        ArrayList<HashMap> dataArr;
         HashMap subData;
 
 //        // Check if the meta data of fertilizer is not "N" ("Y" or null)
@@ -1059,7 +1059,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         // OPTIONS
         sb.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
         if (!(smStr = getValueOr(trData, "sm_options", "")).equals("")) {
-            smStr = replaceSMStr(smStr, co2, 64);
+//            smStr = replaceSMStr(smStr, co2, 64);
             sb.append(sm).append(" ").append(smStr).append("\r\n");
         } else {
             sb.append(sm).append(" OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     Y     ").append(co2).append("\r\n");
@@ -1074,8 +1074,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
         // MANAGEMENT
         sb.append("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
         if (!(smStr = getValueOr(trData, "sm_management", "")).equals("")) {
-            smStr = smStr.replaceAll("     D", "     R");
-            smStr = replaceSMStr(smStr, harOpt, 40);
+//            smStr = smStr.replaceAll("     D", "     R");
+//            smStr = replaceSMStr(smStr, harOpt, 40);
             sb.append(sm).append(" ").append(smStr).append("\r\n");
         } else {
             sb.append(sm).append(" MA              R     R     R     R     ").append(harOpt).append("\r\n");
