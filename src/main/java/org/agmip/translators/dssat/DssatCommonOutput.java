@@ -514,7 +514,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     }
 
     protected String transSltx(String sltx) {
-        String ret = LookupCodes.lookupCode("sltx", sltx, "Alternate").toUpperCase();
+        String ret = LookupCodes.lookupCode("sltx", sltx, "DSSAT").toUpperCase();
         LOG.debug("{} is translated to {}", sltx, ret);
         return ret;
     }

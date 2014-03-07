@@ -3,7 +3,7 @@
 
     <groupId>org.agmip.translators</groupId>
     <artifactId>translator-dssat</artifactId>
-    <version>1.2.9</version>
+    <version>1.2.10</version>
     <packaging>jar</packaging>
     <name>translator-dssat</name>
     <description>
@@ -62,6 +62,11 @@
             <artifactId>agmip-common-functions</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.agmip</groupId>
+            <artifactId>ace-lookup</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
@@ -75,7 +80,7 @@
     <connection>scm:git:git://github.com/agmip/translator-dssat.git</connection>
     <developerConnection>scm:git:git@github.com:agmip/translator-dssat.git</developerConnection>
     <url>https://github.com/agmip/translator-dssat</url>
-    <tag>translator-dssat-1.2.9</tag>
+    <tag>translator-dssat-1.2.10</tag>
 </scm>
 <build>
     <plugins>

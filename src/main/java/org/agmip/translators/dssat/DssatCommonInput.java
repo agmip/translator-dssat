@@ -1052,7 +1052,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
     }
 
     protected String transSltx(String sltx) {
-        String ret = LookupCodes.lookupCode("sltx", sltx, "code", "Alternate").toUpperCase();
+        String ret = LookupCodes.lookupCode("sltx", sltx, "code", "DSSAT").toUpperCase();
         LOG.debug("{} is translated to {}", sltx, ret);
         return ret;
     }
