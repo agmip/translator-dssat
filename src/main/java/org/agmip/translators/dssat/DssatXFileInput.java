@@ -402,10 +402,10 @@ public class DssatXFileInput extends DssatCommonInput {
                             }
                         }
 
-                        if (tmp.containsKey("fl_lat")) {
+                        if (strLat != null) {
                             tmp.put("fl_lat", strLat);
                         }
-                        if (tmp.containsKey("fl_long")) {
+                        if (strLong != null) {
                             tmp.put("fl_long", strLong);
                         }
                         addToArray(flArr, tmp, "fl");
