@@ -402,10 +402,10 @@ public class DssatXFileInput extends DssatCommonInput {
                             }
                         }
 
-                        if (tmp.containsKey("fl_lat")) {
+                        if (strLat != null) {
                             tmp.put("fl_lat", strLat);
                         }
-                        if (tmp.containsKey("fl_long")) {
+                        if (strLong != null) {
                             tmp.put("fl_long", strLong);
                         }
                         addToArray(flArr, tmp, "fl");
@@ -1002,6 +1002,7 @@ public class DssatXFileInput extends DssatCommonInput {
 
                 // planting
                 String pdate = "";
+                boolean isFallow = false;
                 if (!getObjectOr(sqData, "pl", "0").equals("0")) {
                     // add event data into array
                     addEvent(evtArr, (HashMap) getSectionDataObj(plArr, "pl", sqData.get("pl").toString()), "pdate", "planting", seqid);
@@ -1015,6 +1016,8 @@ public class DssatXFileInput extends DssatCommonInput {
 //                    if (pdate.length() > 5) {
 //                        pdate = pdate.substring(2);
 //                    }
+                } else {
+                    isFallow = true;
                 }
 
                 // simulation
@@ -1138,7 +1141,9 @@ public class DssatXFileInput extends DssatCommonInput {
                 // harvest
                 if (!getObjectOr(sqData, "ha", "0").equals("0")) {
                     // add event data into array
-                    addEvent(evtArr, (HashMap) getSectionDataObj(haArr, "ha", sqData.get("ha").toString()), "hadat", "harvest", seqid);
+                    HashMap haData = (HashMap) getSectionDataObj(haArr, "ha", sqData.get("ha").toString());
+                    addEvent(evtArr, haData, "hadat", "harvest", seqid);
+                    copyItem(trMetaData, haData, "endat", "hadat", false);
                 }
 
                 // soil_analysis

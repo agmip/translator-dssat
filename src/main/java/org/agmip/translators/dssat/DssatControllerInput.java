@@ -131,6 +131,7 @@ public class DssatControllerInput implements TranslatorInput {
         ArrayList<HashMap> soilArr;
         HashMap soilData;
         HashMap soilTmpMap = new HashMap();
+        HashMap<String, String> soilAnalysisMap = new HashMap();
         String soilId;
         ArrayList<HashMap> wthArr;
         HashMap wthData;
@@ -198,27 +199,34 @@ public class DssatControllerInput implements TranslatorInput {
                 soilData = getSectionDataWithNocopy(soilArr, "soil_id", soilId);
                 // if there is soil analysis data, create new soil block by using soil analysis info
                 if (expData.get("soil_analysis") != null) {
-                    if (soilData == null) {
-                        soilData = new HashMap();
-                    } else {
-                        soilData = CopyList(soilData);
-                    }
                     HashMap saTmp = (HashMap) expData.remove("soil_analysis");
+                    String saHash = saTmp.hashCode() + "_" + soilId;
+                    if (!soilAnalysisMap.containsKey(saHash)) {
+                        if (soilData == null) {
+                            soilData = new HashMap();
+                        } else {
+                            soilData = CopyList(soilData);
+                        }
 
-                    // Update soil site data
-                    copyItem(soilData, saTmp, "sadat");
-                    copyItem(soilData, saTmp, "smhb");
-                    copyItem(soilData, saTmp, "smpx");
-                    copyItem(soilData, saTmp, "smke");
-                    soilId += "_" + (i + 1);
-                    soilData.put("soil_id", soilId);
-                    expData.put("soil_id", soilId);
+                        // Update soil site data
+                        copyItem(soilData, saTmp, "sadat");
+                        copyItem(soilData, saTmp, "smhb");
+                        copyItem(soilData, saTmp, "smpx");
+                        copyItem(soilData, saTmp, "smke");
+                        soilId += "_" + (i + 1);
+                        soilData.put("soil_id", soilId);
+                        expData.put("soil_id", soilId);
+                        soilAnalysisMap.put(saHash, soilId);
 
-                    // Update soil layer data
-                    ArrayList<HashMap> soilLyrs = getObjectOr(soilData, soilReader.layerKey, new ArrayList());
-                    ArrayList<HashMap> saLyrs = getObjectOr(saTmp, mgnReader.icEventKey, new ArrayList());
-                    String[] copyKeys = {"sllb", "slbdm", "sloc", "slni", "slphw", "slphb", "slpx", "slke", "slsc"};
-                    soilData.put(soilReader.layerKey, combinLayers(soilLyrs, saLyrs, "sllb", "sllb", copyKeys));
+                        // Update soil layer data
+                        ArrayList<HashMap> soilLyrs = getObjectOr(soilData, soilReader.layerKey, new ArrayList());
+                        ArrayList<HashMap> saLyrs = getObjectOr(saTmp, mgnReader.icEventKey, new ArrayList());
+                        String[] copyKeys = {"sllb", "slbdm", "sloc", "slni", "slphw", "slphb", "slpx", "slke", "slsc"};
+                        soilData.put(soilReader.layerKey, combinLayers(soilLyrs, saLyrs, "sllb", "sllb", copyKeys));
+                    } else {
+                        expData.put("soil_id", soilAnalysisMap.get(saHash));
+                        soilData = null;
+                    }
                 }
 
                 if (soilData != null && !soilData.isEmpty()) {
