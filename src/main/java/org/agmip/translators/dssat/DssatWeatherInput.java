@@ -299,10 +299,29 @@ public class DssatWeatherInput extends DssatCommonInput {
                         after.addAll(arr.subList(i, arr.size()));
                         break;
                     } else {
-                        if ((arrDay / 10000) % 4 == 0) {
-                            i += 366;
+                        // Get the index of the first day of next year
+                        int curYear = arrDay / 10000;
+                        int start = i;
+                        i += 365;
+                        if (curYear % 4 == 0) {
+                            i++;
+                        }
+                        if (i >=  arr.size()) {
+                            i = arr.size() - 1;
+                        }
+                        int lastDay = Integer.parseInt(arr.get(i).get("w_date"));
+                        int lastDayYear = lastDay / 10000;
+                        if (i == arr.size() - 1 && curYear == lastDayYear) {
+                            break;
                         } else {
-                            i += 365;
+                            while (i > start + 1) {
+                                lastDay = Integer.parseInt(arr.get(i - 1).get("w_date"));
+                                lastDayYear = lastDay / 10000;
+                                if (curYear == lastDayYear) {
+                                    break;
+                                }
+                                i--;
+                            }
                         }
                     }
                 }
