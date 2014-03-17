@@ -28,13 +28,14 @@ public class DssatControllerTest {
     URL resource2;
     String fileName =
 //                        "UFGA8401_CPX.ZIP";
-                        "GHWA0401_MZX.ZIP";
+//                        "GHWA0401_MZX.ZIP";
 //                        "UFGA8201_MZX.ZIP";
 //                        "UFGA8202_MZX.ZIP";
 //                        "UFGA8201_MZX_dummy.ZIP";
 //                        "SWData.zip";
 //                        "AGMIP_DSSAT_1359154224136.zip";
 //                        "HSC_wth_bak.zip";
+    "IUAM9801_FAX.zip";
 
     @Before
     public void setUp() throws Exception {
