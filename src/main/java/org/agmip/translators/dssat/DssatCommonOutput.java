@@ -203,17 +203,26 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         HashMap mgnData = getObjectOr(result, "management", new HashMap());
         ArrayList<HashMap> events = getObjectOr(mgnData, "events", new ArrayList());
         String crid = null;
-        for (int i = 0; i < events.size(); i++) {
-            if (events.get(i).get("event").equals("planting")) {
+        boolean isPlEventExist = false;
+        for (HashMap event : events) {
+            if ("planting".equals(event.get("event"))) {
+                isPlEventExist = true;
                 if (crid == null) {
-                    crid = (String) events.get(i).get("crid");
-                } else if (!crid.equals(events.get(i).get("crid"))) {
+                    crid = (String) event.get("crid");
+                } else if (!crid.equals(event.get("crid"))) {
                     return "SQ";
                 }
             }
         }
-//        DssatCRIDHelper crids = new DssatCRIDHelper();
-        return DssatCRIDHelper.get2BitCrid(crid);
+        if (crid == null) {
+            crid = getValueOr(result, "crid", "XX");
+        }
+        if (!isPlEventExist && "XX".equals(crid)) {
+            return "FA";
+        } else {
+//            DssatCRIDHelper crids = new DssatCRIDHelper();
+            return DssatCRIDHelper.get2BitCrid(crid);
+        }
     }
 
     /**
@@ -232,7 +241,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             crid = getCrid(result);
         }
         if (exname.length() == 10) {
-            if (crid.equals("XX")) {
+            if (crid.equals("XX") || crid.equals("FA")) {
                 crid = exname.substring(exname.length() - 2, exname.length());
             }
         }

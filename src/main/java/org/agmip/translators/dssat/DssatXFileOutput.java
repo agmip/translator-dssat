@@ -79,6 +79,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         ArrayList<ArrayList<HashMap>> mhArr = new ArrayList();   // array for harvest record
         ArrayList<HashMap> smArr = new ArrayList();     // array for simulation control record
 //        String exName;
+        boolean isFallow = false;
 
         try {
 
@@ -413,6 +414,21 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                        mfSubArr.add(new HashMap());
 //                    }
 //                }
+                
+                // Specila handling for fallow experiment
+                if (mpData.isEmpty()) {
+                    isFallow = true;
+                    cuData.put("crid", "FA");
+                    cuData.put("dssat_cul_id", "IB0001");
+                    cuData.put("cul_name", "Fallow");
+                    if (mhSubArr.isEmpty()) {
+                        HashMap mhData = new HashMap();
+                        copyItem(mhData, rootData, "date", "endat", false);
+    //                    mhData.put("hastg", "GS000");
+                        mhSubArr.add(mhData);
+                        smData.put("hadat_valid", "Y");
+                    }
+                }
 
                 cuNum = setSecDataArr(cuData, cuArr);
                 mpNum = setSecDataArr(mpData, mpArr);
@@ -494,7 +510,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 }
                 sbData.append("\r\n");
-            } else {
+            } else if (!isFallow) {
                 sbError.append("! Warning: There is no cultivar data in the experiment.\r\n");
             }
 
@@ -693,7 +709,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 }
                 sbData.append("\r\n");
-            } else {
+            } else if (!isFallow) {
                 sbError.append("! Warning: There is no plainting data in the experiment.\r\n");
             }
 
