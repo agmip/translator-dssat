@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.agmip.ace.LookupCodes;
+import org.agmip.common.Functions;
 import org.agmip.core.types.TranslatorOutput;
 import static org.agmip.util.MapUtil.*;
 import org.slf4j.Logger;
@@ -460,10 +461,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     }
 
     protected static String getStackTrace(Throwable aThrowable) {
-        final Writer result = new StringWriter();
-        final PrintWriter printWriter = new PrintWriter(result);
-        aThrowable.printStackTrace(printWriter);
-        return result.toString();
+        return Functions.getStackTrace(aThrowable);
     }
 
     /**

@@ -68,7 +68,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             LOG.warn("File not found under following path : [" + filePath + "]!");
             return ret;
         } catch (Exception e) {
-            LOG.error(DssatCommonOutput.getStackTrace(e));
+            LOG.error(getStackTrace(e));
         }
 
         return ret;
@@ -768,7 +768,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
             br.close();
         } catch (IOException ex) {
-            LOG.error(DssatCommonOutput.getStackTrace(ex));
+            LOG.error(getStackTrace(ex));
         }
 
         return "";
@@ -1050,7 +1050,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
     }
 
     protected String getStackTrace(Throwable aThrowable) {
-        return DssatCommonOutput.getStackTrace(aThrowable);
+        return Functions.getStackTrace(aThrowable);
     }
 
     protected String transSltx(String sltx) {
