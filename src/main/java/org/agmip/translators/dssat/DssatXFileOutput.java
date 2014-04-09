@@ -371,8 +371,22 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             copyItem(cuData, evtData, "cul_notes");
                             translateTo2BitCrid(cuData);
                             // Set planting info
-                            mpData.putAll(evtData);
-                            mpData.remove("cul_name");
+                            // To make comparision only on the planting information (without crop data), use HashMap to rebuild pure planting map
+                            copyItem(mpData, evtData, "date");
+                            copyItem(mpData, evtData, "edate");
+                            copyItem(mpData, evtData, "plpop");
+                            copyItem(mpData, evtData, "plpoe");
+                            copyItem(mpData, evtData, "plma");
+                            copyItem(mpData, evtData, "plds");
+                            copyItem(mpData, evtData, "plrs");
+                            copyItem(mpData, evtData, "plrd");
+                            copyItem(mpData, evtData, "pldp");
+                            copyItem(mpData, evtData, "plmwt");
+                            copyItem(mpData, evtData, "page");
+                            copyItem(mpData, evtData, "plenv");
+                            copyItem(mpData, evtData, "plph");
+                            copyItem(mpData, evtData, "plspl");
+                            copyItem(mpData, evtData, "pl_name");
                         } // irrigation event
                         else if (getValueOr(evtData, "event", "").equals("irrigation")) {
                             miSubArr.add(evtData);
