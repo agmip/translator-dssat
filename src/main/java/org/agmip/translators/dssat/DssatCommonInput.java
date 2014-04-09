@@ -867,26 +867,6 @@ public abstract class DssatCommonInput implements TranslatorInput {
             String fromKeyVal = fromKeyArr.get(j);
             String toKeyVal;
 
-            for (int k = cnt; k < toKeyArr.size(); k++, cnt++) {
-                toKeyVal = toKeyArr.get(k);
-                if (Double.parseDouble(toKeyVal) == Double.parseDouble(fromKeyVal)) {
-                    toTmp = (HashMap) getSectionData(toArr, toKey, toKeyVal);
-                    ret.add(toTmp);
-                    copyItems(toTmp, fromTmp, copyKeys);
-                    break;
-                } else if (Double.parseDouble(toKeyVal) > Double.parseDouble(fromKeyVal)) {
-                    toTmp = CopyList((HashMap) getSectionData(toArr, toKey, toKeyVal));
-                    toTmp.put(toKey, fromKeyVal);
-                    ret.add(toTmp);
-                    copyItems(toTmp, fromTmp, copyKeys);
-                    break;
-                } else if (!fromKeyArr.contains(toKeyVal)) {
-                    toTmp = (HashMap) getSectionData(toArr, toKey, toKeyVal);
-                    ret.add(toTmp);
-                    copyItems(toTmp, fromTmp, copyKeys);
-                }
-            }
-
             if (toKeyArr.isEmpty()) {
                 ret.add(toTmp);
                 copyItems(toTmp, fromTmp, copyKeys);
@@ -895,6 +875,28 @@ public abstract class DssatCommonInput implements TranslatorInput {
                 toTmp.put(toKey, fromKeyVal);
                 ret.add(toTmp);
                 copyItems(toTmp, fromTmp, copyKeys);
+            }
+            
+            for (;cnt < toKeyArr.size(); cnt++) {
+                toKeyVal = toKeyArr.get(cnt);
+                if (Double.parseDouble(toKeyVal) == Double.parseDouble(fromKeyVal)) {
+                    toTmp = (HashMap) getSectionData(toArr, toKey, toKeyVal);
+                    ret.add(toTmp);
+                    copyItems(toTmp, fromTmp, copyKeys);
+                    cnt++;
+                    break;
+                } else if (Double.parseDouble(toKeyVal) > Double.parseDouble(fromKeyVal)) {
+                    toTmp = CopyList((HashMap) getSectionData(toArr, toKey, toKeyVal));
+                    toTmp.put(toKey, fromKeyVal);
+                    ret.add(toTmp);
+                    copyItems(toTmp, fromTmp, copyKeys);
+                    cnt++;
+                    break;
+                } else {
+                    toTmp = (HashMap) getSectionData(toArr, toKey, toKeyVal);
+                    ret.add(toTmp);
+                    copyItems(toTmp, fromTmp, copyKeys);
+                }
             }
         }
 
