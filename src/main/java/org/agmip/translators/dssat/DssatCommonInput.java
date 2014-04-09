@@ -62,7 +62,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
         try {
             // read file by file
-            ret = readFile(getBufferReader(filePath));
+            HashMap bufs = getBufferReader(filePath);
+            ret = readFile(bufs);
+            bufs = null;
 
         } catch (FileNotFoundException fe) {
             LOG.warn("File not found under following path : [" + filePath + "]!");
@@ -370,6 +372,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
                     }
                 }
             }
+            in.close();
         } // If input File is not ZIP file
         else {
             in = new FileInputStream(filePath);
