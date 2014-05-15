@@ -44,7 +44,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
     private ExecutorService executor = Executors.newFixedThreadPool(64);
     private static final Logger LOG = LoggerFactory.getLogger(DssatControllerOutput.class);
 //    private ArrayList<File> 
-    
+
     public DssatControllerOutput() {
         soilHelper = new DssatSoilFileHelper();
         wthHelper = new DssatWthFileHelper();
@@ -170,14 +170,14 @@ public class DssatControllerOutput extends DssatCommonOutput {
      */
     @Override
     public void writeFile(String arg0, Map result) {
-        
+
         long estTime = 0;
 
         try {
             if (getObjectOr(result, "experiments", new ArrayList()).isEmpty()
                     && getObjectOr(result, "soils", new ArrayList()).isEmpty()
                     && getObjectOr(result, "weathers", new ArrayList()).isEmpty()) {
-                
+
                 // Calculate estimated time consume
                 HashMap wth = getObjectOr(result, "weather", new HashMap());
                 estTime += getObjectOr(wth, "dailyWeather", new ArrayList()).size();
@@ -198,7 +198,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 writeSingleExp(arg0, result, new DssatRunFileOutput(DssatVersion.DSSAT46), "Run46.bat");
 
                 // compress all output files into one zip file
-                //outputFile = new File(revisePath(arg0) + getZipFileName(outputs));
+                outputFile = new File(revisePath(arg0) + exname + ".ZIP");
 
                 //createZip();
 
@@ -209,7 +209,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 }
                 writeMultipleExp(arg0, result);
             }
-            
+
             if (estTime > 0) {
                 estTime *= 10;
             } else {
@@ -243,6 +243,23 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 }
             }
             executor = null;
+            LOG.debug("Consume {} s", (System.currentTimeMillis() - timer) / 1000.0);
+
+            // Get output result files into output array
+            for (String key : futFiles.keySet()) {
+                try {
+                    File f = futFiles.get(key).get();
+                    if (f != null) {
+                        files.put(f.getPath(), f);
+                    }
+                } catch (InterruptedException ex) {
+                    LOG.error(getStackTrace(ex));
+                } catch (ExecutionException ex) {
+                    if (!ex.getMessage().contains("NoOutputFileException")) {
+                        LOG.error(getStackTrace(ex));
+                    }
+                }
+            }
 
         } catch (FileNotFoundException e) {
             LOG.error(getStackTrace(e));
@@ -325,7 +342,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
             } else {
                 soil_id = soil_id.substring(0, 2);
             }
-            
+
             Map soil = (Map) data.get("soil");
             if (soil == null || soil.isEmpty()) {
                 continue;
@@ -353,30 +370,23 @@ public class DssatControllerOutput extends DssatCommonOutput {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private void createZip() throws FileNotFoundException, IOException {
+    public void createZip() throws FileNotFoundException, IOException {
+        createZip(true);
+    }
+
+    /**
+     * Compress the files in one zip
+     *
+     * @param isDelete Flag for if deleted the files after compression
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public void createZip(boolean isDelete) throws FileNotFoundException, IOException {
 
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outputFile));
         ZipEntry entry;
         BufferedInputStream bis;
         byte[] data = new byte[1024];
-
-        // Get output result files into output array for zip package
-        long timer = System.currentTimeMillis();
-        for (String key : futFiles.keySet()) {
-            try {
-                File f = futFiles.get(key).get();
-                if (f != null) {
-                    files.put(f.getPath(), f);
-                }
-            } catch (InterruptedException ex) {
-                LOG.error(getStackTrace(ex));
-            } catch (ExecutionException ex) {
-                if (!ex.getMessage().contains("NoOutputFileException")) {
-                    LOG.error(getStackTrace(ex));
-                }
-            }
-        }
-        LOG.debug("Consume {} s", (System.currentTimeMillis() - timer) / 1000.0);
 
         LOG.info("Start zipping all the files...");
 
@@ -418,26 +428,25 @@ public class DssatControllerOutput extends DssatCommonOutput {
         return new ArrayList(files.values());
     }
 
-    /**
-     * Get output zip file name by using experiment file name
-     *
-     * @param outputs DSSAT Output objects
-     */
-    private String getZipFileName(DssatCommonOutput[] outputs) {
-
-        for (int i = 0; i < outputs.length; i++) {
-            if (outputs[i] instanceof DssatXFileOutput) {
-                if (outputs[i].getOutputFile() != null) {
-                    return outputs[i].getOutputFile().getName().replaceAll("\\.", "_") + ".ZIP";
-                } else {
-                    break;
-                }
-            }
-        }
-
-        return "OUTPUT.ZIP";
-    }
-
+//    /**
+//     * Get output zip file name by using experiment file name
+//     *
+//     * @param outputs DSSAT Output objects
+//     */
+//    private String getZipFileName(DssatCommonOutput... outputs) {
+//
+//        for (int i = 0; i < outputs.length; i++) {
+//            if (outputs[i] instanceof DssatXFileOutput) {
+//                if (outputs[i].getOutputFile() != null) {
+//                    return outputs[i].getOutputFile().getName().replaceAll("\\.", "_") + ".ZIP";
+//                } else {
+//                    break;
+//                }
+//            }
+//        }
+//
+//        return "OUTPUT.ZIP";
+//    }
     /**
      * Get output zip file
      */
