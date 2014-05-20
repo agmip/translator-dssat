@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import org.agmip.util.JSONAdapter;
@@ -52,7 +53,7 @@ public class DssatControllerTest {
         Calendar cal;
         String outPath;
         File outDir;
-        File[] files;
+        ArrayList<File> files;
         result = obDssatControllerInput.readFile(resource.getPath());
 //        BufferedOutputStream bo;
 //        File f = new File("output\\" + fileName.replaceAll("[Xx]*\\.\\w+$", ".json"));
@@ -68,11 +69,13 @@ public class DssatControllerTest {
         obDssatControllerOutput = new DssatControllerOutput();
         obDssatControllerOutput.writeFile(outPath, result);
         outDir = new File(outPath);
-        files = outDir.listFiles();
+        files = obDssatControllerOutput.getOutputFiles();
         for (File file : files) {
             System.out.println("Generated: " + file.getName());
-            file.delete();
         }
+        obDssatControllerOutput.createZip();
+        System.out.println("Generated: " + obDssatControllerOutput.getOutputZipFile().getPath());
+        obDssatControllerOutput.getOutputZipFile().delete();
         outDir.delete();
 
         String jsonStr;
@@ -84,11 +87,13 @@ public class DssatControllerTest {
         obDssatControllerOutput = new DssatControllerOutput();
         obDssatControllerOutput.writeFile(outPath, JSONAdapter.fromJSON(jsonStr));
         outDir = new File(outPath);
-        files = outDir.listFiles();
+        files = obDssatControllerOutput.getOutputFiles();
         for (File file : files) {
             System.out.println("Generated: " + file.getName());
-            file.delete();
         }
+        obDssatControllerOutput.createZip();
+        System.out.println("Generated: " + obDssatControllerOutput.getOutputZipFile().getName());
+        obDssatControllerOutput.getOutputZipFile().delete();
         outDir.delete();
         
         // Test for CRAFT
@@ -106,7 +111,7 @@ public class DssatControllerTest {
         obDssatControllerOutput = new DssatControllerOutput();
         obDssatControllerOutput.writeFile(outPath, result);
         outDir = new File(outPath);
-        files = outDir.listFiles();
+        files = obDssatControllerOutput.getOutputFiles();
         for (File file : files) {
             System.out.println("Generated: " + file.getName());
             file.delete();
