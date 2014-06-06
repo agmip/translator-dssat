@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import org.agmip.acmo.util.AcmoUtil;
 import org.agmip.common.Functions;
 import org.agmip.util.JSONAdapter;
 import org.agmip.util.MapUtil;
@@ -35,10 +36,12 @@ public class DssatCmdApp {
         if (isToModel) {
             LOG.info("Translate {} to DSSAT...", inputPaths);
             DssatControllerOutput translator = new DssatControllerOutput();
-            translator.writeFile(outputPath, readJson());
+            HashMap data = readJson();
+            translator.writeFile(outputPath, data);
             if (isCompressed) {
-                translator.createZip();
+                translator.createZip(new File(outputPath + File.separator + "DSSAT_Input.zip"));
             }
+            writeAcmo(data);
         } else {
             LOG.info("Translate {} to JSON...", inputPaths.get(0));
             DssatControllerInput translator = new DssatControllerInput();
@@ -75,13 +78,29 @@ public class DssatCmdApp {
         LOG.info("Output to {}", outputPath);
     }
 
-    private static Map readJson() throws IOException {
-        Map data = new HashMap();
+    private static HashMap readJson() throws IOException {
+        HashMap data = new HashMap();
         for (String in : inputPaths) {
-            data.putAll(JSONAdapter.fromJSONFile(in));
+            HashMap tmp = JSONAdapter.fromJSONFile(in);
+            conbineData(data, tmp, "experiments");
+            conbineData(data, tmp, "soils");
+            conbineData(data, tmp, "weathers");
         }
         fixData(data);
         return data;
+    }
+    
+    private static void conbineData(Map to, Map from, String key) {
+        
+        ArrayList fromArr = (ArrayList) from.get(key);
+        if (fromArr != null) {
+            ArrayList toArr = (ArrayList) to.get(key);
+            if (toArr == null) {
+                to.put(key, fromArr);
+            } else {
+                toArr.addAll(fromArr);
+            }
+        }
     }
 
     private static String getOutputPath(String arg) {
@@ -170,5 +189,9 @@ public class DssatCmdApp {
             }
         }
         return null;
+    }
+    
+    private static void writeAcmo(HashMap data) {
+        AcmoUtil.writeAcmo(outputPath, data, "dssat", new HashMap());
     }
 }

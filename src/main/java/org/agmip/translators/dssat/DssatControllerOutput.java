@@ -373,6 +373,10 @@ public class DssatControllerOutput extends DssatCommonOutput {
     public void createZip() throws FileNotFoundException, IOException {
         createZip(true);
     }
+    
+    public void createZip(File out) throws FileNotFoundException, IOException {
+        createZip(out, true);
+    }
 
     /**
      * Compress the files in one zip
@@ -382,6 +386,10 @@ public class DssatControllerOutput extends DssatCommonOutput {
      * @throws IOException
      */
     public void createZip(boolean isDelete) throws FileNotFoundException, IOException {
+        createZip(outputFile, isDelete);
+    }
+    
+    public void createZip(File outputFile, boolean isDelete) throws FileNotFoundException, IOException {
 
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outputFile));
         ZipEntry entry;
