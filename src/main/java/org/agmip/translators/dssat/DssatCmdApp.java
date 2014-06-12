@@ -27,6 +27,11 @@ public class DssatCmdApp {
     private static ArrayList<String> inputPaths = new ArrayList();
     private static String outputPath = getOutputPath("");
     private static final Logger LOG = LoggerFactory.getLogger(DssatCmdApp.class);
+    private static final String defValC = "-99";
+    private static final String defValI = "-99";
+    private static final String defValD = "-99";
+    private static final String defValR = "-99";
+    private static final String defValBlank = "";
 
     public static void main(String... args) throws IOException {
         readCommand(args);
@@ -131,6 +136,7 @@ public class DssatCmdApp {
             fixDataLink(exp, wstIds, "wst_id", 4);
             fixEventDate(exp);
             fixSimCtrl(exp);
+            fixEnvMdf(exp);
         }
     }
 
@@ -198,10 +204,6 @@ public class DssatCmdApp {
     }
 
     private static void fixSimCtrl(HashMap expData) {
-        String defValC = "-99";
-        String defValI = "-99";
-        String defValD = "-99";
-        String defValR = "-99";
         HashMap smData = MapUtil.getObjectOr(expData, "dssat_simulation_control", new HashMap());
         ArrayList<HashMap> smArr = MapUtil.getObjectOr(smData, "data", new ArrayList());
         for (HashMap data : smArr) {
@@ -213,7 +215,7 @@ public class DssatCmdApp {
                             MapUtil.getValueOr(smCtrls, "nyers", defValI),
                             MapUtil.getValueOr(smCtrls, "nreps", defValI),
                             MapUtil.getValueOr(smCtrls, "start", defValC).toString(),
-                            getDate(smCtrls, "sdate", "sdyer","sdday", defValD),
+                            getDate(smCtrls, "sdate", "sdyer", "sdday", defValD),
                             MapUtil.getValueOr(smCtrls, "rseed", defValI),
                             MapUtil.getValueOr(smCtrls, "sname", defValC),
                             MapUtil.getValueOr(smCtrls, "model", defValC));
@@ -295,8 +297,8 @@ public class DssatCmdApp {
                 if (!smCtrls.isEmpty()) {
                     String smStr = String.format("%1$-11s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s",
                             MapUtil.getValueOr(smCtrls, "planting", "PL"),
-                            getDate(smCtrls, "pfrst", "pfyer","pfday", defValD),
-                            getDate(smCtrls, "plast", "plyer","plday", defValD),
+                            getDate(smCtrls, "pfrst", "pfyer", "pfday", defValD),
+                            getDate(smCtrls, "plast", "plyer", "plday", defValD),
                             MapUtil.getValueOr(smCtrls, "ph2ol", defValR),
                             MapUtil.getValueOr(smCtrls, "ph2ou", defValR),
                             MapUtil.getValueOr(smCtrls, "ph2od", defValR),
@@ -350,7 +352,7 @@ public class DssatCmdApp {
                     String smStr = String.format("%1$-11s %2$5s %3$5s %4$5s %5$5s",
                             MapUtil.getValueOr(smCtrls, "harvests", "HA"),
                             MapUtil.getValueOr(smCtrls, "hfrst", defValD),
-                            getDate(smCtrls, "hlast", "hlyer","hlday", defValD),
+                            getDate(smCtrls, "hlast", "hlyer", "hlday", defValD),
                             MapUtil.getValueOr(smCtrls, "hpcnp", defValR),
                             MapUtil.getValueOr(smCtrls, "hpcnr", defValR));
                     data.put("sm_harvests", smStr);
@@ -358,7 +360,7 @@ public class DssatCmdApp {
             }
         }
     }
-    
+
     private static String getDate(HashMap data, String dateId, String yearId, String dayId, String defVal) {
         String date = DssatCommonOutput.formatDateStr(MapUtil.getValueOr(data, dateId, defVal));
         if (defVal.equals(date)) {
@@ -370,5 +372,29 @@ public class DssatCmdApp {
             }
         }
         return date;
+    }
+
+    private static void fixEnvMdf(HashMap expData) {
+        HashMap emData = MapUtil.getObjectOr(expData, "dssat_environment_modification", new HashMap());
+        ArrayList<HashMap> emArr = MapUtil.getObjectOr(emData, "data", new ArrayList());
+        for (HashMap data : emArr) {
+            if (!data.containsKey("em_data")) {
+                HashMap secData = MapUtil.getObjectOr(data, "data", new HashMap());
+                if (!secData.isEmpty()) {
+                    String emStr = String.format("%1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$s",
+                            getDate(secData, "date", "odyer", "odday", defValD),
+                            MapUtil.getValueOr(secData, "eday", defValBlank),
+                            MapUtil.getValueOr(secData, "erad", defValBlank),
+                            MapUtil.getValueOr(secData, "emax", defValBlank),
+                            MapUtil.getValueOr(secData, "emin", defValBlank),
+                            MapUtil.getValueOr(secData, "erain", defValBlank),
+                            MapUtil.getValueOr(secData, "eco2", defValBlank),
+                            MapUtil.getValueOr(secData, "edew", defValBlank),
+                            MapUtil.getValueOr(secData, "ewind", defValBlank),
+                            MapUtil.getValueOr(secData, "em_name", defValC));
+                    data.put("em_data", emStr);
+                }
+            }
+        }
     }
 }
