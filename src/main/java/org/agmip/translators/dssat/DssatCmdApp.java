@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -89,9 +90,9 @@ public class DssatCmdApp {
         fixData(data);
         return data;
     }
-    
+
     private static void conbineData(Map to, Map from, String key) {
-        
+
         ArrayList fromArr = (ArrayList) from.get(key);
         if (fromArr != null) {
             ArrayList toArr = (ArrayList) to.get(key);
@@ -104,14 +105,14 @@ public class DssatCmdApp {
     }
 
     private static String getOutputPath(String arg) {
-        
+
         String path;
         if (arg != null && !"".equals(arg)) {
             path = new File(arg).getPath() + File.separator + "DSSAT";
         } else {
             path = "DSSAT";
         }
-        
+
         File dir = new File(path);
         int cnt = 1;
         while (dir.exists() && dir.list().length > 0) {
@@ -120,7 +121,7 @@ public class DssatCmdApp {
         }
         return dir.getPath();
     }
-    
+
     private static void fixData(Map data) {
         ArrayList<HashMap> exps = MapUtil.getObjectOr(data, "experiments", new ArrayList());
         HashSet soilIds = getIds(MapUtil.getObjectOr(data, "soils", new ArrayList()), "soil_id");
@@ -129,9 +130,10 @@ public class DssatCmdApp {
             fixDataLink(exp, soilIds, "soil_id", 10);
             fixDataLink(exp, wstIds, "wst_id", 4);
             fixEventDate(exp);
+            fixSimCtrl(exp);
         }
     }
-    
+
     private static HashSet<String> getIds(ArrayList<HashMap> arr, String idName) {
         HashSet ids = new HashSet();
         for (HashMap data : arr) {
@@ -142,9 +144,9 @@ public class DssatCmdApp {
         }
         return ids;
     }
-    
+
     private static void fixDataLink(HashMap expData, HashSet ids, String idName, int adjustLength) {
-        
+
         String id = (String) expData.get(idName);
         boolean isIdFixed = false;
         if (id != null && !ids.isEmpty()) {
@@ -163,7 +165,7 @@ public class DssatCmdApp {
             expData.put(idName, id);
         }
     }
-    
+
     private static void fixEventDate(HashMap expData) {
         ArrayList<HashMap<String, String>> events = MapUtil.getBucket(expData, "management").getDataList();
         String pdate = getPdate(events);
@@ -181,7 +183,7 @@ public class DssatCmdApp {
             }
         }
     }
-    
+
     private static String getPdate(ArrayList<HashMap<String, String>> events) {
         for (HashMap<String, String> event : events) {
             if ("planting".equals(event.get("event"))) {
@@ -190,8 +192,183 @@ public class DssatCmdApp {
         }
         return null;
     }
-    
+
     private static void writeAcmo(HashMap data) {
         AcmoUtil.writeAcmo(outputPath, data, "dssat", new HashMap());
+    }
+
+    private static void fixSimCtrl(HashMap expData) {
+        String defValC = "-99";
+        String defValI = "-99";
+        String defValD = "-99";
+        String defValR = "-99";
+        HashMap smData = MapUtil.getObjectOr(expData, "dssat_simulation_control", new HashMap());
+        ArrayList<HashMap> smArr = MapUtil.getObjectOr(smData, "data", new ArrayList());
+        for (HashMap data : smArr) {
+            if (!data.containsKey("sm_general")) {
+                HashMap smCtrls = MapUtil.getObjectOr(data, "general", new HashMap());
+                if (!smCtrls.isEmpty()) {
+                    String smStr = String.format("%1$-11s %2$5s %3$5s %4$5s %5$5s %6$5s %7$-25s %8$s",
+                            MapUtil.getValueOr(smCtrls, "general", "GE"),
+                            MapUtil.getValueOr(smCtrls, "nyers", defValI),
+                            MapUtil.getValueOr(smCtrls, "nreps", defValI),
+                            MapUtil.getValueOr(smCtrls, "start", defValC).toString(),
+                            getDate(smCtrls, "sdate", "sdyer","sdday", defValD),
+                            MapUtil.getValueOr(smCtrls, "rseed", defValI),
+                            MapUtil.getValueOr(smCtrls, "sname", defValC),
+                            MapUtil.getValueOr(smCtrls, "model", defValC));
+                    data.put("sm_general", smStr);
+                }
+            }
+            if (!data.containsKey("sm_options")) {
+                HashMap smCtrls = MapUtil.getObjectOr(data, "options", new HashMap());
+                if (!smCtrls.isEmpty()) {
+                    String smStr = String.format("%1$-11s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s",
+                            MapUtil.getValueOr(smCtrls, "options", "OP"),
+                            MapUtil.getValueOr(smCtrls, "water", defValC),
+                            MapUtil.getValueOr(smCtrls, "nitro", defValC),
+                            MapUtil.getValueOr(smCtrls, "symbi", defValC),
+                            MapUtil.getValueOr(smCtrls, "phosp", defValC),
+                            MapUtil.getValueOr(smCtrls, "potas", defValC),
+                            MapUtil.getValueOr(smCtrls, "dises", defValC),
+                            MapUtil.getValueOr(smCtrls, "chem", defValC),
+                            MapUtil.getValueOr(smCtrls, "till", defValC),
+                            MapUtil.getValueOr(smCtrls, "co2", defValC));
+                    data.put("sm_options", smStr);
+                }
+            }
+            if (!data.containsKey("sm_methods")) {
+                HashMap smCtrls = MapUtil.getObjectOr(data, "methods", new HashMap());
+                if (!smCtrls.isEmpty()) {
+                    String smStr = String.format("%1$-11s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s",
+                            MapUtil.getValueOr(smCtrls, "methods", "ME"),
+                            MapUtil.getValueOr(smCtrls, "wther", defValC),
+                            MapUtil.getValueOr(smCtrls, "incon", defValC),
+                            MapUtil.getValueOr(smCtrls, "light", defValC),
+                            MapUtil.getValueOr(smCtrls, "evapo", defValC),
+                            MapUtil.getValueOr(smCtrls, "infil", defValC),
+                            MapUtil.getValueOr(smCtrls, "photo", defValC),
+                            MapUtil.getValueOr(smCtrls, "hydro", defValC),
+                            MapUtil.getValueOr(smCtrls, "nswit", defValC),
+                            MapUtil.getValueOr(smCtrls, "mesom", defValC),
+                            MapUtil.getValueOr(smCtrls, "mesev", defValC),
+                            MapUtil.getValueOr(smCtrls, "mesol", defValC));
+                    data.put("sm_methods", smStr);
+                }
+            }
+            if (!data.containsKey("sm_management")) {
+                HashMap smCtrls = MapUtil.getObjectOr(data, "management", new HashMap());
+                if (!smCtrls.isEmpty()) {
+                    String smStr = String.format("%1$-11s %2$5s %3$5s %4$5s %5$5s %6$5s",
+                            MapUtil.getValueOr(smCtrls, "management", "MA"),
+                            MapUtil.getValueOr(smCtrls, "plant", defValC),
+                            MapUtil.getValueOr(smCtrls, "irrig", defValC),
+                            MapUtil.getValueOr(smCtrls, "ferti", defValC),
+                            MapUtil.getValueOr(smCtrls, "resid", defValC),
+                            MapUtil.getValueOr(smCtrls, "harvs", defValC));
+                    data.put("sm_management", smStr);
+                }
+            }
+            if (!data.containsKey("sm_outputs")) {
+                HashMap smCtrls = MapUtil.getObjectOr(data, "outputs", new HashMap());
+                if (!smCtrls.isEmpty()) {
+                    String smStr = String.format("%1$-11s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s",
+                            MapUtil.getValueOr(smCtrls, "outputs", "OU"),
+                            MapUtil.getValueOr(smCtrls, "fname", defValC),
+                            MapUtil.getValueOr(smCtrls, "ovvew", defValC),
+                            MapUtil.getValueOr(smCtrls, "sumry", defValC),
+                            MapUtil.getValueOr(smCtrls, "fropt", defValI),
+                            MapUtil.getValueOr(smCtrls, "grout", defValC),
+                            MapUtil.getValueOr(smCtrls, "caout", defValC),
+                            MapUtil.getValueOr(smCtrls, "waout", defValC),
+                            MapUtil.getValueOr(smCtrls, "niout", defValC),
+                            MapUtil.getValueOr(smCtrls, "miout", defValC),
+                            MapUtil.getValueOr(smCtrls, "diout", defValC),
+                            MapUtil.getValueOr(smCtrls, "vbose", defValC),
+                            MapUtil.getValueOr(smCtrls, "chout", defValC),
+                            MapUtil.getValueOr(smCtrls, "opout", defValC));
+                    data.put("sm_outputs", smStr);
+                }
+            }
+            if (!data.containsKey("sm_planting")) {
+                HashMap smCtrls = MapUtil.getObjectOr(data, "planting", new HashMap());
+                if (!smCtrls.isEmpty()) {
+                    String smStr = String.format("%1$-11s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s",
+                            MapUtil.getValueOr(smCtrls, "planting", "PL"),
+                            getDate(smCtrls, "pfrst", "pfyer","pfday", defValD),
+                            getDate(smCtrls, "plast", "plyer","plday", defValD),
+                            MapUtil.getValueOr(smCtrls, "ph2ol", defValR),
+                            MapUtil.getValueOr(smCtrls, "ph2ou", defValR),
+                            MapUtil.getValueOr(smCtrls, "ph2od", defValR),
+                            MapUtil.getValueOr(smCtrls, "pstmx", defValR),
+                            MapUtil.getValueOr(smCtrls, "pstmn", defValR));
+                    data.put("sm_planting", smStr);
+                }
+            }
+            if (!data.containsKey("sm_irrigation")) {
+                HashMap smCtrls = MapUtil.getObjectOr(data, "irrigation", new HashMap());
+                if (!smCtrls.isEmpty()) {
+                    String smStr = String.format("%1$-11s %2$5s %3$5s %4$5s %5$-5s %6$-5s %7$5s %8$5s",
+                            MapUtil.getValueOr(smCtrls, "irrigation", "IR"),
+                            MapUtil.getValueOr(smCtrls, "imdep", defValR),
+                            MapUtil.getValueOr(smCtrls, "ithrl", defValR),
+                            MapUtil.getValueOr(smCtrls, "ithru", defValR),
+                            MapUtil.getValueOr(smCtrls, "iroff", defValC),
+                            MapUtil.getValueOr(smCtrls, "imeth", defValC),
+                            MapUtil.getValueOr(smCtrls, "iramt", defValR),
+                            MapUtil.getValueOr(smCtrls, "ireff", defValR));
+                    data.put("sm_irrigation", smStr);
+                }
+            }
+            if (!data.containsKey("sm_nitrogen")) {
+                HashMap smCtrls = MapUtil.getObjectOr(data, "nitrogen", new HashMap());
+                if (!smCtrls.isEmpty()) {
+                    String smStr = String.format("%1$-11s %2$5s %3$5s %4$5s %5$-5s %6$-5s",
+                            MapUtil.getValueOr(smCtrls, "nitrogen", "NI"),
+                            MapUtil.getValueOr(smCtrls, "nmdep", defValR),
+                            MapUtil.getValueOr(smCtrls, "nmthr", defValR),
+                            MapUtil.getValueOr(smCtrls, "namnt", defValR),
+                            MapUtil.getValueOr(smCtrls, "ncode", defValC),
+                            MapUtil.getValueOr(smCtrls, "naoff", defValC));
+                    data.put("sm_nitrogen", smStr);
+                }
+            }
+            if (!data.containsKey("sm_residues")) {
+                HashMap smCtrls = MapUtil.getObjectOr(data, "residues", new HashMap());
+                if (!smCtrls.isEmpty()) {
+                    String smStr = String.format("%1$-11s %2$5s %3$5s %4$5s",
+                            MapUtil.getValueOr(smCtrls, "residues", "RE"),
+                            MapUtil.getValueOr(smCtrls, "ripcn", defValR),
+                            MapUtil.getValueOr(smCtrls, "rtime", defValI),
+                            MapUtil.getValueOr(smCtrls, "ridep", defValR));
+                    data.put("sm_residues", smStr);
+                }
+            }
+            if (!data.containsKey("sm_harvests")) {
+                HashMap smCtrls = MapUtil.getObjectOr(data, "harvests", new HashMap());
+                if (!smCtrls.isEmpty()) {
+                    String smStr = String.format("%1$-11s %2$5s %3$5s %4$5s %5$5s",
+                            MapUtil.getValueOr(smCtrls, "harvests", "HA"),
+                            MapUtil.getValueOr(smCtrls, "hfrst", defValD),
+                            getDate(smCtrls, "hlast", "hlyer","hlday", defValD),
+                            MapUtil.getValueOr(smCtrls, "hpcnp", defValR),
+                            MapUtil.getValueOr(smCtrls, "hpcnr", defValR));
+                    data.put("sm_harvests", smStr);
+                }
+            }
+        }
+    }
+    
+    private static String getDate(HashMap data, String dateId, String yearId, String dayId, String defVal) {
+        String date = DssatCommonOutput.formatDateStr(MapUtil.getValueOr(data, dateId, defVal));
+        if (defVal.equals(date)) {
+            date = String.format("%1$02d%2$03d",
+                    new BigDecimal(MapUtil.getValueOr(data, yearId, "0")).intValue(),
+                    new BigDecimal(MapUtil.getValueOr(data, dayId, "0")).intValue());
+            if ("00000".equals(date)) {
+                date = defVal;
+            }
+        }
+        return date;
     }
 }
