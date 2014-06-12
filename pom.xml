@@ -74,6 +74,10 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.agmip</groupId>
+            <artifactId>acmo</artifactId>
+        </dependency>
     </dependencies>
 
     <scm>
