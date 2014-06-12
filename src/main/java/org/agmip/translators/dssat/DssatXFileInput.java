@@ -834,7 +834,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("niout", 6);
                         //                    formats.put("miout", 6);
                         //                    formats.put("diout", 6);
-                        //                    formats.put("long", 6);
+                        //                    formats.put("vbose", 6);
                         //                    formats.put("chout", 6);
                         //                    formats.put("opout", 6);
                         // Read line and save into return holder
@@ -851,9 +851,9 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("planting", 12);
                         //                    formats.put("pfrst", 6);
                         //                    formats.put("plast", 6);
-                        //                    formats.put("ph20l", 6);
+                        //                    formats.put("ph2ol", 6);
                         //                    formats.put("ph2ou", 6);
-                        //                    formats.put("ph20d", 6);
+                        //                    formats.put("ph2od", 6);
                         //                    formats.put("pstmx", 6);
                         //                    formats.put("pstmn", 6);
                         // Read line and save into return holder
@@ -924,7 +924,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         //                    formats.put("hfrst", 6);    // P.S. Keep the original value
                         //                    formats.put("hlast", 6);
                         //                    formats.put("hpcnp", 6);
-                        //                    formats.put("hrcnr", 6);
+                        //                    formats.put("hpcnr", 6);
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
                         //                    translateDateStr(tmp, "hlast");
