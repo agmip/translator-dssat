@@ -6,12 +6,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import org.agmip.acmo.util.AcmoUtil;
-import org.agmip.common.Functions;
+import org.agmip.functions.DataCombinationHelper;
 import org.agmip.util.JSONAdapter;
-import org.agmip.util.MapUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,13 +19,14 @@ import org.slf4j.LoggerFactory;
  */
 public class DssatCmdApp {
 
-    private static boolean isCompressed = false;
-    private static boolean isToModel = false;
-    private static ArrayList<String> inputPaths = new ArrayList();
-    private static String outputPath = getOutputPath("");
+    private static boolean isCompressed;
+    private static boolean isToModel;
+    private static ArrayList<String> inputPaths;
+    private static String outputPath;
     private static final Logger LOG = LoggerFactory.getLogger(DssatCmdApp.class);
 
     public static void main(String... args) throws IOException {
+        init();
         readCommand(args);
         if (inputPaths == null) {
             LOG.error("There is no valid input path, please check input arguments");
@@ -59,6 +58,13 @@ public class DssatCmdApp {
         LOG.info("Job done!");
     }
 
+    private static void init() {
+        isCompressed = false;
+        isToModel = false;
+        inputPaths = new ArrayList();
+        outputPath = getOutputPath("");
+    }
+
     private static void readCommand(String[] args) {
 
         for (int i = 0; i < args.length; i++) {
@@ -79,39 +85,20 @@ public class DssatCmdApp {
     }
 
     private static HashMap readJson() throws IOException {
-        HashMap data = new HashMap();
-        for (String in : inputPaths) {
-            HashMap tmp = JSONAdapter.fromJSONFile(in);
-            conbineData(data, tmp, "experiments");
-            conbineData(data, tmp, "soils");
-            conbineData(data, tmp, "weathers");
-        }
-        fixData(data);
+        HashMap data = DataCombinationHelper.combine(inputPaths);
+        DataCombinationHelper.fixData(data);
         return data;
-    }
-    
-    private static void conbineData(Map to, Map from, String key) {
-        
-        ArrayList fromArr = (ArrayList) from.get(key);
-        if (fromArr != null) {
-            ArrayList toArr = (ArrayList) to.get(key);
-            if (toArr == null) {
-                to.put(key, fromArr);
-            } else {
-                toArr.addAll(fromArr);
-            }
-        }
     }
 
     private static String getOutputPath(String arg) {
-        
+
         String path;
         if (arg != null && !"".equals(arg)) {
             path = new File(arg).getPath() + File.separator + "DSSAT";
         } else {
             path = "DSSAT";
         }
-        
+
         File dir = new File(path);
         int cnt = 1;
         while (dir.exists() && dir.list().length > 0) {
@@ -120,77 +107,7 @@ public class DssatCmdApp {
         }
         return dir.getPath();
     }
-    
-    private static void fixData(Map data) {
-        ArrayList<HashMap> exps = MapUtil.getObjectOr(data, "experiments", new ArrayList());
-        HashSet soilIds = getIds(MapUtil.getObjectOr(data, "soils", new ArrayList()), "soil_id");
-        HashSet wstIds = getIds(MapUtil.getObjectOr(data, "weathers", new ArrayList()), "wst_id");
-        for (HashMap exp : exps) {
-            fixDataLink(exp, soilIds, "soil_id", 10);
-            fixDataLink(exp, wstIds, "wst_id", 4);
-            fixEventDate(exp);
-        }
-    }
-    
-    private static HashSet<String> getIds(ArrayList<HashMap> arr, String idName) {
-        HashSet ids = new HashSet();
-        for (HashMap data : arr) {
-            String id = (String) data.get(idName);
-            if (id != null) {
-                ids.add(id);
-            }
-        }
-        return ids;
-    }
-    
-    private static void fixDataLink(HashMap expData, HashSet ids, String idName, int adjustLength) {
-        
-        String id = (String) expData.get(idName);
-        boolean isIdFixed = false;
-        if (id != null && !ids.isEmpty()) {
-            while (!ids.contains(id)) {
-                if (id.length() > adjustLength) {
-                    id = id.substring(0, adjustLength);
-                    isIdFixed = true;
-                } else {
-                    isIdFixed = false;
-                    break;
-                }
-            }
-        }
-        if (isIdFixed) {
-            LOG.info("Fix {} to {} for experiment {}", idName, id, MapUtil.getValueOr(expData, "exname", "N/A"));
-            expData.put(idName, id);
-        }
-    }
-    
-    private static void fixEventDate(HashMap expData) {
-        ArrayList<HashMap<String, String>> events = MapUtil.getBucket(expData, "management").getDataList();
-        String pdate = getPdate(events);
-        if (pdate == null) {
-            LOG.warn("Planting date is missing, will quit fixing event date");
-            return;
-        }
-        String exname = MapUtil.getValueOr(expData, "exname", "N/A");
-        for (HashMap<String, String> event : events) {
-            String date = event.get("date");
-            if (date != null && date.length() != 8) {
-                String newDate = Functions.dateOffset(pdate, date);
-                event.put("date", newDate);
-                LOG.info("Fix {} date to {} for experiment {}", event.get("event"), newDate, exname);
-            }
-        }
-    }
-    
-    private static String getPdate(ArrayList<HashMap<String, String>> events) {
-        for (HashMap<String, String> event : events) {
-            if ("planting".equals(event.get("event"))) {
-                return event.get("date");
-            }
-        }
-        return null;
-    }
-    
+
     private static void writeAcmo(HashMap data) {
         AcmoUtil.writeAcmo(outputPath, data, "dssat", new HashMap());
     }

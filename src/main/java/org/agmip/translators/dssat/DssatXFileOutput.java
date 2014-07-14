@@ -907,9 +907,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     ArrayList<HashMap> secDataArr = meArr.get(idx);
                     for (int i = 0; i < secDataArr.size(); i++) {
                         HashMap secData = secDataArr.get(i);
-                        sbData.append(String.format("%1$2s%2$s\r\n",
+                        sbData.append(String.format("%1$2s %2$s\r\n",
                                 cnt,
-                                secData.get("em_data")));
+                                getValueOr(secData, "em_data", "").trim()));
 //                        sbData.append(String.format("%1$2s%2$s\r\n",
 //                                idx + 1,
 //                                (String) secDataArr.get(i)));

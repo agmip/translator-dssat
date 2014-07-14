@@ -140,7 +140,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @param str date string with format of "yyyymmdd"
      * @return result date string with format of "yyddd"
      */
-    protected String formatDateStr(String str) {
+    protected static String formatDateStr(String str) {
 
         return formatDateStr(str, "0");
     }
@@ -152,7 +152,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @param strDays the number of days need to be added on
      * @return result date string with format of "yyddd"
      */
-    protected String formatDateStr(String startDate, String strDays) {
+    protected static String formatDateStr(String startDate, String strDays) {
 
         // Initial Calendar object
         Calendar cal = Calendar.getInstance();
