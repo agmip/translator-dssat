@@ -60,6 +60,7 @@
         <dependency>
             <groupId>org.agmip</groupId>
             <artifactId>agmip-common-functions</artifactId>
+            <version>1.3.7</version>
         </dependency>
         <dependency>
             <groupId>org.agmip</groupId>
