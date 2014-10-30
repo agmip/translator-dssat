@@ -67,17 +67,17 @@ public class DssatCmdApp {
 
     private static void readCommand(String[] args) {
 
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equalsIgnoreCase("-zip")) {
+        for (String arg : args) {
+            if (arg.equalsIgnoreCase("-zip")) {
                 isCompressed = true;
-            } else if (args[i].toUpperCase().endsWith(".JSON")) {
+            } else if (arg.toUpperCase().endsWith(".JSON")) {
                 isToModel = true;
-                inputPaths.add(args[i]);
-            } else if (args[i].toUpperCase().endsWith(".ZIP")) {
+                inputPaths.add(arg);
+            } else if (arg.toUpperCase().endsWith(".ZIP")) {
                 isToModel = false;
-                inputPaths.add(args[i]);
+                inputPaths.add(arg);
             } else {
-                outputPath = getOutputPath(args[i]);
+                outputPath = getOutputPath(arg);
             }
         }
         LOG.info("Read from {}", inputPaths);

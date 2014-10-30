@@ -31,6 +31,7 @@ public class DssatCulFileInput extends DssatCommonInput {
      *
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
+     * @throws java.io.IOException
      */
     @Override
     protected HashMap readFile(HashMap brMap) throws IOException {
@@ -54,15 +55,16 @@ public class DssatCulFileInput extends DssatCommonInput {
      * not be compressed)
      *
      * @param brMap The holder for BufferReader objects for all files
+     * @param ret
      * @return result data holder object
+     * @throws java.io.IOException
      */
     protected ArrayList<HashMap> readCultivarData(HashMap brMap, HashMap ret) throws IOException {
 
-        String slNotes = null;
         ArrayList<HashMap> culArr = new ArrayList<HashMap>();
         HashMap culData = new HashMap();
         String line;
-        BufferedReader brC = null;
+        BufferedReader brC;
         Object buf;
         HashMap mapC;
         LinkedHashMap formats = new LinkedHashMap();
@@ -110,11 +112,10 @@ public class DssatCulFileInput extends DssatCommonInput {
                     culArr.add(tmp);
                 }
             }
+            brC.close();
         }
 
 //        compressData(culArr);
-        brC.close();
-
         return culArr;
     }
 

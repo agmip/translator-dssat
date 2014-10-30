@@ -35,8 +35,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
 //        ArrayList soilSites;                            // Soil site data array
         HashMap soilSite;                       // Data holder for one site of soil data
         ArrayList<Map> soilSistes;
-        ArrayList soilRecords;                          // Soil layer data array
-        HashMap soilRecord;                     // Data holder for one layer data
+        ArrayList<HashMap> soilRecords;                          // Soil layer data array
         BufferedWriter bwS;                             // output object
         StringBuilder sbTitle = new StringBuilder();
         StringBuilder sbSites = new StringBuilder();
@@ -56,8 +55,7 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 soilSistes.add(result);
             }
 
-            Map expData = soilSistes.get(0);
-            soilSite = (HashMap) getObjectOr(expData, "soil", new HashMap());
+            soilSite = (HashMap) getObjectOr(soilSistes.get(0), "soil", new HashMap());
             if (soilSite.isEmpty()) {
                 return;
             }
@@ -86,9 +84,8 @@ public class DssatSoilOutput extends DssatCommonOutput {
             sbTitle.append("!This soil file is created by DSSAT translator tool on ").append(Calendar.getInstance().getTime()).append(".\r\n");
             sbTitle.append("*SOILS: ");
 
-            for (int i = 0; i < soilSistes.size(); i++) {
+            for (Map expData : soilSistes) {
 
-                expData = soilSistes.get(i);
                 soilSite = (HashMap) getObjectOr(expData, "soil", new HashMap());
                 sbError = new StringBuilder();
                 sbData = new StringBuilder();
@@ -114,14 +111,14 @@ public class DssatSoilOutput extends DssatCommonOutput {
                         formatStr(11, soilSite, "sl_source", defValC),
                         formatStr(5, transSltx(getValueOr(soilSite, "sltx", defValC)), "sltx"),
                         formatNumStr(5, soilSite, "sldp", defValR),
-                        getObjectOr(soilSite, "soil_name", defValC).toString()));
+                        getObjectOr(soilSite, "soil_name", defValC)));
                 sbData.append("@SITE        COUNTRY          LAT     LONG SCS FAMILY\r\n");
                 sbData.append(String.format(" %1$-11s %2$-11s %3$9s%4$8s %5$s\r\n",
                         formatStr(11, soilSite, "sl_loc_3", defValC),
                         formatStr(11, soilSite, "sl_loc_1", defValC),
                         formatNumStr(8, soilSite, "soil_lat", defValR), // P.S. Definition changed 9 -> 10 (06/24)
                         formatNumStr(8, soilSite, "soil_long", defValR), // P.S. Definition changed 9 -> 8  (06/24)
-                        getObjectOr(soilSite, "classification", defValC).toString()));
+                        getObjectOr(soilSite, "classification", defValC)));
                 sbData.append("@ SCOM  SALB  SLU1  SLDR  SLRO  SLNF  SLPF  SMHB  SMPX  SMKE\r\n");
 //                if (getObjectOr(soilSite, "slnf", "").equals("")) {
 //                    sbError.append("! Warning: missing data : [slnf], and will automatically use default value '1'\r\n");
@@ -130,16 +127,16 @@ public class DssatSoilOutput extends DssatCommonOutput {
 //                    sbError.append("! Warning: missing data : [slpf], and will automatically use default value '0.92'\r\n");
 //                }
                 sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
-                        getObjectOr(soilSite, "sscol", defValC).toString(),
+                        getObjectOr(soilSite, "sscol", defValC),
                         formatNumStr(5, soilSite, "salb", defValR),
                         formatNumStr(5, soilSite, "slu1", defValR),
                         formatNumStr(5, soilSite, "sldr", defValR),
                         formatNumStr(5, soilSite, "slro", defValR),
                         formatNumStr(5, soilSite, "slnf", defValR), // P.S. Remove default value as '1'
                         formatNumStr(5, soilSite, "slpf", defValR), // P.S. Remove default value as '0.92'
-                        getObjectOr(soilSite, "smhb", defValC).toString(),
-                        getObjectOr(soilSite, "smpx", defValC).toString(),
-                        getObjectOr(soilSite, "smke", defValC).toString()));
+                        getObjectOr(soilSite, "smhb", defValC),
+                        getObjectOr(soilSite, "smpx", defValC),
+                        getObjectOr(soilSite, "smke", defValC)));
 
                 // Soil Layer data section
                 soilRecords = (ArrayList) getObjectOr(soilSite, layerKey, new ArrayList());
@@ -151,13 +148,12 @@ public class DssatSoilOutput extends DssatCommonOutput {
                 p2Flg = false;
 
                 // Loop for laryer data
-                for (int k = 0; k < soilRecords.size(); k++) {
+                for (HashMap soilRecord : soilRecords) {
 
-                    soilRecord = (HashMap) soilRecords.get(k);
                     // part one
                     sbData.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s %16$5s %17$5s\r\n",
                             formatNumStr(5, soilRecord, "sllb", defValR),
-                            getObjectOr(soilRecord, "slmh", defValC).toString(),
+                            getObjectOr(soilRecord, "slmh", defValC),
                             formatNumStr(5, soilRecord, "slll", defValR),
                             formatNumStr(5, soilRecord, "sldul", defValR),
                             formatNumStr(5, soilRecord, "slsat", defValR),
@@ -173,7 +169,6 @@ public class DssatSoilOutput extends DssatCommonOutput {
                             formatNumStr(5, soilRecord, "slphb", defValR),
                             formatNumStr(5, soilRecord, "slcec", defValR),
                             formatNumStr(5, soilRecord, "sladc", defValR)));
-
                     // part two
                     sbLyrP2.append(String.format(" %1$5s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s %16$5s %17$5s\r\n",
                             formatNumStr(5, soilRecord, "sllb", defValR),
@@ -193,11 +188,10 @@ public class DssatSoilOutput extends DssatCommonOutput {
                             formatNumStr(5, soilRecord, "slsu", defValR),
                             formatNumStr(5, soilRecord, "slec", defValR),
                             formatNumStr(5, soilRecord, "slca", defValR)));
-
                     // Check if there is 2nd part of layer data for output
                     if (!p2Flg) {
-                        for (int j = 0; j < p2Ids.length; j++) {
-                            if (!getValueOr(soilRecord, p2Ids[j], "").equals("")) {
+                        for (String p2Id : p2Ids) {
+                            if (!getValueOr(soilRecord, p2Id, "").equals("")) {
                                 p2Flg = true;
                                 break;
                             }

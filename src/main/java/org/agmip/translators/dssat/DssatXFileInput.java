@@ -35,6 +35,7 @@ public class DssatXFileInput extends DssatCommonInput {
      *
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
+     * @throws java.io.IOException
      */
     @Override
     protected HashMap readFile(HashMap brMap) throws IOException {
@@ -60,8 +61,8 @@ public class DssatXFileInput extends DssatCommonInput {
             copyItem(soilTmp, expData, "sltx");
             copyItem(soilTmp, expData, "sldp");
             ArrayList<HashMap> soilSubArr = getObjectOr(soilTmp, icEventKey, new ArrayList());
-            for (int j = 0; j < soilSubArr.size(); j++) {
-                soilSubArr.get(j).remove("slsc");
+            for (HashMap soilSubData : soilSubArr) {
+                soilSubData.remove("slsc");
             }
             expData.put("soil", soilTmp);
 
@@ -84,6 +85,7 @@ public class DssatXFileInput extends DssatCommonInput {
      * @param brMap The holder for BufferReader objects for all files
      * @param metaData
      * @return trArr The array of treatment data
+     * @throws java.io.IOException
      */
     protected ArrayList<HashMap> readTreatments(HashMap brMap, HashMap metaData) throws IOException {
 
@@ -210,7 +212,6 @@ public class DssatXFileInput extends DssatCommonInput {
 //                                }
 //                                meta.put("fl_loc_3", loc3.substring(0, loc3.length() - 2));
 //                        }
-
                     } // Site info
                     else if ((flg[1].equals("site") || flg[1].equals("sites")) && flg[2].equals("data")) {
                         // P.S. site is missing in the master variables list
@@ -281,7 +282,6 @@ public class DssatXFileInput extends DssatCommonInput {
                         sqArr.add(tmp);
                     } else {
                     }
-
 
                 } // Read CULTIVARS Section
                 else if (flg[0].startsWith("cultivars")) {
@@ -728,7 +728,6 @@ public class DssatXFileInput extends DssatCommonInput {
                     } else {
                     }
 
-
                 } // Read SIMULATION CONTROLS Section // P.S. no need to be divided
                 else if (flg[0].startsWith("simulation")) {
 
@@ -737,199 +736,231 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Set variables' formats
                         formats.clear();
                         formats.put("sm", 2);
-                        formats.put("sm_general", line.length());
-                        //                    formats.put("general", 12);
-                        //                    formats.put("nyers", 6);
-                        //                    formats.put("nreps", 6);
-                        //                    formats.put("start", 6);
-                        //                    formats.put("sdate", 6);
-                        //                    formats.put("rseed", 6);
-                        //                    formats.put("sname", 26);
-                        //                    formats.put("model", line.length());
+//                        formats.put("sm_general", line.length());
+                        formats.put("null", 12);
+                        formats.put("nyers", 6);
+                        formats.put("nreps", 6);
+                        formats.put("start", 6);
+                        formats.put("sdyer", 3);
+                        formats.put("sdday", 3);
+                        formats.put("rseed", 6);
+                        formats.put("sname", 26);
+                        formats.put("model", line.length());
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
-                        //                    translateDateStr(tmp, "sdate");
-                        //                    smSubArr = new ArrayList();
-                        //                    smArr.add(tmp);
-                        //                    tmp.put(eventKey, smSubArr);
-                        //                    smSubArr.add(line);
-                        addToArray(smArr, tmp, "sm");
-
+                        HashMap smData = new HashMap();
+                        Object sm = tmp.remove("sm");
+                        smData.put("sm", sm);
+                        smData.put("general", tmp);
+                        String sdyer = getValueOr(tmp, "sdyer", "");
+                        String sdday = getValueOr(tmp, "sdday", "");
+                        String sdat = translateDateStr(sdyer + sdday);
+                        if (!sdat.equals("")) {
+                            meta.put("sdat", sdat);
+                        }
+                        addToArray(smArr, smData, "sm");
 
                     } // Read options info
                     else if (flg[1].startsWith("n options") && flg[2].equals("data")) {
                         // Set variables' formats
                         formats.clear();
                         formats.put("sm", 2);
-                        formats.put("sm_options", line.length());
-                        //                    formats.put("options", 12);
-                        //                    formats.put("water", 6);
-                        //                    formats.put("nitro", 6);
-                        //                    formats.put("symbi", 6);
-                        //                    formats.put("phosp", 6);
-                        //                    formats.put("potas", 6);
-                        //                    formats.put("dises", 6);
-                        //                    formats.put("chem", 6);
-                        //                    formats.put("till", 6);
-                        //                    formats.put("co2", 6);
+//                        formats.put("sm_options", line.length());
+                        formats.put("null", 12);
+                        formats.put("water", 6);
+                        formats.put("nitro", 6);
+                        formats.put("symbi", 6);
+                        formats.put("phosp", 6);
+                        formats.put("potas", 6);
+                        formats.put("dises", 6);
+                        formats.put("chem", 6);
+                        formats.put("till", 6);
+                        formats.put("co2", 6);
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
-                        addToArray(smArr, tmp, "sm");
-                        //                    smSubArr.add(line);
+                        HashMap smData = new HashMap();
+                        Object sm = tmp.remove("sm");
+                        smData.put("sm", sm);
+                        smData.put("options", tmp);
+                        addToArray(smArr, smData, "sm");
 
                     } // Read methods info
                     else if (flg[1].startsWith("n methods") && flg[2].equals("data")) {
                         // Set variables' formats
                         formats.clear();
                         formats.put("sm", 2);
-                        formats.put("sm_methods", line.length());
-                        //                    formats.put("methods", 12);
-                        //                    formats.put("wther", 6);
-                        //                    formats.put("incon", 6);
-                        //                    formats.put("light", 6);
-                        //                    formats.put("evapo", 6);
-                        //                    formats.put("infil", 6);
-                        //                    formats.put("photo", 6);
-                        //                    formats.put("hydro", 6);
-                        //                    formats.put("nswit", 6);
-                        //                    formats.put("mesom", 6);
-                        //                    formats.put("mesev", 6);
-                        //                    formats.put("mesol", 6);
+//                        formats.put("sm_methods", line.length());
+                        formats.put("null", 12);
+                        formats.put("wther", 6);
+                        formats.put("incon", 6);
+                        formats.put("light", 6);
+                        formats.put("evapo", 6);
+                        formats.put("infil", 6);
+                        formats.put("photo", 6);
+                        formats.put("hydro", 6);
+                        formats.put("nswit", 6);
+                        formats.put("mesom", 6);
+                        formats.put("mesev", 6);
+                        formats.put("mesol", 6);
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
-                        addToArray(smArr, tmp, "sm");
-                        //                    smSubArr.add(line);
+                        HashMap smData = new HashMap();
+                        Object sm = tmp.remove("sm");
+                        smData.put("sm", sm);
+                        smData.put("methods", tmp);
+                        addToArray(smArr, smData, "sm");
 
                     } // Read management info
                     else if (flg[1].startsWith("n management") && flg[2].equals("data")) {
                         // Set variables' formats
                         formats.clear();
                         formats.put("sm", 2);
-                        formats.put("sm_management", line.length());
-                        //                    formats.put("management", 12);
-                        //                    formats.put("plant", 6);
-                        //                    formats.put("irrig", 6);
-                        //                    formats.put("ferti", 6);
-                        //                    formats.put("resid", 6);
-                        //                    formats.put("harvs", 6);
+//                        formats.put("sm_management", line.length());
+                        formats.put("null", 12);
+                        formats.put("plant", 6);
+                        formats.put("irrig", 6);
+                        formats.put("ferti", 6);
+                        formats.put("resid", 6);
+                        formats.put("harvs", 6);
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
-                        addToArray(smArr, tmp, "sm");
-                        //                    smSubArr.add(line);
+                        HashMap smData = new HashMap();
+                        Object sm = tmp.remove("sm");
+                        smData.put("sm", sm);
+                        smData.put("management", tmp);
+                        addToArray(smArr, smData, "sm");
 
                     } // Read outputs info
                     else if (flg[1].startsWith("n outputs") && flg[2].equals("data")) {
                         // Set variables' formats
                         formats.clear();
                         formats.put("sm", 2);
-                        formats.put("sm_outputs", line.length());
-                        //                    formats.put("outputs", 12);
-                        //                    formats.put("fname", 6);
-                        //                    formats.put("ovvew", 6);
-                        //                    formats.put("sumry", 6);
-                        //                    formats.put("fropt", 6);
-                        //                    formats.put("grout", 6);
-                        //                    formats.put("caout", 6);
-                        //                    formats.put("waout", 6);
-                        //                    formats.put("niout", 6);
-                        //                    formats.put("miout", 6);
-                        //                    formats.put("diout", 6);
-                        //                    formats.put("vbose", 6);
-                        //                    formats.put("chout", 6);
-                        //                    formats.put("opout", 6);
+//                        formats.put("sm_outputs", line.length());
+                        formats.put("null", 12);
+                        formats.put("fname", 6);
+                        formats.put("ovvew", 6);
+                        formats.put("sumry", 6);
+                        formats.put("fropt", 6);
+                        formats.put("grout", 6);
+                        formats.put("caout", 6);
+                        formats.put("waout", 6);
+                        formats.put("niout", 6);
+                        formats.put("miout", 6);
+                        formats.put("diout", 6);
+                        formats.put("vbose", 6);
+                        formats.put("chout", 6);
+                        formats.put("opout", 6);
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
-                        addToArray(smArr, tmp, "sm");
-                        //                    smSubArr.add(line);
+                        HashMap smData = new HashMap();
+                        Object sm = tmp.remove("sm");
+                        smData.put("sm", sm);
+                        smData.put("outputs", tmp);
+                        addToArray(smArr, smData, "sm");
 
                     } // Read planting info
                     else if (flg[1].startsWith("n planting") && flg[2].equals("data")) {
                         // Set variables' formats
                         formats.clear();
                         formats.put("sm", 2);
-                        formats.put("sm_planting", line.length());
-                        //                    formats.put("planting", 12);
-                        //                    formats.put("pfrst", 6);
-                        //                    formats.put("plast", 6);
-                        //                    formats.put("ph2ol", 6);
-                        //                    formats.put("ph2ou", 6);
-                        //                    formats.put("ph2od", 6);
-                        //                    formats.put("pstmx", 6);
-                        //                    formats.put("pstmn", 6);
+//                        formats.put("sm_planting", line.length());
+                        formats.put("null", 12);
+                        formats.put("pfyer", 3);
+                        formats.put("pfday", 3);
+                        formats.put("plyer", 3);
+                        formats.put("plday", 3);
+                        formats.put("ph2ol", 6);
+                        formats.put("ph2ou", 6);
+                        formats.put("ph2od", 6);
+                        formats.put("pstmx", 6);
+                        formats.put("pstmn", 6);
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
-                        //                    translateDateStr(tmp, "pfrst");
-                        //                    translateDateStr(tmp, "plast");
-                        addToArray(smArr, tmp, "sm");
-                        //                    smSubArr.add(line);
+                        HashMap smData = new HashMap();
+                        Object sm = tmp.remove("sm");
+                        smData.put("sm", sm);
+                        smData.put("planting", tmp);
+                        addToArray(smArr, smData, "sm");
 
                     } // Read irrigation info
                     else if (flg[1].startsWith("n irrigation") && flg[2].equals("data")) {
                         // Set variables' formats
                         formats.clear();
                         formats.put("sm", 2);
-                        formats.put("sm_irrigation", line.length());
-                        //                    formats.put("irrigation", 12);
-                        //                    formats.put("imdep", 6);
-                        //                    formats.put("ithrl", 6);
-                        //                    formats.put("ithru", 6);
-                        //                    formats.put("iroff", 6);
-                        //                    formats.put("imeth", 6);
-                        //                    formats.put("iramt", 6);
-                        //                    formats.put("ireff", 6);
+//                        formats.put("sm_irrigation", line.length());
+                        formats.put("null", 12);
+                        formats.put("imdep", 6);
+                        formats.put("ithrl", 6);
+                        formats.put("ithru", 6);
+                        formats.put("iroff", 6);
+                        formats.put("imeth", 6);
+                        formats.put("iramt", 6);
+                        formats.put("ireff", 6);
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
-                        addToArray(smArr, tmp, "sm");
-                        //                    smSubArr.add(line);
+                        HashMap smData = new HashMap();
+                        Object sm = tmp.remove("sm");
+                        smData.put("sm", sm);
+                        smData.put("irrigation", tmp);
+                        addToArray(smArr, smData, "sm");
 
                     } // Read nitrogen info
                     else if (flg[1].startsWith("n nitrogen") && flg[2].equals("data")) {
                         // Set variables' formats
                         formats.clear();
                         formats.put("sm", 2);
-                        formats.put("sm_nitrogen", line.length());
-                        //                    formats.put("nitrogen", 12);
-                        //                    formats.put("nmdep", 6);
-                        //                    formats.put("nmthr", 6);
-                        //                    formats.put("namnt", 6);
-                        //                    formats.put("ncode", 6);
-                        //                    formats.put("naoff", 6);
+//                        formats.put("sm_nitrogen", line.length());
+                        formats.put("null", 12);
+                        formats.put("nmdep", 6);
+                        formats.put("nmthr", 6);
+                        formats.put("namnt", 6);
+                        formats.put("ncode", 6);
+                        formats.put("naoff", 6);
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
-                        addToArray(smArr, tmp, "sm");
-                        //                    smSubArr.add(line);
+                        HashMap smData = new HashMap();
+                        Object sm = tmp.remove("sm");
+                        smData.put("sm", sm);
+                        smData.put("nitrogen", tmp);
+                        addToArray(smArr, smData, "sm");
 
                     } // Read residues info
                     else if (flg[1].startsWith("n residues") && flg[2].equals("data")) {
                         // Set variables' formats
                         formats.clear();
                         formats.put("sm", 2);
-                        formats.put("sm_residues", line.length());
-                        //                    formats.put("residues", 12);
-                        //                    formats.put("ripcn", 6);
-                        //                    formats.put("rtime", 6);
-                        //                    formats.put("ridep", 6);
+//                        formats.put("sm_residues", line.length());
+                        formats.put("null", 12);
+                        formats.put("ripcn", 6);
+                        formats.put("rtime", 6);
+                        formats.put("ridep", 6);
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
-                        addToArray(smArr, tmp, "sm");
-                        //                    smSubArr.add(line);
+                        HashMap smData = new HashMap();
+                        Object sm = tmp.remove("sm");
+                        smData.put("sm", sm);
+                        smData.put("residues", tmp);
+                        addToArray(smArr, smData, "sm");
 
                     } // Read harvest info
                     else if (flg[1].startsWith("n harvest") && flg[2].equals("data")) {
                         // Set variables' formats
                         formats.clear();
                         formats.put("sm", 2);
-                        formats.put("sm_harvests", line.length());
-                        //                    formats.put("harvests", 12);
-                        //                    formats.put("hfrst", 6);    // P.S. Keep the original value
-                        //                    formats.put("hlast", 6);
-                        //                    formats.put("hpcnp", 6);
-                        //                    formats.put("hpcnr", 6);
+//                        formats.put("sm_harvests", line.length());
+                        formats.put("null", 12);
+                        formats.put("hfrst", 6);    // P.S. Keep the original value
+                        formats.put("hlyer", 3);
+                        formats.put("hlday", 3);
+                        formats.put("hpcnp", 6);
+                        formats.put("hpcnr", 6);
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
-                        //                    translateDateStr(tmp, "hlast");
-                        addToArray(smArr, tmp, "sm");
-                        //                    smSubArr.add(line);
+                        HashMap smData = new HashMap();
+                        Object sm = tmp.remove("sm");
+                        smData.put("sm", sm);
+                        smData.put("harvests", tmp);
+                        addToArray(smArr, smData, "sm");
 
                     } else {
                     }
@@ -1027,20 +1058,21 @@ public class DssatXFileInput extends DssatCommonInput {
                     HashMap smData = (HashMap) getSectionDataObj(smArr, "sm", sm);
 //                sqData.putAll((HashMap) getSectionDataObj(smArr, "sm", sm));
                     // Read SM management
-                    formats.clear();
-                    formats.put("management", 12);
-                    formats.put("plant", 6);
-                    formats.put("irrig", 6);
-                    formats.put("ferti", 6);
-                    formats.put("resid", 6);
-                    formats.put("harvs", 6);
-                    smManagements = readLine(getValueOr(smData, "sm_management", ""), formats);
+//                    formats.clear();
+//                    formats.put("management", 12);
+//                    formats.put("plant", 6);
+//                    formats.put("irrig", 6);
+//                    formats.put("ferti", 6);
+//                    formats.put("resid", 6);
+//                    formats.put("harvs", 6);
+//                    smManagements = readLine(getValueOr(smData, "sm_management", ""), formats);
+                    smManagements = getObjectOr(smData, "management", new HashMap());
 
                     HashMap tmp = getObjectOr(trData, "dssat_simulation_control", new HashMap());
                     ArrayList<HashMap> arr = getObjectOr(tmp, eventKey, new ArrayList());
                     boolean isExistFlg = false;
-                    for (int j = 0; j < arr.size(); j++) {
-                        if (sm.equals(arr.get(j).get("sm"))) {
+                    for (HashMap data : arr) {
+                        if (sm.equals(data.get("sm"))) {
                             isExistFlg = true;
                             break;
                         }
@@ -1057,8 +1089,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     // Date adjust based on realted treatment info (handling for DOY type value)
                     HashMap irTmp = (HashMap) getSectionDataObj(irArr, "ir", sqData.get("ir").toString());
                     ArrayList<HashMap> irTmpSubs = getObjectOr(irTmp, "data", new ArrayList());
-                    for (int j = 0; j < irTmpSubs.size(); j++) {
-                        HashMap irTmpSub = irTmpSubs.get(j);
+                    for (HashMap irTmpSub : irTmpSubs) {
                         translateDateStrForDOY(irTmpSub, "idate", pdate, smManagements.get("irrig"));
                     }
 
@@ -1070,9 +1101,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (!getObjectOr(sqData, "fe", "0").equals("0")) {
 
                     ArrayList<HashMap> feTmps = (ArrayList) getSectionDataObj(feArr, "fe", sqData.get("fe").toString());
-                    HashMap feTmp;
-                    for (int j = 0; j < feTmps.size(); j++) {
-                        feTmp = feTmps.get(j);
+                    for (HashMap feTmp : feTmps) {
                         // Date adjust based on realted treatment info (handling for DOY type value)
                         translateDateStrForDOY(feTmp, "fdate", pdate, smManagements.get("ferti"));
 
@@ -1084,9 +1113,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 // organic_matter
                 if (!getObjectOr(sqData, "om", "0").equals("0")) {
                     ArrayList<HashMap> omTmps = (ArrayList) getSectionDataObj(omArr, "om", sqData.get("om").toString());
-                    HashMap omTmp;
-                    for (int j = 0; j < omTmps.size(); j++) {
-                        omTmp = omTmps.get(j);
+                    for (HashMap omTmp : omTmps) {
                         // Date adjust based on realted treatment info (handling for DOY type value)
                         translateDateStrForDOY(omTmp, "omdat", pdate, smManagements.get("resid"));
                         // add event data into array
@@ -1097,18 +1124,18 @@ public class DssatXFileInput extends DssatCommonInput {
                 // chemical
                 if (!getObjectOr(sqData, "ch", "0").equals("0")) {
                     ArrayList<HashMap> chTmps = (ArrayList) getSectionDataObj(chArr, "ch", sqData.get("ch").toString());
-                    for (int j = 0; j < chTmps.size(); j++) {
+                    for (HashMap chTmp : chTmps) {
                         // add event data into array
-                        addEvent(evtArr, chTmps.get(j), "cdate", "chemical", seqid);
+                        addEvent(evtArr, chTmp, "cdate", "chemical", seqid);
                     }
                 }
 
                 // tillage
                 if (!getObjectOr(sqData, "ti", "0").equals("0")) {
                     ArrayList<HashMap> tiTmps = (ArrayList) getSectionDataObj(tiArr, "ti", sqData.get("ti").toString());
-                    for (int j = 0; j < tiTmps.size(); j++) {
+                    for (HashMap tiTmp : tiTmps) {
                         // add event data into array
-                        addEvent(evtArr, tiTmps.get(j), "tdate", "tillage", seqid);
+                        addEvent(evtArr, tiTmp, "tdate", "tillage", seqid);
                     }
                 }
 
@@ -1125,8 +1152,8 @@ public class DssatXFileInput extends DssatCommonInput {
                     HashMap tmp = getObjectOr(trData, "dssat_environment_modification", new HashMap());
                     ArrayList<HashMap> arr = getObjectOr(tmp, eventKey, new ArrayList());
                     boolean isExistFlg = false;
-                    for (int j = 0; j < arr.size(); j++) {
-                        if (em.equals(arr.get(j).get("em"))) {
+                    for (HashMap data : arr) {
+                        if (em.equals(data.get("em"))) {
                             isExistFlg = true;
                             break;
                         }
@@ -1240,17 +1267,17 @@ public class DssatXFileInput extends DssatCommonInput {
             HashMap fstNode = (HashMap) secArr.get(0);
             // If it contains multiple sub array of data, or it does not have multiple sub records
             if (fstNode.containsKey(eventKey) || fstNode.containsKey(icEventKey) || singleSubRecSecList.contains(key)) {
-                for (int i = 0; i < secArr.size(); i++) {
-                    if (value.equals(((HashMap) secArr.get(i)).get(key))) {
-                        return CopyList((HashMap) secArr.get(i));
+                for (Object secData : secArr) {
+                    if (value.equals(((HashMap) secData).get(key))) {
+                        return CopyList((HashMap) secData);
                     }
                 }
 
             } // If it is simple array
             else {
                 HashMap node;
-                for (int i = 0; i < secArr.size(); i++) {
-                    node = (HashMap) secArr.get(i);
+                for (Object secData : secArr) {
+                    node = (HashMap) secData;
                     if (value.equals(node.get(key))) {
                         ret.add(CopyList(node));
                     }
@@ -1286,9 +1313,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 events.add(ret);
             }
 
-            for (int i = 0; i < subArr.size(); i++) {
-
-                HashMap tmp = subArr.get(i);
+            for (HashMap tmp : subArr) {
                 ret.put("date", tmp.remove(dateId).toString());
                 ret.putAll(mCopy);
                 ret.putAll(tmp);

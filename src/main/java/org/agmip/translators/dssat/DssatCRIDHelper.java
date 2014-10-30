@@ -10,8 +10,8 @@ import org.agmip.ace.LookupCodes;
 public class DssatCRIDHelper {
 
 //    private HashMap<String, String> crids;  // Mapping the 2-bit value and 3-bit value of crid
-    private static String def2BitVal = "XX";       // default 2-bit value for unknow crid
-    private static String def3BitVal = "XXX";      // default 3-bit value for unknow crid
+    private static final String def2BitVal = "XX";       // default 2-bit value for unknow crid
+    private static final String def3BitVal = "XXX";      // default 3-bit value for unknow crid
 
 //    public DssatCRIDHelper() {
 //        crids = new HashMap();
@@ -97,9 +97,10 @@ public class DssatCRIDHelper {
 //    }
 
     /**
-     * get 2-bit version of crid by given string
+     * get 2-bit version of crop id by given string
      *
      * @param str input string of 3-bit crid
+     * @return 2-bit version of crop id
      */
     public static String get2BitCrid(String str) {
          if (str != null) {
@@ -128,6 +129,7 @@ public class DssatCRIDHelper {
      * get 3-bit version of crop id by given string
      *
      * @param str input string of 2-bit crop id
+     * @return 3-bit version of crop id
      */
     public static String get3BitCrid(String str) {
         if (str != null) {

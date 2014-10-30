@@ -32,6 +32,7 @@ public class DssatAFileInput extends DssatCommonInput {
      *
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
+     * @throws java.io.IOException
      */
     @Override
     protected HashMap readFile(HashMap brMap) throws IOException {
@@ -45,12 +46,12 @@ public class DssatAFileInput extends DssatCommonInput {
 
         for (String exname : files.keySet()) {
             obvData = (ArrayList) files.get(exname).get(obvDataKey);
-            for (int i = 0; i < obvData.size(); i++) {
+            for (HashMap obvSub : obvData) {
                 expData = new HashMap();
                 copyItem(expData, files.get(exname), "exname");
                 copyItem(expData, files.get(exname), "crid");
                 copyItem(expData, files.get(exname), "local_name");
-                expData.put(jsonKey, obvData.get(i));
+                expData.put(jsonKey, obvSub);
                 expArr.add(expData);
             }
         }
@@ -70,6 +71,7 @@ public class DssatAFileInput extends DssatCommonInput {
      *
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
+     * @throws java.io.IOException
      */
     protected HashMap readObvData(HashMap brMap) throws IOException {
 
@@ -77,7 +79,7 @@ public class DssatAFileInput extends DssatCommonInput {
         HashMap file = new HashMap();
         String line;
         HashMap mapA;
-        BufferedReader brA = null;
+        BufferedReader brA;
         Object buf;
         LinkedHashMap formats = new LinkedHashMap();
         ArrayList titles = new ArrayList();
@@ -133,14 +135,13 @@ public class DssatAFileInput extends DssatCommonInput {
                     else {
                         // Set variables' formats
                         formats.clear();
-                        for (int i = 0; i < titles.size(); i++) {
-                            formats.put(titles.get(i), 6);
+                        for (Object title : titles) {
+                            formats.put(title, 6);
                         }
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
                         pdate = getPdate(brMap, (String) tmp.get("trno_a"), fileName.replaceAll("A$", "X"));
-                        for (int i = 0; i < titles.size(); i++) {
-                            String title = (String) titles.get(i);
+                        for (Object title : titles) {
                             if (obvDataList.isDateType(title)) {
                                 translateDateStrForDOY(tmp, (String) title, pdate, "");
 //                            String val = (String) tmp.get(title);
@@ -173,9 +174,8 @@ public class DssatAFileInput extends DssatCommonInput {
             }
             file.put(obvDataKey, obvData);
             files.put(exname, file);
+            brA.close();
         }
-
-        brA.close();
 
         return files;
     }

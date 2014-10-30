@@ -1,9 +1,7 @@
 package org.agmip.translators.dssat;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,12 +19,12 @@ import org.slf4j.LoggerFactory;
  */
 public class DssatControllerInput implements TranslatorInput {
 
-    private DssatXFileInput mgnReader = new DssatXFileInput();
-    private DssatSoilInput soilReader = new DssatSoilInput();
-    private DssatWeatherInput wthReader = new DssatWeatherInput();
-    private DssatAFileInput obvAReader = new DssatAFileInput();
-    private DssatTFileInput obvTReader = new DssatTFileInput();
-    private DssatCulFileInput culReader = new DssatCulFileInput();
+    private final DssatXFileInput mgnReader = new DssatXFileInput();
+    private final DssatSoilInput soilReader = new DssatSoilInput();
+    private final DssatWeatherInput wthReader = new DssatWeatherInput();
+    private final DssatAFileInput obvAReader = new DssatAFileInput();
+    private final DssatTFileInput obvTReader = new DssatTFileInput();
+    private final DssatCulFileInput culReader = new DssatCulFileInput();
     private static final Logger LOG = LoggerFactory.getLogger(DssatControllerInput.class);
 
     /**

@@ -57,9 +57,9 @@ class DssatSortHelper implements Comparator<HashMap> {
     public int compare(HashMap m1, HashMap m2) {
         double val1;
         double val2;
-        for (int i = 0; i < sortIds.length; i++) {
-            val1 = getValue(m1, sortIds[i]);
-            val2 = getValue(m2, sortIds[i]);
+        for (String sortId : sortIds) {
+            val1 = getValue(m1, sortId);
+            val2 = getValue(m2, sortId);
             if (val1 > val2) {
                 return decVal;
             } else if (val1 < val2) {

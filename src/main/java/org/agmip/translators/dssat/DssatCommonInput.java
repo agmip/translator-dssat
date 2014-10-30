@@ -45,6 +45,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      *
      * @param m The holder for BufferReader objects for all files
      * @return result data holder object
+     * @throws java.io.IOException
      */
     protected abstract HashMap readFile(HashMap m) throws IOException;
 
@@ -64,7 +65,6 @@ public abstract class DssatCommonInput implements TranslatorInput {
             // read file by file
             HashMap bufs = getBufferReader(filePath);
             ret = readFile(bufs);
-            bufs = null;
 
         } catch (FileNotFoundException fe) {
             LOG.warn("File not found under following path : [" + filePath + "]!");
@@ -267,8 +267,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
         for (String key : formats.keySet()) {
             // To avoid to be over limit of string lenght
-            length = Math.min((Integer) formats.get(key), line.length());
-            if (!((String) key).equals("") && !((String) key).startsWith("null")) {
+            length = Math.min(formats.get(key), line.length());
+            if (!key.equals("") && !key.startsWith("null")) {
                 tmp = line.substring(0, length).trim();
                 // if the value is in valid keep blank string in it
                 if (checkValidValue(tmp)) {
@@ -288,14 +288,11 @@ public abstract class DssatCommonInput implements TranslatorInput {
     /**
      * Check if input is a valid value
      *
+     * @param value
      * @return check result
      */
     protected boolean checkValidValue(String value) {
-        if (value == null || value.trim().equals(defValC) || value.equals(defValI) || value.equals(defValR)) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(value == null || value.trim().equals(defValC) || value.equals(defValI) || value.equals(defValR));
     }
 
     /**
@@ -511,10 +508,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
     protected void compressData(HashMap m) {
 
         Object[] keys = m.keySet().toArray();
-        Object key;
-        for (int i = 0; i < keys.length; i++) {
-            key = keys[i];
-
+        for (Object key : keys) {
             if (m.get(key) instanceof ArrayList) {
                 if (((ArrayList) m.get(key)).isEmpty()) {
                     // Delete the empty list
@@ -549,22 +543,19 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
         HashMap fstData = null; // The first data record (Map type)
         HashMap cprData;        // The following data record which will be compressed
-
-        for (int i = 0; i < arr.size(); i++) {
-            if (arr.get(i) instanceof ArrayList) {
+        for (Object sub : arr) {
+            if (sub instanceof ArrayList) {
                 // iterate sub array nodes
-                compressData((ArrayList) arr.get(i));
-
-            } else if (arr.get(i) instanceof HashMap) {
+                compressData((ArrayList) sub);
+            } else if (sub instanceof HashMap) {
                 // iterate sub data nodes
-                compressData((HashMap) arr.get(i));
-
+                compressData((HashMap) sub);
                 // Compress data for current array
                 if (fstData == null) {
                     // Get first data node
-                    fstData = (HashMap) arr.get(i);
+                    fstData = (HashMap) sub;
                 } else {
-                    cprData = (HashMap) arr.get(i);
+                    cprData = (HashMap) sub;
                     Object[] keys = cprData.keySet().toArray();
                     // The missing data will be given a "" value; Only data item (String type) will be processed
                     for (Object key : fstData.keySet()) {
@@ -621,13 +612,13 @@ public abstract class DssatCommonInput implements TranslatorInput {
      */
     protected static ArrayList CopyList(ArrayList arr) {
         ArrayList ret = new ArrayList();
-        for (int i = 0; i < arr.size(); i++) {
-            if (arr.get(i) instanceof String) {
-                ret.add(arr.get(i));
-            } else if (arr.get(i) instanceof HashMap) {
-                ret.add(CopyList((HashMap) arr.get(i)));
-            } else if (arr.get(i) instanceof ArrayList) {
-                ret.add(CopyList((ArrayList) arr.get(i)));
+        for (Object sub : arr) {
+            if (sub instanceof String) {
+                ret.add(sub);
+            } else if (sub instanceof HashMap) {
+                ret.add(CopyList((HashMap) sub));
+            } else if (sub instanceof ArrayList) {
+                ret.add(CopyList((ArrayList) sub));
             }
         }
 
@@ -651,8 +642,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
         LOG.debug("Key: {}", key);
 
 
-        for (int i = 0; i < arr.size(); i++) {
-            elem = (HashMap) arr.get(i);
+        for (Object sub : arr) {
+            elem = (HashMap) sub;
             if (!key.getClass().isArray()) {
                 if (elem.get(key).equals(item.get(key))) {
                     elem.putAll(item);
@@ -662,8 +653,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
             } else {
                 Object[] keys = (Object[]) key;
                 boolean equalFlg = true;
-                for (int j = 0; j < keys.length; j++) {
-                    if (!elem.get(keys[j]).equals(item.get(keys[j]))) {
+                for (Object key1 : keys) {
+                    if (!elem.get(key1).equals(item.get(key1))) {
                         equalFlg = false;
                         break;
                     }
@@ -684,6 +675,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * Get planting date value from XFile with related treatment number
      *
      * @param m the files content holder
+     * @param trno
+     * @param fileName
+     * @return planting date
      */
     protected String getPdate(HashMap m, String trno, String fileName) {
 
@@ -788,6 +782,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param secArr Section data array
      * @param key index variable name
      * @param value index variable value
+     * @return the section data with given index value and key
      */
     public static HashMap getSectionData(ArrayList secArr, Object key, String value) {
 
@@ -796,9 +791,9 @@ public abstract class DssatCommonInput implements TranslatorInput {
         if (secArr.isEmpty() || value == null) {
             return ret;
         }
-        for (int i = 0; i < secArr.size(); i++) {
-            if (value.equals(((HashMap) secArr.get(i)).get(key))) {
-                return DssatCommonInput.CopyList((HashMap) secArr.get(i));
+        for (Object secData : secArr) {
+            if (value.equals(((HashMap) secData).get(key))) {
+                return DssatCommonInput.CopyList((HashMap) secData);
             }
         }
 
@@ -812,6 +807,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * @param secArr Section data array
      * @param key index variable name
      * @param value index variable value
+     * @return the section data with given index value and key
      */
     public static HashMap getSectionDataWithNocopy(ArrayList secArr, Object key, String value) {
 
@@ -825,19 +821,19 @@ public abstract class DssatCommonInput implements TranslatorInput {
             if (value.matches("\\w{4}\\d{4}$")) {
                 wst_id = value.substring(0, 4);
             }
-            for (int i = 0; i < secArr.size(); i++) {
-                Object id = ((HashMap) secArr.get(i)).get(key);
+            for (Object secData : secArr) {
+                Object id = ((HashMap) secData).get(key);
                 if (wst_id.equals(id)) {
-                    return (HashMap) secArr.get(i);
+                    return (HashMap) secData;
                 }
-                if (value.equals(((HashMap) secArr.get(i)).get(key))) {
-                    return (HashMap) secArr.get(i);
+                if (value.equals(((HashMap) secData).get(key))) {
+                    return (HashMap) secData;
                 }
             }
         } else {
-            for (int i = 0; i < secArr.size(); i++) {
-                if (value.equals(((HashMap) secArr.get(i)).get(key))) {
-                    return (HashMap) secArr.get(i);
+            for (Object secData : secArr) {
+                if (value.equals(((HashMap) secData).get(key))) {
+                    return (HashMap) secData;
                 }
             }
         }
@@ -909,22 +905,22 @@ public abstract class DssatCommonInput implements TranslatorInput {
 
         // Auto-fill the copy data in the missing layer with nearby layer data
         String copyItem;
-        for (int i = 0; i < copyKeys.length; i++) {
+        for (String copyKey : copyKeys) {
             copyItem = null;
             for (int j = ret.size() - 1; j > 0; j--) {
-                if (ret.get(j).containsKey(copyKeys[i])) {
-                    copyItem = (String) ret.get(j).get(copyKeys[i]);
+                if (ret.get(j).containsKey(copyKey)) {
+                    copyItem = (String) ret.get(j).get(copyKey);
                 } else {
                     if (copyItem == null) {
                         for (int k = ret.size() - 1; k > 0; k--) {
-                            if (ret.get(k).get(copyKeys[i]) != null) {
-                                copyItem = (String) ret.get(k).get(copyKeys[i]);
+                            if (ret.get(k).get(copyKey) != null) {
+                                copyItem = (String) ret.get(k).get(copyKey);
                                 break;
                             }
                         }
                     }
                     if (copyItem != null) {
-                        ret.get(j).put(copyKeys[i], copyItem);
+                        ret.get(j).put(copyKey, copyItem);
                     }
                 }
             }
@@ -945,8 +941,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
     private static ArrayList<String> getLayerNumArray(ArrayList<HashMap> arr, String key) {
 
         ArrayList<String> ret = new ArrayList();
-        for (int i = 0; i < arr.size(); i++) {
-            ret.add((String) (arr.get(i).get(key)));
+        for (HashMap data : arr) {
+            ret.add((String) (data.get(key)));
         }
         return ret;
     }
@@ -960,8 +956,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
      *
      */
     private static void copyItems(HashMap to, HashMap from, String[] copyKeys) {
-        for (int i = 0; i < copyKeys.length; i++) {
-            copyItem(to, from, copyKeys[i]);
+        for (String copyKey : copyKeys) {
+            copyItem(to, from, copyKey);
         }
     }
 
@@ -973,14 +969,12 @@ public abstract class DssatCommonInput implements TranslatorInput {
      */
     public static void removeIndex(ArrayList arr, ArrayList idNames) {
 
-        for (int i = 0; i < arr.size(); i++) {
-            Object item = arr.get(i);
+        for (Object item : arr) {
             if (item instanceof ArrayList) {
                 removeIndex((ArrayList) item, idNames);
             } else if (item instanceof HashMap) {
                 removeIndex((HashMap) item, idNames);
             }
-
         }
 
     }
@@ -989,6 +983,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      * remove all the relation index for the input map
      *
      * @param m the array of treatment data
+     * @param idNames
      */
     public static void removeIndex(HashMap m, ArrayList idNames) {
 

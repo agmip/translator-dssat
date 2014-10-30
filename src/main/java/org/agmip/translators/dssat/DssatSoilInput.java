@@ -32,6 +32,7 @@ public class DssatSoilInput extends DssatCommonInput {
      *
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
+     * @throws java.io.IOException
      */
     @Override
     protected HashMap readFile(HashMap brMap) throws IOException {
@@ -48,7 +49,9 @@ public class DssatSoilInput extends DssatCommonInput {
      * compressed)
      *
      * @param brMap The holder for BufferReader objects for all files
+     * @param ret
      * @return result data holder object
+     * @throws java.io.IOException
      */
     protected ArrayList<HashMap> readSoilSites(HashMap brMap, HashMap ret) throws IOException {
 
@@ -57,7 +60,7 @@ public class DssatSoilInput extends DssatCommonInput {
         HashMap site = new HashMap();
         ArrayList layers = new ArrayList();
         String line;
-        BufferedReader brS = null;
+        BufferedReader brS;
         Object buf;
         HashMap mapS;
         LinkedHashMap formats = new LinkedHashMap();
@@ -218,11 +221,11 @@ public class DssatSoilInput extends DssatCommonInput {
                 } else {
                 }
             }
+            brS.close();
         }
 
 //        compressData(sites);
 //        ret.put(jsonKey, sites);
-        brS.close();
 
         return sites;
     }
