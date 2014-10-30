@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
  */
 public class DssatTranslateRunner implements Callable<File> {
 
-    private DssatCommonOutput translator;
+    private final DssatCommonOutput translator;
     private Map data;
     private ArrayList<HashMap> dataArr;
-    private String outputDirectory;
+    private final String outputDirectory;
     private static Logger LOG = LoggerFactory.getLogger(DssatTranslateRunner.class);
 
     public DssatTranslateRunner(DssatCommonOutput translator, Map data, String outputDirectory) {

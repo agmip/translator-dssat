@@ -33,6 +33,7 @@ public class DssatTFileInput extends DssatCommonInput {
      *
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
+     * @throws java.io.IOException
      */
     @Override
     protected HashMap readFile(HashMap brMap) throws IOException {
@@ -47,15 +48,14 @@ public class DssatTFileInput extends DssatCommonInput {
 
         for (String exname : files.keySet()) {
             obvData = (ArrayList) files.get(exname).get(obvDataKey);
-            for (int i = 0; i < obvData.size(); i++) {
+            for (HashMap obvSub : obvData) {
                 expData = new HashMap();
                 obv = new HashMap();
                 copyItem(expData, files.get(exname), "exname");
                 copyItem(expData, files.get(exname), "crid");
                 copyItem(expData, files.get(exname), "local_name");
                 expData.put(jsonKey, obv);
-                obv.put(obvFileKey, obvData.get(i).get(obvDataKey));
-
+                obv.put(obvFileKey, obvSub.get(obvDataKey));
                 expArr.add(expData);
             }
         }
@@ -75,13 +75,14 @@ public class DssatTFileInput extends DssatCommonInput {
      *
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
+     * @throws java.io.IOException
      */
     protected HashMap readObvData(HashMap brMap) throws IOException {
 
         HashMap files = new HashMap();
         HashMap file = new HashMap();
         String line;
-        BufferedReader brT = null;
+        BufferedReader brT;
         Object buf;
         HashMap mapT;
         LinkedHashMap formats = new LinkedHashMap();
@@ -142,8 +143,8 @@ public class DssatTFileInput extends DssatCommonInput {
                     else {
                         // Set variables' formats
                         formats.clear();
-                        for (int i = 0; i < titles.size(); i++) {
-                            formats.put(titles.get(i), 6);
+                        for (Object title : titles) {
+                            formats.put(title, 6);
                         }
 
                         // Read line and save into return holder
@@ -151,9 +152,9 @@ public class DssatTFileInput extends DssatCommonInput {
                         // translate date from yyddd format to yyyymmdd format
                         tmp.put("date", translateDateStr((String) tmp.get("date")));
                         pdate = getPdate(brMap, (String) tmp.get("trno_t"), fileName.replaceAll("T$", "X"));
-                        for (int i = 0; i < titles.size(); i++) {
-                            if (obvDataList.isDateType(titles.get(i))) {
-                                translateDateStrForDOY(tmp, (String) titles.get(i), pdate, "");
+                        for (Object title : titles) {
+                            if (obvDataList.isDateType(title)) {
+                                translateDateStrForDOY(tmp, (String) title, pdate, "");
                             }
                         }
 
@@ -163,9 +164,9 @@ public class DssatTFileInput extends DssatCommonInput {
                             obvDataByTrno = null;
 
                             // Try to get the reccord which matches with the given treatment number
-                            for (int i = 0; i < obvData.size(); i++) {
-                                if (trno.equals(obvData.get(i).get("trno_t"))) {
-                                    obvDataByTrno = obvData.get(i);
+                            for (HashMap obvSub : obvData) {
+                                if (trno.equals(obvSub.get("trno_t"))) {
+                                    obvDataByTrno = obvSub;
                                     obvDataSecByTrno = (ArrayList) obvDataByTrno.get(obvDataKey);
                                     break;
                                 }
@@ -208,9 +209,8 @@ public class DssatTFileInput extends DssatCommonInput {
             }
             file.put(obvDataKey, obvData);
             files.put(exname, file);
+            brT.close();
         }
-
-        brT.close();
 
         return files;
     }

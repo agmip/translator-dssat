@@ -12,10 +12,10 @@ import java.util.HashSet;
 public enum DssatObservedData {
     INSTANCE;
 
-    private HashSet summaryList = new HashSet();        // Define the variables used in AFile
-    private HashSet timeCourseList = new HashSet();     // Define the variables used in TFile
-    private HashSet dateTypeList = new HashSet();       // Define the variables of data types
-    private HashMap dapDateTypeList = new HashMap();    // Define the variables of data types comes with day after planting (dap) variable; value means dap variable code
+    private final HashSet summaryList = new HashSet();        // Define the variables used in AFile
+    private final HashSet timeCourseList = new HashSet();     // Define the variables used in TFile
+    private final HashSet dateTypeList = new HashSet();       // Define the variables of data types
+    private final HashMap dapDateTypeList = new HashMap();    // Define the variables of data types comes with day after planting (dap) variable; value means dap variable code
 
     DssatObservedData() {
 

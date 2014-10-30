@@ -11,8 +11,8 @@ import static org.agmip.util.MapUtil.*;
  */
 public class DssatSoilFileHelper {
 
-    private HashSet<String> names = new HashSet();
-    private HashMap<String, String> hashToName = new HashMap();
+    private final HashSet<String> names = new HashSet();
+    private final HashMap<String, String> hashToName = new HashMap();
 
     /**
      * Generate the soil file name for auto-generating (extend name not
@@ -23,7 +23,7 @@ public class DssatSoilFileHelper {
      */
     public String getSoilID(Map soilData) {
 
-        String hash = getObjectOr(soilData, "soil_id", "").toString();
+        String hash = getObjectOr(soilData, "soil_id", "");
 
         if (hashToName.containsKey(hash)) {
             return hashToName.get(hash);

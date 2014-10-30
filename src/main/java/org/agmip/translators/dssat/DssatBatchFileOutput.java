@@ -57,7 +57,6 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
     public void writeFile(String arg0, ArrayList<HashMap> results) {
 
         // Initial variables
-        HashMap result;                       // Data holder for summary data
         BufferedWriter bwB;                         // output object
         StringBuilder sbData = new StringBuilder(); // construct the data info in the output
 
@@ -70,11 +69,11 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
             if (results.isEmpty()) {
                 return;
             }
-            result = results.get(0);
+            HashMap fstResult = results.get(0);
 
             // Get version number
             if (dssatVerStr == null) {
-                dssatVerStr = getObjectOr(result, "crop_model_version", "").replaceAll("\\D", "");
+                dssatVerStr = getObjectOr(fstResult, "crop_model_version", "").replaceAll("\\D", "");
                 if (!dssatVerStr.matches("\\d+")) {
                     dssatVerStr = DssatVersion.DSSAT45.toString();
                 }
@@ -86,9 +85,9 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
 
             // Output Batch File
             // Titel Section
-            String crop = getCropName(result);
+            String crop = getCropName(fstResult);
             String dssatPath = "C:\\DSSAT" + dssatVerStr + "\\";
-            String exFileName = getFileName(result, "X");
+            String exFileName = getFileName(fstResult, "X");
             int expNo = results.size();
 
             // Write title section
@@ -101,8 +100,7 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
 
             // Body Section
             sbData.append("@FILEX                                                                                        TRTNO     RP     SQ     OP     CO\r\n");
-            for (int i = 0; i < results.size(); i++) {
-                result = results.get(i);
+            for (HashMap result : results) {
                 exFileName = getFileName(result, "X");
 //                String folderPath = getObjectOr(result, "exname", "Experiment_" + i);
 //                String folderPath = getObjectOr(expNameMap, getObjectOr(result, "exname", "Experiment_" + i), "");
@@ -122,15 +120,9 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
                     dssatSeqArr.add(tmp);
                 }
                 // Output all info
-                for (int j = 0; j < dssatSeqArr.size(); j++) {
-                    sbData.append(String.format("%1$-92s %2$6s %3$6s %4$6s %5$6s %6$6s\r\n",
-                            //                            folderPath + exFileName,
-                            exFileName,
-                            getObjectOr(dssatSeqArr.get(j), "trno", "1"),
-                            "1",
-                            getObjectOr(dssatSeqArr.get(j), "sq", "1"),
-                            getObjectOr(dssatSeqArr.get(j), "op", "1"),
-                            getObjectOr(dssatSeqArr.get(j), "co", "0")));
+                for (HashMap dssatSeqSubData : dssatSeqArr) {
+                    sbData.append(String.format("%1$-92s %2$6s %3$6s %4$6s %5$6s %6$6s\r\n", //                            folderPath + exFileName,
+                            exFileName, getObjectOr(dssatSeqSubData, "trno", "1"), "1", getObjectOr(dssatSeqSubData, "sq", "1"), getObjectOr(dssatSeqSubData, "op", "1"), getObjectOr(dssatSeqSubData, "co", "0")));
                 }
             }
 
@@ -184,11 +176,11 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
 
             // Write title section
             sbData.append("$BATCH(").append(crop).append(")\r\n!\r\n");
-            sbData.append(String.format("! Command Line : %1$sDSCSM%2$03d.EXE B DSSBatch.v%2$s\r\n", dssatPath, dssatVerStr));
+            sbData.append(String.format("! Command Line : %1$sDSCSM0%2$s.EXE B DSSBatch.v%2$s\r\n", dssatPath, dssatVerStr));
             sbData.append("! Crop         : ").append(crop).append("\r\n");
             sbData.append("! Experiment   : ").append(exFileName).append("\r\n");
             sbData.append("! ExpNo        : ").append(expNo).append("\r\n");
-            sbData.append(String.format("! Debug        : %1$sDSCSM%2$03d.EXE \" B DSSBatch.v%2$s\"\r\n!\r\n", dssatPath, dssatVerStr));
+            sbData.append(String.format("! Debug        : %1$sDSCSM0%2$s.EXE \" B DSSBatch.v%2$s\"\r\n!\r\n", dssatPath, dssatVerStr));
 
             // Body Section
             sbData.append("@FILEX                                                                                        TRTNO     RP     SQ     OP     CO\r\n");
@@ -204,14 +196,8 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
                 dssatSeqArr.add(tmp);
             }
             // Output all info
-            for (int i = 0; i < dssatSeqArr.size(); i++) {
-                sbData.append(String.format("%1$-92s %2$6s %3$6s %4$6s %5$6s %6$6s",
-                        exFileName,
-                        "1",
-                        "1",
-                        getObjectOr(dssatSeqArr.get(i), "sq", "1"),
-                        getObjectOr(dssatSeqArr.get(i), "op", "1"),
-                        getObjectOr(dssatSeqArr.get(i), "co", "0")));
+            for (HashMap dssatSeqSubData : dssatSeqArr) {
+                sbData.append(String.format("%1$-92s %2$6s %3$6s %4$6s %5$6s %6$6s", exFileName, "1", "1", getObjectOr(dssatSeqSubData, "sq", "1"), getObjectOr(dssatSeqSubData, "op", "1"), getObjectOr(dssatSeqSubData, "co", "0")));
             }
 
             // Output finish
