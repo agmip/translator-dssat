@@ -3,7 +3,7 @@
 
     <groupId>org.agmip.translators</groupId>
     <artifactId>translator-dssat</artifactId>
-    <version>1.2.14</version>
+    <version>1.2.15</version>
     <packaging>jar</packaging>
     <name>translator-dssat</name>
     <description>
@@ -86,7 +86,7 @@
         <connection>scm:git:git://github.com/agmip/translator-dssat.git</connection>
         <developerConnection>scm:git:git@github.com:agmip/translator-dssat.git</developerConnection>
         <url>https://github.com/agmip/translator-dssat</url>
-        <tag>translator-dssat-1.2.14</tag>
+        <tag>translator-dssat-1.2.15</tag>
     </scm>
     <build>
         <plugins>
@@ -193,28 +193,6 @@
                     <pushChanges>false</pushChanges>
                     <localCheckout>true</localCheckout>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                        <phase>package</phase>
-                        <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <archive>
-                                <manifest>
-                                    <mainClass>org.agmip.translators.dssat.DssatCmdApp</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

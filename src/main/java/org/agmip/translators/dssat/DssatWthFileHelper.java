@@ -12,8 +12,8 @@ import static org.agmip.util.MapUtil.*;
  */
 public class DssatWthFileHelper {
 
-    private HashSet<String> names = new HashSet();
-    private HashMap<String, String> hashToName = new HashMap();
+    private final HashSet<String> names = new HashSet();
+    private final HashMap<String, String> hashToName = new HashMap();
     private int defInsiName = 0xAAAA;
 
     /**

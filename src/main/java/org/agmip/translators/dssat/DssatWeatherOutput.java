@@ -76,9 +76,9 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             // Output Weather File
             // Titel Section
             if (getObjectOr(wthFile, "wst_notes", ".AgMIP File").equals(".AgMIP File")) {
-                sbData.append(String.format("*WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_source", defValBlank).toString(), getValueOr(wthFile, "clim_id", "N/A")));
+                sbData.append(String.format("*WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_source", defValBlank), getValueOr(wthFile, "clim_id", "N/A")));
             } else {
-                sbData.append(String.format("*WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_notes", defValBlank).toString(), getValueOr(wthFile, "clim_id", "N/A")));
+                sbData.append(String.format("*WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_notes", defValBlank), getValueOr(wthFile, "clim_id", "N/A")));
             }
 
             // Weather Station Section
@@ -120,7 +120,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                 dailyHeaders.seCurItems(wthRecord.keySet());
 
                 // if date is missing, jump the record
-                if (!getObjectOr(wthRecord, "w_date", "").toString().equals("")) {
+                if (!getObjectOr(wthRecord, "w_date", "").equals("")) {
                     //  Format handling for daily date
                     dailyData[i].append(String.format("%1$5s", formatDateStr(getObjectOr(wthRecord, dailyHeaders.get(0), defValD))));
 

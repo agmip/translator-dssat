@@ -1,9 +1,6 @@
 package org.agmip.translators.dssat;
 
 import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -252,7 +249,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             return exToFileMap.get(exname + "_" + crid) + fileType;
         } else {
             ret = exname;
-            if (ret == null || ret.equals("")) {
+            if (ret.equals("")) {
                 ret = "TEMP0001";
             } else {
                 try {
@@ -308,7 +305,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                 path += File.separator;
             }
             File f = new File(path);
-            if (f != null && !f.exists()) {
+            if (!f.exists()) {
                 f.mkdirs();
             }
             if (!f.isDirectory()) {
@@ -321,6 +318,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 
     /**
      * Get output file object
+     * @return output file
      */
     public File getOutputFile() {
         return outputFile;
@@ -357,22 +355,19 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 
         HashMap fstData = null; // The first data record (Map type)
         HashMap cprData;        // The following data record which will be compressed
-
-        for (int i = 0; i < arr.size(); i++) {
-            if (arr.get(i) instanceof ArrayList) {
+        for (Object sub : arr) {
+            if (sub instanceof ArrayList) {
                 // iterate sub array nodes
-                decompressData((ArrayList) arr.get(i));
-
-            } else if (arr.get(i) instanceof HashMap) {
+                decompressData((ArrayList) sub);
+            } else if (sub instanceof HashMap) {
                 // iterate sub data nodes
-                decompressData((HashMap) arr.get(i));
-
+                decompressData((HashMap) sub);
                 // Compress data for current array
                 if (fstData == null) {
                     // Get first data node
-                    fstData = (HashMap) arr.get(i);
+                    fstData = (HashMap) sub;
                 } else {
-                    cprData = (HashMap) arr.get(i);
+                    cprData = (HashMap) sub;
                     // The omitted data will be recovered to the following map; Only data item (String type) will be processed
                     for (Object key : fstData.keySet()) {
                         if (!cprData.containsKey(key)) {
@@ -395,9 +390,9 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 
         HashMap management = getObjectOr(result, "management", new HashMap());
         ArrayList<HashMap> events = getObjectOr(management, "events", new ArrayList<HashMap>());
-        for (int i = 0; i < events.size(); i++) {
-            if (getValueOr(events.get(i), "event", "").equals("planting")) {
-                return getValueOr(events.get(i), "date", "");
+        for (HashMap event : events) {
+            if (getValueOr(event, "event", "").equals("planting")) {
+                return getValueOr(event, "date", "");
             }
         }
 
@@ -416,7 +411,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 //        if (agmipFileHack.length() == 8) {
 //            return agmipFileHack;
 //        }
-        String ret = getObjectOr(data, "wst_id", "").toString();
+        String ret = getObjectOr(data, "wst_id", "");
         if (ret.equals("") || ret.length() > 8) {
             ret = wthHelper.createWthFileName(getObjectOr(data, "weather", data));
             if (ret.equals("")) {
@@ -466,10 +461,11 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 
     /**
      * To support different amount of weather variables in each day
+     * @param <E>
      */
     protected class HeaderArrayList<E> extends ArrayList<E> {
 
-        private HashSet<E> items = new HashSet();
+        private final HashSet<E> items = new HashSet();
         private HashSet<E> curItems;
 
         @Override
@@ -502,11 +498,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         }
 
         public boolean hasMoreItem() {
-            if (curItems == null || curItems.isEmpty()) {
-                return false;
-            } else {
-                return true;
-            }
+            return !(curItems == null || curItems.isEmpty());
         }
 
         public E applyNext() {

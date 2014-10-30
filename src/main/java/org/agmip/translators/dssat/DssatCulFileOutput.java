@@ -67,22 +67,21 @@ public class DssatCulFileOutput extends DssatCommonOutput {
             // Output Cultivar File
             String lastHeaderInfo = "";
             String lastTitles = "";
-            for (int i = 0; i < culArr.size(); i++) {
+            for (HashMap culSubData : culArr) {
                 // If come to new header, add header line and title line
-                if (!getObjectOr(culArr.get(i), "header_info", "").equals(lastHeaderInfo)) {
-                    lastHeaderInfo = getObjectOr(culArr.get(i), "header_info", "");
+                if (!getObjectOr(culSubData, "header_info", "").equals(lastHeaderInfo)) {
+                    lastHeaderInfo = getObjectOr(culSubData, "header_info", "");
                     sbData.append(lastHeaderInfo).append("\r\n");
-                    lastTitles = getObjectOr(culArr.get(i), "cul_titles", "");
+                    lastTitles = getObjectOr(culSubData, "cul_titles", "");
                     sbData.append(lastTitles).append("\r\n");
                 }
                 // If come to new title line, add title line
-                if (!getObjectOr(culArr.get(i), "cul_titles", "").equals(lastTitles)) {
-                    lastTitles = getObjectOr(culArr.get(i), "cul_titles", "");
+                if (!getObjectOr(culSubData, "cul_titles", "").equals(lastTitles)) {
+                    lastTitles = getObjectOr(culSubData, "cul_titles", "");
                     sbData.append(lastTitles).append("\r\n");
                 }
                 // Write data line
-                sbData.append(getObjectOr(culArr.get(i), "cul_info", "")).append("\r\n");
-
+                sbData.append(getObjectOr(culSubData, "cul_info", "")).append("\r\n");
             }
 
             // Output finish

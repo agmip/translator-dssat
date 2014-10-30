@@ -11,7 +11,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -35,12 +34,12 @@ import org.slf4j.LoggerFactory;
  */
 public class DssatControllerOutput extends DssatCommonOutput {
 
-    private HashMap<String, File> files = new HashMap();
-    private HashMap<String, Future<File>> futFiles = new HashMap();
+    private final HashMap<String, File> files = new HashMap();
+    private final HashMap<String, Future<File>> futFiles = new HashMap();
 //    private HashMap<String, Future<File>> soilFiles = new HashMap();
 //    private HashMap<String, Future<File>> wthFiles = new HashMap();
-    private HashMap<String, Map> soilData = new HashMap();
-    private HashMap<String, Map> wthData = new HashMap();
+    private final HashMap<String, Map> soilData = new HashMap();
+    private final HashMap<String, Map> wthData = new HashMap();
     private ExecutorService executor = Executors.newFixedThreadPool(64);
     private static final Logger LOG = LoggerFactory.getLogger(DssatControllerOutput.class);
 //    private ArrayList<File> 

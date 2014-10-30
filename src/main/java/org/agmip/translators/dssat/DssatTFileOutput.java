@@ -29,7 +29,6 @@ public class DssatTFileOutput extends DssatCommonOutput {
     public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        HashMap<String, String> record;       // Data holder for time series data
         ArrayList<HashMap> records;
         ArrayList<HashMap> recordT;
         ArrayList<HashMap> observeRecords;    // Array of data holder for time series data
@@ -60,14 +59,14 @@ public class DssatTFileOutput extends DssatCommonOutput {
             }
 
             observeRecords = new ArrayList();
-            for (int i = 0; i < records.size(); i++) {
-                recordT = getObjectOr(records.get(i), "timeSeries", new ArrayList());
-                String trno = getValueOr(records.get(i), "trno", "1");
+            for (HashMap record : records) {
+                recordT = getObjectOr(record, "timeSeries", new ArrayList());
+                String trno = getValueOr(record, "trno", "1");
                 if (!recordT.isEmpty()) {
                     String[] sortIds = {"date"};
                     Collections.sort(recordT, new DssatSortHelper(sortIds));
-                    for (int j = 0; j < recordT.size(); j++) {
-                        recordT.get(j).put("trno", trno);
+                    for (HashMap recordT1 : recordT) {
+                        recordT1.put("trno", trno);
                     }
                     observeRecords.addAll(recordT);
                 }
@@ -85,16 +84,14 @@ public class DssatTFileOutput extends DssatCommonOutput {
 
             // Output Observation File
             // Titel Section
-            sbData.append(String.format("*EXP.DATA (T): %1$-10s %2$s\r\n\r\n",
+            sbError.append(String.format("*EXP.DATA (T): %1$-10s %2$s\r\n\r\n",
                     fileName.replaceAll("\\.", "").replaceAll("T$", ""),
                     getObjectOr(result, "local_name", defValBlank)));
 
             titleOutput = new HashMap();
             // TODO get title for output
             // Loop all records to find out all the titles
-            for (int i = 0; i < observeRecords.size(); i++) {
-                record = observeRecords.get(i);
-
+            for (HashMap record : observeRecords) {
                 // Check if which field is available
                 for (Object key : record.keySet()) {
                     // check which optional data is exist, if not, remove from map
@@ -112,7 +109,6 @@ public class DssatTFileOutput extends DssatCommonOutput {
                         sbError.append("! Waring: Unsuitable data for DSSAT observed data (too long): [").append(key).append("]\r\n");
                     }
                 }
-
                 // Check if all necessary field is available    // P.S. conrently unuseful
                 for (String title : altTitleList.keySet()) {
 
@@ -128,7 +124,6 @@ public class DssatTFileOutput extends DssatCommonOutput {
                     } else {
                     }
                 }
-
             }
 
             // decompress observed data
@@ -145,17 +140,16 @@ public class DssatTFileOutput extends DssatCommonOutput {
                 }
                 sbData.append("\r\n");
 
-                for (int j = 0; j < observeRecords.size(); j++) {
+                for (HashMap record : observeRecords) {
 
-                    record = (HashMap) observeRecords.get(j);
                     sbData.append(String.format(" %1$5s", getValueOr(record, "trno", "1")));
-                    sbData.append(String.format(" %1$5d", Integer.parseInt(formatDateStr(getObjectOr(record, "date", defValI).toString()))));
+                    sbData.append(String.format(" %1$5d", Integer.parseInt(formatDateStr(getObjectOr(record, "date", defValI)))));
                     for (int k = i * 39; k < limit; k++) {
 
                         if (obvDataList.isDapDateType(titleOutputId[k], titleOutput.get(titleOutputId[k]))) {
-                            sbData.append(String.format("%1$6s", formatDateStr(pdate, getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
+                            sbData.append(String.format("%1$6s", formatDateStr(pdate, getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI))));
                         } else if (obvDataList.isDateType(titleOutputId[k])) {
-                            sbData.append(String.format("%1$6s", formatDateStr(getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString())));
+                            sbData.append(String.format("%1$6s", formatDateStr(getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI))));
                         } else {
                             sbData.append(" ").append(formatNumStr(5, record, titleOutput.get(titleOutputId[k]), defValI));
                         }

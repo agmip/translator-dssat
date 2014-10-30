@@ -34,6 +34,7 @@ public class DssatWeatherInput extends DssatCommonInput {
      *
      * @param brMap The holder for BufferReader objects for all files
      * @return result data holder object
+     * @throws java.io.IOException
      */
     @Override
     protected HashMap readFile(HashMap brMap) throws IOException {
@@ -50,7 +51,9 @@ public class DssatWeatherInput extends DssatCommonInput {
      * not be compressed)
      *
      * @param brMap The holder for BufferReader objects for all files
+     * @param ret
      * @return result data holder object
+     * @throws java.io.IOException
      */
     protected ArrayList<HashMap> readDailyData(HashMap brMap, HashMap ret) throws IOException {
 
@@ -59,7 +62,7 @@ public class DssatWeatherInput extends DssatCommonInput {
         ArrayList titles;
         HashMap file;
         String line;
-        BufferedReader brW = null;
+        BufferedReader brW;
         Object buf;
         HashMap mapW;
         LinkedHashMap formats = new LinkedHashMap();
@@ -169,8 +172,8 @@ public class DssatWeatherInput extends DssatCommonInput {
                         // Set variables' formats
                         formats.clear();
                         formats.put("w_date", 5);
-                        for (int i = 0; i < titles.size(); i++) {
-                            formats.put(titles.get(i), 6);
+                        for (Object title : titles) {
+                            formats.put(title, 6);
                         }
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
@@ -242,9 +245,8 @@ public class DssatWeatherInput extends DssatCommonInput {
 //                tmpArr.addAll(daily);
                 addDaily(tmpArr, daily);
             }
+            brW.close();
         }
-
-        brW.close();
 
         return files;
     }

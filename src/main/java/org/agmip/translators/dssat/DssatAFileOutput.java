@@ -31,7 +31,6 @@ public class DssatAFileOutput extends DssatCommonOutput {
     public void writeFile(String arg0, Map result) {
 
         // Initial variables
-        HashMap<String, String> record;       // Data holder for summary data
         ArrayList<HashMap<String, String>> records; // Array of Data holder for summary data
         BufferedWriter bwA;                         // output object
         StringBuilder sbData = new StringBuilder(); // construct the data info in the output
@@ -74,13 +73,12 @@ public class DssatAFileOutput extends DssatCommonOutput {
 
             // Output Observation File
             // Titel Section
-            sbData.append(String.format("*EXP.DATA (A): %1$-10s %2$s\r\n\r\n",
+            sbError.append(String.format("*EXP.DATA (A): %1$-10s %2$s\r\n\r\n",
                     fileName.replaceAll("\\.", "").replaceAll("T$", ""),
                     getObjectOr(result, "local_name", defValBlank)));
 
             // Check if which field is available
-            for (int i = 0; i < records.size(); i++) {
-                record = records.get(i);
+            for (HashMap<String, String> record : records) {
                 for (String key : record.keySet()) {
 
                     if (!(record.get(key) instanceof String)) {
@@ -96,7 +94,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
                         titleOutput.put(key, key);
 
                     } // check if the additional data is too long to output
-                    else if (key.toString().length() <= 5) {
+                    else if (key.length() <= 5) {
                         titleOutput.put(key, key);
 
                     } // If it is too long for DSSAT, give a warning message
@@ -104,7 +102,6 @@ public class DssatAFileOutput extends DssatCommonOutput {
                         sbError.append("! Waring: Unsuitable data for DSSAT observed data (too long): [").append(key).append("]\r\n");
                     }
                 }
-
                 // Check if all necessary field is available
                 for (String title : altTitleList.keySet()) {
 
@@ -139,15 +136,14 @@ public class DssatAFileOutput extends DssatCommonOutput {
                 sbData.append("\r\n");
 
                 // Write data line
-                for (int j = 0; j < records.size(); j++) {
-                    record = records.get(j);
+                for (HashMap<String, String> record : records) {
                     sbData.append(String.format(" %1$5s", getValueOr(record, "trno", "1")));
                     for (int k = i * 40; k < limit; k++) {
 
                         if (obvDataList.isDapDateType(titleOutputId[k], titleOutput.get(titleOutputId[k]))) {
-                            sbData.append(String.format("%1$6s", cutYear(formatDateStr(pdate, getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString()))));
+                            sbData.append(String.format("%1$6s", cutYear(formatDateStr(pdate, getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI)))));
                         } else if (obvDataList.isDateType(titleOutputId[k])) {
-                            sbData.append(String.format("%1$6s", cutYear(formatDateStr(getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI).toString()))));
+                            sbData.append(String.format("%1$6s", cutYear(formatDateStr(getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI)))));
                         } else {
                             sbData.append(" ").append(formatNumStr(5, record, titleOutput.get(titleOutputId[k]), defValI));
                         }
