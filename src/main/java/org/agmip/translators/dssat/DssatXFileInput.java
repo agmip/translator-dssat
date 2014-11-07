@@ -752,12 +752,6 @@ public class DssatXFileInput extends DssatCommonInput {
                         Object sm = tmp.remove("sm");
                         smData.put("sm", sm);
                         smData.put("general", tmp);
-                        String sdyer = getValueOr(tmp, "sdyer", "");
-                        String sdday = getValueOr(tmp, "sdday", "");
-                        String sdat = translateDateStr(sdyer + sdday);
-                        if (!sdat.equals("")) {
-                            meta.put("sdat", sdat);
-                        }
                         addToArray(smArr, smData, "sm");
 
                     } // Read options info
@@ -1052,22 +1046,20 @@ public class DssatXFileInput extends DssatCommonInput {
                 }
 
                 // simulation
-                HashMap<String, String> smManagements = new HashMap();
+                HashMap<String, String> smManagement = new HashMap();
                 if (!getObjectOr(sqData, "sm", "0").equals("0")) {
                     String sm = (String) sqData.get("sm");
                     HashMap smData = (HashMap) getSectionDataObj(smArr, "sm", sm);
-//                sqData.putAll((HashMap) getSectionDataObj(smArr, "sm", sm));
-                    // Read SM management
-//                    formats.clear();
-//                    formats.put("management", 12);
-//                    formats.put("plant", 6);
-//                    formats.put("irrig", 6);
-//                    formats.put("ferti", 6);
-//                    formats.put("resid", 6);
-//                    formats.put("harvs", 6);
-//                    smManagements = readLine(getValueOr(smData, "sm_management", ""), formats);
-                    smManagements = getObjectOr(smData, "management", new HashMap());
-
+                    // Set SDAT
+                    HashMap smGeneral = getObjectOr(smData, "general", new HashMap());
+                    String sdyer = getValueOr(smGeneral, "sdyer", "");
+                    String sdday = getValueOr(smGeneral, "sdday", "");
+                    String sdat = translateDateStr(sdyer + sdday);
+                    if (!sdat.equals("")) {
+                        trData.put("sdat", sdat);
+                    }
+                    // Get simulation control management section info
+                    smManagement = getObjectOr(smData, "management", new HashMap());
                     HashMap tmp = getObjectOr(trData, "dssat_simulation_control", new HashMap());
                     ArrayList<HashMap> arr = getObjectOr(tmp, eventKey, new ArrayList());
                     boolean isExistFlg = false;
@@ -1090,7 +1082,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     HashMap irTmp = (HashMap) getSectionDataObj(irArr, "ir", sqData.get("ir").toString());
                     ArrayList<HashMap> irTmpSubs = getObjectOr(irTmp, "data", new ArrayList());
                     for (HashMap irTmpSub : irTmpSubs) {
-                        translateDateStrForDOY(irTmpSub, "idate", pdate, smManagements.get("irrig"));
+                        translateDateStrForDOY(irTmpSub, "idate", pdate, smManagement.get("irrig"));
                     }
 
                     // add event data into array
@@ -1103,7 +1095,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     ArrayList<HashMap> feTmps = (ArrayList) getSectionDataObj(feArr, "fe", sqData.get("fe").toString());
                     for (HashMap feTmp : feTmps) {
                         // Date adjust based on realted treatment info (handling for DOY type value)
-                        translateDateStrForDOY(feTmp, "fdate", pdate, smManagements.get("ferti"));
+                        translateDateStrForDOY(feTmp, "fdate", pdate, smManagement.get("ferti"));
 
                         // add event data into array
                         addEvent(evtArr, feTmp, "fdate", "fertilizer", seqid);
@@ -1115,7 +1107,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     ArrayList<HashMap> omTmps = (ArrayList) getSectionDataObj(omArr, "om", sqData.get("om").toString());
                     for (HashMap omTmp : omTmps) {
                         // Date adjust based on realted treatment info (handling for DOY type value)
-                        translateDateStrForDOY(omTmp, "omdat", pdate, smManagements.get("resid"));
+                        translateDateStrForDOY(omTmp, "omdat", pdate, smManagement.get("resid"));
                         // add event data into array
                         addEvent(evtArr, omTmp, "omdat", "organic_matter", seqid); // P.S. change event name to organic-materials; Back to organic_matter again
                     }
