@@ -62,7 +62,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
 
         arg0 = revisePath(arg0);
         ArrayList<HashMap> expArr = getObjectOr(result, "experiments", new ArrayList());
-        HashMap expData;
         ArrayList<HashMap> soilArr = getObjectOr(result, "soils", new ArrayList());
         ArrayList<HashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
 
@@ -82,8 +81,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         String soil_id;
         String wth_id;
         expArr = combineExps(expArr);
-        for (int i = 0; i < expArr.size(); i++) {
-            expData = expArr.get(i);
+        for (HashMap expData : expArr) {
             ArrayList<HashMap> rootArr = getObjectOr(expData, "dssat_root", new ArrayList());
             if (rootArr.isEmpty()) {
                 soil_id = getObjectOr(expData, "soil_id", "");
@@ -95,30 +93,29 @@ public class DssatControllerOutput extends DssatCommonOutput {
             } else {
                 ArrayList<HashMap> soilArrTmp = new ArrayList();
                 ArrayList<HashMap> wthArrTmp = new ArrayList();
-                for (int j = 0; j < rootArr.size(); j++) {
-                    soil_id = getObjectOr(rootArr.get(j), "soil_id", "");
-                    wth_id = getObjectOr(rootArr.get(j), "wst_id", "");
+                for (HashMap rootData : rootArr) {
+                    soil_id = getObjectOr(rootData, "soil_id", "");
+                    wth_id = getObjectOr(rootData, "wst_id", "");
                     HashMap soilTmp = new HashMap();
                     HashMap wthTmp = new HashMap();
                     soilTmp.put("soil", getSectionDataWithNocopy(soilArr, "soil_id", soil_id));
                     soilTmp.put("soil_id", soil_id);
-                    soilTmp.put("exname", rootArr.get(j).get("exname"));
-                    soilTmp.put("id", rootArr.get(j).get("id"));
+                    soilTmp.put("exname", rootData.get("exname"));
+                    soilTmp.put("id", rootData.get("id"));
                     wthTmp.put("weather", getSectionDataWithNocopy(wthArr, "wst_id", wth_id));
                     wthTmp.put("wst_id", wth_id);
                     recordSWData(soilTmp, new DssatSoilOutput());
                     recordSWData(wthTmp, new DssatWeatherOutput());
                     soilArrTmp.add((HashMap) soilTmp.get("soil"));
                     wthArrTmp.add(wthTmp);
-                    rootArr.get(j).put("wst_id", getObjectOr(wthTmp, "wst_id", wth_id));
-                    rootArr.get(j).put("soil_id", getObjectOr(soilTmp, "soil_id", wth_id));
+                    rootData.put("wst_id", getObjectOr(wthTmp, "wst_id", wth_id));
+                    rootData.put("soil_id", getObjectOr(soilTmp, "soil_id", wth_id));
                 }
                 expData.put("soil", soilArrTmp);
                 expData.put("weather", wthArrTmp);
             }
-
             String exname = getValueOr(expData, "exname", "N/A");
-//            DssatCommonOutput[] outputs = {
+            //            DssatCommonOutput[] outputs = {
 //                new DssatXFileOutput(),
 //                new DssatAFileOutput(),
 //                new DssatTFileOutput(),
@@ -138,16 +135,16 @@ public class DssatControllerOutput extends DssatCommonOutput {
             futFiles.put("Run46.bat", executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT46), expArr, arg0)));
         } // If only weather or soil data is included
         else {
-            for (int i = 0; i < soilArr.size(); i++) {
+            for (HashMap sData : soilArr) {
                 HashMap tmp = new HashMap();
-                tmp.put("soil", soilArr.get(i));
-                tmp.put("soil_id", getObjectOr(soilArr.get(i), "soil_id", ""));
+                tmp.put("soil", sData);
+                tmp.put("soil_id", getObjectOr(sData, "soil_id", ""));
                 recordSWData(tmp, new DssatSoilOutput());
             }
-            for (int i = 0; i < wthArr.size(); i++) {
+            for (HashMap wData : wthArr) {
                 HashMap tmp = new HashMap();
-                tmp.put("weather", wthArr.get(i));
-                tmp.put("wst_id", getObjectOr(wthArr.get(i), "wst_id", ""));
+                tmp.put("weather", wData);
+                tmp.put("wst_id", getObjectOr(wData, "wst_id", ""));
                 recordSWData(tmp, new DssatWeatherOutput());
             }
         }
@@ -430,6 +427,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
 
     /**
      * Get all output files
+     * @return list of output files
      */
     public ArrayList<File> getOutputFiles() {
         return new ArrayList(files.values());
@@ -456,6 +454,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
 //    }
     /**
      * Get output zip file
+     * @return output zip file
      */
     public File getOutputZipFile() {
         return outputFile;
@@ -540,9 +539,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         if (seqArr.isEmpty()) {
             seqArr.add(new HashMap());
         }
-        for (int i = 0; i < seqArr.size(); i++) {
-            HashMap tmp = seqArr.get(i);
-
+        for (HashMap<String, String> tmp : seqArr) {
             try {
                 seqid = Integer.parseInt(getValueOr(tmp, "seqid", "0")) + baseId;
                 sm = Integer.parseInt(getValueOr(tmp, "sm", "0")) + baseId;
@@ -567,8 +564,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
 
         // Update management events data
         ArrayList<HashMap<String, String>> evtArr = new BucketEntry(getObjectOr(expData, "management", new HashMap())).getDataList();
-        for (int i = 0; i < evtArr.size(); i++) {
-            HashMap tmp = evtArr.get(i);
+        for (HashMap<String, String> tmp : evtArr) {
             try {
                 seqid = Integer.parseInt(getValueOr(tmp, "seqid", "0")) + baseId;
             } catch (NumberFormatException e) {
@@ -580,8 +576,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
 
         // Update dssat_environment_modification data
         ArrayList<HashMap<String, String>> emArr = new BucketEntry(getObjectOr(expData, "dssat_environment_modification", new HashMap())).getDataList();
-        for (int i = 0; i < emArr.size(); i++) {
-            HashMap tmp = emArr.get(i);
+        for (HashMap<String, String> tmp : emArr) {
             try {
                 em = Integer.parseInt(getValueOr(tmp, "em", "0")) + baseId;
             } catch (NumberFormatException e) {
@@ -592,9 +587,8 @@ public class DssatControllerOutput extends DssatCommonOutput {
         combineData(out, emArr, "dssat_environment_modification");
 
         // Update dssat_simulation_control data
-        ArrayList<HashMap<String, String>> smArr = new BucketEntry(getObjectOr(expData, "dssat_simulation_control", new HashMap())).getDataList();
-        for (int i = 0; i < smArr.size(); i++) {
-            HashMap tmp = smArr.get(i);
+        ArrayList<HashMap<String, Object>> smArr =  getObjectOr(getObjectOr(expData, "dssat_simulation_control", new HashMap()), "data", new ArrayList());
+        for (HashMap<String, Object> tmp : smArr) {
             try {
                 sm = Integer.parseInt(getValueOr(tmp, "sm", "0")) + baseId;
             } catch (NumberFormatException e) {
