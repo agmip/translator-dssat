@@ -350,6 +350,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                    smData.put("planting", mpData);
 //                }
                 copyItem(smData, rootData, "sdat");
+                copyItem(smData, rootData, "dssat_model");
                 copyItem(smData, getObjectOr(wthData, "weather", new HashMap()), "co2y");
 
                 // Loop all event data
@@ -1063,11 +1064,12 @@ public class DssatXFileOutput extends DssatCommonOutput {
         String smStr;
         HashMap smData;
         // GENERAL
-        sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME....................\r\n");
+        sb.append("@N GENERAL     NYERS NREPS START SDATE RSEED SNAME.................... SMODEL\r\n");
         if (!(smStr = getValueOr(trData, "sm_general", "")).equals("")) {
             if (!sdate.trim().equals("-99") && !sdate.trim().equals("")) {
                 smStr = replaceSMStr(smStr, sdate, 30);
             }
+            smStr = replaceSMStr(smStr, getValueOr(trData, "dssat_model", ""), 68);
             sb.append(sm).append(" ").append(smStr).append("\r\n");
         } else if (!(smData = getObjectOr(trData, "general", new HashMap())).isEmpty()) {
             if (sdate.trim().equals("-99") || sdate.trim().equals("")) {
@@ -1082,9 +1084,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     sdate,
                     getValueOr(smData, "rseed", "250"),
                     getValueOr(smData, "sname", defValC),
-                    getValueOr(smData, "model", "")));
+                    getValueOr(trData, "dssat_model", getValueOr(smData, "model", ""))));
         } else {
-            sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTROL\r\n");
+            sb.append(sm).append(" GE              1     1     S ").append(sdate).append("  2150 DEFAULT SIMULATION CONTRL ").append(getValueOr(trData, "dssat_model", "")).append("\r\n");
         }
         // OPTIONS
         sb.append("@N OPTIONS     WATER NITRO SYMBI PHOSP POTAS DISES  CHEM  TILL   CO2\r\n");
