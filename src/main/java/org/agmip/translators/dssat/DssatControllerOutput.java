@@ -600,20 +600,22 @@ public class DssatControllerOutput extends DssatCommonOutput {
 
         // Update observation data
         HashMap obvData = getObjectOr(expData, "observed", new HashMap());
-        obvData.put("trno", trno + "");
-        Object outObvData = getObjectOr(out, "observed", new Object());
-        if (outObvData instanceof HashMap) {
-            ((HashMap) outObvData).put("trno", "1");
-            ArrayList obvArr = new ArrayList();
-            obvArr.add(outObvData);
-            obvArr.add(obvData);
-            out.put("observed", obvArr);
-        } else if (outObvData instanceof ArrayList) {
-            ((ArrayList) outObvData).add(obvData);
-        } else {
-            ArrayList obvArr = new ArrayList();
-            obvArr.add(obvData);
-            out.put("observed", obvArr);
+        if (!obvData.isEmpty()) {
+            obvData.put("trno", trno + "");
+            Object outObvData = getObjectOr(out, "observed", new Object());
+            if (outObvData instanceof HashMap) {
+                ((HashMap) outObvData).put("trno", "1");
+                ArrayList obvArr = new ArrayList();
+                obvArr.add(outObvData);
+                obvArr.add(obvData);
+                out.put("observed", obvArr);
+            } else if (outObvData instanceof ArrayList) {
+                ((ArrayList) outObvData).add(obvData);
+            } else {
+                ArrayList obvArr = new ArrayList();
+                obvArr.add(obvData);
+                out.put("observed", obvArr);
+            }
         }
     }
 
