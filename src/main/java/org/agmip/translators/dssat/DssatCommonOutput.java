@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * @version 1.0
  */
 public abstract class DssatCommonOutput implements TranslatorOutput {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(DssatCommonInput.class);
 
     // Default value for each type of value (R: real number; C: String; I: Integer; D: Date)
@@ -125,7 +125,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             sbError.append("! Waring: There is a variable [").append(key).append("] with oversized content [").append(val).append("], only first ").append(bits).append(" bits will be applied.\r\n");
             return val.substring(0, bits);
         }
-        
+
         return val;
     }
 
@@ -272,6 +272,12 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
                 }
             }
 
+            // Special handling for batch
+            if (exname.matches(".+_\\d+_b\\S+(__\\d+)?$")) {
+                int idx = exname.lastIndexOf("_b") + 2;
+                ret += "B" + exname.substring(idx).replaceAll("__\\d+$", "");
+            }
+
             // Find a non-repeated file name
             int count;
             while (fileNameSet.contains(ret + "." + crid)) {
@@ -285,7 +291,6 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             }
         }
 
-        
         exToFileMap.put(exname + "_" + crid, ret + "." + crid);
         fileNameSet.add(ret + "." + crid);
 
@@ -318,6 +323,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 
     /**
      * Get output file object
+     *
      * @return output file
      */
     public File getOutputFile() {
@@ -461,6 +467,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 
     /**
      * To support different amount of weather variables in each day
+     *
      * @param <E>
      */
     protected class HeaderArrayList<E> extends ArrayList<E> {
