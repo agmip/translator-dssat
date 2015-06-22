@@ -197,7 +197,6 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 outputFile = new File(revisePath(arg0) + exname + ".ZIP");
 
                 //createZip();
-
             } else {
                 // Calculate estimated time consume
                 for (HashMap wth : (ArrayList<HashMap>) getObjectOr(result, "weathers", new ArrayList<HashMap>())) {
@@ -369,7 +368,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
     public void createZip() throws FileNotFoundException, IOException {
         createZip(true);
     }
-    
+
     public void createZip(File out) throws FileNotFoundException, IOException {
         createZip(out, true);
     }
@@ -384,7 +383,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
     public void createZip(boolean isDelete) throws FileNotFoundException, IOException {
         createZip(outputFile, isDelete);
     }
-    
+
     public void createZip(File outputFile, boolean isDelete) throws FileNotFoundException, IOException {
 
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outputFile));
@@ -427,6 +426,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
 
     /**
      * Get all output files
+     *
      * @return list of output files
      */
     public ArrayList<File> getOutputFiles() {
@@ -454,6 +454,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
 //    }
     /**
      * Get output zip file
+     *
      * @return output zip file
      */
     public File getOutputZipFile() {
@@ -574,6 +575,18 @@ public class DssatControllerOutput extends DssatCommonOutput {
         }
         combineData(out, evtArr, "management");
 
+        // Update adjustments data
+        ArrayList<HashMap<String, String>> adjArr = getObjectOr(expData, "adjustments", new ArrayList());
+        for (HashMap<String, String> tmp : adjArr) {
+            try {
+                seqid = Integer.parseInt(getValueOr(tmp, "seqid", "0")) + baseId;
+            } catch (NumberFormatException e) {
+                seqid = baseId;
+            }
+            tmp.put("seqid", seqid + "");
+        }
+        combineArr(out, adjArr, "adjustments");
+
         // Update dssat_environment_modification data
         ArrayList<HashMap<String, String>> emArr = new BucketEntry(getObjectOr(expData, "dssat_environment_modification", new HashMap())).getDataList();
         for (HashMap<String, String> tmp : emArr) {
@@ -587,7 +600,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         combineData(out, emArr, "dssat_environment_modification");
 
         // Update dssat_simulation_control data
-        ArrayList<HashMap<String, Object>> smArr =  getObjectOr(getObjectOr(expData, "dssat_simulation_control", new HashMap()), "data", new ArrayList());
+        ArrayList<HashMap<String, Object>> smArr = getObjectOr(getObjectOr(expData, "dssat_simulation_control", new HashMap()), "data", new ArrayList());
         for (HashMap<String, Object> tmp : smArr) {
             try {
                 sm = Integer.parseInt(getValueOr(tmp, "sm", "0")) + baseId;
@@ -634,9 +647,17 @@ public class DssatControllerOutput extends DssatCommonOutput {
             } else {
                 subSecName = "data";
             }
-            seqArrOut = getObjectOr(data, subSecName, new ArrayList());
+            combineArr(data, arr, subSecName);
+        }
+    }
+
+    private void combineArr(HashMap out, ArrayList arr, String secName) {
+        ArrayList<HashMap<String, String>> seqArrOut;
+        // combine the array of data
+        if (!arr.isEmpty()) {
+            seqArrOut = getObjectOr(out, secName, new ArrayList());
             if (seqArrOut.isEmpty()) {
-                data.put(subSecName, seqArrOut);
+                out.put(secName, seqArrOut);
             }
             seqArrOut.addAll(arr);
         }

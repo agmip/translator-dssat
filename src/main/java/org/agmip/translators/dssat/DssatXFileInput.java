@@ -1056,7 +1056,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     String sdday = getValueOr(smGeneral, "sdday", "");
                     String sdat = translateDateStr(sdyer + sdday);
                     if (!sdat.equals("")) {
-                        trData.put("sdat", sdat);
+                        trMetaData.put("sdat", sdat);
                     }
                     // Get simulation control management section info
                     smManagement = getObjectOr(smData, "management", new HashMap());

@@ -6,9 +6,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import static org.agmip.translators.dssat.DssatCommonInput.copyItem;
 import static org.agmip.util.MapUtil.*;
@@ -49,6 +51,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         StringBuilder eventPart2 = new StringBuilder();                   // output string for second part of event data
         HashMap sqData;
         ArrayList<HashMap> evtArr;            // Arraylist for section data holder
+        ArrayList<HashMap> adjArr;
         HashMap evtData;
 //        int trmnNum;                            // total numbers of treatment in the data holder
         int cuNum;                              // total numbers of cultivars in the data holder
@@ -166,6 +169,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             // TREATMENT Section
             sqArr = getDataList(expData, "dssat_sequence", "data");
             evtArr = getDataList(expData, "management", "events");
+            adjArr = getObjectOr(expData, "adjustments", new ArrayList());
             ArrayList<HashMap> rootArr = getObjectOr(expData, "dssat_root", new ArrayList());
             ArrayList<HashMap> meOrgArr = getDataList(expData, "dssat_environment_modification", "data");
             ArrayList<HashMap> smOrgArr = getDataList(expData, "dssat_simulation_control", "data");
@@ -297,6 +301,76 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         tmp.remove("em");
                         meSubArr.add(tmp);
                     }
+                }
+                if (!adjArr.isEmpty()) {
+                    ArrayList<HashMap<String, String>> startArr = new ArrayList();
+                    ArrayList<HashMap<String, String>> endArr = new ArrayList();
+                    String sdat = getValueOr(rootData, "sdat", "");
+                    if (sdat.equals("")) {
+                        sdat = getPdate(result);
+                    }
+                    final List<String> vars = Arrays.asList(new String[]{"tmax", "tmin", "srad", "wind", "rain", "co2y", "tdew"});
+                    final List<String> emVars = Arrays.asList(new String[]{"emmax", "emmin", "emrad", "emwnd", "emrai", "emco2", "emdew"});
+                    final List<String> emcVars = Arrays.asList(new String[]{"ecmax", "ecmin", "ecrad", "ecwnd", "ecrai", "ecco2", "ecdew"});
+
+                    for (HashMap adjData : adjArr) {
+                        if (getValueOr(adjData, "seqid", defValBlank).equals(seqId)) {
+                            String var = getValueOr(adjData, "variable", "");
+                            String ecVar;
+                            String val = getValueOr(adjData, "value", "");
+                            String method = getValueOr(adjData, "method", "");
+                            String startDate = getValueOr(adjData, "startdate", sdat);
+                            String endDate = getValueOr(adjData, "enddate", "");
+                            int idx = vars.indexOf(var);
+                            if (idx < 0) {
+                                LOG.warn("Found unsupported adjusment variable [" + var + "], will be ignored.");
+                                sbError.append("Found unsupported adjusment variable [").append(var).append("], will be ignored.");
+                                continue;
+                            } else {
+                                var = emVars.get(idx);
+                                ecVar = emcVars.get(idx);
+                            }
+                            if (method.equals("substitute")) {
+                                method = "R";
+                            } else if (method.equals("delta")) {
+                                if (val.startsWith("-")) {
+                                    val = val.substring(1);
+                                    method = "S";
+                                } else {
+                                    method = "A";
+                                }
+                            } else if (method.equals("multiply")) {
+                                method = "M";
+                            } else {
+                                LOG.warn("Found unsupported adjusment method [" + method + "] for [" + var + "], will be ignored.");
+                                sbError.append("Found unsupported adjusment method [").append(method).append("] for [").append(var).append("], will be ignored.");
+                                continue;
+                            }
+
+                            HashMap tmp = DssatCommonInput.getSectionDataWithNocopy(startArr, "date", startDate);
+                            if (tmp == null) {
+                                tmp = new HashMap();
+                                startArr.add(tmp);
+                            }
+                            tmp.put(var, val);
+                            tmp.put(ecVar, method);
+                            tmp.put("date", startDate);
+
+                            if (!endDate.equals("")) {
+                                tmp = DssatCommonInput.getSectionDataWithNocopy(endArr, "date", endDate);
+                                if (tmp == null) {
+                                    tmp = new HashMap();
+                                    endArr.add(tmp);
+                                }
+                                tmp.put(var, "0");
+                                tmp.put(ecVar, "A");
+                                tmp.put("date", endDate);
+                            }
+                        }
+                    }
+
+                    meSubArr.addAll(startArr);
+                    meSubArr.addAll(endArr);
                 }
 
                 // Set soil analysis info
@@ -896,32 +970,33 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 for (int idx = 0, cnt = 1; idx < meArr.size(); idx++) {
                     ArrayList<HashMap> secDataArr = meArr.get(idx);
                     for (HashMap secData : secDataArr) {
-                        sbData.append(String.format("%1$2s %2$s\r\n",
-                                cnt,
-                                getValueOr(secData, "em_data", "").trim()));
-//                        sbData.append(String.format("%1$2s%2$s\r\n",
-//                                idx + 1,
-//                                (String) secDataArr.get(i)));
-//                        sbData.append(String.format("%1$2s %2$5s %3$-1s%4$4s %5$-1s%6$4s %7$-1s%8$4s %9$-1s%10$4s %11$-1s%12$4s %13$-1s%14$4s %15$-1s%16$4s %17$-1s%18$4s %19$s\r\n",
-//                                idx + 1,
-//                                formatDateStr(getValueOr(secData, "date", defValD).toString()), // P.S. emday -> date
-//                                getValueOr(secData, "ecdyl", defValBlank),
-//                                formatNumStr(4, getValueOr(secData, "emdyl", defValR),
-//                                getValueOr(secData, "ecrad", defValBlank),
-//                                formatNumStr(4, getValueOr(secData, "emrad", defValR),
-//                                getValueOr(secData, "ecmax", defValBlank),
-//                                formatNumStr(4, getValueOr(secData, "emmax", defValR),
-//                                getValueOr(secData, "ecmin", defValBlank),
-//                                formatNumStr(4, getValueOr(secData, "emmin", defValR),
-//                                getValueOr(secData, "ecrai", defValBlank),
-//                                formatNumStr(4, getValueOr(secData, "emrai", defValR),
-//                                getValueOr(secData, "ecco2", defValBlank),
-//                                formatNumStr(4, getValueOr(secData, "emco2", defValR),
-//                                getValueOr(secData, "ecdew", defValBlank),
-//                                formatNumStr(4, getValueOr(secData, "emdew", defValR),
-//                                getValueOr(secData, "ecwnd", defValBlank),
-//                                formatNumStr(4, getValueOr(secData, "emwnd", defValR),
-//                                getValueOr(secData, "em_name", defValC)));
+                        if (secData.containsKey("em_data")) {
+                            sbData.append(String.format("%1$2s %2$s\r\n",
+                                    cnt,
+                                    getValueOr(secData, "em_data", "").trim()));
+                        } else {
+                            sbData.append(String.format("%1$2s %2$5s %3$-1s%4$4s %5$-1s%6$4s %7$-1s%8$4s %9$-1s%10$4s %11$-1s%12$4s %13$-1s%14$4s %15$-1s%16$4s %17$-1s%18$4s %19$s\r\n",
+                                    idx + 1,
+                                    formatDateStr(getValueOr(secData, "date", defValD)), // P.S. emday -> date
+                                    getValueOr(secData, "ecdyl", "A"),
+                                    formatNumStr(4, secData, "emdyl", "0"),
+                                    getValueOr(secData, "ecrad", "A"),
+                                    formatNumStr(4, secData, "emrad", "0"),
+                                    getValueOr(secData, "ecmax", "A"),
+                                    formatNumStr(4, secData, "emmax", "0"),
+                                    getValueOr(secData, "ecmin", "A"),
+                                    formatNumStr(4, secData, "emmin", "0"),
+                                    getValueOr(secData, "ecrai", "A"),
+                                    formatNumStr(4, secData, "emrai", "0"),
+                                    getValueOr(secData, "ecco2", "A"),
+                                    formatNumStr(4, secData, "emco2", "0"),
+                                    getValueOr(secData, "ecdew", "A"),
+                                    formatNumStr(4, secData, "emdew", "0"),
+                                    getValueOr(secData, "ecwnd", "A"),
+                                    formatNumStr(4, secData, "emwnd", "0"),
+                                    getValueOr(secData, "em_name", defValC)));
+                        }
+
                     }
                 }
                 sbData.append("\r\n");
