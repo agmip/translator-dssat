@@ -405,7 +405,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     }
                     copyItem(saData, soilData, "sadat");
                     saData.put("soilLayer", saSubArr);
-                    saNum = setSecDataArr(saData, saArr);
+                    saNum = setSecDataArr(saData, saArr, true);
                 } else {
                     saNum = 0;
                 }
@@ -518,20 +518,77 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 }
 
                 cuNum = setSecDataArr(cuData, cuArr);
-                mpNum = setSecDataArr(mpData, mpArr);
-                miNum = setSecDataArr(miSubArr, miArr);
-                mfNum = setSecDataArr(mfSubArr, mfArr);
-                mrNum = setSecDataArr(mrSubArr, mrArr);
-                mcNum = setSecDataArr(mcSubArr, mcArr);
-                mtNum = setSecDataArr(mtSubArr, mtArr);
-                meNum = setSecDataArr(meSubArr, meArr);
-                mhNum = setSecDataArr(mhSubArr, mhArr);
+                mpNum = setSecDataArr(mpData, mpArr, true);
+                miNum = setSecDataArr(miSubArr, miArr, true);
+                mfNum = setSecDataArr(mfSubArr, mfArr, true);
+                mrNum = setSecDataArr(mrSubArr, mrArr, true);
+                mcNum = setSecDataArr(mcSubArr, mcArr, true);
+                mtNum = setSecDataArr(mtSubArr, mtArr, true);
+                meNum = setSecDataArr(meSubArr, meArr); // Since old format of EM might exist, skip the check for EM
+                mhNum = setSecDataArr(mhSubArr, mhArr, true);
                 smNum = setSecDataArr(smData, smArr);
                 if (smNum == 0) {
                     smNum = 1;
                 }
+                StringBuilder sbBadEventRrrMsg = new StringBuilder();
+                boolean badEventFlg = false;
+                if (saNum < 0) {
+                    saNum = 0;
+                    badEventFlg = true;
+                    sbBadEventRrrMsg.append("SA ");
+                }
+                if (icNum < 0) {
+                    icNum = 0;
+                    badEventFlg = true;
+                    sbBadEventRrrMsg.append("IC ");
+                }
+                if (mpNum < 0) {
+                    mpNum = 0;
+                    badEventFlg = true;
+                    sbBadEventRrrMsg.append("MP ");
+                }
+                if (miNum < 0) {
+                    miNum = 0;
+                    badEventFlg = true;
+                    sbBadEventRrrMsg.append("MI ");
+                }
+                if (mfNum < 0) {
+                    mfNum = 0;
+                    badEventFlg = true;
+                    sbBadEventRrrMsg.append("MF ");
+                }
+                if (mrNum < 0) {
+                    mrNum = 0;
+                    badEventFlg = true;
+                    sbBadEventRrrMsg.append("MR ");
+                }
+                if (mcNum < 0) {
+                    mcNum = 0;
+                    badEventFlg = true;
+                    sbBadEventRrrMsg.append("MC ");
+                }
+                if (mtNum < 0) {
+                    mtNum = 0;
+                    badEventFlg = true;
+                    sbBadEventRrrMsg.append("MT ");
+                }
+                if (meNum < 0) {
+                    meNum = 0;
+                    badEventFlg = true;
+                    sbBadEventRrrMsg.append("ME ");
+                }
+                if (mhNum < 0) {
+                    mhNum = 0;
+                    badEventFlg = true;
+                    sbBadEventRrrMsg.append("MH ");
+                }
+                if (badEventFlg) {
+                    String tmp = sbBadEventRrrMsg.toString();
+                    sbBadEventRrrMsg = new StringBuilder();
+                    sbBadEventRrrMsg.append(" ! Bad Event detected for ").append(tmp);
+                }
 
-                sbData.append(String.format("%1$-3s%2$1s %3$1s %4$1s %5$-25s %6$2s %7$2s %8$2s %9$2s %10$2s %11$2s %12$2s %13$2s %14$2s %15$2s %16$2s %17$2s %18$2s\r\n",
+                sbData.append(String.format("%1$-3s%2$1s %3$1s %4$1s %5$-25s %6$2s %7$2s %8$2s %9$2s %10$2s %11$2s %12$2s %13$2s %14$2s %15$2s %16$2s %17$2s %18$2s%19$s\r\n",
                         String.format("%2s", getValueOr(sqData, "trno", "1")), // For 3-bit treatment number
                         getValueOr(sqData, "sq", "1"), // P.S. default value here is based on document DSSAT vol2.pdf
                         getValueOr(sqData, "op", "1"),
@@ -549,7 +606,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         mtNum, //getObjectOr(data, "ti", defValI).toString(),
                         meNum, //getObjectOr(data, "em", defValI).toString(),
                         mhNum, //getObjectOr(data, "ha", defValI).toString(),
-                        smNum)); // 1
+                        smNum, // 1
+                        sbBadEventRrrMsg.toString()));
 
             }
             sbData.append("\r\n");
@@ -660,8 +718,12 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 for (int idx = 0; idx < saArr.size(); idx++) {
 
                     HashMap secData = (HashMap) saArr.get(idx);
-                    sbData.append("@A SADAT  SMHB  SMPX  SMKE  SANAME\r\n");
-                    sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s  %6$s\r\n",
+                    String brokenMark = "";
+                    if (getValueOr(secData, "sadat", defValD).equals(defValD)) {
+                        brokenMark = "!";
+                    }
+                    sbData.append(brokenMark).append("@A SADAT  SMHB  SMPX  SMKE  SANAME\r\n");
+                    sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s  %6$s\r\n",
                             idx + 1,
                             formatDateStr(getValueOr(secData, "sadat", defValD)),
                             getValueOr(secData, "samhb", defValC),
@@ -671,10 +733,10 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                     ArrayList<HashMap> subDataArr = getObjectOr(secData, "soilLayer", new ArrayList());
                     if (!subDataArr.isEmpty()) {
-                        sbData.append("@A  SABL  SADM  SAOC  SANI SAPHW SAPHB  SAPX  SAKE  SASC\r\n");
+                        sbData.append(brokenMark).append("@A  SABL  SADM  SAOC  SANI SAPHW SAPHB  SAPX  SAKE  SASC\r\n");
                     }
                     for (HashMap subData : subDataArr) {
-                        sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
+                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
                                 idx + 1,
                                 formatNumStr(5, subData, "sabl", defValR),
                                 formatNumStr(5, subData, "sabdm", defValR),
@@ -698,8 +760,12 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 for (int idx = 0; idx < icArr.size(); idx++) {
 
                     HashMap secData = icArr.get(idx);
-                    sbData.append("@C   PCR ICDAT  ICRT  ICND  ICRN  ICRE  ICWD ICRES ICREN ICREP ICRIP ICRID ICNAME\r\n");
-                    sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$s\r\n",
+                    String brokenMark = "";
+                    if (getValueOr(secData, "icdat", defValD).equals(defValD)) {
+                        brokenMark = "!";
+                    }
+                    sbData.append(brokenMark).append("@C   PCR ICDAT  ICRT  ICND  ICRN  ICRE  ICWD ICRES ICREN ICREP ICRIP ICRID ICNAME\r\n");
+                    sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$s\r\n",
                             idx + 1,
                             translateTo2BitCrid(secData, "icpcr", defValC),
                             formatDateStr(getValueOr(secData, "icdat", getPdate(result))),
@@ -717,10 +783,10 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                     ArrayList<HashMap> subDataArr = getObjectOr(secData, "soilLayer", new ArrayList());
                     if (!subDataArr.isEmpty()) {
-                        sbData.append("@C  ICBL  SH2O  SNH4  SNO3\r\n");
+                        sbData.append(brokenMark).append("@C  ICBL  SH2O  SNH4  SNO3\r\n");
                     }
                     for (HashMap subData : subDataArr) {
-                        sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s\r\n",
+                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s\r\n",
                                 idx + 1,
                                 formatNumStr(5, subData, "icbl", defValR),
                                 formatNumStr(5, subData, "ich2o", defValR),
@@ -828,7 +894,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     }
                     for (HashMap subDataArr1 : subDataArr) {
                         subData = subDataArr1;
-                        sbData.append(String.format("%1$2s %2$5s %3$-5s %4$5s\r\n",
+                        String brokenMark = "";
+                        if (getValueOr(subData, "date", defValD).equals(defValD)) {
+                            brokenMark = "!";
+                        }
+                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$-5s %4$5s\r\n",
                                 idx + 1,
                                 formatDateStr(getValueOr(subData, "date", defValD)), // P.S. idate -> date
                                 getValueOr(subData, "irop", defValC),
@@ -875,13 +945,17 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                        if (getValueOr(secData, "feamk", "").equals("")) {
 //                            sbError.append("! Warning: missing data : [feamk], and will automatically use the value of FEK_TOT, '").append(fek_tot).append("'\r\n");
 //                        }
-                        sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$s\r\n",
+                        String brokenMark = "";
+                        if (getValueOr(secData, "date", defValD).equals(defValD)) {
+                            brokenMark = "!";
+                        }
+                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$s\r\n",
                                 idx + 1,
                                 formatDateStr(getValueOr(secData, "date", defValD)), // P.S. fdate -> date
                                 getValueOr(secData, "fecd", defValC), // P.S. Set default value as "FE005"(Cancelled)
                                 getValueOr(secData, "feacd", defValC), // P.S. Set default value as "AP002"(Cancelled)
                                 formatNumStr(5, secData, "fedep", defValR), // P.S. Set default value as "10"(Cancelled)
-                                formatNumStr(5, secData, "feamn", defValR), // P.S. Set default value to use the value of FEN_TOT in meta data(Cancelled)
+                                formatNumStr(5, secData, "feamn", "0"), // P.S. Set default value to use 0 instead of -99
                                 formatNumStr(5, secData, "feamp", defValR), // P.S. Set default value to use the value of FEP_TOT in meta data(Cancelled)
                                 formatNumStr(5, secData, "feamk", defValR), // P.S. Set default value to use the value of FEK_TOT in meta data(Cancelled)
                                 formatNumStr(5, secData, "feamc", defValR),
@@ -902,7 +976,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     ArrayList<HashMap> secDataArr = mrArr.get(idx);
 
                     for (HashMap secData : secDataArr) {
-                        sbData.append(String.format("%1$2s %2$5s %3$-5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$s\r\n",
+                        String brokenMark = "";
+                        if (getValueOr(secData, "date", defValD).equals(defValD)) {
+                            brokenMark = "!";
+                        }
+                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$-5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$s\r\n",
                                 idx + 1,
                                 formatDateStr(getValueOr(secData, "date", defValD)), // P.S. omdat -> date
                                 getValueOr(secData, "omcd", defValC),
@@ -928,7 +1006,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     ArrayList<HashMap> secDataArr = mcArr.get(idx);
 
                     for (HashMap secData : secDataArr) {
-                        sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s  %8$s\r\n",
+                        String brokenMark = "";
+                        if (getValueOr(secData, "date", defValD).equals(defValD)) {
+                            brokenMark = "!";
+                        }
+                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s  %8$s\r\n",
                                 idx + 1,
                                 formatDateStr(getValueOr(secData, "date", defValD)), // P.S. cdate -> date
                                 getValueOr(secData, "chcd", defValC),
@@ -951,7 +1033,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     ArrayList<HashMap> secDataArr = mtArr.get(idx);
 
                     for (HashMap secData : secDataArr) {
-                        sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$s\r\n",
+                        String brokenMark = "";
+                        if (getValueOr(secData, "date", defValD).equals(defValD)) {
+                            brokenMark = "!";
+                        }
+                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$s\r\n",
                                 idx + 1,
                                 formatDateStr(getValueOr(secData, "date", defValD)), // P.S. tdate -> date
                                 getValueOr(secData, "tiimp", defValC),
@@ -975,7 +1061,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                     cnt,
                                     getValueOr(secData, "em_data", "").trim()));
                         } else {
-                            sbData.append(String.format("%1$2s %2$5s %3$-1s%4$4s %5$-1s%6$4s %7$-1s%8$4s %9$-1s%10$4s %11$-1s%12$4s %13$-1s%14$4s %15$-1s%16$4s %17$-1s%18$4s %19$s\r\n",
+                            String brokenMark = "";
+                            if (getValueOr(secData, "date", defValD).equals(defValD)) {
+                                brokenMark = "!";
+                            }
+                            sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$-1s%4$4s %5$-1s%6$4s %7$-1s%8$4s %9$-1s%10$4s %11$-1s%12$4s %13$-1s%14$4s %15$-1s%16$4s %17$-1s%18$4s %19$s\r\n",
                                     idx + 1,
                                     formatDateStr(getValueOr(secData, "date", defValD)), // P.S. emday -> date
                                     getValueOr(secData, "ecdyl", "A"),
@@ -1011,7 +1101,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     ArrayList<HashMap> secDataArr = mhArr.get(idx);
 
                     for (HashMap secData : secDataArr) {
-                        sbData.append(String.format("%1$2s %2$5s %3$-5s %4$-5s %5$-5s %6$5s %7$5s %8$s\r\n",
+                        String brokenMark = "";
+                        if (getValueOr(secData, "date", defValD).equals(defValD)) {
+                            brokenMark = "!";
+                        }
+                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$-5s %4$-5s %5$-5s %6$5s %7$5s %8$s\r\n",
                                 idx + 1,
                                 formatDateStr(getValueOr(secData, "date", defValD)), // P.S. hdate -> date
                                 getValueOr(secData, "hastg", defValC),
@@ -1336,6 +1430,26 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
         return sb.toString();
     }
+    
+    /**
+     * Get index value of the record and set new id value in the array.
+     * In addition, it will check if the event date is available. If not, then
+     * return 0.
+     *
+     * @param m sub data
+     * @param arr array of sub data
+     * @return current index value of the sub data
+     */
+    private int setSecDataArr(HashMap m, ArrayList arr, boolean isEvent) {
+        
+        int idx = setSecDataArr(m, arr);
+        
+        if (idx != 0 && isEvent && getValueOr(m, "date", "").equals("")) {
+            return -1;
+        } else {
+            return idx;
+        }
+    }
 
     /**
      * Get index value of the record and set new id value in the array
@@ -1357,6 +1471,26 @@ public class DssatXFileOutput extends DssatCommonOutput {
         } else {
             return 0;
         }
+    }
+    
+    private int setSecDataArr(ArrayList inArr, ArrayList outArr, boolean isEvent) {
+        
+        int idx = setSecDataArr(inArr, outArr);
+        
+        if (idx != 0 && isEvent && !checkEventDate(inArr)) {
+            return -1;
+        } else {
+            return idx;
+        }
+    }
+    
+    private boolean checkEventDate(ArrayList arr) {
+        for (Object o : arr) {
+            if (getValueOr((HashMap) o, "date", "").equals("")) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
