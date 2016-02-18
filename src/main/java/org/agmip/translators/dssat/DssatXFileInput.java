@@ -1050,13 +1050,17 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (!getObjectOr(sqData, "sm", "0").equals("0")) {
                     String sm = (String) sqData.get("sm");
                     HashMap smData = (HashMap) getSectionDataObj(smArr, "sm", sm);
-                    // Set SDAT
+                    // Set SDAT and EXP_DUR
                     HashMap smGeneral = getObjectOr(smData, "general", new HashMap());
                     String sdyer = getValueOr(smGeneral, "sdyer", "");
                     String sdday = getValueOr(smGeneral, "sdday", "");
                     String sdat = translateDateStr(sdyer + sdday);
                     if (!sdat.equals("")) {
                         trMetaData.put("sdat", sdat);
+                    }
+                    String expDur = getValueOr(smGeneral, "nyers", "");
+                    if (!expDur.equals("")) {
+                        trMetaData.put("exp_dur", expDur);
                     }
                     // Get simulation control management section info
                     smManagement = getObjectOr(smData, "management", new HashMap());
