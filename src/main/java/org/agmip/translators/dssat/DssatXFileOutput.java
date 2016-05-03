@@ -532,16 +532,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 }
                 StringBuilder sbBadEventRrrMsg = new StringBuilder();
                 boolean badEventFlg = false;
-                if (saNum < 0) {
-                    saNum = 0;
-                    badEventFlg = true;
-                    sbBadEventRrrMsg.append("SA ");
-                }
-                if (icNum < 0) {
-                    icNum = 0;
-                    badEventFlg = true;
-                    sbBadEventRrrMsg.append("IC ");
-                }
                 if (mpNum < 0) {
                     mpNum = 0;
                     badEventFlg = true;
