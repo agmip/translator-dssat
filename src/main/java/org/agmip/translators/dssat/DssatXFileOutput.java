@@ -1336,11 +1336,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     getValueOr(smData, "niout", "N"),
                     getValueOr(smData, "miout", "N"),
                     getValueOr(smData, "diout", "N"),
-                    getValueOr(smData, "vbose", "N"),
+                    getValueOr(smData, "vbose", "0"),
                     getValueOr(smData, "chout", "N"),
                     getValueOr(smData, "opout", "N")));
         } else {
-            sb.append(sm).append(" OU              N     Y     Y     1     Y     Y     N     N     N     N     N     N     N\r\n\r\n");
+            sb.append(sm).append(" OU              N     Y     Y     1     Y     Y     N     N     N     N     0     N     N\r\n\r\n");
         }
         // PLANTING
         sb.append("@  AUTOMATIC MANAGEMENT\r\n");
