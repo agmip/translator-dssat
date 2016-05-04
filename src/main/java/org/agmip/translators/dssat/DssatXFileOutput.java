@@ -248,6 +248,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         appliedDomes.put(trt_name + " Seasonal ", getAppliedDomes(rootData, "seasonal"));
                     }
                     isAnyDomeApplied = true;
+                    copyItem(smData, rootData, "seasonal_dome_applied");
                 } else {
                     appliedDomes.put(trt_name, "");
                 }
@@ -405,7 +406,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     }
                     copyItem(saData, soilData, "sadat");
                     saData.put("soilLayer", saSubArr);
-                    saNum = setSecDataArr(saData, saArr, true);
+                    saNum = setSecDataArr(saData, saArr);
                 } else {
                     saNum = 0;
                 }
@@ -514,6 +515,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         //                    mhData.put("hastg", "GS000");
                         mhSubArr.add(mhData);
                         smData.put("hadat_valid", "Y");
+                        //
                     }
                 }
 
@@ -708,12 +710,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 for (int idx = 0; idx < saArr.size(); idx++) {
 
                     HashMap secData = (HashMap) saArr.get(idx);
-                    String brokenMark = "";
-                    if (getValueOr(secData, "sadat", defValD).equals(defValD)) {
-                        brokenMark = "!";
-                    }
-                    sbData.append(brokenMark).append("@A SADAT  SMHB  SMPX  SMKE  SANAME\r\n");
-                    sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s  %6$s\r\n",
+                    sbData.append("@A SADAT  SMHB  SMPX  SMKE  SANAME\r\n");
+                    sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s  %6$s\r\n",
                             idx + 1,
                             formatDateStr(getValueOr(secData, "sadat", defValD)),
                             getValueOr(secData, "samhb", defValC),
@@ -723,10 +721,10 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                     ArrayList<HashMap> subDataArr = getObjectOr(secData, "soilLayer", new ArrayList());
                     if (!subDataArr.isEmpty()) {
-                        sbData.append(brokenMark).append("@A  SABL  SADM  SAOC  SANI SAPHW SAPHB  SAPX  SAKE  SASC\r\n");
+                        sbData.append("@A  SABL  SADM  SAOC  SANI SAPHW SAPHB  SAPX  SAKE  SASC\r\n");
                     }
                     for (HashMap subData : subDataArr) {
-                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
+                        sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
                                 idx + 1,
                                 formatNumStr(5, subData, "sabl", defValR),
                                 formatNumStr(5, subData, "sabdm", defValR),
@@ -1167,6 +1165,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         String sm = String.format("%2d", smid);
 //        ArrayList<HashMap> dataArr;
         HashMap subData;
+        String vbose="N";
 
 //        // Check if the meta data of fertilizer is not "N" ("Y" or null)
 //        if (!getValueOr(expData, "fertilizer", "").equals("N")) {
@@ -1218,6 +1217,10 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
         if (!getValueOr(trData, "hadat_valid", "").trim().equals("")) {
             harOpt = "R";
+        }
+        
+        if (getValueOr(trData, "seasonal_dome_applied", "").trim().equals("Y")) {
+            vbose = "0";
         }
 
         String smStr;
@@ -1326,11 +1329,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     getValueOr(smData, "niout", "N"),
                     getValueOr(smData, "miout", "N"),
                     getValueOr(smData, "diout", "N"),
-                    getValueOr(smData, "vbose", "0"),
+                    getValueOr(smData, "vbose", vbose),
                     getValueOr(smData, "chout", "N"),
                     getValueOr(smData, "opout", "N")));
         } else {
-            sb.append(sm).append(" OU              N     Y     Y     1     Y     Y     N     N     N     N     0     N     N\r\n\r\n");
+            sb.append(sm).append(" OU              N     Y     Y     1     Y     Y     N     N     N     N     ").append(vbose).append("     N     N\r\n\r\n");
         }
         // PLANTING
         sb.append("@  AUTOMATIC MANAGEMENT\r\n");
