@@ -325,7 +325,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             int idx = vars.indexOf(var);
                             if (idx < 0) {
                                 LOG.warn("Found unsupported adjusment variable [" + var + "], will be ignored.");
-                                sbError.append("Found unsupported adjusment variable [").append(var).append("], will be ignored.");
+                                sbError.append("! Warning: Found unsupported adjusment variable [").append(var).append("], will be ignored.");
                                 continue;
                             } else {
                                 var = emVars.get(idx);
@@ -344,7 +344,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                 method = "M";
                             } else {
                                 LOG.warn("Found unsupported adjusment method [" + method + "] for [" + var + "], will be ignored.");
-                                sbError.append("Found unsupported adjusment method [").append(method).append("] for [").append(var).append("], will be ignored.");
+                                sbError.append("! Warning: Found unsupported adjusment method [").append(method).append("] for [").append(var).append("], will be ignored.");
                                 continue;
                             }
 
@@ -437,7 +437,8 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         evtData.remove("seqid");
 
                         // Planting event
-                        if (getValueOr(evtData, "event", defValBlank).equals("planting")) {
+                        String eventType = getValueOr(evtData, "event", defValBlank);
+                        if (eventType.equals("planting")) {
                             // Set cultivals info
                             copyItem(cuData, evtData, "cul_name");
                             copyItem(cuData, evtData, "crid");
@@ -464,25 +465,35 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             copyItem(mpData, evtData, "plspl");
                             copyItem(mpData, evtData, "pl_name");
                         } // irrigation event
-                        else if (getValueOr(evtData, "event", "").equals("irrigation")) {
+                        else if (eventType.equals("irrigation")) {
                             miSubArr.add(evtData);
+                        } // auto irrigation event
+                        else if (eventType.equals("auto_irrig")) {
+                            smData.put("auto_irrig", evtData);
+//                            if (getValueOr(evtData, "iamt", "").trim().equals("")) {
+//                                smData.put("auto_irrig_code", "A");
+//                            } else {
+//                                smData.put("auto_irrig_code", "F");
+//                            }
+//                            copyItem(smData, evtData, "irmdp");
+//                            copyItem(smData, evtData, "irthr");
                         } // fertilizer event
-                        else if (getValueOr(evtData, "event", "").equals("fertilizer")) {
+                        else if (eventType.equals("fertilizer")) {
                             mfSubArr.add(evtData);
                         } // organic_matter event
-                        else if (getValueOr(evtData, "event", "").equals("organic_matter")) {   // P.S. change event name to organic-materials; Back to organic_matter again.
+                        else if (eventType.equals("organic_matter")) {   // P.S. change event name to organic-materials; Back to organic_matter again.
                             mrSubArr.add(evtData);
                         } // chemical event
-                        else if (getValueOr(evtData, "event", "").equals("chemical")) {
+                        else if (eventType.equals("chemical")) {
                             mcSubArr.add(evtData);
                         } // tillage event
-                        else if (getValueOr(evtData, "event", "").equals("tillage")) {
+                        else if (eventType.equals("tillage")) {
                             mtSubArr.add(evtData);
 //                        } // environment_modification event
 //                        else if (getValueOr(evtData, "event", "").equals("environment_modification")) {
 //                            meSubArr.add(evtData);
                         } // harvest event
-                        else if (getValueOr(evtData, "event", "").equals("harvest")) {
+                        else if (eventType.equals("harvest")) {
                             mhSubArr.add(evtData);
                             if (!getValueOr(evtData, "date", "").trim().equals("")) {
                                 smData.put("hadat_valid", "Y");
@@ -521,7 +532,11 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                 cuNum = setSecDataArr(cuData, cuArr);
                 mpNum = setSecDataArr(mpData, mpArr, true);
-                miNum = setSecDataArr(miSubArr, miArr, true);
+                if (smData.containsKey("auto_irrig_code")) {
+                    miNum = setSecDataArr(miSubArr, miArr); // skip date check for auto_irrig event
+                } else {
+                    miNum = setSecDataArr(miSubArr, miArr, true);
+                }
                 mfNum = setSecDataArr(mfSubArr, mfArr, true);
                 mrNum = setSecDataArr(mrSubArr, mrArr, true);
                 mcNum = setSecDataArr(mcSubArr, mcArr, true);
@@ -1162,11 +1177,29 @@ public class DssatXFileOutput extends DssatCommonOutput {
         String co2 = "M";
         String harOpt = "M";
         String sdate;
+        String irrigMgn;
+        HashMap<String, String> autoIrrEvt = getObjectOr(trData, "auto_irrig", new HashMap());
         String sm = String.format("%2d", smid);
 //        ArrayList<HashMap> dataArr;
         HashMap subData;
         String vbose="N";
 
+        // Detect the irrigation control code
+        String iamt = getValueOr(autoIrrEvt, "iamt", "").trim();
+        String irmdp = getValueOr(autoIrrEvt, "irmdp", "").trim();
+        String irthr = getValueOr(autoIrrEvt, "irthr", "").trim();
+        if (irmdp.equals("") || irthr.equals("")) {
+            irrigMgn = "R";
+            if (!irmdp.equals("") || !irthr.equals("")) {
+                LOG.warn("Detect incompleted auto-irrigation event. Please provide IRMDP and IRTHR at least.");
+                sbError.append("! Warning: Detect incompleted auto-irrigation event. Please provide IRMDP and IRTHR at least.");
+            }
+        } else if (!iamt.equals("")) {
+            irrigMgn = "F";
+        } else {
+            irrigMgn = "A";
+        }
+        
 //        // Check if the meta data of fertilizer is not "N" ("Y" or null)
 //        if (!getValueOr(expData, "fertilizer", "").equals("N")) {
 //
@@ -1309,7 +1342,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     getValueOr(smData, "resid", "R"),
                     getValueOr(smData, "harvs", harOpt)));
         } else {
-            sb.append(sm).append(" MA              R     R     R     R     ").append(harOpt).append("\r\n");
+            sb.append(sm).append(" MA              R     ").append(irrigMgn).append("     R     R     ").append(harOpt).append("\r\n");
         }
         // OUTPUTS
         sb.append("@N OUTPUTS     FNAME OVVEW SUMRY FROPT GROUT CAOUT WAOUT NIOUT MIOUT DIOUT VBOSE CHOUT OPOUT\r\n");
@@ -1371,6 +1404,17 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     getValueOr(smData, "imeth", "IR001"),
                     getValueOr(smData, "iramt", "10"),
                     getValueOr(smData, "ireff", "1.00")));
+        } else if (!"R".equals(irrigMgn)) {
+            sb.append(String.format("%1$2s %2$-11s %3$5s %4$5s %5$5s %6$-5s %7$-5s %8$5s %9$5s\r\n",
+                    sm,
+                    "IR",
+                    getValueOr(autoIrrEvt, "irmdp", ""),
+                    getValueOr(autoIrrEvt, "irthr", ""),
+                    getValueOr(autoIrrEvt, "irept", ""),
+                    getValueOr(autoIrrEvt, "irstg", ""),
+                    getValueOr(autoIrrEvt, "iame", ""),
+                    getValueOr(autoIrrEvt, "iamt", ""),
+                    getValueOr(autoIrrEvt, "ireff", "")));
         } else {
             sb.append(sm).append(" IR             30    50   100 GS000 IR001    10  1.00\r\n");
         }
