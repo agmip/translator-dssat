@@ -124,8 +124,8 @@ public class DssatWthFileHelper {
                 try {
                     int iStartYear = Integer.parseInt(startYear);
                     int iEndYear = Integer.parseInt(endYear);
-                    iStartYear += iStartYear <= 15 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version
-                    iEndYear += iEndYear <= 15 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version
+                    iStartYear += iStartYear <= 30 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version
+                    iEndYear += iEndYear <= 30 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version
                     int duration = iEndYear - iStartYear + 1;
                     // P.S. Currently the system only support the maximum of 99 years for duration
                     duration = duration > 99 ? 99 : duration;

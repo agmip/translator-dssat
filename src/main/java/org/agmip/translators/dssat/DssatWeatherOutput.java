@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.agmip.common.Functions;
+import org.agmip.util.MapUtil;
 import static org.agmip.util.MapUtil.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,6 +120,23 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                 wthRecord = (HashMap) wthRecords.get(i);
                 dailyData[i] = new StringBuilder();
                 dailyHeaders.seCurItems(wthRecord.keySet());
+                
+                // Check daily weather data
+                String date = MapUtil.getValueOr(wthRecord, "w_date", "");
+                // 1.0 <= SRAD <= 50.
+                String srad = MapUtil.getValueOr(wthRecord, "srad", "");
+                if (!srad.equals("")
+                        && (Functions.compare(srad, "1.0", Functions.CompareMode.LESS)
+                          || Functions.compare(srad, "50.0", Functions.CompareMode.GREATER))) {
+                    sbError.append("! Value of SRAD on ").append(date).append(" is invalid (out of  [1.0, 50.0])");
+                }
+                // TMAX > TMIN
+                String tmax = MapUtil.getValueOr(wthRecord, "tmax", "");
+                String tmin = MapUtil.getValueOr(wthRecord, "tmin", "");
+                if (!tmax.equals("") && !tmin.equals("")
+                        && Functions.compare(tmax, tmin, Functions.CompareMode.NOTGREATER)) {
+                    sbError.append("! Value of TMAX and TMIN on ").append(date).append(" is invalid (TMAX <= TMIN)");
+                }
 
                 // if date is missing, jump the record
                 if (!getObjectOr(wthRecord, "w_date", "").equals("")) {
