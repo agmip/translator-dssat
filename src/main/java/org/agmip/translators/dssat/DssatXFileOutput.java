@@ -1394,8 +1394,6 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     getValueOr(smData, "till", "Y"),
                     getValueOr(smData, "co2", co2)));
         } else if (is2D) {
-            water = "Y";
-            nitro = "N";
             sb.append(sm).append(" OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     N     ").append(co2).append("\r\n");
         } else {
             sb.append(sm).append(" OP              ").append(water).append("     ").append(nitro).append("     Y     N     N     N     N     Y     ").append(co2).append("\r\n");
