@@ -429,6 +429,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                }
                 copyItem(smData, rootData, "sdat");
                 copyItem(smData, rootData, "dssat_model");
+                copyItem(smData, rootData, "water");
+                copyItem(smData, rootData, "nitro");
+                copyItem(smData, rootData, "mesev");
                 copyItem(smData, getObjectOr(wthData, "weather", new HashMap()), "co2y");
                 if (rootData.containsKey("bdwd")
                         || rootData.containsKey("bdht")
@@ -1257,8 +1260,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
     private String createSMMAStr(int smid, HashMap trData) {
 
         StringBuilder sb = new StringBuilder();
-        String nitro = "Y";
-        String water = "Y";
+        String nitro = getValueOr(trData, "nitro", "Y").trim();
+        String water = getValueOr(trData, "water", "Y").trim();
+        String mesev = getValueOr(trData, "mesev", "S").trim();
         String co2 = "M";
         String harOpt = "M";
         String hydro = "R";
@@ -1415,12 +1419,12 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     getValueOr(smData, "hydro", "R"),
                     getValueOr(smData, "nswit", "1"),
                     getValueOr(smData, "mesom", "P"),
-                    getValueOr(smData, "mesev", "S"),
+                    getValueOr(smData, "mesev", mesev),
                     getValueOr(smData, "mesol", "2")));
         } else if (is2D) {
-            sb.append(sm).append(" ME              M     M     E     R     N     C     ").append(hydro).append("     1     G     S     2\r\n"); // P.S. 2012/09/02 MESOM "G" -> "P"
+            sb.append(sm).append(" ME              M     M     E     R     N     C     ").append(hydro).append("     1     G     ").append(mesev).append("     2\r\n"); // P.S. 2012/09/02 MESOM "G" -> "P"
         } else {
-            sb.append(sm).append(" ME              M     M     E     R     S     L     ").append(hydro).append("     1     P     S     2\r\n"); // P.S. 2012/09/02 MESOM "G" -> "P"
+            sb.append(sm).append(" ME              M     M     E     R     S     L     ").append(hydro).append("     1     P     ").append(mesev).append("     2\r\n"); // P.S. 2012/09/02 MESOM "G" -> "P"
         }
         // MANAGEMENT
         sb.append("@N MANAGEMENT  PLANT IRRIG FERTI RESID HARVS\r\n");
