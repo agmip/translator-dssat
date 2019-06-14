@@ -59,7 +59,7 @@ public class DssatRunFileOutput extends DssatCommonOutput implements DssatBtachF
             if (dssatVerStr == null) {
                 dssatVerStr = getObjectOr(result, "crop_model_version", "").replaceAll("\\D", "");
                 if (!dssatVerStr.matches("\\d+")) {
-                    dssatVerStr = DssatBatchFileOutput.DssatVersion.DSSAT45.toString();
+                    dssatVerStr = DssatBatchFileOutput.DssatVersion.DSSAT47.toString();
                 }
             }
 
