@@ -307,7 +307,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 swData = wthData;
                 expData.put("wst_id", id);
             }
-            if (!id.equals("") && !swData.containsKey(id)) {
+            if (!id.isEmpty() && !swData.containsKey(id)) {
                 swData.put(id, expData);
 //                Future fut = executor.submit(new DssatTranslateRunner(output, expData, arg0));
 //                swfiles.put(id, fut);
@@ -471,7 +471,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         for (int i = 0; i < expArr.size(); i++) {
             exname = getValueOr(expArr.get(i), "exname", "");
 
-            if (exname.equals("")) {
+            if (exname.isEmpty()) {
                 subExpArr = new ArrayList();
                 subExpArr.add(expArr.get(i));
                 expGroupMap.put("Experiment_" + i, subExpArr);
@@ -498,7 +498,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     ArrayList<HashMap> seqArr = new ArrayList();
                     HashMap seqData = new HashMap();
                     String trt_name = getValueOr(tmp, "trt_name", getValueOr(tmp, "exname", ""));
-                    if (!trt_name.equals("")) {
+                    if (!trt_name.isEmpty()) {
                         seqData.put("trt_name", trt_name);
                     }
                     seqArr.add(seqData);
@@ -556,7 +556,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
             tmp.put("trno", trno + "");
             if (tmp.get("trt_name") == null) {
                 String trt_name = getValueOr(expData, "trt_name", getValueOr(expData, "exname", ""));
-                if (!trt_name.equals("")) {
+                if (!trt_name.isEmpty()) {
                     tmp.put("trt_name", trt_name);
                 }
             }

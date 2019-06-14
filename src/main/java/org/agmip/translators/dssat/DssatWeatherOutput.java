@@ -67,7 +67,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             // Initial BufferedWriter
             // Get File name
             String fileName = getValueOr(result, "wst_id", "");
-            if (fileName.equals("")) {
+            if (fileName.isEmpty()) {
                 fileName = getWthFileName(result);
             }
             fileName += ".WTH";
@@ -125,21 +125,21 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                 String date = MapUtil.getValueOr(wthRecord, "w_date", "");
                 // 1.0 <= SRAD <= 50.
                 String srad = MapUtil.getValueOr(wthRecord, "srad", "");
-                if (!srad.equals("")
+                if (!srad.isEmpty()
                         && (Functions.compare(srad, "1.0", Functions.CompareMode.LESS)
                           || Functions.compare(srad, "50.0", Functions.CompareMode.GREATER))) {
-                    sbError.append("! Value of SRAD on ").append(date).append(" is invalid (out of  [1.0, 50.0])");
+                    sbError.append("! Value of SRAD on ").append(date).append(" is invalid (out of  [1.0, 50.0])\r\n");
                 }
                 // TMAX > TMIN
                 String tmax = MapUtil.getValueOr(wthRecord, "tmax", "");
                 String tmin = MapUtil.getValueOr(wthRecord, "tmin", "");
-                if (!tmax.equals("") && !tmin.equals("")
+                if (!tmax.isEmpty() && !tmin.isEmpty()
                         && Functions.compare(tmax, tmin, Functions.CompareMode.NOTGREATER)) {
-                    sbError.append("! Value of TMAX and TMIN on ").append(date).append(" is invalid (TMAX <= TMIN)");
+                    sbError.append("! Value of TMAX and TMIN on ").append(date).append(" is invalid (TMAX <= TMIN)\r\n");
                 }
 
                 // if date is missing, jump the record
-                if (!getObjectOr(wthRecord, "w_date", "").equals("")) {
+                if (!getObjectOr(wthRecord, "w_date", "").isEmpty()) {
                     //  Format handling for daily date
                     dailyData[i].append(String.format("%1$5s", formatDateStr(getObjectOr(wthRecord, dailyHeaders.get(0), defValD))));
 
