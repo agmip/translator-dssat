@@ -250,7 +250,7 @@ public class DssatXFileInput extends DssatCommonInput {
                     }
 
                 } // Read TREATMENTS Section
-                else if (flg[0].startsWith("N R O C TNAME")) {
+                else if (flg[0].startsWith("treatments")) {
 
                     // Read TREATMENTS data / Rotation data
                     if (flg[2].equals("data")) {
