@@ -223,6 +223,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                 ArrayList<HashMap> meSubArr = new ArrayList<HashMap>();
                 ArrayList<HashMap> mhSubArr = new ArrayList<HashMap>();
                 HashMap smData = new HashMap();
+                boolean is2D = false;
                 HashMap rootData;
                 // Set exp root info
                 if (i < rootArr.size()) {
@@ -437,6 +438,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         || rootData.containsKey("bdht")
                         || rootData.containsKey("pmalb")) {
                     smData.put("2d_valid", "Y");
+                    is2D = true;
                 }
 
                 // Loop all event data
@@ -478,6 +480,9 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         } // irrigation event
                         else if (eventType.equals("irrigation")) {
                             miSubArr.add(evtData);
+                            if (is2D) {
+                                evtData.put("2d_valid", "Y");
+                            }
                         } // auto irrigation event
                         else if (eventType.equals("auto_irrig")) {
                             smData.put("auto_irrig", evtData);
@@ -921,10 +926,25 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                    secData = (ArrayList) miArr.get(idx);
                     ArrayList<HashMap> subDataArr = miArr.get(idx);
                     boolean isDrip = false;
+                    ArrayList<HashMap> dripLines = new ArrayList();
+                    ArrayList<Integer> dripLineNos = new ArrayList();
+                    
                     for (HashMap subData : subDataArr) {
-                        if (getValueOr(subData, "irop", defValC).equals("IR005")) {
+                        if (getValueOr(subData, "irop", defValC).equals("IR005") &&
+                                getValueOr(subData, "2d_valid", defValC).equals("Y")) {
                             isDrip = true;
-                            break;
+                            HashMap dripLine = new HashMap();
+                            copyItem(dripLine, subData, "irspc");
+                            copyItem(dripLine, subData, "irofs");
+                            copyItem(dripLine, subData, "irdep");
+                            if (dripLines.contains(dripLine)) {
+                                dripLineNos.add(dripLines.indexOf(dripLine) + 1);
+                            } else {
+                                dripLines.add(dripLine);
+                                dripLineNos.add(dripLines.size());
+                            }
+                        } else {
+                            dripLineNos.add(-99);
                         }
                     }
                     HashMap subData;
@@ -934,7 +954,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         subData = new HashMap();
                     }
                     if (isDrip) {
-                        sbData.append("@I  EFIR  IDEP  ITHR  IEPT  IOFF  IAME  IAMT IRSPC IROFS IRDEP IRNAME\r\n");
+                        sbData.append("@I  EFIR  IDEP  ITHR  IEPT  IOFF  IAME  IAMT IRNAME\r\n");
                         sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$s\r\n",
                                 idx + 1,
                                 formatNumStr(5, subData, "ireff", defValR),
@@ -944,10 +964,18 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                 getValueOr(subData, "irstg", defValC),
                                 getValueOr(subData, "iame", defValC),
                                 formatNumStr(5, subData, "iamt", defValR),
-                                formatNumStr(5, subData, "irspc", defValR),
-                                formatNumStr(5, subData, "irofs", defValR),
-                                formatNumStr(5, subData, "irdep", defValR),
                                 getValueOr(subData, "ir_name", defValC)));
+                        sbData.append("@I  IRLN IRSPC IROFS IRDEP\r\n");
+                        int drpLnIdx = 1;
+                        for (HashMap dripLine : dripLines) {
+                            sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s\r\n",
+                                    idx + 1,
+                                    drpLnIdx,
+                                    formatNumStr(5, dripLine, "irspc", defValR),
+                                    formatNumStr(5, dripLine, "irofs", defValR),
+                                    formatNumStr(5, dripLine, "irdep", defValR)));
+                            drpLnIdx++;
+                        }
                     } else {
                         sbData.append("@I  EFIR  IDEP  ITHR  IEPT  IOFF  IAME  IAMT IRNAME\r\n");
                         sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$s\r\n",
@@ -964,11 +992,12 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                     if (!subDataArr.isEmpty()) {
                         if (isDrip) {
-                            sbData.append("@I IDATE  IROP IRVAL IRSTR IRDUR IRINT IRNUM\r\n");
+                            sbData.append("@I IDATE  IROP IRVAL IRSTR IRDUR  IRLN\r\n");
                         } else {
                             sbData.append("@I IDATE  IROP IRVAL\r\n");
                         }
                     }
+                    int drpLnIdx = 0;
                     for (HashMap subDataArr1 : subDataArr) {
                         subData = subDataArr1;
                         String brokenMark = "";
@@ -977,15 +1006,15 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         }
                         if (isDrip) {
                             sbData.append(brokenMark)
-                                    .append(String.format("%1$2s %2$5s %3$-5s %4$5s %5$5s %6$5s %7$5s %8$5s\r\n",
+                                    .append(String.format("%1$2s %2$5s %3$-5s %4$5s %5$5s %6$5s %7$5s\r\n",
                                                     idx + 1,
                                                     formatDateStr(getValueOr(subData, "date", defValD)), // P.S. idate -> date
                                                     getValueOr(subData, "irop", defValC),
                                                     formatNumStr(5, subData, "irval", defValR),
                                                     getValueOr(subData, "irstr", defValC),
                                                     formatNumStr(5, subData, "irdur", defValR),
-                                                    formatNumStr(5, subData, "irint", defValR),
-                                                    formatNumStr(5, subData, "irnum", defValR)));
+                                                    dripLineNos.get(drpLnIdx)));
+                            drpLnIdx++;
                         } else {
                             sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$-5s %4$5s\r\n",
                                     idx + 1,
