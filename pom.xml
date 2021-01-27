@@ -80,6 +80,11 @@
             <artifactId>acmo</artifactId>
             <version>1.1.5</version>
         </dependency>
+        <dependency>
+            <groupId>org.agmip.ace</groupId>
+            <artifactId>ace-core</artifactId>
+            <version>2.0.0</version>
+        </dependency>
     </dependencies>
 
     <scm>
