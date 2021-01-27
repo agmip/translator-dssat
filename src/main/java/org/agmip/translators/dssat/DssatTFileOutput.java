@@ -130,6 +130,7 @@ public class DssatTFileOutput extends DssatCommonOutput {
 //            decompressData(observeRecords);
             // Observation Data Section
             Object[] titleOutputId = titleOutput.keySet().toArray();
+            Arrays.sort(titleOutputId);
             String pdate = getPdate(result);
             for (int i = 0; i < (titleOutputId.length / 39 + titleOutputId.length % 39 == 0 ? 0 : 1); i++) {
 
@@ -141,9 +142,12 @@ public class DssatTFileOutput extends DssatCommonOutput {
                 sbData.append("\r\n");
 
                 for (HashMap record : observeRecords) {
-
+                    
+                    if (record.keySet().size() <= 2 && record.containsKey("trno") && record.containsKey("date")) {
+                        continue;
+                    }
                     sbData.append(String.format(" %1$5s", getValueOr(record, "trno", "1")));
-                    sbData.append(String.format(" %1$5d", Integer.parseInt(formatDateStr(getObjectOr(record, "date", defValI)))));
+                    sbData.append(String.format(" %1$5s", formatDateStr(getObjectOr(record, "date", defValI))));
                     for (int k = i * 39; k < limit; k++) {
 
                         if (obvDataList.isDapDateType(titleOutputId[k], titleOutput.get(titleOutputId[k]))) {

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import static org.agmip.util.MapUtil.*;
@@ -123,6 +124,7 @@ public class DssatAFileOutput extends DssatCommonOutput {
 //            decompressData(trArr);
             // Observation Data Section
             Object[] titleOutputId = titleOutput.keySet().toArray();
+            Arrays.sort(titleOutputId);
             String pdate = getPdate(result);
             int loops = titleOutputId.length / 40 + titleOutputId.length % 40 == 0 ? 0 : 1;
             for (int i = 0; i < loops; i++) {
@@ -141,9 +143,9 @@ public class DssatAFileOutput extends DssatCommonOutput {
                     for (int k = i * 40; k < limit; k++) {
 
                         if (obvDataList.isDapDateType(titleOutputId[k], titleOutput.get(titleOutputId[k]))) {
-                            sbData.append(String.format("%1$6s", cutYear(formatDateStr(pdate, getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI)))));
+                            sbData.append(String.format("%1$6s", formatDateStr(pdate, getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI))));
                         } else if (obvDataList.isDateType(titleOutputId[k])) {
-                            sbData.append(String.format("%1$6s", cutYear(formatDateStr(getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI)))));
+                            sbData.append(String.format("%1$6s", formatDateStr(getObjectOr(record, titleOutput.get(titleOutputId[k]).toString(), defValI))));
                         } else {
                             sbData.append(" ").append(formatNumStr(5, record, titleOutput.get(titleOutputId[k]), defValI));
                         }
