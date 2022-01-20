@@ -39,14 +39,14 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     protected static DssatSoilFileHelper soilHelper = new DssatSoilFileHelper();
 
     /**
-     * Translate data str from "yyyymmdd" to "yyddd"
+     * Translate data str from "yyyymmdd" to "yyyyddd"
      *
      * 2012/3/19 change input format from "yy/mm/dd" to "yyyymmdd"
      *
      * @param str date string with format of "yyyymmdd"
-     * @return result date string with format of "yyddd"
+     * @return result date string with format of "yyyyddd"
      */
-    protected String formatDateStr2(String str) {
+    protected String formatDateStr4Y(String str) {
 
         // Initial Calendar object
         Calendar cal = Calendar.getInstance();
@@ -55,11 +55,11 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             // Set date with input value
             cal.set(Integer.parseInt(str.substring(0, 4)), Integer.parseInt(str.substring(4, 6)) - 1, Integer.parseInt(str.substring(6)));
             // translatet to yyddd format
-            return String.format("%1$02d%2$03d", cal.get(Calendar.YEAR) % 100, cal.get(Calendar.DAY_OF_YEAR));
+            return String.format("%1$04d%2$03d", cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_YEAR));
         } catch (Exception e) {
             // if tranlate failed, then use default value for date
             //sbError.append("! Waring: There is a invalid date [").append(str).append("]\r\n");
-            return formatDateStr2(defValD);
+            return formatDateStr4Y(defValD);
         }
     }
 

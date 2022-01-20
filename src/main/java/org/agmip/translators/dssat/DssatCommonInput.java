@@ -84,7 +84,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
      */
     protected void judgeContentType(String line) {
         // Section Title line
-        if (line.startsWith("*")) {
+        if (line.startsWith("*") || line.startsWith("$")) {
 
             setTitleFlgs(line);
             flg4 = 0;
@@ -102,7 +102,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             flg[2] = "comment";
 
         } // Data line
-        else if (!line.trim().equals("")) {
+        else if (!line.trim().isEmpty()) {
 
             flg[2] = "data";
 
@@ -187,7 +187,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
     protected String translateDateStrForDOY(String str, String pdate) {
 
         if (str != null && str.length() <= 3) {
-            if (!pdate.equals("") && pdate.length() >= 2) {
+            if (!pdate.isEmpty() && pdate.length() >= 2) {
                 try {
                     str = String.format("%1$2s%2$03d", pdate.substring(0, 2), Integer.parseInt(str));
                 } catch (NumberFormatException e) {
@@ -200,7 +200,8 @@ public abstract class DssatCommonInput implements TranslatorInput {
     }
 
     /**
-     * Translate data str from "yyddd" to "yyyymmdd" plus days you want
+     * Translate data str from "yyddd" or "yyyydd" to "yyyymmdd"
+     * plus days you want
      *
      * @param startDate date string with format of "yyydd"
      * @param strDays the number of days need to be added on
@@ -212,18 +213,26 @@ public abstract class DssatCommonInput implements TranslatorInput {
         Calendar cal = Calendar.getInstance();
         int days;
         int year;
-        if (startDate == null || startDate.length() > 5 || startDate.length() < 4) {
+        boolean is4Y = false;
+        if (startDate == null || (startDate.length() != 5 && startDate.length() != 7)) {
             //throw new Exception("");
             return ""; //defValD; // P.S. use blank string instead of -99
+        } else if (startDate.length() == 7) {
+            is4Y = true;
         }
         try {
-            startDate = String.format("%05d", Integer.parseInt(startDate));
+            if (is4Y) {
+                startDate = String.format("%07d", Integer.parseInt(startDate));
+                year = Integer.parseInt(startDate.substring(0, 4));
+            } else {
+                startDate = String.format("%05d", Integer.parseInt(startDate));
+                year = Integer.parseInt(startDate.substring(0, 2));
+                year += year <= 15 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version 
+            }
             days = Double.valueOf(strDays).intValue();
             // Set date with input value
-            year = Integer.parseInt(startDate.substring(0, 2));
-            year += year <= 15 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version 
             cal.set(Calendar.YEAR, year);
-            cal.set(Calendar.DAY_OF_YEAR, Integer.parseInt(startDate.substring(2)));
+            cal.set(Calendar.DAY_OF_YEAR, Integer.parseInt(startDate.substring(startDate.length() - 3)));
             cal.add(Calendar.DATE, days);
             // translatet to yyddd format
             return String.format("%1$04d%2$02d%3$02d", cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
@@ -268,7 +277,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
         for (String key : formats.keySet()) {
             // To avoid to be over limit of string lenght
             length = Math.min(formats.get(key), line.length());
-            if (!key.equals("") && !key.startsWith("null")) {
+            if (!key.isEmpty() && !key.startsWith("null")) {
                 tmp = line.substring(0, length).trim();
                 // if the value is in valid keep blank string in it
                 if (checkValidValue(tmp)) {

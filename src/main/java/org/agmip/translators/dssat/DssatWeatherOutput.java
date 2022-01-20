@@ -78,9 +78,9 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             // Output Weather File
             // Titel Section
             if (getObjectOr(wthFile, "wst_notes", ".AgMIP File").equals(".AgMIP File")) {
-                sbData.append(String.format("*WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_source", defValBlank), getValueOr(wthFile, "clim_id", "N/A")));
+                sbData.append(String.format("$WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_source", defValBlank), getValueOr(wthFile, "clim_id", "N/A")));
             } else {
-                sbData.append(String.format("*WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_notes", defValBlank), getValueOr(wthFile, "clim_id", "N/A")));
+                sbData.append(String.format("$WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_notes", defValBlank), getValueOr(wthFile, "clim_id", "N/A")));
             }
 
             // Weather Station Section
@@ -102,7 +102,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // Daily weather data section
             // Title line
-            sbData.append("@DATE  SRAD  TMAX  TMIN  RAIN  DEWP  WIND   PAR");
+            sbData.append("@DATE    SRAD  TMAX  TMIN  RAIN  DEWP  WIND   PAR");
             // Register fixed headers
             dailyHeaders.add("w_date");
             dailyHeaders.add("srad");
@@ -141,7 +141,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                 // if date is missing, jump the record
                 if (!getObjectOr(wthRecord, "w_date", "").isEmpty()) {
                     //  Format handling for daily date
-                    dailyData[i].append(String.format("%1$5s", formatDateStr(getObjectOr(wthRecord, dailyHeaders.get(0), defValD))));
+                    dailyData[i].append(String.format("%1$7s", formatDateStr4Y(getObjectOr(wthRecord, dailyHeaders.get(0), defValD))));
 
                     // Output the registered variables
                     for (int j = 1; j < dailyHeaders.size(); j++) {

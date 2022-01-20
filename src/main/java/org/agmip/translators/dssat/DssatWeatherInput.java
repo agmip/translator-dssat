@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class DssatWeatherInput extends DssatCommonInput {
 
     private static final Logger LOG = LoggerFactory.getLogger(DssatWeatherInput.class);
-    public String dailyKey = "dailyWeather";  // P.S. the key name might change
+    public static final String dailyKey = "dailyWeather";  // P.S. the key name might change
 
     /**
      * Constructor with no parameters Set jsonKey as "weather"
@@ -68,6 +68,7 @@ public class DssatWeatherInput extends DssatCommonInput {
         LinkedHashMap formats = new LinkedHashMap();
         HashMap<String, ArrayList<HashMap<String, String>>> dailyById = new HashMap();
         String fileName;
+        boolean is4Y = false;
 
         mapW = (HashMap) brMap.get("W");
 
@@ -108,10 +109,15 @@ public class DssatWeatherInput extends DssatCommonInput {
                 judgeContentType(line);
 
                 // Read Weather File Info
-                if (flg[0].equals("weather") && flg[1].equals("") && flg[2].equals("data")) {
+                if (flg[0].equals("weather") && flg[1].isEmpty() && flg[2].equals("data")) {
 
                     // header info
-                    file.put("wst_notes", line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*([Dd][Aa][Tt][Aa]\\s*)*:?", "").trim());
+                    if (line.startsWith("$")) {
+                        file.put("wst_notes", line.replaceFirst("\\$[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*([Dd][Aa][Tt][Aa]\\s*)*:?", "").trim());
+                        is4Y = true;
+                    } else {
+                        file.put("wst_notes", line.replaceFirst("\\*[Ww][Ee][Aa][Tt][Hh][Ee][Rr]\\s*([Dd][Aa][Tt][Aa]\\s*)*:?", "").trim());
+                    }
 
                 } // Read Weather Data
                 else if (flg[2].equals("data")) {
@@ -171,7 +177,11 @@ public class DssatWeatherInput extends DssatCommonInput {
 
                         // Set variables' formats
                         formats.clear();
-                        formats.put("w_date", 5);
+                        if (is4Y) {
+                            formats.put("w_date", 7);
+                        } else {
+                            formats.put("w_date", 5);
+                        }
                         for (Object title : titles) {
                             formats.put(title, 6);
                         }
@@ -187,7 +197,11 @@ public class DssatWeatherInput extends DssatCommonInput {
                 else if (flg[2].equals("title")) {
                     // Dialy Data Title
                     if (flg[1].startsWith("date ")) {
-                        for (int i = 6; i < line.length(); i += 6) {
+                        int startDigit = 6;
+                        if (is4Y) {
+                            startDigit = 8;
+                        }
+                        for (int i = startDigit; i < line.length(); i += 6) {
                             String title = line.substring(i, Math.min(i + 6, line.length())).trim();
                             if (title.equalsIgnoreCase("DEWP")) {
                                 titles.add("tdew");
