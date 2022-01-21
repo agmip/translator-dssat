@@ -158,7 +158,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 judgeContentType(line);
 
                 // Read Exp title info
-                if (flg[0].startsWith("exp.details:") && flg[2].equals("")) {
+                if (flg[0].startsWith("exp.details:") && flg[2].isEmpty()) {
 
                     // Set variables' formats
                     formats.clear();
@@ -332,7 +332,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
                         String sltx = MapUtil.getValueOr(tmp, "sltx", "");
-                        if (!sltx.equals("")) {
+                        if (!sltx.isEmpty()) {
                             tmp.put("sltx", transSltx(sltx));
                         }
                         addToArray(flArr, tmp, "fl");
@@ -525,7 +525,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         translateDateStr(tmp, "edate");
                         // cm -> mm
                         String pldp = getObjectOr(tmp, "pldp", "");
-                        if (!pldp.equals("")) {
+                        if (!pldp.isEmpty()) {
                             try {
                                 BigDecimal pldpBD = new BigDecimal(pldp);
                                 pldpBD = pldpBD.multiply(new BigDecimal("10"));
@@ -1050,13 +1050,17 @@ public class DssatXFileInput extends DssatCommonInput {
                 if (!getObjectOr(sqData, "sm", "0").equals("0")) {
                     String sm = (String) sqData.get("sm");
                     HashMap smData = (HashMap) getSectionDataObj(smArr, "sm", sm);
-                    // Set SDAT
+                    // Set SDAT and EXP_DUR
                     HashMap smGeneral = getObjectOr(smData, "general", new HashMap());
                     String sdyer = getValueOr(smGeneral, "sdyer", "");
                     String sdday = getValueOr(smGeneral, "sdday", "");
                     String sdat = translateDateStr(sdyer + sdday);
                     if (!sdat.equals("")) {
-                        trData.put("sdat", sdat);
+                        trMetaData.put("sdat", sdat);
+                    }
+                    String expDur = getValueOr(smGeneral, "nyers", "");
+                    if (!expDur.equals("")) {
+                        trMetaData.put("exp_dur", expDur);
                     }
                     // Get simulation control management section info
                     smManagement = getObjectOr(smData, "management", new HashMap());

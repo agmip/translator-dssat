@@ -129,10 +129,14 @@ public class DssatControllerOutput extends DssatCommonOutput {
         // If experiment data is included
         if (!expArr.isEmpty()) {
             // Write all batch files
-            futFiles.put("DSSBatch.v45", executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT45), expArr, arg0)));
-            futFiles.put("DSSBatch.v46", executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT46), expArr, arg0)));
-            futFiles.put("Run45.bat", executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT45), expArr, arg0)));
-            futFiles.put("Run46.bat", executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT46), expArr, arg0)));
+//            futFiles.put("DSSBatch.v45", executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT45), expArr, arg0)));
+//            futFiles.put("DSSBatch.v46", executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT46), expArr, arg0)));
+            futFiles.put("DSSBatch.v47", executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT47), expArr, arg0)));
+            futFiles.put("DSSBatch.v48", executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT48), expArr, arg0)));
+//            futFiles.put("Run45.bat", executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT45), expArr, arg0)));
+//            futFiles.put("Run46.bat", executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT46), expArr, arg0)));
+            futFiles.put("Run47.bat", executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT47), expArr, arg0)));
+            futFiles.put("Run48.bat", executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT48), expArr, arg0)));
         } // If only weather or soil data is included
         else {
             for (HashMap sData : soilArr) {
@@ -188,16 +192,19 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 writeSingleExp(arg0, result, new DssatAFileOutput(), exname + "_A");
                 writeSingleExp(arg0, result, new DssatTFileOutput(), exname + "_T");
                 writeSingleExp(arg0, result, new DssatCulFileOutput(), exname + "_Cul");
-                writeSingleExp(arg0, result, new DssatBatchFileOutput(DssatVersion.DSSAT45), "DSSBatch.v45");
-                writeSingleExp(arg0, result, new DssatBatchFileOutput(DssatVersion.DSSAT46), "DSSBatch.v46");
-                writeSingleExp(arg0, result, new DssatRunFileOutput(DssatVersion.DSSAT45), "Run45.bat");
-                writeSingleExp(arg0, result, new DssatRunFileOutput(DssatVersion.DSSAT46), "Run46.bat");
+//                writeSingleExp(arg0, result, new DssatBatchFileOutput(DssatVersion.DSSAT45), "DSSBatch.v45");
+//                writeSingleExp(arg0, result, new DssatBatchFileOutput(DssatVersion.DSSAT46), "DSSBatch.v46");
+                writeSingleExp(arg0, result, new DssatBatchFileOutput(DssatVersion.DSSAT47), "DSSBatch.v47");
+                writeSingleExp(arg0, result, new DssatBatchFileOutput(DssatVersion.DSSAT48), "DSSBatch.v48");
+//                writeSingleExp(arg0, result, new DssatRunFileOutput(DssatVersion.DSSAT45), "Run45.bat");
+//                writeSingleExp(arg0, result, new DssatRunFileOutput(DssatVersion.DSSAT46), "Run46.bat");
+                writeSingleExp(arg0, result, new DssatRunFileOutput(DssatVersion.DSSAT47), "Run47.bat");
+                writeSingleExp(arg0, result, new DssatRunFileOutput(DssatVersion.DSSAT48), "Run48.bat");
 
                 // compress all output files into one zip file
                 outputFile = new File(revisePath(arg0) + exname + ".ZIP");
 
                 //createZip();
-
             } else {
                 // Calculate estimated time consume
                 for (HashMap wth : (ArrayList<HashMap>) getObjectOr(result, "weathers", new ArrayList<HashMap>())) {
@@ -308,7 +315,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 swData = wthData;
                 expData.put("wst_id", id);
             }
-            if (!id.equals("") && !swData.containsKey(id)) {
+            if (!id.isEmpty() && !swData.containsKey(id)) {
                 swData.put(id, expData);
 //                Future fut = executor.submit(new DssatTranslateRunner(output, expData, arg0));
 //                swfiles.put(id, fut);
@@ -369,7 +376,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
     public void createZip() throws FileNotFoundException, IOException {
         createZip(true);
     }
-    
+
     public void createZip(File out) throws FileNotFoundException, IOException {
         createZip(out, true);
     }
@@ -384,7 +391,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
     public void createZip(boolean isDelete) throws FileNotFoundException, IOException {
         createZip(outputFile, isDelete);
     }
-    
+
     public void createZip(File outputFile, boolean isDelete) throws FileNotFoundException, IOException {
 
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outputFile));
@@ -427,6 +434,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
 
     /**
      * Get all output files
+     *
      * @return list of output files
      */
     public ArrayList<File> getOutputFiles() {
@@ -454,6 +462,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
 //    }
     /**
      * Get output zip file
+     *
      * @return output zip file
      */
     public File getOutputZipFile() {
@@ -470,7 +479,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         for (int i = 0; i < expArr.size(); i++) {
             exname = getValueOr(expArr.get(i), "exname", "");
 
-            if (exname.equals("")) {
+            if (exname.isEmpty()) {
                 subExpArr = new ArrayList();
                 subExpArr.add(expArr.get(i));
                 expGroupMap.put("Experiment_" + i, subExpArr);
@@ -497,7 +506,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     ArrayList<HashMap> seqArr = new ArrayList();
                     HashMap seqData = new HashMap();
                     String trt_name = getValueOr(tmp, "trt_name", getValueOr(tmp, "exname", ""));
-                    if (!trt_name.equals("")) {
+                    if (!trt_name.isEmpty()) {
                         seqData.put("trt_name", trt_name);
                     }
                     seqArr.add(seqData);
@@ -555,7 +564,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
             tmp.put("trno", trno + "");
             if (tmp.get("trt_name") == null) {
                 String trt_name = getValueOr(expData, "trt_name", getValueOr(expData, "exname", ""));
-                if (!trt_name.equals("")) {
+                if (!trt_name.isEmpty()) {
                     tmp.put("trt_name", trt_name);
                 }
             }
@@ -574,6 +583,18 @@ public class DssatControllerOutput extends DssatCommonOutput {
         }
         combineData(out, evtArr, "management");
 
+        // Update adjustments data
+        ArrayList<HashMap<String, String>> adjArr = getObjectOr(expData, "adjustments", new ArrayList());
+        for (HashMap<String, String> tmp : adjArr) {
+            try {
+                seqid = Integer.parseInt(getValueOr(tmp, "seqid", "0")) + baseId;
+            } catch (NumberFormatException e) {
+                seqid = baseId;
+            }
+            tmp.put("seqid", seqid + "");
+        }
+        combineArr(out, adjArr, "adjustments");
+
         // Update dssat_environment_modification data
         ArrayList<HashMap<String, String>> emArr = new BucketEntry(getObjectOr(expData, "dssat_environment_modification", new HashMap())).getDataList();
         for (HashMap<String, String> tmp : emArr) {
@@ -587,7 +608,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         combineData(out, emArr, "dssat_environment_modification");
 
         // Update dssat_simulation_control data
-        ArrayList<HashMap<String, Object>> smArr =  getObjectOr(getObjectOr(expData, "dssat_simulation_control", new HashMap()), "data", new ArrayList());
+        ArrayList<HashMap<String, Object>> smArr = getObjectOr(getObjectOr(expData, "dssat_simulation_control", new HashMap()), "data", new ArrayList());
         for (HashMap<String, Object> tmp : smArr) {
             try {
                 sm = Integer.parseInt(getValueOr(tmp, "sm", "0")) + baseId;
@@ -600,20 +621,22 @@ public class DssatControllerOutput extends DssatCommonOutput {
 
         // Update observation data
         HashMap obvData = getObjectOr(expData, "observed", new HashMap());
-        obvData.put("trno", trno + "");
-        Object outObvData = getObjectOr(out, "observed", new Object());
-        if (outObvData instanceof HashMap) {
-            ((HashMap) outObvData).put("trno", "1");
-            ArrayList obvArr = new ArrayList();
-            obvArr.add(outObvData);
-            obvArr.add(obvData);
-            out.put("observed", obvArr);
-        } else if (outObvData instanceof ArrayList) {
-            ((ArrayList) outObvData).add(obvData);
-        } else {
-            ArrayList obvArr = new ArrayList();
-            obvArr.add(obvData);
-            out.put("observed", obvArr);
+        if (!obvData.isEmpty()) {
+            obvData.put("trno", trno + "");
+            Object outObvData = getObjectOr(out, "observed", new Object());
+            if (outObvData instanceof HashMap) {
+                ((HashMap) outObvData).put("trno", "1");
+                ArrayList obvArr = new ArrayList();
+                obvArr.add(outObvData);
+                obvArr.add(obvData);
+                out.put("observed", obvArr);
+            } else if (outObvData instanceof ArrayList) {
+                ((ArrayList) outObvData).add(obvData);
+            } else {
+                ArrayList obvArr = new ArrayList();
+                obvArr.add(obvData);
+                out.put("observed", obvArr);
+            }
         }
     }
 
@@ -632,9 +655,17 @@ public class DssatControllerOutput extends DssatCommonOutput {
             } else {
                 subSecName = "data";
             }
-            seqArrOut = getObjectOr(data, subSecName, new ArrayList());
+            combineArr(data, arr, subSecName);
+        }
+    }
+
+    private void combineArr(HashMap out, ArrayList arr, String secName) {
+        ArrayList<HashMap<String, String>> seqArrOut;
+        // combine the array of data
+        if (!arr.isEmpty()) {
+            seqArrOut = getObjectOr(out, secName, new ArrayList());
             if (seqArrOut.isEmpty()) {
-                data.put(subSecName, seqArrOut);
+                out.put(secName, seqArrOut);
             }
             seqArrOut.addAll(arr);
         }

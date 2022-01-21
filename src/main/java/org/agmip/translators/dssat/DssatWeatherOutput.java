@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.agmip.common.Functions;
+import org.agmip.util.MapUtil;
 import static org.agmip.util.MapUtil.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +67,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             // Initial BufferedWriter
             // Get File name
             String fileName = getValueOr(result, "wst_id", "");
-            if (fileName.equals("")) {
+            if (fileName.isEmpty()) {
                 fileName = getWthFileName(result);
             }
             fileName += ".WTH";
@@ -76,9 +78,9 @@ public class DssatWeatherOutput extends DssatCommonOutput {
             // Output Weather File
             // Titel Section
             if (getObjectOr(wthFile, "wst_notes", ".AgMIP File").equals(".AgMIP File")) {
-                sbData.append(String.format("*WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_source", defValBlank), getValueOr(wthFile, "clim_id", "N/A")));
+                sbData.append(String.format("$WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_source", defValBlank), getValueOr(wthFile, "clim_id", "N/A")));
             } else {
-                sbData.append(String.format("*WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_notes", defValBlank), getValueOr(wthFile, "clim_id", "N/A")));
+                sbData.append(String.format("$WEATHER DATA : %1$s\r\n!Climate ID: %2$s\r\n", getObjectOr(wthFile, "wst_notes", defValBlank), getValueOr(wthFile, "clim_id", "N/A")));
             }
 
             // Weather Station Section
@@ -100,7 +102,7 @@ public class DssatWeatherOutput extends DssatCommonOutput {
 
             // Daily weather data section
             // Title line
-            sbData.append("@DATE  SRAD  TMAX  TMIN  RAIN  DEWP  WIND   PAR");
+            sbData.append("@DATE    SRAD  TMAX  TMIN  RAIN  DEWP  WIND   PAR");
             // Register fixed headers
             dailyHeaders.add("w_date");
             dailyHeaders.add("srad");
@@ -118,11 +120,28 @@ public class DssatWeatherOutput extends DssatCommonOutput {
                 wthRecord = (HashMap) wthRecords.get(i);
                 dailyData[i] = new StringBuilder();
                 dailyHeaders.seCurItems(wthRecord.keySet());
+                
+                // Check daily weather data
+                String date = MapUtil.getValueOr(wthRecord, "w_date", "");
+                // 1.0 <= SRAD <= 50.
+                String srad = MapUtil.getValueOr(wthRecord, "srad", "");
+                if (!srad.isEmpty()
+                        && (Functions.compare(srad, "1.0", Functions.CompareMode.LESS)
+                          || Functions.compare(srad, "50.0", Functions.CompareMode.GREATER))) {
+                    sbError.append("! Value of SRAD on ").append(date).append(" is invalid (out of  [1.0, 50.0])\r\n");
+                }
+                // TMAX > TMIN
+                String tmax = MapUtil.getValueOr(wthRecord, "tmax", "");
+                String tmin = MapUtil.getValueOr(wthRecord, "tmin", "");
+                if (!tmax.isEmpty() && !tmin.isEmpty()
+                        && Functions.compare(tmax, tmin, Functions.CompareMode.NOTGREATER)) {
+                    sbError.append("! Value of TMAX and TMIN on ").append(date).append(" is invalid (TMAX <= TMIN)\r\n");
+                }
 
                 // if date is missing, jump the record
-                if (!getObjectOr(wthRecord, "w_date", "").equals("")) {
+                if (!getObjectOr(wthRecord, "w_date", "").isEmpty()) {
                     //  Format handling for daily date
-                    dailyData[i].append(String.format("%1$5s", formatDateStr(getObjectOr(wthRecord, dailyHeaders.get(0), defValD))));
+                    dailyData[i].append(String.format("%1$7s", formatDateStr4Y(getObjectOr(wthRecord, dailyHeaders.get(0), defValD))));
 
                     // Output the registered variables
                     for (int j = 1; j < dailyHeaders.size(); j++) {

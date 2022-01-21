@@ -41,7 +41,7 @@ public class DssatBatchFileTest {
         File file = obDssatBatchFileOutput.getOutputFile();
         if (file != null) {
             assertTrue(file.exists());
-            assertEquals("DSSBatch.v45", file.getName());
+            assertEquals("DSSBatch.v47", file.getName());
             assertTrue(file.delete());
         }
     }

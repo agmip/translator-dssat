@@ -188,6 +188,13 @@ public class DssatControllerInput implements TranslatorInput {
                 if (wthData != null && !wthData.isEmpty()) {
 //                    expData.put(wthReader.jsonKey, wthData);
                     wthTmpMap.put(wthId, wthData);
+                } else {
+                    wthId = getValueOr(expData, "dssat_wst_id", "0");
+                    wthData = getSectionDataWithNocopy(wthArr, "wst_id", wthId);
+                    if (wthData != null && !wthData.isEmpty()) {
+                        wthTmpMap.put(wthId, wthData);
+                        expData.put("wst_id", wthId);
+                    }
                 }
             }
 
