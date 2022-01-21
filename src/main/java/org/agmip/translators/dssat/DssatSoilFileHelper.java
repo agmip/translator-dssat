@@ -32,7 +32,7 @@ public class DssatSoilFileHelper {
             if (hash.length() > 10) {
                 soil_id = hash.substring(0, 6) + "0001";
             } else if (hash.equals("")) {
-                soil_id = "AGMIP_0001";
+                soil_id = "";
             } else {
                 soil_id = hash;
                 while (soil_id.length() < 10) {

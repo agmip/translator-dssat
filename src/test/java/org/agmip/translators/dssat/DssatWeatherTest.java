@@ -23,15 +23,17 @@ public class DssatWeatherTest {
     DssatWeatherOutput obDssatWeatherOutput;
     DssatWeatherInput obDssatWeatherInput;
     URL resource;
+    URL resource4Y;
 
     @Before
     public void setUp() throws Exception {
         obDssatWeatherOutput = new DssatWeatherOutput();
         obDssatWeatherInput = new DssatWeatherInput();
         resource = this.getClass().getResource("/UFGA8202_MZX.ZIP");
+        resource4Y = this.getClass().getResource("/UHIH1201.WTH");
     }
 
-    @Test
+//    @Test
     public void test() throws IOException, Exception {
         HashMap result;
 
@@ -68,5 +70,29 @@ public class DssatWeatherTest {
         } else {
             assertTrue(file != null);
         }
+    }
+    
+    @Test
+    public void test4Y() throws IOException, Exception {
+        HashMap result;
+
+        result = obDssatWeatherInput.readFile(resource4Y.getPath());
+
+        ArrayList<HashMap> wthArr = getObjectOr(result, "weathers", new ArrayList());
+        HashMap expData = new HashMap();
+        expData.put("weather", wthArr.get(0));
+        obDssatWeatherOutput.writeFile("output", expData);
+        File file = obDssatWeatherOutput.getOutputFile();
+        if (file != null) {
+            assertTrue(file.exists());
+            assertEquals("UHIH1201.WTH", file.getName());
+//            assertTrue(file.delete());
+        } else {
+            assertTrue(file != null);
+        }
+        
+        ArrayList<HashMap> wthRecords = (ArrayList<HashMap>) getObjectOr(wthArr.get(0), DssatWeatherInput.dailyKey, new ArrayList());
+        assertTrue("20120101".equals(wthRecords.get(0).get("w_date")));
+        
     }
 }

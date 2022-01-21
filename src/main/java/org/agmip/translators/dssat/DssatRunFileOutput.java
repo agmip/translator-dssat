@@ -59,7 +59,7 @@ public class DssatRunFileOutput extends DssatCommonOutput implements DssatBtachF
             if (dssatVerStr == null) {
                 dssatVerStr = getObjectOr(result, "crop_model_version", "").replaceAll("\\D", "");
                 if (!dssatVerStr.matches("\\d+")) {
-                    dssatVerStr = DssatBatchFileOutput.DssatVersion.DSSAT45.toString();
+                    dssatVerStr = DssatBatchFileOutput.DssatVersion.DSSAT47.toString();
                 }
             }
 
@@ -76,6 +76,16 @@ public class DssatRunFileOutput extends DssatCommonOutput implements DssatBtachF
 
             // Output finish
             bwR.close();
+            
+//            // Output Run File for 2D
+//            File outputFile2D = new File(arg0 + "Run" + dssatVerStr + "_2D.bat");
+//            bwR = new BufferedWriter(new FileWriter(outputFile2D));
+//            bwR.write("C:\\dssat" + dssatVerStr + "\\dscsm0" + dssatVerStr + "_2D b dssbatch.v" + dssatVerStr + "\r\n");
+//            bwR.write("@echo off\r\n");
+//            bwR.write("pause\r\n");
+//            bwR.write("exit\r\n");
+//            bwR.close();
+            
         } catch (IOException e) {
             LOG.error(DssatCommonOutput.getStackTrace(e));
         }

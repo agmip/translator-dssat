@@ -46,7 +46,7 @@ public class DssatWthFileHelper {
                 wst_id = getNextDefName() + yearDur;
             }
             names.add(wst_id);
-            if (hash.equals("")) {
+            if (hash.isEmpty()) {
                 hash = wst_id;
             }
             hashToName.put(hash, wst_id);
@@ -63,7 +63,7 @@ public class DssatWthFileHelper {
      */
     private String getWthInsiCodeOr(Map wthData) {
         String insiName = getWthInsiCode(wthData);
-        if (insiName.equals("")) {
+        if (insiName.isEmpty()) {
             return getNextDefName();
         } else {
             return insiName;
@@ -119,13 +119,13 @@ public class DssatWthFileHelper {
             String startYear = getValueOr((wthRecords.get(0)), "w_date", "    ").substring(2, 4).trim();
             String endYear = getValueOr((wthRecords.get(wthRecords.size() - 1)), "w_date", "    ").substring(2, 4).trim();
             // If not available, do not show year and duration in the file name
-            if (!startYear.equals("") && !endYear.equals("")) {
+            if (!startYear.isEmpty() && !endYear.isEmpty()) {
                 yearDur += startYear;
                 try {
                     int iStartYear = Integer.parseInt(startYear);
                     int iEndYear = Integer.parseInt(endYear);
-                    iStartYear += iStartYear <= 15 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version
-                    iEndYear += iEndYear <= 15 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version
+                    iStartYear += iStartYear <= 30 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version
+                    iEndYear += iEndYear <= 30 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version
                     int duration = iEndYear - iStartYear + 1;
                     // P.S. Currently the system only support the maximum of 99 years for duration
                     duration = duration > 99 ? 99 : duration;

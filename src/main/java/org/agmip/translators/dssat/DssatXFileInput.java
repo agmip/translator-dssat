@@ -158,7 +158,7 @@ public class DssatXFileInput extends DssatCommonInput {
                 judgeContentType(line);
 
                 // Read Exp title info
-                if (flg[0].startsWith("exp.details:") && flg[2].equals("")) {
+                if (flg[0].startsWith("exp.details:") && flg[2].isEmpty()) {
 
                     // Set variables' formats
                     formats.clear();
@@ -332,7 +332,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         // Read line and save into return holder
                         HashMap tmp = readLine(line, formats);
                         String sltx = MapUtil.getValueOr(tmp, "sltx", "");
-                        if (!sltx.equals("")) {
+                        if (!sltx.isEmpty()) {
                             tmp.put("sltx", transSltx(sltx));
                         }
                         addToArray(flArr, tmp, "fl");
@@ -525,7 +525,7 @@ public class DssatXFileInput extends DssatCommonInput {
                         translateDateStr(tmp, "edate");
                         // cm -> mm
                         String pldp = getObjectOr(tmp, "pldp", "");
-                        if (!pldp.equals("")) {
+                        if (!pldp.isEmpty()) {
                             try {
                                 BigDecimal pldpBD = new BigDecimal(pldp);
                                 pldpBD = pldpBD.multiply(new BigDecimal("10"));

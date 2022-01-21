@@ -129,10 +129,14 @@ public class DssatControllerOutput extends DssatCommonOutput {
         // If experiment data is included
         if (!expArr.isEmpty()) {
             // Write all batch files
-            futFiles.put("DSSBatch.v45", executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT45), expArr, arg0)));
-            futFiles.put("DSSBatch.v46", executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT46), expArr, arg0)));
-            futFiles.put("Run45.bat", executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT45), expArr, arg0)));
-            futFiles.put("Run46.bat", executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT46), expArr, arg0)));
+//            futFiles.put("DSSBatch.v45", executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT45), expArr, arg0)));
+//            futFiles.put("DSSBatch.v46", executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT46), expArr, arg0)));
+            futFiles.put("DSSBatch.v47", executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT47), expArr, arg0)));
+            futFiles.put("DSSBatch.v48", executor.submit(new DssatTranslateRunner(new DssatBatchFileOutput(DssatVersion.DSSAT48), expArr, arg0)));
+//            futFiles.put("Run45.bat", executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT45), expArr, arg0)));
+//            futFiles.put("Run46.bat", executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT46), expArr, arg0)));
+            futFiles.put("Run47.bat", executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT47), expArr, arg0)));
+            futFiles.put("Run48.bat", executor.submit(new DssatTranslateRunner(new DssatRunFileOutput(DssatVersion.DSSAT48), expArr, arg0)));
         } // If only weather or soil data is included
         else {
             for (HashMap sData : soilArr) {
@@ -188,10 +192,14 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 writeSingleExp(arg0, result, new DssatAFileOutput(), exname + "_A");
                 writeSingleExp(arg0, result, new DssatTFileOutput(), exname + "_T");
                 writeSingleExp(arg0, result, new DssatCulFileOutput(), exname + "_Cul");
-                writeSingleExp(arg0, result, new DssatBatchFileOutput(DssatVersion.DSSAT45), "DSSBatch.v45");
-                writeSingleExp(arg0, result, new DssatBatchFileOutput(DssatVersion.DSSAT46), "DSSBatch.v46");
-                writeSingleExp(arg0, result, new DssatRunFileOutput(DssatVersion.DSSAT45), "Run45.bat");
-                writeSingleExp(arg0, result, new DssatRunFileOutput(DssatVersion.DSSAT46), "Run46.bat");
+//                writeSingleExp(arg0, result, new DssatBatchFileOutput(DssatVersion.DSSAT45), "DSSBatch.v45");
+//                writeSingleExp(arg0, result, new DssatBatchFileOutput(DssatVersion.DSSAT46), "DSSBatch.v46");
+                writeSingleExp(arg0, result, new DssatBatchFileOutput(DssatVersion.DSSAT47), "DSSBatch.v47");
+                writeSingleExp(arg0, result, new DssatBatchFileOutput(DssatVersion.DSSAT48), "DSSBatch.v48");
+//                writeSingleExp(arg0, result, new DssatRunFileOutput(DssatVersion.DSSAT45), "Run45.bat");
+//                writeSingleExp(arg0, result, new DssatRunFileOutput(DssatVersion.DSSAT46), "Run46.bat");
+                writeSingleExp(arg0, result, new DssatRunFileOutput(DssatVersion.DSSAT47), "Run47.bat");
+                writeSingleExp(arg0, result, new DssatRunFileOutput(DssatVersion.DSSAT48), "Run48.bat");
 
                 // compress all output files into one zip file
                 outputFile = new File(revisePath(arg0) + exname + ".ZIP");
@@ -307,7 +315,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                 swData = wthData;
                 expData.put("wst_id", id);
             }
-            if (!id.equals("") && !swData.containsKey(id)) {
+            if (!id.isEmpty() && !swData.containsKey(id)) {
                 swData.put(id, expData);
 //                Future fut = executor.submit(new DssatTranslateRunner(output, expData, arg0));
 //                swfiles.put(id, fut);
@@ -471,7 +479,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
         for (int i = 0; i < expArr.size(); i++) {
             exname = getValueOr(expArr.get(i), "exname", "");
 
-            if (exname.equals("")) {
+            if (exname.isEmpty()) {
                 subExpArr = new ArrayList();
                 subExpArr.add(expArr.get(i));
                 expGroupMap.put("Experiment_" + i, subExpArr);
@@ -498,7 +506,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
                     ArrayList<HashMap> seqArr = new ArrayList();
                     HashMap seqData = new HashMap();
                     String trt_name = getValueOr(tmp, "trt_name", getValueOr(tmp, "exname", ""));
-                    if (!trt_name.equals("")) {
+                    if (!trt_name.isEmpty()) {
                         seqData.put("trt_name", trt_name);
                     }
                     seqArr.add(seqData);
@@ -556,7 +564,7 @@ public class DssatControllerOutput extends DssatCommonOutput {
             tmp.put("trno", trno + "");
             if (tmp.get("trt_name") == null) {
                 String trt_name = getValueOr(expData, "trt_name", getValueOr(expData, "exname", ""));
-                if (!trt_name.equals("")) {
+                if (!trt_name.isEmpty()) {
                     tmp.put("trt_name", trt_name);
                 }
             }

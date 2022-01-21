@@ -39,14 +39,14 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
     protected static DssatSoilFileHelper soilHelper = new DssatSoilFileHelper();
 
     /**
-     * Translate data str from "yyyymmdd" to "yyddd"
+     * Translate data str from "yyyymmdd" to "yyyyddd"
      *
      * 2012/3/19 change input format from "yy/mm/dd" to "yyyymmdd"
      *
      * @param str date string with format of "yyyymmdd"
-     * @return result date string with format of "yyddd"
+     * @return result date string with format of "yyyyddd"
      */
-    protected String formatDateStr2(String str) {
+    protected String formatDateStr4Y(String str) {
 
         // Initial Calendar object
         Calendar cal = Calendar.getInstance();
@@ -55,11 +55,11 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             // Set date with input value
             cal.set(Integer.parseInt(str.substring(0, 4)), Integer.parseInt(str.substring(4, 6)) - 1, Integer.parseInt(str.substring(6)));
             // translatet to yyddd format
-            return String.format("%1$02d%2$03d", cal.get(Calendar.YEAR) % 100, cal.get(Calendar.DAY_OF_YEAR));
+            return String.format("%1$04d%2$03d", cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_YEAR));
         } catch (Exception e) {
             // if tranlate failed, then use default value for date
             //sbError.append("! Waring: There is a invalid date [").append(str).append("]\r\n");
-            return formatDateStr2(defValD);
+            return formatDateStr4Y(defValD);
         }
     }
 
@@ -77,7 +77,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         String ret = "";
         String str = getObjectOr(m, key, defVal);
         String[] inputStr = str.split("\\.");
-        if (str.trim().equals("")) {
+        if (str.trim().isEmpty()) {
             return String.format("%" + bits + "s", defVal);
         } else if (str.length() <= bits) {
             ret = String.format("%1$" + bits + "s", str);
@@ -88,7 +88,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
         } else {
             int decimalLength = bits - inputStr[0].length() - 1;
             decimalLength = decimalLength < 0 ? 0 : decimalLength;
-            ret = org.agmip.common.Functions.round(str, decimalLength);
+            ret = String.format("%" + bits + "s", org.agmip.common.Functions.round(str, decimalLength));
         }
 
         return ret;
@@ -118,7 +118,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @return formated string of number
      */
     protected String formatStr(int bits, String val, Object key) {
-        if (val.equals("")) {
+        if (val.isEmpty()) {
             return val;
         } else if (val.length() > bits) {
             //throw new Exception();
@@ -249,7 +249,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
             return exToFileMap.get(exname + "_" + crid) + fileType;
         } else {
             ret = exname;
-            if (ret.equals("")) {
+            if (ret.isEmpty()) {
                 ret = "TEMP0001";
             } else {
                 try {
@@ -304,7 +304,7 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
      * @return revised path
      */
     public static String revisePath(String path) {
-        if (!path.trim().equals("")) {
+        if (!path.trim().isEmpty()) {
 //            path = path.replaceAll("/", File.separator);
             if (!path.endsWith(File.separator)) {
                 path += File.separator;
@@ -418,9 +418,9 @@ public abstract class DssatCommonOutput implements TranslatorOutput {
 //            return agmipFileHack;
 //        }
         String ret = getObjectOr(data, "wst_id", "");
-        if (ret.equals("") || ret.length() > 8) {
+        if (ret.isEmpty() || ret.length() > 8) {
             ret = wthHelper.createWthFileName(getObjectOr(data, "weather", data));
-            if (ret.equals("")) {
+            if (ret.isEmpty()) {
                 ret = "AGMP";
             }
         }
