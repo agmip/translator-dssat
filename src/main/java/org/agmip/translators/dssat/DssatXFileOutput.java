@@ -658,7 +658,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //                    if (getObjectOr(secData, "cul_id", "").equals("")) {
 //                        sbError.append("! Warning: Incompleted record because missing data : [cul_id], and will use default value '").append(cul_id).append("'\r\n");
                     }
-                    sbData.append(String.format("%1$2s %2$-2s %3$-6s %4$s\r\n",
+                    sbData.append(String.format("%1$-3s%2$-2s %3$-6s %4$s\r\n",
                             idx + 1,
                             formatStr(2, secData, "crid", defValBlank), // P.S. if missing, default value use blank string
                             formatStr(6, secData, "dssat_cul_id", getValueOr(secData, "cul_id", defValC)), // P.S. Set default value which is deponds on crid(Cancelled)
@@ -670,7 +670,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         }
                         sbNotesData.append(" Cultivar Additional Info\r\n");
                         sbNotesData.append(" C   RM CNAME            CUL_NOTES\r\n");
-                        sbNotesData.append(String.format("%1$2s %2$4s %3$s\r\n",
+                        sbNotesData.append(String.format("%1$-3s%2$4s %3$s\r\n",
                                 idx + 1,
                                 getValueOr(secData, "rm", defValC),
                                 getValueOr(secData, "cul_notes", defValC)));
@@ -717,7 +717,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         sbError.append("! Warning: Oversized data : [soil_id] ").append(soil_id).append("\r\n");
                     }
                     if (is2D) {
-                        sbData.append(String.format("%1$2s %2$-8s %3$-8s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$-5s %10$-5s%11$5s  %12$-10s %13$5s %14$5s %15$5s %16$s\r\n", // P.S. change length definition to match current way
+                        sbData.append(String.format("%1$-3s%2$-8s %3$-8s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$-5s %10$-5s%11$5s  %12$-10s %13$5s %14$5s %15$5s %16$s\r\n", // P.S. change length definition to match current way
                                 idx + 1,
                                 formatStr(8, secData, "id_field", defValC),
                                 formatStr(8, secData, "wst_id", defValC),
@@ -735,7 +735,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                 formatNumStr(5, secData, "pmalb", defValR),
                                 getValueOr(secData, "fl_name", defValC)));
                     } else {
-                        sbData.append(String.format("%1$2s %2$-8s %3$-8s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$-5s %10$-5s%11$5s  %12$-10s %13$s\r\n", // P.S. change length definition to match current way
+                        sbData.append(String.format("%1$-3s%2$-8s %3$-8s %4$5s %5$5s %6$-5s %7$5s %8$5s %9$-5s %10$-5s%11$5s  %12$-10s %13$s\r\n", // P.S. change length definition to match current way
                                 idx + 1,
                                 formatStr(8, secData, "id_field", defValC),
                                 formatStr(8, secData, "wst_id", defValC),
@@ -751,7 +751,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                 getValueOr(secData, "fl_name", defValC)));
                     }
 
-                    eventPart2.append(String.format("%1$2s %2$15s %3$15s %4$9s %5$17s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
+                    eventPart2.append(String.format("%1$-3s%2$15s %3$15s %4$9s %5$17s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
                             idx + 1,
                             formatNumStr(15, secData, "fl_long", defValR),
                             formatNumStr(15, secData, "fl_lat", defValR),
@@ -777,7 +777,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 
                     HashMap secData = (HashMap) saArr.get(idx);
                     sbData.append("@A SADAT  SMHB  SMPX  SMKE  SANAME\r\n");
-                    sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s  %6$s\r\n",
+                    sbData.append(String.format("%1$-3s%2$5s %3$5s %4$5s %5$5s  %6$s\r\n",
                             idx + 1,
                             formatDateStr(getValueOr(secData, "sadat", defValD)),
                             getValueOr(secData, "samhb", defValC),
@@ -790,7 +790,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         sbData.append("@A  SABL  SADM  SAOC  SANI SAPHW SAPHB  SAPX  SAKE  SASC\r\n");
                     }
                     for (HashMap subData : subDataArr) {
-                        sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
+                        sbData.append(String.format("%1$-3s%2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s\r\n",
                                 idx + 1,
                                 formatNumStr(5, subData, "sabl", defValR),
                                 formatNumStr(5, subData, "sabdm", defValR),
@@ -819,7 +819,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         brokenMark = "!";
                     }
                     sbData.append(brokenMark).append("@C   PCR ICDAT  ICRT  ICND  ICRN  ICRE  ICWD ICRES ICREN ICREP ICRIP ICRID ICNAME\r\n");
-                    sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$s\r\n",
+                    sbData.append(brokenMark).append(String.format("%1$-3s%2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$s\r\n",
                             idx + 1,
                             translateTo2BitCrid(secData, "icpcr", defValC),
                             formatDateStr(getValueOr(secData, "icdat", getPdate(result))),
@@ -840,7 +840,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         sbData.append(brokenMark).append("@C  ICBL  SH2O  SNH4  SNO3\r\n");
                     }
                     for (HashMap subData : subDataArr) {
-                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s\r\n",
+                        sbData.append(brokenMark).append(String.format("%1$-3s%2$5s %3$5s %4$5s %5$5s\r\n",
                                 idx + 1,
                                 formatNumStr(5, subData, "icbl", defValR),
                                 formatNumStr(5, subData, "ich2o", defValR),
@@ -893,7 +893,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         }
                     }
 
-                    sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s                        %16$s\r\n",
+                    sbData.append(String.format("%1$-3s%2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$5s %13$5s %14$5s %15$5s                        %16$s\r\n",
                             idx + 1,
                             formatDateStr(getValueOr(secData, "date", defValD)),
                             formatDateStr(getValueOr(secData, "edate", defValD)),
@@ -955,7 +955,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     }
                     if (isDrip) {
                         sbData.append("@I  EFIR  IDEP  ITHR  IEPT  IOFF  IAME  IAMT IRNAME\r\n");
-                        sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$s\r\n",
+                        sbData.append(String.format("%1$-3s%2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$s\r\n",
                                 idx + 1,
                                 formatNumStr(5, subData, "ireff", defValR),
                                 formatNumStr(5, subData, "irmdp", defValR),
@@ -968,7 +968,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         sbData.append("@I  IRLN IRSPC IROFS IRDEP\r\n");
                         int drpLnIdx = 1;
                         for (HashMap dripLine : dripLines) {
-                            sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s\r\n",
+                            sbData.append(String.format("%1$-3s%2$5s %3$5s %4$5s %5$5s\r\n",
                                     idx + 1,
                                     drpLnIdx,
                                     formatNumStr(5, dripLine, "irspc", defValR),
@@ -978,7 +978,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         }
                     } else {
                         sbData.append("@I  EFIR  IDEP  ITHR  IEPT  IOFF  IAME  IAMT IRNAME\r\n");
-                        sbData.append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$s\r\n",
+                        sbData.append(String.format("%1$-3s%2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$s\r\n",
                                 idx + 1,
                                 formatNumStr(5, subData, "ireff", defValR),
                                 formatNumStr(5, subData, "irmdp", defValR),
@@ -1006,7 +1006,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         }
                         if (isDrip) {
                             sbData.append(brokenMark)
-                                    .append(String.format("%1$2s %2$5s %3$-5s %4$5s %5$5s %6$5s %7$5s\r\n",
+                                    .append(String.format("%1$-3s%2$5s %3$-5s %4$5s %5$5s %6$5s %7$5s\r\n",
                                                     idx + 1,
                                                     formatDateStr(getValueOr(subData, "date", defValD)), // P.S. idate -> date
                                                     getValueOr(subData, "irop", defValC),
@@ -1016,7 +1016,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                                                     dripLineNos.get(drpLnIdx)));
                             drpLnIdx++;
                         } else {
-                            sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$-5s %4$5s\r\n",
+                            sbData.append(brokenMark).append(String.format("%1$-3s%2$5s %3$-5s %4$5s\r\n",
                                     idx + 1,
                                     formatDateStr(getValueOr(subData, "date", defValD)), // P.S. idate -> date
                                     getValueOr(subData, "irop", defValC),
@@ -1069,7 +1069,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         if (getValueOr(secData, "date", defValD).equals(defValD)) {
                             brokenMark = "!";
                         }
-                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$s\r\n",
+                        sbData.append(brokenMark).append(String.format("%1$-3s%2$5s %3$5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$5s %12$s\r\n",
                                 idx + 1,
                                 formatDateStr(getValueOr(secData, "date", defValD)), // P.S. fdate -> date
                                 getValueOr(secData, "fecd", defValC), // P.S. Set default value as "FE005"(Cancelled)
@@ -1100,7 +1100,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         if (getValueOr(secData, "date", defValD).equals(defValD)) {
                             brokenMark = "!";
                         }
-                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$-5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$s\r\n",
+                        sbData.append(brokenMark).append(String.format("%1$-3s%2$5s %3$-5s %4$5s %5$5s %6$5s %7$5s %8$5s %9$5s %10$5s %11$s\r\n",
                                 idx + 1,
                                 formatDateStr(getValueOr(secData, "date", defValD)), // P.S. omdat -> date
                                 getValueOr(secData, "omcd", defValC),
@@ -1130,7 +1130,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         if (getValueOr(secData, "date", defValD).equals(defValD)) {
                             brokenMark = "!";
                         }
-                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$5s %6$5s %7$5s  %8$s\r\n",
+                        sbData.append(brokenMark).append(String.format("%1$-3s%2$5s %3$5s %4$5s %5$5s %6$5s %7$5s  %8$s\r\n",
                                 idx + 1,
                                 formatDateStr(getValueOr(secData, "date", defValD)), // P.S. cdate -> date
                                 getValueOr(secData, "chcd", defValC),
@@ -1157,7 +1157,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         if (getValueOr(secData, "date", defValD).equals(defValD)) {
                             brokenMark = "!";
                         }
-                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$5s %4$5s %5$s\r\n",
+                        sbData.append(brokenMark).append(String.format("%1$-3s%2$5s %3$5s %4$5s %5$s\r\n",
                                 idx + 1,
                                 formatDateStr(getValueOr(secData, "date", defValD)), // P.S. tdate -> date
                                 getValueOr(secData, "tiimp", defValC),
@@ -1177,7 +1177,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     ArrayList<HashMap> secDataArr = meArr.get(idx);
                     for (HashMap secData : secDataArr) {
                         if (secData.containsKey("em_data")) {
-                            sbData.append(String.format("%1$2s %2$s\r\n",
+                            sbData.append(String.format("%1$-3s%2$s\r\n",
                                     cnt,
                                     getValueOr(secData, "em_data", "").trim()));
                         } else {
@@ -1185,7 +1185,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                             if (getValueOr(secData, "date", defValD).equals(defValD)) {
                                 brokenMark = "!";
                             }
-                            sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$-1s%4$4s %5$-1s%6$4s %7$-1s%8$4s %9$-1s%10$4s %11$-1s%12$4s %13$-1s%14$4s %15$-1s%16$4s %17$-1s%18$4s %19$s\r\n",
+                            sbData.append(brokenMark).append(String.format("%1$-3s%2$5s %3$-1s%4$4s %5$-1s%6$4s %7$-1s%8$4s %9$-1s%10$4s %11$-1s%12$4s %13$-1s%14$4s %15$-1s%16$4s %17$-1s%18$4s %19$s\r\n",
                                     idx + 1,
                                     formatDateStr(getValueOr(secData, "date", defValD)), // P.S. emday -> date
                                     getValueOr(secData, "ecdyl", "A"),
@@ -1225,7 +1225,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                         if (getValueOr(secData, "date", defValD).equals(defValD)) {
                             brokenMark = "!";
                         }
-                        sbData.append(brokenMark).append(String.format("%1$2s %2$5s %3$-5s %4$-5s %5$-5s %6$5s %7$5s %8$s\r\n",
+                        sbData.append(brokenMark).append(String.format("%1$-3s%2$5s %3$-5s %4$-5s %5$-5s %6$5s %7$5s %8$s\r\n",
                                 idx + 1,
                                 formatDateStr(getValueOr(secData, "date", defValD)), // P.S. hdate -> date
                                 getValueOr(secData, "hastg", defValC),
@@ -1395,7 +1395,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
             if (sdate.trim().equals("-99") || sdate.trim().isEmpty()) {
                 sdate = String.format("%1$02d%2$03d", Integer.parseInt(formatNumStr(2, smData, "sdyer", "0").trim()), Integer.parseInt(formatNumStr(3, smData, "sdday", "0").trim()));
             }
-            sb.append(String.format("%1$2s %2$-11s %3$5s %4$5s     %5$-1s %6$5s %7$5s %8$-25s %9$s\r\n",
+            sb.append(String.format("%1$-3s%2$-11s %3$5s %4$5s     %5$-1s %6$5s %7$5s %8$-25s %9$s\r\n",
                     sm,
                     "GE",
                     getValueOr(smData, "nyers", "1"),
@@ -1414,7 +1414,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //            smStr = replaceSMStr(smStr, co2, 64);
             sb.append(sm).append(" ").append(smStr).append("\r\n");
         } else if (!(smData = getObjectOr(trData, "options", new HashMap())).isEmpty()) {
-            sb.append(String.format("%1$2s %2$-11s     %3$-1s     %4$-1s     %5$-1s     %6$-1s     %7$-1s     %8$-1s     %9$-1s     %10$-1s     %11$-1s\r\n",
+            sb.append(String.format("%1$-3s%2$-11s     %3$-1s     %4$-1s     %5$-1s     %6$-1s     %7$-1s     %8$-1s     %9$-1s     %10$-1s     %11$-1s\r\n",
                     sm,
                     "OP",
                     getValueOr(smData, "water", water),
@@ -1436,7 +1436,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         if (!(smStr = getValueOr(trData, "sm_methods", "")).isEmpty()) {
             sb.append(sm).append(" ").append(smStr).append("\r\n");
         } else if (!(smData = getObjectOr(trData, "methods", new HashMap())).isEmpty()) {
-            sb.append(String.format("%1$2s %2$-11s     %3$-1s     %4$-1s     %5$-1s     %6$-1s     %7$-1s     %8$-1s     %9$-1s     %10$-1s     %11$-1s     %12$-1s     %13$-1s\r\n",
+            sb.append(String.format("%1$-3s%2$-11s     %3$-1s     %4$-1s     %5$-1s     %6$-1s     %7$-1s     %8$-1s     %9$-1s     %10$-1s     %11$-1s     %12$-1s     %13$-1s\r\n",
                     sm,
                     "ME",
                     getValueOr(smData, "wther", "M"),
@@ -1462,7 +1462,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
 //            smStr = replaceSMStr(smStr, harOpt, 40);
             sb.append(sm).append(" ").append(smStr).append("\r\n");
         } else if (!(smData = getObjectOr(trData, "management", new HashMap())).isEmpty()) {
-            sb.append(String.format("%1$2s %2$-11s     %3$-1s     %4$-1s     %5$-1s     %6$-1s     %7$-1s\r\n",
+            sb.append(String.format("%1$-3s%2$-11s     %3$-1s     %4$-1s     %5$-1s     %6$-1s     %7$-1s\r\n",
                     sm,
                     "MA",
                     getValueOr(smData, "plant", "R"),
@@ -1478,7 +1478,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         if (!(smStr = getValueOr(trData, "sm_outputs", "")).isEmpty()) {
             sb.append(sm).append(" ").append(smStr).append("\r\n\r\n");
         } else if (!(smData = getObjectOr(trData, "outputs", new HashMap())).isEmpty()) {
-            sb.append(String.format("%1$2s %2$-11s     %3$-1s     %4$-1s     %5$-1s %6$5s     %7$-1s     %8$-1s     %9$-1s     %10$-1s     %11$-1s     %12$-1s     %13$-1s     %14$-1s     %15$-1s\r\n\r\n",
+            sb.append(String.format("%1$-3s%2$-11s     %3$-1s     %4$-1s     %5$-1s %6$5s     %7$-1s     %8$-1s     %9$-1s     %10$-1s     %11$-1s     %12$-1s     %13$-1s     %14$-1s     %15$-1s\r\n\r\n",
                     sm,
                     "OU",
                     getValueOr(smData, "fname", "N"),
@@ -1506,7 +1506,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         if (!(smStr = getValueOr(trData, "sm_planting", "")).isEmpty()) {
             sb.append(sm).append(" ").append(smStr).append("\r\n");
         } else if (!(smData = getObjectOr(trData, "planting", new HashMap())).isEmpty()) {
-            sb.append(String.format("%1$2s %2$-11s %3$02d%4$03d %5$02d%6$03d %7$5s %8$5s %9$5s %10$5s %11$5s\r\n",
+            sb.append(String.format("%1$-3s%2$-11s %3$02d%4$03d %5$02d%6$03d %7$5s %8$5s %9$5s %10$5s %11$5s\r\n",
                     sm,
                     "PL",
                     Integer.parseInt(formatNumStr(2, smData, "pfyer", "82")),
@@ -1526,7 +1526,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         if (!(smStr = getValueOr(trData, "sm_irrigation", "")).isEmpty()) {
             sb.append(sm).append(" ").append(smStr).append("\r\n");
         } else if (!(smData = getObjectOr(trData, "irrigation", new HashMap())).isEmpty()) {
-            sb.append(String.format("%1$2s %2$-11s %3$5s %4$5s %5$5s %6$-5s %7$-5s %8$5s %9$5s\r\n",
+            sb.append(String.format("%1$-3s%2$-11s %3$5s %4$5s %5$5s %6$-5s %7$-5s %8$5s %9$5s\r\n",
                     sm,
                     "IR",
                     getValueOr(smData, "imdep", "30"),
@@ -1537,7 +1537,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
                     getValueOr(smData, "iramt", "10"),
                     getValueOr(smData, "ireff", "1.00")));
         } else if (!"R".equals(irrigMgn)) {
-            sb.append(String.format("%1$2s %2$-11s %3$5s %4$5s %5$5s %6$-5s %7$-5s %8$5s %9$5s\r\n",
+            sb.append(String.format("%1$-3s%2$-11s %3$5s %4$5s %5$5s %6$-5s %7$-5s %8$5s %9$5s\r\n",
                     sm,
                     "IR",
                     getValueOr(autoIrrEvt, "irmdp", ""),
@@ -1555,7 +1555,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         if (!(smStr = getValueOr(trData, "sm_nitrogen", "")).isEmpty()) {
             sb.append(sm).append(" ").append(smStr).append("\r\n");
         } else if (!(smData = getObjectOr(trData, "nitrogen", new HashMap())).isEmpty()) {
-            sb.append(String.format("%1$2s %2$-11s %3$5s %4$5s %5$5s %6$-5s %7$-5s\r\n",
+            sb.append(String.format("%1$-3s%2$-11s %3$5s %4$5s %5$5s %6$-5s %7$-5s\r\n",
                     sm,
                     "NI",
                     getValueOr(smData, "nmdep", "30"),
@@ -1571,7 +1571,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         if (!(smStr = getValueOr(trData, "sm_residues", "")).isEmpty()) {
             sb.append(sm).append(" ").append(smStr).append("\r\n");
         } else if (!(smData = getObjectOr(trData, "residues", new HashMap())).isEmpty()) {
-            sb.append(String.format("%1$2s %2$-11s %3$5s %4$5s %5$5s\r\n",
+            sb.append(String.format("%1$-3s%2$-11s %3$5s %4$5s %5$5s\r\n",
                     sm,
                     "RE",
                     getValueOr(smData, "ripcn", "100"),
@@ -1585,7 +1585,7 @@ public class DssatXFileOutput extends DssatCommonOutput {
         if (!(smStr = getValueOr(trData, "sm_harvests", "")).isEmpty()) {
             sb.append(sm).append(" ").append(smStr).append("\r\n\r\n");
         } else if (!(smData = getObjectOr(trData, "harvests", new HashMap())).isEmpty()) {
-            sb.append(String.format("%1$2s %2$-11s %3$5s %4$02d%5$03d %6$5s %7$5s\r\n\r\n",
+            sb.append(String.format("%1$-3s%2$-11s %3$5s %4$02d%5$03d %6$5s %7$5s\r\n\r\n",
                     sm,
                     "HA",
                     getValueOr(smData, "hfrst", "0"),
