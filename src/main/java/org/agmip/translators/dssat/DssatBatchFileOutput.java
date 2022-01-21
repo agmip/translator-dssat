@@ -31,16 +31,22 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
 //                return "45";
 //            }
 //        },
-        DSSAT46 {
-            @Override
-            public String toString() {
-                return "46";
-            }
-        },
+//        DSSAT46 {
+//            @Override
+//            public String toString() {
+//                return "46";
+//            }
+//        },
         DSSAT47 {
             @Override
             public String toString() {
                 return "47";
+            }
+        },
+        DSSAT48 {
+            @Override
+            public String toString() {
+                return "48";
             }
         }
     }
@@ -81,7 +87,7 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
             if (dssatVerStr == null) {
                 dssatVerStr = getObjectOr(fstResult, "crop_model_version", "").replaceAll("\\D", "");
                 if (!dssatVerStr.matches("\\d+")) {
-                    dssatVerStr = DssatVersion.DSSAT47.toString();
+                    dssatVerStr = DssatVersion.DSSAT48.toString();
                 }
             }
             // Initial BufferedWriter
@@ -164,7 +170,7 @@ public class DssatBatchFileOutput extends DssatCommonOutput implements DssatBtac
             if (dssatVerStr == null) {
                 dssatVerStr = getObjectOr(result, "crop_model_version", "").replaceAll("\\D", "");
                 if (!dssatVerStr.matches("\\d+")) {
-                    dssatVerStr = DssatVersion.DSSAT47.toString();
+                    dssatVerStr = DssatVersion.DSSAT48.toString();
                 }
             }
 
