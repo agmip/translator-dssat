@@ -227,7 +227,7 @@ public abstract class DssatCommonInput implements TranslatorInput {
             } else {
                 startDate = String.format("%05d", Integer.parseInt(startDate));
                 year = Integer.parseInt(startDate.substring(0, 2));
-                year += year <= 15 ? 2000 : 1900; // P.S. 2015 is the cross year for the current version 
+                year += year <= 30 ? 2000 : 1900; // P.S. 2030 is the cross year for the current version 
             }
             days = Double.valueOf(strDays).intValue();
             // Set date with input value
